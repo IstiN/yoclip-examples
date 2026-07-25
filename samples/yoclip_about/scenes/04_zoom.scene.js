@@ -34,26 +34,29 @@ scene = {
     // at scale s we translate by (center - focus); the compiler applies
     // translate before scale, so the focus stays pinned to the viewport center
     // at any zoom. Interpolate fx/fy/s together for a smooth flight.
+    // Coordinates are for a 1200x576 virtual page (was 1500x720).
+    // Keeping the zoom scale moderate (max 2.4x) reduces the offscreen
+    // bitmap size and avoids browser rasterization stalls on this scene.
     var f1 = seg(frame, 40, 130);   // full -> feature card (bottom-left)
     var f2 = seg(frame, 130, 220);  // pan to profile avatar (top-right)
     var f3 = seg(frame, 220, 290);  // snap back to full page
 
     var s, fx, fy;
     if (frame < 130) {
-      s  = lerp(1.0, 2.7, eio3(f1));
-      fx = px(lerp(750, 270, eio3(f1)));
-      fy = px(lerp(360, 556, eio3(f1)));
+      s  = lerp(1.0, 2.2, eio3(f1));
+      fx = px(lerp(600, 216, eio3(f1)));
+      fy = px(lerp(288, 445, eio3(f1)));
     } else if (frame < 220) {
-      s  = lerp(2.7, 3.0, eio3(f2));
-      fx = px(lerp(270, 1340, eio3(f2)));
-      fy = px(lerp(556, 120, eio3(f2)));
+      s  = lerp(2.2, 2.4, eio3(f2));
+      fx = px(lerp(216, 1072, eio3(f2)));
+      fy = px(lerp(445, 96, eio3(f2)));
     } else {
-      s  = lerp(3.0, 1.0, eio3(f3));
-      fx = px(lerp(1340, 750, eio3(f3)));
-      fy = px(lerp(120, 360, eio3(f3)));
+      s  = lerp(2.4, 1.0, eio3(f3));
+      fx = px(lerp(1072, 600, eio3(f3)));
+      fy = px(lerp(96, 288, eio3(f3)));
     }
-    var tx = px(750) - fx;
-    var ty = px(360) - fy;
+    var tx = px(600) - fx;
+    var ty = px(288) - fy;
 
     // --- small themed helpers --------------------------------------------
     function dot(color) {
@@ -67,38 +70,37 @@ scene = {
       var primary = C.primary || yoclipColor('primary', '#7c3aed');
       return {
         type: 'container',
-        width: px(470),
-        height: px(230),
-        borderRadius: px(22),
+        width: px(376),
+        height: px(184),
+        borderRadius: px(18),
         color: C.surface || yoclipColor('surfaceDark', '#15131f'),
         borderColor: yoclipColor('panel', '#2a2a36'),
-        borderWidth: 1.5,
-        clip: true,
+        borderWidth: 1,
         child: {
           type: 'column',
           crossAxisAlignment: 'start',
           children: [
-            { type: 'container', height: px(26) },
+            { type: 'container', height: px(20) },
             {
               type: 'container',
-              width: px(64), height: px(64), borderRadius: px(32),
+              width: px(52), height: px(52), borderRadius: px(26),
               gradient: { colors: [tint, primary], begin: 'topLeft', end: 'bottomRight' },
-              shadow: { color: tint, blur: 26, offsetY: 8 },
+              shadow: { color: tint, blur: 12, offsetY: 4 },
               alignment: 'center',
-              offsetX: px(34),
-              child: icon(d, yoclipColor('white', '#ffffff'), px(34)),
+              offsetX: px(28),
+              child: icon(d, yoclipColor('white', '#ffffff'), px(28)),
             },
-            { type: 'container', height: px(18) },
+            { type: 'container', height: px(14) },
             {
               type: 'text', text: title,
-              style: { fontSize: px(yoclipSize('caption', 28)), color: C.text, fontFamily: yoclipFont(), fontWeight: 700 },
-              offsetX: px(34),
+              style: { fontSize: px(yoclipSize('caption', 24)), color: C.text, fontFamily: yoclipFont(), fontWeight: 700 },
+              offsetX: px(28),
             },
-            { type: 'container', height: px(8) },
+            { type: 'container', height: px(6) },
             {
               type: 'text', text: desc,
-              style: { fontSize: px(yoclipSize('micro', 20)), color: C.textMuted, fontFamily: yoclipFont(), lineHeight: 1.32 },
-              offsetX: px(34),
+              style: { fontSize: px(yoclipSize('micro', 17)), color: C.textMuted, fontFamily: yoclipFont(), lineHeight: 1.32 },
+              offsetX: px(28),
             },
           ],
         },
@@ -108,36 +110,36 @@ scene = {
     // --- the fake web page (1500 x 720) ----------------------------------
     var siteTopbar = {
       type: 'container',
-      height: px(64),
+      height: px(52),
       color: C.surface,
       child: {
         type: 'row',
         crossAxisAlignment: 'center',
         children: [
-          { type: 'container', width: px(40) },
+          { type: 'container', width: px(32) },
           {
             type: 'image',
             source: yoclipLogoSource(),
             fit: 'contain',
-            width: px(200),
-            height: px(48),
+            width: px(160),
+            height: px(38),
             alignment: 'centerLeft',
           },
-          { type: 'container', width: px(70) },
-          { type: 'text', text: T.navProduct || 'Product', style: { fontSize: px(yoclipSize('labelSm', 24)), color: C.textMuted, fontFamily: yoclipFont() } },
-          { type: 'container', width: px(44) },
-          { type: 'text', text: T.navPricing || 'Pricing', style: { fontSize: px(yoclipSize('labelSm', 24)), color: C.textMuted, fontFamily: yoclipFont() } },
-          { type: 'container', width: px(44) },
-          { type: 'text', text: T.navDocs || 'Docs', style: { fontSize: px(yoclipSize('labelSm', 24)), color: C.textMuted, fontFamily: yoclipFont() } },
-          { type: 'container', width: px(360) },
+          { type: 'container', width: px(56) },
+          { type: 'text', text: T.navProduct || 'Product', style: { fontSize: px(yoclipSize('labelSm', 20)), color: C.textMuted, fontFamily: yoclipFont() } },
+          { type: 'container', width: px(36) },
+          { type: 'text', text: T.navPricing || 'Pricing', style: { fontSize: px(yoclipSize('labelSm', 20)), color: C.textMuted, fontFamily: yoclipFont() } },
+          { type: 'container', width: px(36) },
+          { type: 'text', text: T.navDocs || 'Docs', style: { fontSize: px(yoclipSize('labelSm', 20)), color: C.textMuted, fontFamily: yoclipFont() } },
+          { type: 'container', width: px(280) },
           {
-            type: 'container', width: px(300), height: px(44), borderRadius: px(22),
-            color: C.surface, borderColor: yoclipColor('panel', '#2a2a36'), borderWidth: 1.5,
-            child: { type: 'text', text: T.search || 'Search docs…', alignment: 'centerLeft', offsetX: px(22),
-              style: { fontSize: px(yoclipSize('tiny', 22)), color: C.textMuted, fontFamily: yoclipFont() } },
+            type: 'container', width: px(240), height: px(36), borderRadius: px(18),
+            color: C.surface, borderColor: yoclipColor('panel', '#2a2a36'), borderWidth: 1,
+            child: { type: 'text', text: T.search || 'Search docs…', alignment: 'centerLeft', offsetX: px(18),
+              style: { fontSize: px(yoclipSize('tiny', 18)), color: C.textMuted, fontFamily: yoclipFont() } },
           },
-          { type: 'container', width: px(24) },
-          { type: 'container', width: px(46), height: px(46), borderRadius: px(23), color: C.accent },
+          { type: 'container', width: px(18) },
+          { type: 'container', width: px(38), height: px(38), borderRadius: px(19), color: C.accent },
         ],
       },
     };
@@ -145,34 +147,34 @@ scene = {
     var heroText = {
       type: 'column',
       crossAxisAlignment: 'start',
-      width: px(780),
+      width: px(624),
       children: [
-        { type: 'container', height: px(40) },
-        { type: 'text', text: 'YOCLIP STUDIO', offsetX: px(70),
-          style: { fontSize: px(yoclipSize('tiny', 22)), color: C.primaryLight, fontFamily: yoclipFont(), fontWeight: 600, letterSpacing: px(6) } },
-        { type: 'container', height: px(14) },
-        { type: 'text', text: T.heroTitle || 'Edit video in code', offsetX: px(70),
-          style: { fontSize: px(yoclipSize('bodyXl', 44)), color: C.text, fontFamily: yoclipFont(), fontWeight: 700 } },
-        { type: 'container', height: px(16) },
-        { type: 'text', text: T.heroSub || 'Scenes, timelines and exports.', offsetX: px(70),
-          style: { fontSize: px(yoclipSize('small', 23)), color: C.textMuted, fontFamily: yoclipFont(), lineHeight: 1.35 } },
-        { type: 'container', height: px(26) },
+        { type: 'container', height: px(32) },
+        { type: 'text', text: 'YOCLIP STUDIO', offsetX: px(56),
+          style: { fontSize: px(yoclipSize('tiny', 18)), color: C.primaryLight, fontFamily: yoclipFont(), fontWeight: 600, letterSpacing: px(5) } },
+        { type: 'container', height: px(12) },
+        { type: 'text', text: T.heroTitle || 'Edit video in code', offsetX: px(56),
+          style: { fontSize: px(yoclipSize('bodyXl', 36)), color: C.text, fontFamily: yoclipFont(), fontWeight: 700 } },
+        { type: 'container', height: px(12) },
+        { type: 'text', text: T.heroSub || 'Scenes, timelines and exports.', offsetX: px(56),
+          style: { fontSize: px(yoclipSize('small', 19)), color: C.textMuted, fontFamily: yoclipFont(), lineHeight: 1.35 } },
+        { type: 'container', height: px(20) },
         {
-          type: 'row', offsetX: px(70), crossAxisAlignment: 'center',
+          type: 'row', offsetX: px(56), crossAxisAlignment: 'center',
           children: [
             {
-              type: 'container', width: px(250), height: px(64), borderRadius: px(32),
+              type: 'container', width: px(200), height: px(52), borderRadius: px(26),
               gradient: { colors: [C.primaryLight || yoclipColor('lavender', '#a78bfa'), C.primary || yoclipColor('primary', '#7c3aed')], begin: 'centerLeft', end: 'centerRight' },
-              shadow: { color: yoclipColorA('primary', 0x80), blur: 26, offsetY: 12 },
+              shadow: { color: yoclipColorA('primary', 0x80), blur: 12, offsetY: 6 },
               child: { type: 'text', text: T.ctaStart || 'Get started', alignment: 'center',
-                style: { fontSize: px(yoclipSize('small', 23)), color: yoclipColor('white', '#ffffff'), fontFamily: yoclipFont(), fontWeight: 700 } },
+                style: { fontSize: px(yoclipSize('small', 19)), color: yoclipColor('white', '#ffffff'), fontFamily: yoclipFont(), fontWeight: 700 } },
             },
-            { type: 'container', width: px(26) },
+            { type: 'container', width: px(20) },
             {
-              type: 'container', width: px(250), height: px(64), borderRadius: px(32),
-              borderColor: yoclipColor('panelAlt', '#3a3a48'), borderWidth: 1.5,
+              type: 'container', width: px(200), height: px(52), borderRadius: px(26),
+              borderColor: yoclipColor('panelAlt', '#3a3a48'), borderWidth: 1,
               child: { type: 'text', text: T.ctaDemo || 'Watch demo', alignment: 'center',
-                style: { fontSize: px(yoclipSize('small', 23)), color: C.text, fontFamily: yoclipFont(), fontWeight: 600 } },
+                style: { fontSize: px(yoclipSize('small', 19)), color: C.text, fontFamily: yoclipFont(), fontWeight: 600 } },
             },
           ],
         },
@@ -181,41 +183,41 @@ scene = {
 
     var heroCard = {
       type: 'container',
-      width: px(460), height: px(250), borderRadius: px(26), offsetY: px(22),
-      color: C.surface, borderColor: yoclipColor('panel', '#2a2a36'), borderWidth: 1.5,
-      shadow: { color: yoclipColorA('cyan', 0x80), blur: 40, offsetY: 20 },
+      width: px(368), height: px(200), borderRadius: px(20), offsetY: px(18),
+      color: C.surface, borderColor: yoclipColor('panel', '#2a2a36'), borderWidth: 1,
+      shadow: { color: yoclipColorA('cyan', 0x80), blur: 20, offsetY: 10 },
       child: {
         type: 'stack', fit: 'expand',
         children: [
-          { type: 'container', width: px(120), height: px(120), borderRadius: px(60),
+          { type: 'container', width: px(96), height: px(96), borderRadius: px(48),
             gradient: { colors: [C.primaryLight || yoclipColor('lavender', '#a78bfa'), C.primary || yoclipColor('primary', '#7c3aed')], begin: 'topLeft', end: 'bottomRight' },
             alignment: 'center', opacity: 0.9 },
-          { type: 'text', text: T.livePreview || 'Live preview', alignment: 'bottomCenter', offsetY: px(-26),
-            style: { fontSize: px(yoclipSize('label', 26)), color: C.textMuted, fontFamily: yoclipFont(), fontWeight: 600 } },
+          { type: 'text', text: T.livePreview || 'Live preview', alignment: 'bottomCenter', offsetY: px(-20),
+            style: { fontSize: px(yoclipSize('label', 21)), color: C.textMuted, fontFamily: yoclipFont(), fontWeight: 600 } },
         ],
       },
     };
 
     var hero = {
-      type: 'container', height: px(366), borderRadius: 1, clip: true,
+      type: 'container', height: px(292),
       child: {
         type: 'row', crossAxisAlignment: 'center',
-        children: [ heroText, { type: 'container', width: px(130) }, heroCard ],
+        children: [ heroText, { type: 'container', width: px(104) }, heroCard ],
       },
     };
 
     var features = {
-      type: 'container', height: px(286), borderRadius: 1, clip: true,
+      type: 'container', height: px(228),
       child: {
         type: 'row', crossAxisAlignment: 'start',
         children: [
-          { type: 'container', width: px(15) },
+          { type: 'container', width: px(12) },
           featureCard(T.featScenes || 'Scenes', T.featScenesDesc || 'Compose clips from reusable JS scenes.',
             'M 24 8 L 42 18 L 24 28 L 6 18 Z M 6 24 L 24 34 L 42 24 M 6 30 L 24 40 L 42 30', C.primaryLight),
-          { type: 'container', width: px(15) },
+          { type: 'container', width: px(12) },
           featureCard(T.featTimeline || 'Timeline', T.featTimelineDesc || 'Seek, scrub and anchor beats to each other.',
             'M 6 30 L 42 30 M 10 22 L 10 30 M 18 20 L 18 30 M 26 22 L 26 30 M 34 20 L 34 30', C.accent),
-          { type: 'container', width: px(15) },
+          { type: 'container', width: px(12) },
           featureCard(T.featExport || 'Export', T.featExportDesc || 'Render MP4, GIF or PNG from one timeline.',
             'M 24 8 L 24 34 M 14 19 L 24 8 L 34 19 M 10 38 L 10 44 L 38 44 L 38 38', C.primaryLight),
         ],
@@ -230,7 +232,7 @@ scene = {
     // The moving layer: translated + scaled for the Ken Burns flight.
     var zoomLayer = {
       type: 'container',
-      width: px(1500), height: px(720),
+      width: px(1200), height: px(576),
       color: C.background,
       offsetX: tx, offsetY: ty, scale: s,
       child: pageContent,
@@ -240,9 +242,9 @@ scene = {
     // zoom layer moves inside it and is clipped to its bounds.
     var frame = {
       type: 'container',
-      width: px(1500), height: px(720), borderRadius: px(26),
-      color: yoclipColor('codeBg', '#0c0c12'), borderColor: yoclipColor('panel', '#2a2a36'), borderWidth: portrait ? 1 : 1.5,
-      shadow: { color: yoclipColorA('ink', 0x80), blur: 60, offsetY: 30 },
+      width: px(1200), height: px(576), borderRadius: px(20),
+      color: yoclipColor('codeBg', '#0c0c12'), borderColor: yoclipColor('panel', '#2a2a36'), borderWidth: 1,
+      shadow: { color: yoclipColorA('ink', 0x80), blur: 30, offsetY: 16 },
       clip: true,
       alignment: 'center',
       offsetY: portrait ? 160 : 150,
@@ -254,7 +256,7 @@ scene = {
       children: [
         { type: 'text', text: 'Zoom into any detail',
           style: { fontSize: yoclipSize('lg', 56), color: C.text, fontFamily: yoclipFont(), fontWeight: 700 },
-          alignment: 'topCenter', offsetY: portrait ? 260 : 60, opacity: titleIn },
+          alignment: 'topCenter', offsetY: portrait ? 260 : 80, opacity: titleIn },
         frame,
       ],
     };
