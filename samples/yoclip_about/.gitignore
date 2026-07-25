@@ -11,3 +11,4 @@ pubspec.lock
 *.mp4
 *.mov
 *.png
+!assets/**/*.png
