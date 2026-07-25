@@ -1,0 +1,13 @@
+# Flutter/Dart
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# Yoclip cache and outputs
+.yoclip_cache/
+*.mp4
+*.mov
+*.png

@@ -1,0 +1,40 @@
+name: intro
+description: Intro sample for Yoclip.
+publish_to: none
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+  flutter: ^3.44.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  path: ^1.9.0
+  path_provider: ^2.1.0
+  yoclip_core:
+    path: ../../packages/yoclip_core
+  yoclip_encoder:
+    path: ../../packages/yoclip_encoder
+  yoclip_player:
+    path: ../../packages/yoclip_player
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/audio/click_loop_drive.mp3
+    - yoclip.yaml
+  fonts:
+    - family: Geneva
+      fonts:
+        - asset: assets/fonts/Geneva.ttf

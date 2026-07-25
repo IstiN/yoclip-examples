@@ -1,0 +1,14 @@
+config:
+  composition: IntroVideo
+  duration: 90
+  fps: 30
+  width: 1920
+  height: 1080
+
+external_assets:
+  laptop_open:
+    type: video
+    path: /Users/Uladzimir_Klyshevich/Downloads/laptop_open.mp4
+  logo:
+    type: image
+    path: /Users/Uladzimir_Klyshevich/Downloads/1780588269066.png

@@ -1,0 +1,31 @@
+name: yoclip_about
+description: A Yoclip video project.
+publish_to: none
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+  flutter: ^3.44.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_svg: ^2.0.10
+  integration_test:
+    sdk: flutter
+  path: ^1.9.0
+  yoclip_core:
+    path: /Users/Uladzimir_Klyshevich/git/yoclip/packages/yoclip_core
+  yoclip_encoder:
+    path: /Users/Uladzimir_Klyshevich/git/yoclip/packages/yoclip_encoder
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - yoclip.yaml

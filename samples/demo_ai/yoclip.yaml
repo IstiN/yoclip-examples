@@ -1,0 +1,18 @@
+config:
+  duration: 1200
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#0a0a12'
+
+theme:
+  colors:
+    background: '#0a0a12'
+    text: '#ffffff'
+    primary: '#7c3aed'
+
+scenes:
+  - scenes/01_intro.scene.js
+  - scenes/02_code.scene.js
+  - scenes/03_animate.scene.js
+  - scenes/04_vision.scene.js

@@ -1,0 +1,183 @@
+config:
+  duration: 4170
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#0a0a12'
+
+theme:
+  colors:
+    background: '#0a0a12'
+    backgroundSoft: '#0d0d18'
+    backgroundDeep: '#07070d'
+    surface: '#15131f'
+    text: '#ffffff'
+    textMuted: '#a1a1aa'
+    primary: '#7c3aed'
+    primaryLight: '#a78bfa'
+    accent: '#22d3ee'
+  headline:
+    fontSize: 96
+    fontFamily: Geneva
+    fontWeight: 700
+  subline:
+    fontSize: 40
+    fontFamily: Geneva
+  label:
+    fontSize: 26
+    fontFamily: Geneva
+    fontWeight: 600
+    letterSpacing: 8
+
+project_js: project.js
+
+scenes:
+  - scenes/00_intro.scene.js
+  - scenes/01_hook.scene.js
+  - scenes/02_scenes.scene.js
+  - scenes/03_code.scene.js
+  - scenes/04_zoom.scene.js
+  - scenes/05_motion.scene.js
+  - scenes/06_stats.scene.js
+  - scenes/07_chat.scene.js
+  - scenes/08_studio.scene.js
+  - scenes/09_montage.scene.js
+  - scenes/12_fx.scene.js
+  - scenes/10_export.scene.js
+  - scenes/11_cta.scene.js
+
+external_assets:
+  logo:
+    type: image
+    path: assets/images/yoclip_logo.svg
+  logo_on_light:
+    type: image
+    path: assets/images/yoclip_logo_on_light.svg
+  studio:
+    type: image
+    path: assets/images/studio.png
+
+audio:
+  tracks:
+    - source: assets://audio/click_loop_drive.mp3
+      start: 0
+      volume: 0.8
+
+# Video variants — one project, many renders. Pick one in the Studio
+# Variants panel (or `yoclip render -V <id>`). Params reach scenes as
+# `yoclipVariant` (lang drives the yoclipTexts dictionaries in project.js,
+# logo swaps the wordmark for light backgrounds); theme overrides deep-merge
+# over the base theme above.
+variants:
+  - id: dark_en
+    label: 'Dark · EN'
+    params:
+      lang: 'en'
+    theme:
+      colors:
+        background: '#0a0a12'
+        backgroundSoft: '#0d0d18'
+        backgroundDeep: '#07070d'
+        surface: '#15131f'
+        text: '#ffffff'
+        textMuted: '#a1a1aa'
+        primary: '#7c3aed'
+        primaryLight: '#a78bfa'
+        accent: '#22d3ee'
+      headline:
+        color: '#ffffff'
+      subline:
+        color: '#a1a1aa'
+      label:
+        color: '#a78bfa'
+  - id: dark_ru
+    label: 'Dark · RU'
+    params:
+      lang: 'ru'
+    theme:
+      colors:
+        background: '#0a0a12'
+        backgroundSoft: '#0d0d18'
+        backgroundDeep: '#07070d'
+        surface: '#15131f'
+        text: '#ffffff'
+        textMuted: '#a1a1aa'
+        primary: '#7c3aed'
+        primaryLight: '#a78bfa'
+        accent: '#22d3ee'
+      headline:
+        color: '#ffffff'
+      subline:
+        color: '#a1a1aa'
+      label:
+        color: '#a78bfa'
+  - id: light_en
+    label: 'Light · EN'
+    params:
+      lang: 'en'
+      logo: 'external:logo_on_light'
+    theme:
+      colors:
+        background: '#f4f3fa'
+        backgroundSoft: '#ffffff'
+        backgroundDeep: '#e6e4f2'
+        surface: '#ffffff'
+        text: '#14121f'
+        textMuted: '#5c5870'
+        primary: '#7c3aed'
+        primaryLight: '#6d28d9'
+        accent: '#0891b2'
+      headline:
+        color: '#14121f'
+      subline:
+        color: '#5c5870'
+      label:
+        color: '#6d28d9'
+  - id: light_ru
+    label: 'Light · RU'
+    params:
+      lang: 'ru'
+      logo: 'external:logo_on_light'
+    theme:
+      colors:
+        background: '#f4f3fa'
+        backgroundSoft: '#ffffff'
+        backgroundDeep: '#e6e4f2'
+        surface: '#ffffff'
+        text: '#14121f'
+        textMuted: '#5c5870'
+        primary: '#7c3aed'
+        primaryLight: '#6d28d9'
+        accent: '#0891b2'
+      headline:
+        color: '#14121f'
+      subline:
+        color: '#5c5870'
+      label:
+        color: '#6d28d9'
+  - id: shorts_en
+    label: 'Shorts · EN'
+    # Explicit resolution retargets the whole render to vertical — scenes
+    # re-render natively at 1080x1920 (yoclipFormat.orientation = 'portrait')
+    # instead of being letterboxed from the landscape master.
+    width: 1080
+    height: 1920
+    params:
+      lang: 'en'
+    theme:
+      colors:
+        background: '#0a0a12'
+        backgroundSoft: '#0d0d18'
+        backgroundDeep: '#07070d'
+        surface: '#15131f'
+        text: '#ffffff'
+        textMuted: '#a1a1aa'
+        primary: '#7c3aed'
+        primaryLight: '#a78bfa'
+        accent: '#22d3ee'
+      headline:
+        color: '#ffffff'
+      subline:
+        color: '#a1a1aa'
+      label:
+        color: '#a78bfa'

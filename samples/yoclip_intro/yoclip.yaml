@@ -1,0 +1,26 @@
+config:
+  duration: 90
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#000000'
+
+scenes:
+  - scenes/intro.scene.js
+
+external_assets:
+  laptop_open:
+    type: video
+    path: /Users/Uladzimir_Klyshevich/Downloads/laptop_open.mp4
+  logo:
+    type: image
+    path: /Users/Uladzimir_Klyshevich/Downloads/1780588269066.png
+
+audio:
+  tracks:
+    - source: assets://audio/click_loop_drive.mp3
+      start: 0
+      volume: 0.8
+      envelope:
+        - { frame: 25, volume: 0.35, ramp: 0 }
+        - { frame: 55, volume: 0.0, ramp: 30 }

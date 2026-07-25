@@ -1,0 +1,152 @@
+# DMTOOLS — an EPAM open-source promo film.
+#
+# Built with yoclip in the EPAM 2023 brand system, in BOTH brandbook modes:
+# Night (dark) canvas and Snow (light) canvas via render variants
+# (`yoclip render -V dark|light`). Museo Sans, left-aligned airy type, one
+# gradient keyword per headline, blur-glow accents, staggered cards and
+# count-up stats. Brand refs: ../EPAM_Brandbook_2023_Final.pdf,
+# ../EPAM_PPT_Dark_Mode_Main_2023.pptx, ../EPAM_PPT_Light_Mode_Main_2023.pptx.
+
+config:
+  duration: auto        # computed from the scene timeline
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#060606'
+
+theme:
+  colors:
+    # EPAM dark-mode palette (brandbook p35-38, dark PPTX theme).
+    night: '#060606'      # canvas
+    surface: '#161616'
+    hairline: '#2a2a2a'
+    snow: '#FBFAFA'       # primary text
+    muted: '#A0A0A0'
+    sea: '#00F6FF'
+    mint: '#00FFF0'
+    lilac: '#B896FF'
+    sky: '#7BA8FF'
+
+project_js: project.js
+
+# Museo Sans — EPAM's brand typeface (weights 100–900 + Cyrillic cuts).
+fonts:
+  - family: Museo Sans 100
+    path: assets/fonts/exljbris - MuseoSans-100.otf
+  - family: Museo Sans 100 Italic
+    path: assets/fonts/exljbris - MuseoSans-100Italic.otf
+  - family: Museo Sans 300
+    path: assets/fonts/exljbris - MuseoSans-300.otf
+  - family: Museo Sans 500
+    path: assets/fonts/exljbris - MuseoSans-500.otf
+  - family: Museo Sans 700
+    path: assets/fonts/exljbris - MuseoSans-700.otf
+  - family: Museo Sans 900
+    path: assets/fonts/exljbris - MuseoSans-900.otf
+
+# Score: "System Pulse" (88s) at 0.3, ducked under the voice-over, with a
+# fade-out via the track envelope (frame 1776 ≈ 59.2s, ramping to silence
+# by the final frame). Envelope volume ramps are honored in export.
+audio:
+  tracks:
+    - source: assets/audio/system_pulse.mp3
+      start: 0
+      volume: 0.3
+      envelope:
+        - frame: 2530
+          volume: 0.0
+          ramp: 110
+
+scenes:
+  - scenes/00_cover.scene.js
+  - scenes/01_problem.scene.js
+  - scenes/02_layer.scene.js
+  - scenes/03_numbers.scene.js
+  - scenes/04_architecture.scene.js
+  - scenes/05_code.scene.js
+  - scenes/06_paths.scene.js
+  - scenes/07_cta.scene.js
+  - scenes/10_epilogue.scene.js
+
+external_assets:
+  epam_logo:
+    type: image
+    path: assets/images/epam_logo_white.png
+  epam_logo_dark:
+    type: image
+    path: assets/images/epam_logo_dark.png
+  # AI-harness marks (scene 02 ring). Two tones where the mark must adapt
+  # to the canvas; the light variant picks the _dark cuts via params.icons.
+  ic_claude:
+    type: image
+    path: assets/images/ic_claude.svg
+  ic_copilot:
+    type: image
+    path: assets/images/ic_copilot.svg
+  ic_copilot_dark:
+    type: image
+    path: assets/images/ic_copilot_dark.svg
+  ic_openai:
+    type: image
+    path: assets/images/ic_openai.svg
+  ic_openai_dark:
+    type: image
+    path: assets/images/ic_openai_dark.svg
+  ic_antigravity:
+    type: image
+    path: assets/images/ic_antigravity.svg
+  ic_antigravity_dark:
+    type: image
+    path: assets/images/ic_antigravity_dark.svg
+  ic_codemie:
+    type: image
+    path: assets/images/ic_codemie.svg
+  ic_codemie_dark:
+    type: image
+    path: assets/images/ic_codemie_dark.svg
+  ic_opencode:
+    type: image
+    path: assets/images/ic_opencode.svg
+  ic_opencode_dark:
+    type: image
+    path: assets/images/ic_opencode_dark.svg
+  ic_kiro:
+    type: image
+    path: assets/images/ic_kiro.svg
+  ic_kiro_dark:
+    type: image
+    path: assets/images/ic_kiro_dark.svg
+  # CTA: GitHub mark (two tones) and the repo QR card.
+  ic_github:
+    type: image
+    path: assets/images/ic_github.svg
+  ic_github_dark:
+    type: image
+    path: assets/images/ic_github_dark.svg
+  qr_dmtools:
+    type: image
+    path: assets/images/qr_dmtools.png
+
+# Render variants — one film, both brandbook modes. Pick with
+# `yoclip render -V dark|light` (or the Studio Variants panel). The light
+# variant deepens the accent colors so the gradient and glows keep contrast
+# on the Snow canvas, and swaps the `<epam>` wordmark to its dark cut.
+variants:
+  - id: dark
+    label: 'Dark · EPAM Night'
+  - id: light
+    label: 'Light · EPAM Snow'
+    params:
+      logo: 'external:epam_logo_dark'
+      icons: 'dark'
+    theme:
+      colors:
+        night: '#FBFAFA'      # canvas
+        surface: '#FFFFFF'
+        hairline: '#E4E4E0'
+        snow: '#060606'       # primary text
+        muted: '#5C5C5C'
+        sea: '#00ACBD'
+        mint: '#00B3A6'
+        lilac: '#7E5BD6'
+        sky: '#3D6FD1'

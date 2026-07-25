@@ -1,0 +1,85 @@
+# REDEFINE — an EPAM AI/Run promo film.
+#
+# Built with yoclip in the EPAM 2023 dark-mode brand system: Night-black
+# canvas, Museo Sans, left-aligned airy type, one gradient keyword per
+# headline, blur-glow accents, staggered cards and count-up stats.
+# Brand references: ../EPAM_Brandbook_2023_Final.pdf, ../EPAM_PPT_Dark_Mode_Main_2023.pptx.
+
+config:
+  duration: auto        # computed from the scene timeline
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#060606'
+
+theme:
+  colors:
+    # EPAM dark-mode palette (brandbook p35–38, dark PPTX theme).
+    night: '#060606'
+    surface: '#161616'
+    hairline: '#2a2a2a'
+    snow: '#FBFAFA'
+    muted: '#A0A0A0'
+    sea: '#00F6FF'
+    mint: '#00FFF0'
+    lilac: '#B896FF'
+    sky: '#7BA8FF'
+
+project_js: project.js
+
+# Museo Sans — EPAM's brand typeface (weights 100–900 + Cyrillic cuts).
+fonts:
+  - family: Museo Sans 100
+    path: assets/fonts/exljbris - MuseoSans-100.otf
+  - family: Museo Sans 100 Italic
+    path: assets/fonts/exljbris - MuseoSans-100Italic.otf
+  - family: Museo Sans 300
+    path: assets/fonts/exljbris - MuseoSans-300.otf
+  - family: Museo Sans 500
+    path: assets/fonts/exljbris - MuseoSans-500.otf
+  - family: Museo Sans 700
+    path: assets/fonts/exljbris - MuseoSans-700.otf
+  - family: Museo Sans 900
+    path: assets/fonts/exljbris - MuseoSans-900.otf
+
+# Score: PLACEHOLDER (72s silence) — replace with the final track and tune
+# `start` to the first beat. See MUSIC_PROMPT.md for the Suno brief.
+audio:
+  tracks:
+    - source: assets/audio/score_placeholder.mp3
+      start: 0
+      volume: 0.9
+
+scenes:
+  - scenes/00_cover.scene.js
+  - scenes/01_hype_gap.scene.js
+  - scenes/02_framework.scene.js
+  - scenes/03_postnl.scene.js
+  - scenes/04_baker.scene.js
+  - scenes/05_tools.scene.js
+  - scenes/06_talent.scene.js
+  - scenes/07_quote.scene.js
+  - scenes/08_cta.scene.js
+
+external_assets:
+  team_office:
+    type: image
+    path: assets/images/team_office.jpg
+  event:
+    type: image
+    path: assets/images/event.jpg
+  laptop_loft:
+    type: image
+    path: assets/images/laptop_loft.jpg
+  corridor:
+    type: image
+    path: assets/images/corridor.jpg
+  epam_logo:
+    type: image
+    path: assets/images/epam_logo_white.png
+  postnl_logo:
+    type: image
+    path: assets/images/postnl_logo_white.png
+  baker_logo:
+    type: image
+    path: assets/images/baker_hughes_logo.png

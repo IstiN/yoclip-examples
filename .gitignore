@@ -1,0 +1,28 @@
+# Build & tooling
+build/
+.dart_tool/
+.yoclip_cache/
+.idea/
+.metadata
+*.iml
+.DS_Store
+
+# Generated platform folders (examples don't need per-platform runner code)
+android/
+ios/
+macos/
+windows/
+linux/
+web/
+
+# Generated test lockfiles
+.flutter-plugins*
+pubspec.lock
+
+# Rendered outputs
+*.mp4
+*.mov
+*.pptx
+
+# Temporary Office files
+~$*
