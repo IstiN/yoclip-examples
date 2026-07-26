@@ -26,7 +26,16 @@ samples/
 branded/epam/
   yoclip/           — EPAM-branded yoclip promo
   dmtools/          — DMTools promo film (EPAM brand system)
+
+docs/               — public scene API reference
+skills/yoclip/      — agent skill + creative cookbook for AI assistants
 ```
+
+## Documentation & agent skill
+
+- `docs/scene_api/` — public reference for `yoclip.yaml`, `project.js`, scenes, widgets, animation, theme, assets and examples.
+- `skills/yoclip/SKILL.md` — complete agent skill: project structure, JS scene API, export, Studio usage and shared rules.
+- `skills/yoclip/CREATIVE.md` — creative cookbook with 15 reusable scene patterns and working code snippets.
 
 ## Notes
 
