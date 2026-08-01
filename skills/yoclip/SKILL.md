@@ -718,6 +718,63 @@ the same loop:
 
 ---
 
+## 3D scenes cookbook (proven recipes)
+
+Hard limits of the render stack (learned by debugging renders — trust these,
+do not rediscover):
+
+- flame GLB loader: no `alphaMode: BLEND` (renders opaque/milky), no
+  `doubleSided` (backfaces always culled — build an explicit back quad with
+  flipped winding instead), no `emissiveTexture` (renders black — rebake
+  emissive maps into `baseColorTexture`), no JPEG textures (rebake to PNG).
+- GLB materials must be `TextureVisuals` + `PBRMaterial` (baseColorFactor
+  pre-linearized pow 2.2 for solid colors, raw sRGB PNG for textures) —
+  `ColorVisuals` renders as a red fallback slab.
+- GLB models have NO opacity. Entrances = scale pop (`eoBack`); handoffs =
+  same-place full-scale single-frame swap (reads as a morph, e.g. column ->
+  lgrad -> white `l` in 01_monolith). A scale "crossfade" paints both
+  models = ghosting.
+- Every asset subdirectory must be listed in the sample's `pubspec.yaml`
+  (`assets/models/panels/` etc.) or the loader renders red fallback slabs.
+- Software scene3d has NO z-buffer — never let meshes intersect; keep
+  separate lanes. A software layer and a flame layer may share one camera
+  object (see 01_monolith, 02_kaleido).
+- Clamp every opacity to [0,1] (`cap01`) — the widget asserts otherwise.
+- The `path` widget clips to its own box: for screen-space graphics use
+  full-frame `width: 1920, height: 1080` and draw in screen coordinates.
+- 2D ellipse ring = container with `borderRadius: 999` on a 2rx x 2ry box +
+  `borderColor`/`borderWidth`; a blurred, wider, dimmer copy underneath
+  reads as a glow band.
+
+Recipes (all battle-tested in samples/samples/yoclip_big_idea_v2):
+
+1. **HDRI star skybox** (02_kaleido): a sphere GLB with the panorama
+   rebaked from `emissiveTexture` to `baseColorTexture` (PIL), scaled ~40,
+   `unlit: true`, slow rotation. Deletes the need for a 2D starfield.
+2. **Hologram panels** (`tools/build_panels_3d.py`): thin dark box + front
+   quad textured with a "holoized" screenshot — local contrast
+   `|lum - blur(lum)| * 6` tinted with an accent color on black (glass is
+   faked with black, never alpha) + explicit mirrored back quad =
+   see-through glass. Panels: billboard `atan2` yaw to camera, or "TV
+   ring" with yaw facing the ring center.
+3. **External GLB with unrenderable materials** (platform): bake world
+   transforms via `scene.dump()`, re-center; when textures will not
+   render, stylize with per-part `PBRMaterial` factor colors
+   (`tools/build_platform_3d.py`).
+4. **Gargantua black hole** (02_kaleido): 2D composite — black void disc,
+   photon ring (crisp + blurred path circles), accretion disk of 3–4
+   blurred ellipse band containers + a white-hot inner band, Doppler via a
+   blurred black mask blob on the far side + a white fireball on the near
+   side, lensed arcs as thin path arcs above/below the void. All paths
+   full-frame; brightness pattern swirls slowly.
+5. **Star-map constellation** (07_space): golden-angle nodes on an
+   ellipsoid (jewel colors), edges to the 1–2 nearest neighbours as thin
+   dim-amber boxes, the whole web auto-rotating; nodes twinkle by scale.
+6. **Globe with dots** (07_space): icosphere GLB (lit, roughness 0.55) +
+   tiny orb GLBs on the surface (lat/lon golden-angle spread), positions
+   recomputed per frame with the SAME rotation as the sphere — one rigid
+   group. `tools/build_panels_3d.py` builds `globe.glb` + colored orbs.
+
 ## Verifying changes
 
 - JS scene syntax: `node --check scenes/<file>.scene.js`.

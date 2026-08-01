@@ -129,8 +129,18 @@ gradient/grain) — same layering as `yoclip_about`.
 6. **M5 — Finale** (flythrough, cta) + music + envelope beat-sync.
 7. **M6 — Variants green**: all 5 variants render; tests pass; screenshots reviewed.
 
-## 5. Open questions
+## 5. Open questions (resolved)
 
-- Does headless export support `scene3d` today? (M0 answers this.)
-- Final CTA domain: `yoclip.dev` or the landing CNAME actually in use?
-- Voiceover: reference has none — keep it music-only (voicePrompts stay metadata).
+- ~~Does headless export support `scene3d` today?~~ **Yes** — the
+  preview/export paths both route through `YoclipWidgetRenderer` (JSR), so the
+  `meshes` path renders headless (spiked in M0). `YoclipWidgetRenderer` now
+  also passes `js3dHost: createJs3dHost()` by default: `flutter_cube`
+  primitives work headless too; the `flame_3d` GLB path is Studio-preview-only
+  (renders nothing in offscreen capture, GLBs must be app assets).
+- ~~GLB in the video~~ — solved by baking: the Khronos DamagedHelmet.glb was
+  decimated offline (trimesh + fast-simplification) to 1400 tris into
+  `lib/mesh_helmet.js` and flies through the finale tunnel via the software
+  meshes path — export-safe.
+- Final CTA domain: `yoclip.dev` (used in `texts.cta.url`; swap if another
+  landing domain is canonical).
+- Voiceover: reference has none — music-only (`voicePrompts` stay metadata).

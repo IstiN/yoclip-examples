@@ -1,0 +1,173 @@
+config:
+  duration: 2997
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#0a0a12'
+
+theme:
+  colors:
+    background: '#0a0a12'
+    backgroundSoft: '#0d0d18'
+    backgroundDeep: '#07070d'
+    surface: '#15131f'
+    text: '#ffffff'
+    textMuted: '#a1a1aa'
+    primary: '#7c3aed'
+    primaryLight: '#a78bfa'
+    accent: '#22d3ee'
+  headline:
+    fontSize: 96
+    fontFamily: Geneva
+    fontWeight: 700
+  subline:
+    fontSize: 40
+    fontFamily: Geneva
+  label:
+    fontSize: 26
+    fontFamily: Geneva
+    fontWeight: 600
+    letterSpacing: 8
+
+project_js: project.js
+
+scenes:
+  - scenes/background.scene.js
+  - scenes/00_hook.scene.js
+  - scenes/01_monolith.scene.js
+  - scenes/02_kaleido.scene.js
+  - scenes/03_generate.scene.js
+  - scenes/04_prompt.scene.js
+  - scenes/05_deck.scene.js
+  - scenes/06_chat.scene.js
+  - scenes/07_space.scene.js
+  - scenes/08_course.scene.js
+  - scenes/09_website.scene.js
+  - scenes/10_carousel.scene.js
+  - scenes/11_upload.scene.js
+  - scenes/12_polish.scene.js
+  - scenes/12b_starmap.scene.js
+  - scenes/12c_globe.scene.js
+  - scenes/13_tunnel.scene.js
+  - scenes/14_end.scene.js
+
+external_assets:
+  logo:
+    type: image
+    path: assets/images/yoclip_logo.svg
+  logo_on_light:
+    type: image
+    path: assets/images/yoclip_logo_on_light.svg
+  yo_bubble:
+    type: image
+    path: assets/images/yo_bubble.svg
+  golden_hook:
+    type: image
+    path: assets/goldens/hook.png
+  golden_monolith:
+    type: image
+    path: assets/goldens/monolith.png
+  golden_kaleido:
+    type: image
+    path: assets/goldens/kaleido.png
+  golden_space:
+    type: image
+    path: assets/goldens/space.png
+  golden_rally:
+    type: image
+    path: assets/goldens/rally.png
+  golden_tunnel:
+    type: image
+    path: assets/goldens/tunnel.png
+  golden_prompt:
+    type: image
+    path: assets/goldens/prompt.png
+  golden_deck:
+    type: image
+    path: assets/goldens/deck.png
+  golden_chat:
+    type: image
+    path: assets/goldens/chat.png
+  golden_website:
+    type: image
+    path: assets/goldens/website.png
+  golden_polish:
+    type: image
+    path: assets/goldens/polish.png
+  golden_endcard:
+    type: image
+    path: assets/goldens/endcard.png
+  ridge_far:
+    type: image
+    path: assets/layers/ridge_far.svg
+  ridge_mid:
+    type: image
+    path: assets/layers/ridge_mid.svg
+  ridge_near:
+    type: image
+    path: assets/layers/ridge_near.svg
+
+audio:
+  tracks:
+    # Music: first 6 s of the source skipped (T6 cut, fade-in baked in the
+    # file); starts right at frame 0.
+    - source: 'assets://audio/Clap Roll Sunrise T6.mp3'
+      start: 0
+      volume: 0.85
+      envelope:
+        - frame: 468
+          volume: 0.4
+          ramp: 24
+        - frame: 492
+          volume: 1.0
+          ramp: 2
+        - frame: 2667
+          volume: 0.5
+          ramp: 24
+        - frame: 2691
+          volume: 1.0
+          ramp: 2
+        - frame: 2877
+          volume: 0.0
+          ramp: 120
+    # 'Clap Roll Hit.mp3' (1.0 s drum hit, cut from the main track at 13.0s) —
+    # placed as per-transition accents later (start frames TBD).
+
+
+variants:
+  - id: dark_en
+    label: 'Dark · EN'
+    params:
+      lang: 'en'
+  - id: dark_ru
+    label: 'Dark · RU'
+    params:
+      lang: 'ru'
+  - id: light_en
+    label: 'Light · EN'
+    params:
+      lang: 'en'
+      logo: 'external:logo_on_light'
+    theme:
+      colors:
+        background: '#f4f3fa'
+        backgroundSoft: '#ffffff'
+        backgroundDeep: '#e6e4f2'
+        surface: '#ffffff'
+        text: '#14121f'
+        textMuted: '#5c5870'
+        primary: '#7c3aed'
+        primaryLight: '#6d28d9'
+        accent: '#0891b2'
+      headline:
+        color: '#14121f'
+      subline:
+        color: '#5c5870'
+      label:
+        color: '#6d28d9'
+  - id: shorts_en
+    label: 'Shorts · EN'
+    width: 1080
+    height: 1920
+    params:
+      lang: 'en'

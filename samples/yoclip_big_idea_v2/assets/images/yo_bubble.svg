@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bubbleGradient" x1="340" y1="330" x2="780" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="55%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer C ring, open on the right -->
+  <path d="M 812.60 204.30 A 410 410 0 1 0 812.60 819.70"
+        fill="none" stroke="#13131A" stroke-width="80" stroke-linecap="round"/>
+
+  <!-- Speech bubble -->
+  <rect x="275" y="300" width="640" height="400" rx="90" fill="url(#bubbleGradient)"/>
+  <path d="M 670 660 L 760 770 L 840 640 Z" fill="url(#bubbleGradient)"/>
+
+  <!-- Filmstrip dots -->
+  <rect x="805" y="385" width="64" height="64" rx="15" fill="#ffffff"/>
+  <rect x="805" y="490" width="64" height="64" rx="15" fill="#ffffff"/>
+
+  <!-- YO wordmark -->
+  <g transform="translate(360, 385)" fill="none" stroke="#ffffff" stroke-width="52" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Y -->
+    <path d="M 20 10 L 70 110 L 120 10 M 70 110 L 70 190"/>
+    <!-- O -->
+    <circle cx="230" cy="105" r="65"/>
+  </g>
+</svg>
