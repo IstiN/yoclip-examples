@@ -78,8 +78,8 @@ scene = {
                 type: 'image',
                 source: 'external:logo',
                 fit: 'contain',
-                width: 120,
-                height: 76,
+                width: 96,
+                height: 60,
                 margin: { top: 2 },
               },
               {
@@ -100,9 +100,9 @@ scene = {
         {
           type: 'text',
           text: titleA,
-          margin: { top: 16 },
+          margin: { top: 10 },
           style: {
-            fontSize: portrait ? 26 : 32,
+            fontSize: portrait ? 26 : 28,
             color: muted,
             fontFamily: font,
             fontWeight: 300,
@@ -113,7 +113,7 @@ scene = {
           text: titleB,
           margin: { top: 2 },
           style: {
-            fontSize: portrait ? 46 : 60,
+            fontSize: portrait ? 46 : 52,
             color: txt,
             fontFamily: font,
             fontWeight: 700,
@@ -202,7 +202,9 @@ scene = {
       type: 'container',
       alignment: portrait ? 'center' : 'centerLeft',
       offsetX: portrait ? 0 : 80,
-      offsetY: (portrait ? -240 : 6) + (1 - codeIn) * 40,
+      // 40px below center — the two-line header ends ~y210, the card top
+      // must clear it (at offsetY 6 the card edge crossed the title).
+      offsetY: (portrait ? -240 : 40) + (1 - codeIn) * 40,
       width: codeCardW,
       height: codeCardH,
       opacity: codeIn,
@@ -249,8 +251,8 @@ scene = {
     var chip = {
       type: 'container',
       alignment: portrait ? 'center' : 'centerLeft',
-      offsetX: (portrait ? 300 : 555),
-      offsetY: (portrait ? -240 : 6) - codeCardH / 2 + 34 + (1 - chipIn) * 18,
+      offsetX: (portrait ? 300 : 606),
+      offsetY: (portrait ? -240 : 40) - codeCardH / 2 + 34 + (1 - chipIn) * 18,
       width: 230,
       height: 48,
       opacity: chipIn * (1 - chipOut),
@@ -306,7 +308,7 @@ scene = {
       type: 'container',
       alignment: portrait ? 'center' : 'centerRight',
       offsetX: portrait ? 0 : -80,
-      offsetY: (portrait ? 400 : 6),
+      offsetY: (portrait ? 400 : 40),
       width: animCardW,
       height: animCardH,
       opacity: Math.max(0.02, animIn.opacity),

@@ -325,8 +325,10 @@ A project's own `lib/*.js` can add more; list them in `project.js → lib`.
 
 ### Node types
 
-Produced by `render()` and compiled to Flutter widgets by
-`YoclipSceneCompiler`.
+Produced by `render()` and compiled to Flutter widgets by the unified
+`YoclipWidgetRenderer` (the one renderer for preview, export, Studio edit
+mode and PPTX — hooks plug in via `overrides` / `nodeDecorator` /
+`hideText`).
 
 | Type | Purpose | Key props |
 |------|---------|-----------|
@@ -338,6 +340,7 @@ Produced by `render()` and compiled to Flutter widgets by
 | `image` | image / external image | `source`, `fit`, `width`, `height` |
 | `path` | SVG path (stroked, drawable) | `path`, `progress`, `color`, `strokeWidth`, `width`, `height` |
 | `video` | external video clip | `source`, `fit`, `startFrame`, `speed`, `sourceStart`, `reverse` |
+| `audio_player` | frame-driven audio playback (zero-size) | `src`, `playing`, `volume`, `loop`, `seekToMs` |
 | `absolute_fill` / `fill` | absolute color fill layer | `color`, `child` |
 
 `volume`/`muted` on a `video` node are **not render props** — the compiler and
@@ -523,6 +526,35 @@ mute/solo and a master mute (the "Delete clip" menu action is a no-op).
 Preview audio tracks loop. The resolver re-reads `yoclip.yaml` from disk at
 resolve time, so track edits apply without touching Dart state. Verify muxed
 audio with `ffprobe video.mp4`.
+
+**`audio_player` node** — the third, code-driven way to place sound. Unlike
+the two declarative track lists above, its props are ordinary JS values
+computed inside `render(frame)`, so play/pause, volume rides and seeks can
+depend on anything the frame knows:
+
+```js
+{
+  type: 'audio_player',
+  src: 'assets://audio/hit.mp3',
+  playing: frame >= 30 && frame < 90,   // play/pause from code
+  volume: 0.8 * fadeOut(frame, 70, 20), // per-frame volume → fades in code
+  loop: false,                          // preview loops; export ignores it
+  seekToMs: null,                       // seeks when the value CHANGES
+}
+```
+
+- In the **Studio preview** a real player is created per node and reconciled
+  every frame (play/pause/volume/loop, seek on `seekToMs` change).
+- At **export** the resolver samples every frame of the scene and converts
+  the node into a regular timeline `AudioTrack`: start = first playing
+  frame, pause/resume and volume envelope points on change. The MP4 mix
+  therefore matches the preview without you touching the audio file.
+
+**Which one when:** composition yaml tracks for the static music bed and
+its ducking envelope; scene `audio: [...]` entries for one-off stingers on a
+scene (`start` is scene-local, no envelope); `audio_player` when timing or
+level must be computed in JS — character-by-character sync, conditional
+hits, fades driven by the same easing helpers as the visuals.
 
 ---
 

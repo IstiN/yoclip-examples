@@ -45,66 +45,127 @@ scene = {
     var muted = '#8a7f70';
     var figure = '#4c1d95';
 
-    // -- Prompt pill: types the brief, a mini Render chip pops, the cursor
-    // clicks it, then the pill slides down and fades as the site sweeps in.
+    // -- Prompt beat (same UI language as 04_prompt, centered): the input
+    // pill types the brief with a caret, the gradient Render button sits
+    // below it, the cursor glides and clicks — then the whole UI slides
+    // down/out as the site sweeps in.
     var pillOp = seg(frame, 2, 10) * (1 - seg(frame, 52, 64));
-    var pillSlide = seg(frame, 52, 64, eio3) * 60;
-    var typedPrompt = typewriter(promptText, frame, 6, 70);
-    var chipPop = pop(frame, 38, 12);
-    var chipDip = seg(frame, 48, 52) * (1 - seg(frame, 52, 56));
+    var pillSlide = seg(frame, 52, 64, eio3) * 140;
+    var promptPair = typewriterParts(promptText, frame, 8, 55);
+    var typedPrompt = promptPair[0];
+    var typedRest = promptPair[1];
+    var promptDone = typedPrompt.length >= promptText.length;
+    var promptCaret = frame >= 8 && (!promptDone || blink(frame, 14) === 1);
+    var chipPop = pop(frame, 30, 14);
+    var chipDip = seg(frame, 44, 48) * (1 - seg(frame, 48, 54));
+    var chipGlow = 18 + 16 * seg(frame, 50, 58) * shimmer(frame, 22);
+    var curOp = seg(frame, 30, 36) * (1 - seg(frame, 50, 58));
+    var curGlide = ease(frame, 36, 46, eio3);
+    var curDrift = ease(frame, 50, 58, eo3);
+    var curX = lerp(330, 74, curGlide) + 64 * curDrift;
+    var curY = lerp(310, 78, curGlide) + 56 * curDrift;
     var promptPill = {
-      type: 'container',
-      alignment: 'topLeft',
-      offsetX: 56,
-      offsetY: 118 + pillSlide,
+      type: 'column',
+      alignment: 'center',
+      offsetY: pillSlide,
       opacity: pillOp,
-      width: 760,
-      color: '#ffffff',
-      borderRadius: 999,
-      borderColor: '#eadfce',
-      borderWidth: 1.5,
-      shadow: { color: '#1f4c1d95', blur: 18, offsetX: 0, offsetY: 8 },
-      child: {
-        type: 'row',
-        crossAxisAlignment: 'center',
-        children: [
-          { type: 'container', width: 22 },
-          {
-            type: 'path',
-            path: 'M 12 0 L 15 9 L 24 12 L 15 15 L 12 24 L 9 15 L 0 12 L 9 9 Z',
-            color: primary,
-            strokeWidth: 2.5,
-            width: 18,
-            height: 18,
-            margin: { right: 12 },
+      mainAxisAlignment: 'center',
+      crossAxisAlignment: 'center',
+      children: [
+        {
+          type: 'container',
+          width: 640,
+          height: 76,
+          color: '#ffffff',
+          borderRadius: 999,
+          borderColor: '#eadfce',
+          borderWidth: 1.5,
+          shadow: { color: '#1f4c1d95', blur: 24, offsetX: 0, offsetY: 10 },
+          child: {
+            type: 'row',
+            crossAxisAlignment: 'center',
+            children: [
+              { type: 'container', width: 28 },
+              {
+                type: 'path',
+                path: 'M 12 0 L 15 9 L 24 12 L 15 15 L 12 24 L 9 15 L 0 12 L 9 9 Z',
+                color: primary,
+                strokeWidth: 2.5,
+                width: 20,
+                height: 20,
+                margin: { right: 12 },
+              },
+              {
+                type: 'text',
+                text: typedPrompt,
+                style: { fontSize: 24, color: ink, fontFamily: font },
+              },
+              {
+                type: 'container',
+                width: 3,
+                height: 30,
+                opacity: promptCaret ? 1 : 0,
+                margin: { left: 4 },
+                color: primary,
+              },
+              {
+                // Invisible remainder: constant width, no jitter.
+                type: 'text',
+                text: typedRest,
+                style: { fontSize: 24, color: '#00000000', fontFamily: font },
+              },
+            ],
           },
-          {
-            type: 'text',
-            text: typedPrompt,
-            style: { fontSize: 22, color: ink, fontFamily: font },
+        },
+        { type: 'container', height: 24 },
+        {
+          type: 'container',
+          width: 260,
+          height: 70,
+          scale: Math.max(0.001, chipPop.scale * (1 - 0.12 * chipDip)),
+          opacity: chipPop.opacity,
+          gradient: {
+            colors: [primaryLight, primary],
+            begin: 'centerLeft',
+            end: 'centerRight',
           },
-          { type: 'container', width: 16 },
-          {
-            type: 'container',
-            scale: Math.max(0.001, chipPop.scale * (1 - 0.15 * chipDip)),
-            opacity: chipPop.opacity,
-            gradient: {
-              colors: [primaryLight, primary],
-              begin: 'centerLeft',
-              end: 'centerRight',
-            },
-            borderRadius: 999,
-            child: {
-              type: 'text',
-              text: 'Render',
-              margin: { left: 18, right: 18, top: 10, bottom: 10 },
-              style: { fontSize: 20, color: '#ffffff', fontFamily: font, fontWeight: 700 },
-            },
+          borderRadius: 999,
+          shadow: { color: yoclipColorA('primary', 0x66, '#7c3aed'), blur: chipGlow, offsetX: 0, offsetY: 10 },
+          child: {
+            type: 'row',
+            mainAxisAlignment: 'center',
+            crossAxisAlignment: 'center',
+            children: [
+              {
+                type: 'path',
+                path: 'M 12 0 L 15 9 L 24 12 L 15 15 L 12 24 L 9 15 L 0 12 L 9 9 Z',
+                color: '#ffffff',
+                strokeWidth: 2.5,
+                width: 20,
+                height: 20,
+                margin: { right: 10 },
+              },
+              {
+                type: 'text',
+                text: 'Render',
+                style: { fontSize: 26, color: '#ffffff', fontFamily: font, fontWeight: 700 },
+              },
+            ],
           },
-          { type: 'container', width: 24 },
-          { type: 'container', height: 52 },
-        ],
-      },
+        },
+      ],
+    };
+    var promptCursor = {
+      type: 'path',
+      path: 'M 6 2 L 6 30 L 12 24 L 17 34 L 21 32 L 16 23 L 25 23 Z',
+      color: ink,
+      strokeWidth: 3,
+      width: 34,
+      height: 34,
+      alignment: 'center',
+      offsetX: curX,
+      offsetY: curY + pillSlide,
+      opacity: curOp,
     };
 
     // -- Nav bar.
@@ -438,6 +499,7 @@ scene = {
         stepsRow,
         rail,
         promptPill,
+        promptCursor,
         sweep,
       ],
     };

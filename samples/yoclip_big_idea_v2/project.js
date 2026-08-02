@@ -2,6 +2,11 @@
 //
 // Same architecture as v1: background layer full length, content beats chained
 // with -6 frame crossfades. Palette lives in yoclip.yaml -> theme.colors.
+//
+// NOTE: the `duration` here MUST match each scene module's own `duration` —
+// the anchor resolver and the scene window disagree otherwise, leaving dark
+// background-only gaps between scenes (e.g. generate was 141 here vs 165 in
+// the scene file -> a black hole at ~15.3–15.9 s).
 
 project = {
   lib: 'lib/animation.js',
@@ -30,13 +35,40 @@ project = {
       },
       deck: {
         timeline: 'Deck',
-        title: 'yoclip golden tests',
-        subtitle: 'Every frame is a test fixture',
+        tag: 'YOCLIP DECK',
+        heroTitle: 'YoClip sees the frame,\nnot just text',
+        heroSubtitle: 'Your code, your visuals,\none render graph.',
         bullets: [
-          ['Zero setup', 'describe a video in JS, get an MP4'],
-          ['Code-first', 'git-diffable scenes, real reviews'],
-          ['GPU 3D', 'GLB with textures and skeletal clips'],
+          {
+            title: 'Zero setup',
+            lines: ['Describe a video as text or images,', 'and get an MP4.'],
+            icon: 'wand',
+          },
+          {
+            title: 'Code-first',
+            lines: ['Write scenes in JavaScript,', 'animate any property by frame.'],
+            icon: 'code',
+          },
+          {
+            title: 'Native encoding',
+            lines: ['FFmpeg under the hood,', 'MP4, GIF, WebM, image sequences.'],
+            icon: 'chip',
+          },
+          {
+            title: 'GPU 3D',
+            lines: ['Import GLB models, animate', 'skeletons, particles, shaders.'],
+            icon: 'cube',
+          },
         ],
+      },
+      zoom: {
+        timeline: 'Zoom',
+        prompts: [
+          'A 3D neon kaleidoscope vortex with real frames',
+          'An AI agent that rebuilds the stats card on request',
+        ],
+        resultSrcs: ['golden_kaleido', 'golden_chat'],
+        thumbSrcs: ['golden_kaleido', 'golden_chat', 'golden_space', 'golden_website'],
       },
       chat: {
         timeline: 'Agent',
@@ -102,7 +134,7 @@ project = {
       end: {
         timeline: 'End',
         tagline: 'Describe it. Render it.',
-        url: 'https://yoclip.studio',
+        url: 'yoclip.studio',
         meta: 'Rendered by yoclip.',
       },
     },
@@ -124,13 +156,40 @@ project = {
       },
       deck: {
         timeline: 'Дека',
-        title: 'золотые тесты yoclip',
-        subtitle: 'Каждый кадр — тестовая фикстура',
+        tag: 'YOCLIP DECK',
+        heroTitle: 'YoClip видит кадр,\nа не только текст',
+        heroSubtitle: 'Твой код, твоя визуализация,\nодин граф рендера.',
         bullets: [
-          ['Нулевой сетап', 'описываешь видео в JS — получаешь MP4'],
-          ['Код-первый', 'сцены диффаются в гите'],
-          ['GPU 3D', 'GLB с текстурами и скелетом'],
+          {
+            title: 'Zero setup',
+            lines: ['Опиши видео текстом или картинкой,', 'получи MP4.'],
+            icon: 'wand',
+          },
+          {
+            title: 'Code-first',
+            lines: ['Пиши сцены на JavaScript,', 'анимируй любое свойство по кадру.'],
+            icon: 'code',
+          },
+          {
+            title: 'Native encoding',
+            lines: ['FFmpeg под капотом,', 'MP4, GIF, WebM, image sequences.'],
+            icon: 'chip',
+          },
+          {
+            title: 'GPU 3D',
+            lines: ['Импорт GLB-моделей, анимация', 'скелетов, партиклов, шейдеров.'],
+            icon: 'cube',
+          },
         ],
+      },
+      zoom: {
+        timeline: 'Zoom',
+        prompts: [
+          '3D неоновый калейдоскоп-вихрь с реальными кадрами',
+          'AI-агент, который пересобирает карточку статистики по запросу',
+        ],
+        resultSrcs: ['golden_kaleido', 'golden_chat'],
+        thumbSrcs: ['golden_kaleido', 'golden_chat', 'golden_space', 'golden_website'],
       },
       chat: {
         timeline: 'Агент',
@@ -196,31 +255,30 @@ project = {
       end: {
         timeline: 'Финал',
         tagline: 'Опиши. Отрендерь.',
-        url: 'https://yoclip.studio',
+        url: 'yoclip.studio',
         meta: 'Отрендерено в yoclip.',
       },
     },
   },
 
   scenes: [
-    { path: 'scenes/background.scene.js',   layer: 'background', start: 0, duration: 2997 },
+    { path: 'scenes/background.scene.js',   layer: 'background', start: 0, duration: 2687 },
 
     { path: 'scenes/00_hook.scene.js',      layer: 'content', start: 0, duration: 150 },
     { path: 'scenes/01_monolith.scene.js',  layer: 'content', duration: 180, start: { after: 'hook',      offset: -6 } },
-    { path: 'scenes/02_kaleido.scene.js',   layer: 'content', duration: 180, start: { after: 'monolith',  offset: -6 } },
-    { path: 'scenes/03_generate.scene.js',  layer: 'content', duration: 165, start: { after: 'kaleido',   offset: -6 } },
+    { path: 'scenes/03_generate.scene.js',  layer: 'content', duration: 165, start: { after: 'monolith',  offset: -6 } },
     { path: 'scenes/04_prompt.scene.js',    layer: 'content', duration: 111, start: { after: 'generate',  offset: -6 } },
     { path: 'scenes/05_deck.scene.js',      layer: 'content', duration: 171, start: { after: 'prompt',    offset: -6 } },
-    { path: 'scenes/06_chat.scene.js',      layer: 'content', duration: 216, start: { after: 'deck',      offset: -6 } },
+    { path: 'scenes/05b_zoom.scene.js',    layer: 'content', duration: 300, start: { after: 'deck',      offset: -6 } },
+    { path: 'scenes/02_kaleido.scene.js',  layer: 'content', duration: 180, start: { after: 'zoom',      offset: -6 } },
+    { path: 'scenes/06_chat.scene.js',      layer: 'content', duration: 216, start: { after: 'kaleido',   offset: -6 } },
     { path: 'scenes/07_space.scene.js',     layer: 'content', duration: 147, start: { after: 'chat',      offset: -6 } },
     { path: 'scenes/08_course.scene.js',    layer: 'content', duration: 276, start: { after: 'space',     offset: -6 } },
     { path: 'scenes/09_website.scene.js',   layer: 'content', duration: 207, start: { after: 'course',    offset: -6 } },
     { path: 'scenes/10_carousel.scene.js',  layer: 'content', duration: 201, start: { after: 'website',   offset: -6 } },
     { path: 'scenes/11_upload.scene.js',    layer: 'content', duration: 201, start: { after: 'carousel',  offset: -6 } },
     { path: 'scenes/12_polish.scene.js',    layer: 'content', duration: 276, start: { after: 'upload',    offset: -6 } },
-    { path: 'scenes/12b_starmap.scene.js',  layer: 'content', duration: 150, start: { after: 'polish',    offset: -6 } },
-    { path: 'scenes/12c_globe.scene.js',    layer: 'content', duration: 150, start: { after: 'starmap',   offset: -6 } },
-    { path: 'scenes/13_tunnel.scene.js',    layer: 'content', duration: 132, start: { after: 'globe',     offset: -6 } },
+    { path: 'scenes/13_tunnel.scene.js',    layer: 'content', duration: 132, start: { after: 'polish',    offset: -6 } },
     { path: 'scenes/14_end.scene.js',       layer: 'content', duration: 180, start: { after: 'tunnel',    offset: -6 } },
   ],
 };

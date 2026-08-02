@@ -25,6 +25,7 @@
 scene = {
   id: 'monolith',
   duration: 180,
+  slides: [51],
   description: 'The hook caret grows into an iridescent column in a vivid sunset world; the column lands as the "l" of a giant 3D yoclip wordmark (letters rise from the dunes), then the camera dives into the static white dot over the "i".',
   voicePrompts: {
     en: 'A deep cinematic swell as the caret grows; playful plucks as each letter lands; a rising whoosh into the i-dot.',

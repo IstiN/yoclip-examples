@@ -57,7 +57,9 @@ scene = {
     // Flow: type in the INPUT -> click Render -> the typed text becomes the
     // user's blue bubble -> Yo answers.
     var inputIn = ease(frame, 6, 20, eo3);
-    var typedInput = typewriter(userMsg, frame, 22, 30);
+    var typedPair = typewriterParts(userMsg, frame, 22, 30);
+    var typedInput = typedPair[0];
+    var typedRest = typedPair[1];
     var inputTypingDone = typedInput.length >= userMsg.length;
     var btnPulse = seg(frame, 46, 52) * (1 - seg(frame, 52, 58));
     var inputOut = 1 - seg(frame, 56, 66);
@@ -253,6 +255,12 @@ scene = {
                         opacity: !inputTypingDone || blink(frame, 14) === 1 ? 1 : 0,
                         margin: { left: 4 },
                         color: accent,
+                      },
+                      {
+                        // Invisible remainder: constant width, no jitter.
+                        type: 'text',
+                        text: typedRest,
+                        style: { fontSize: portrait ? 24 : 26, color: '#00000000', fontFamily: font },
                       },
                     ],
                   },

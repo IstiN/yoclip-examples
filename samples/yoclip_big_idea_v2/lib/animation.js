@@ -114,6 +114,28 @@ function typewriter(text, frame, start, cps) {
   return text.slice(0, count);
 }
 
+/// Jitter-free typewriter pair: returns [typed, rest]. Render BOTH as
+/// adjacent text nodes with identical style — `rest` in a fully transparent
+/// color ('#00000000') — so the line's measured width stays constant while
+/// typing. A growing single text node makes the renderer re-measure every
+/// frame, which shows up as a ±5px oscillation of the whole line (and as
+/// drift whenever the line is center-anchored).
+///
+/// Trailing spaces are moved from `typed` into `rest`: the renderer trims
+/// trailing whitespace when measuring, so a typed string ending in a space
+/// shifts the whole line by half a space-width for one frame — the visible
+/// "jump" at every word boundary.
+function typewriterParts(text, frame, start, cps) {
+  var typed = typewriter(text, frame, start, cps);
+  var rest = text.slice(typed.length);
+  var trailing = / +$/.exec(typed);
+  if (trailing) {
+    typed = typed.slice(0, typed.length - trailing[0].length);
+    rest = trailing[0] + rest;
+  }
+  return [typed, rest];
+}
+
 /// Per-item stagger progress 0..1. Item `index` begins at start + index*delay.
 function staggerItem(frame, index, start, delay, dur) {
   return seg(frame, start + index * delay, start + index * delay + dur);

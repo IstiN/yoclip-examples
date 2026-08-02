@@ -160,8 +160,10 @@ scene = {
       }
     }
 
-    // Platform chips: staggered pops floating around the globe.
+    // Platform chips: frosted-glass pills with a glowing platform dot —
+    // staggered pops floating around the globe.
     var CHIPS = ['CLI', 'macOS', 'Linux', 'Windows', 'iOS', 'Android', 'Web'];
+    var CHIP_C = ['#22d3ee', '#a78bfa', '#34d399', '#7dd3fc', '#fbbf24', '#ec4899', '#f97316'];
     for (var ch = 0; ch < CHIPS.length; ch++) {
       var ang = -Math.PI * 0.82 + ch * (Math.PI * 1.64 / (CHIPS.length - 1));
       var chipIn = ease(frame, 30 + ch * 8, 44 + ch * 8, eoBack);
@@ -173,16 +175,35 @@ scene = {
         offsetX: chipX,
         offsetY: chipY + (CY - 540),
         scale: Math.max(0.001, chipIn),
-        padding: 10,
-        color: '#1a2138',
-        borderColor: '#3d5a9e',
-        borderWidth: 1,
+        // Explicit width — a container > row stretches to the frame.
+        width: (CHIPS[ch].length * 15 + 78) * k,
+        color: '#d90e1628',
+        borderColor: '#59729fd8',
+        borderWidth: 1.5,
         borderRadius: 999,
-        shadow: { color: '#59000000', blur: 18, offsetX: 0, offsetY: 6 },
+        shadow: { color: ga(CHIP_C[ch], 0.35), blur: 18, offsetX: 0, offsetY: 6 },
         child: {
-          type: 'text',
-          text: CHIPS[ch],
-          style: { fontSize: 18 * k, color: '#c9d8ff', fontFamily: font, fontWeight: 600 },
+          type: 'row',
+          crossAxisAlignment: 'center',
+          children: [
+            { type: 'container', width: 18 },
+            {
+              type: 'container',
+              width: 10,
+              height: 10,
+              borderRadius: 5,
+              color: CHIP_C[ch],
+              shadow: { color: ga(CHIP_C[ch], 0.8), blur: 8, offsetX: 0, offsetY: 0 },
+            },
+            {
+              type: 'text',
+              text: CHIPS[ch],
+              margin: { left: 10 },
+              style: { fontSize: 20 * k, color: '#eaf1ff', fontFamily: font, fontWeight: 600, letterSpacing: 1 },
+            },
+            { type: 'container', width: 20 },
+            { type: 'container', height: 46 },
+          ],
         },
       });
     }

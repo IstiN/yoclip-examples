@@ -14,6 +14,7 @@
 scene = {
   id: 'starmap',
   duration: 150,
+  slides: [73],
   description: 'Constellation hero: ~40 glowing jewel nodes on an ellipsoid web (faint gold edges to nearest neighbours) auto-rotate in fake-3D; the 5 biggest hubs are labeled Render / Scenes / Studio / Golden tests / CLI; fly-in zoom entrance, holds.',
   voicePrompts: {
     en: 'A calm cosmic pad with soft chimes as the constellation rotates.',

@@ -164,8 +164,9 @@ scene = {
     for (var ri = 0; ri < RINGS.length; ri++) {
       var R = RINGS[ri];
       var ph = frame * R.sp * 30 + R.seed;
-      var ph2 = ph; // (ring LINES removed per review — dust/comets stay)
-      // Sparkle dust along the ring.
+      // Sparkle dust along the ring — slow shimmer pulse, no hard blinking
+      // (the on/off blink read as jitter; comets removed per review —
+      // the head+trail dots moved like tadpoles).
       for (var di = 0; di < 12; di++) {
         var da = frac(Math.sin(di * 91.7 + R.seed * 13.1) * 9182.17) * Math.PI * 2;
         var dw = 1 + R.amp * Math.sin(R.wob * da + ph);
@@ -178,39 +179,8 @@ scene = {
           borderRadius: 999,
           offsetX: R.rx * dw * Math.cos(da) * k,
           offsetY: (R.rx * TILT * dw * Math.sin(da) - 20) * k,
-          opacity: worldIn * (0.3 + 0.7 * blink(frame + di * 5, 18)),
+          opacity: worldIn * (0.25 + 0.55 * shimmer(frame + di * 9, 46)),
           color: '#ffffff',
-        });
-      }
-      // Two comets with glowing heads and fading trail dots.
-      for (var cj = 0; cj < 2; cj++) {
-        var ct = frame * R.sp + cj * Math.PI + R.seed;
-        for (var m = 5; m >= 0; m--) {
-          var ta = ct - m * 0.05;
-          var cw = 1 + R.amp * Math.sin(R.wob * ta + ph);
-          var csz = m === 0 ? 9 : 2 + 5 * (1 - m / 6);
-          layers.push({
-            type: 'container',
-            alignment: 'center',
-            width: csz * k,
-            height: csz * k,
-            borderRadius: 999,
-            offsetX: R.rx * cw * Math.cos(ta) * k,
-            offsetY: (R.rx * TILT * cw * Math.sin(ta) - 20) * k,
-            opacity: worldIn * (m === 0 ? 1 : 0.5 * (1 - m / 6)),
-            color: m === 0 ? '#ffffff' : R.c,
-          });
-        }
-        // Head glow.
-        layers.push({
-          type: 'container',
-          alignment: 'center',
-          width: 44 * k,
-          height: 44 * k,
-          offsetX: R.rx * cw * Math.cos(ct) * k,
-          offsetY: (R.rx * TILT * cw * Math.sin(ct) - 20) * k,
-          opacity: worldIn * 0.75,
-          gradient: { type: 'radial', colors: [ga(R.c, 0.55), ga(R.c, 0)], stops: [0, 1] },
         });
       }
     }

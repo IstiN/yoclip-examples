@@ -36,12 +36,17 @@ scene = {
     var uiOp = uiIn * (1 - uiOut);
     var uiY = (1 - uiIn) * 40 - 700 * uiOut;
 
-    // -- Prompt typing (~2.2 chars/frame).
-    var TYPE_START = 10;
-    var typed = typewriter(fieldText, frame, TYPE_START, 66);
+    // -- Prompt typing (~2.2 chars/frame). TYPE_START holds ~0.8s so the
+    // "Describe your video..." hint is actually readable before typing
+    // begins; the caret idles in the pill from the hint phase on.
+    var TYPE_START = 34;
+    var typedPair = typewriterParts(fieldText, frame, TYPE_START, 66);
+    var typed = typedPair[0];
+    var typedRest = typedPair[1];
     var hint = t.hint || 'Describe your video...';
-    var showHint = typed.length === 0 && frame < TYPE_START + 4;
+    var showHint = typed.length === 0 && frame < TYPE_START;
     var typingDone = typed.length >= fieldText.length;
+    // Caret only appears once real typing starts, then blinks when done.
     var caretOn = frame >= TYPE_START && (!typingDone || blink(frame, 14) === 1);
 
     // -- Cursor: appears, glides bottom-right -> button (~25f), clicks.
@@ -112,6 +117,16 @@ scene = {
                     opacity: caretOn ? 1 : 0,
                     margin: { left: 6 },
                     color: '#2563eb',
+                  },
+                  {
+                    // Invisible remainder: constant line width, no jitter.
+                    type: 'text',
+                    text: showHint ? '' : typedRest,
+                    style: {
+                      fontSize: portrait ? 28 : 32,
+                      color: '#00000000',
+                      fontFamily: yoclipFont(),
+                    },
                   },
                 ],
               },

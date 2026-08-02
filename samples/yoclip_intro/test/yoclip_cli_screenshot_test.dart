@@ -27,7 +27,7 @@ void main() {
       final project = await YoclipProject.load(storage, projectPath);
       print('SCREENSHOT: project loaded');
 
-      final runtime = YoclipQuickJsRuntime();
+      final runtime = createYoclipJsRuntime();
       print('SCREENSHOT: init runtime');
       await runtime.init();
       print('SCREENSHOT: runtime init done');
@@ -42,8 +42,8 @@ void main() {
         project: project,
         scenes: targetScenes,
         storage: storage,
-        externalFiles: {"laptop_open":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/yoclip_intro/.yoclip_cache/external/laptop_open/laptop_open.mp4","logo":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/yoclip_intro/.yoclip_cache/external/logo/1780588269066.png"},
-        externalFrameDirs: {"laptop_open":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/yoclip_intro/.yoclip_cache/external/laptop_open/frames"},
+        externalFiles: {"laptop_open":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_intro/.yoclip_cache/external/laptop_open/laptop_open.mp4","logo":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_intro/.yoclip_cache/external/logo/1780588269066.png"},
+        externalFrameDirs: {"laptop_open":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_intro/.yoclip_cache/external/laptop_open/frames"},
         externalImageBytes: externalImageBytes,
       );
 

@@ -15,7 +15,7 @@
 
 scene = {
   id: 'polish',
-  duration: 276,
+  duration: 262,
   description: 'White report card on #f5f2ee (geometry matched to 11_upload for a morphing crossfade): the before-paragraph sits under a blue selection tint, an "Improve writing" chip pops, the text morphs (old blurs out, new rises word-by-word in teal) and a "Before -> After" legend lands at the bottom; the report slides left, an analytics card pops right with 3 stat bullets + a floating chart menu (Circle/Bar/Pyramid/Funnel), cursor picks Pyramid, bullets fade out fully and a real 3-tier pyramid (primary/primaryLight/accent tiers in one triangular silhouette) draws tier by tier with labels; a big blue Share pill pops bottom-center, cursor clicks, the world dims to 0.28, button stays lit.',
   voicePrompts: {
     en: 'A soft chime as the words rewrite themselves; a satisfying click on share.',
@@ -42,7 +42,7 @@ scene = {
     var stat3 = chat.stat3 || ['0', 'errors'];
     var portrait = yoclipIsPortrait();
     var font = yoclipFont();
-    var life = presence(frame, 8, 254, 14);
+    var life = presence(frame, 8, 234, 14);
 
     var primary = yoclipColor('primary', '#7c3aed');
     var primaryLight = yoclipColor('primaryLight', '#a78bfa');
@@ -173,7 +173,9 @@ scene = {
       width: repW,
       height: repH,
       scale: repScale,
-      opacity: fadeIn(frame, 12),
+      // Fully present from frame 0 — the card carries over from 11_upload;
+      // fading it in would break the cross-scene morph.
+      opacity: 1,
       color: '#ffffff',
       borderRadius: 28,
       shadow: { color: '#2e4c1d95', blur: 48, offsetX: 0, offsetY: 20 },
@@ -267,7 +269,7 @@ scene = {
 
     var bullets = [stat1, stat2, stat3];
     var bulletKids = [];
-    var bulletFade = 1 - seg(frame, PICK + 8, PICK + 20);
+    var bulletFade = 1 - seg(frame, PICK + 2, PICK + 14);
     for (var b = 0; b < 3; b++) {
       var bIn = staggerItem(frame, b, SPLIT + 18, 8, 12);
       bulletKids.push({
@@ -362,8 +364,11 @@ scene = {
             style: { fontSize: 22, color: mutedUi, fontFamily: font, fontWeight: 600, letterSpacing: 4 },
           },
           {
+            // Explicit width: an expanding column stretches to the card and
+            // the bullet dots end up glued to the card's left edge.
             type: 'column',
             alignment: 'center',
+            width: portrait ? 560 : 400,
             mainAxisAlignment: 'center',
             crossAxisAlignment: 'start',
             children: bulletKids,
@@ -380,7 +385,8 @@ scene = {
       },
     };
 
-    // Floating chart menu above the analytics card.
+    // Floating chart menu above the analytics card — a tight segmented
+    // control, not a row of loose chips.
     var menuPop = pop(frame, SPLIT + 26, 16);
     var menuOut = seg(frame, PICK + 24, PICK + 38);
     var menuItems = ['Circle stats', 'Bar stats', 'Pyramid', 'Funnel'];
@@ -389,17 +395,15 @@ scene = {
       var picked = mi === 2 && frame >= PICK;
       menuKids.push({
         type: 'container',
-        margin: { left: mi === 0 ? 0 : 10 },
-        color: picked ? primary : '#f5f2ee',
-        borderRadius: 999,
-        borderColor: picked ? primary : '#e5e1dc',
-        borderWidth: 1.5,
+        margin: { left: mi === 0 ? 5 : 2, right: mi === menuItems.length - 1 ? 5 : 2 },
+        color: picked ? primary : '#00000000',
+        borderRadius: 11,
         child: {
           type: 'text',
           text: menuItems[mi],
-          margin: { left: 18, right: 18, top: 10, bottom: 10 },
+          margin: { left: 15, right: 15, top: 9, bottom: 9 },
           style: {
-            fontSize: 21,
+            fontSize: 20,
             color: picked ? '#ffffff' : mutedUi,
             fontFamily: font,
             fontWeight: 600,
@@ -411,21 +415,22 @@ scene = {
       type: 'container',
       alignment: 'center',
       offsetX: anaX,
-      offsetY: anaY - anaH / 2 - 44,
+      // Clears the card top by ~36px — a tighter gap read as an overlap.
+      offsetY: anaY - anaH / 2 - 64,
       // Explicit width — a container > row stretches to the frame otherwise.
-      width: 640,
+      width: 560,
       opacity: menuPop.opacity * (1 - menuOut),
       scale: Math.max(0.05, menuPop.scale),
       color: '#ffffff',
-      borderRadius: 999,
+      borderRadius: 16,
       borderColor: '#e5e1dc',
       borderWidth: 1.5,
       shadow: { color: '#264c1d95', blur: 24, offsetX: 0, offsetY: 10 },
       child: {
         type: 'row',
+        mainAxisAlignment: 'center',
         crossAxisAlignment: 'center',
-        children: [{ type: 'container', width: 14 }]
-          .concat(menuKids, [{ type: 'container', width: 14 }, { type: 'container', height: 56 }]),
+        children: menuKids.concat([{ type: 'container', height: 50 }]),
       },
     };
 
@@ -481,11 +486,11 @@ scene = {
     var curX, curY, curOp;
     if (frame < 170) {
       curX = lerp(anaX + 420, menuChipX, glide2);
-      curY = lerp(anaY + 300, anaY - anaH / 2 - 36, glide2);
+      curY = lerp(anaY + 300, anaY - anaH / 2 - 56, glide2);
       curOp = curOp2;
     } else {
       curX = lerp(menuChipX + 300, 140, glide3);
-      curY = lerp(anaY - anaH / 2 - 36, (portrait ? 540 - 56 : 540 - 64) - 6, glide3);
+      curY = lerp(anaY - anaH / 2 - 56, (portrait ? 540 - 56 : 540 - 64) - 6, glide3);
       curOp = curOp3;
     }
     var cursor = {
@@ -501,6 +506,44 @@ scene = {
       opacity: curOp,
     };
 
+    // Post-click confirmation: a "Link copied" toast rises above the pill —
+    // without it the glowing button just hung there for two dead seconds.
+    var toastPop = pop(frame, 214, 14);
+    var toast = {
+      type: 'container',
+      alignment: 'bottomCenter',
+      offsetY: portrait ? -168 : -180,
+      width: 300,
+      opacity: toastPop.opacity,
+      scale: Math.max(0.05, toastPop.scale),
+      color: ink,
+      borderRadius: 999,
+      shadow: { color: '#331f2937', blur: 22, offsetX: 0, offsetY: 10 },
+      child: {
+        type: 'row',
+        crossAxisAlignment: 'center',
+        children: [
+          { type: 'container', width: 24 },
+          {
+            type: 'path',
+            path: 'M 6 13 L 11 18 L 20 8',
+            color: '#34d399',
+            strokeWidth: 3,
+            width: 24,
+            height: 24,
+            margin: { right: 10 },
+          },
+          {
+            type: 'text',
+            text: t.copied || 'Link copied',
+            style: { fontSize: 24, color: '#ffffff', fontFamily: font, fontWeight: 600 },
+          },
+          { type: 'container', width: 26 },
+          { type: 'container', height: 56 },
+        ],
+      },
+    };
+
     // World dim behind the lit button — light enough that the white cards
     // stay white, not muddy grey.
     var dimOp = 0.28 * ease(frame, DIM, DIM + 16, eo3);
@@ -510,12 +553,25 @@ scene = {
       fit: 'expand',
       opacity: life,
       children: [
-        { type: 'container', color: '#f5f2ee' },
+        // Continuity with 11_upload: open on its dark violet gallery world
+        // (the report card carries over the cut), then settle into the cream
+        // report world over the first ~28 frames.
+        {
+          type: 'container',
+          gradient: {
+            type: 'linear',
+            begin: 'topCenter',
+            end: 'bottomCenter',
+            colors: ['#1a1033', '#07070d'],
+          },
+        },
+        { type: 'container', color: '#f5f2ee', opacity: ease(frame, 4, 28, eio3) },
         reportCard,
         analyticsCard,
         chartMenu,
         { type: 'absolute_fill', color: '#1f2937', opacity: dimOp },
         sharePill,
+        toast,
         cursor,
       ],
     };

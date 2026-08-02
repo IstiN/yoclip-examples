@@ -39,8 +39,6 @@ scene = {
 
     var font = yoclipFont();
     var ink = '#14121f';
-    var muted = '#5b5670';
-    var urlColor = '#2563eb'; // link blue, readable on lavender
 
     // -- Beat 0 (0–6): SHORT white settle from the tunnel. A long flash +
     // slow world fade read as "just a white scene" — keep it snappy.
@@ -57,9 +55,8 @@ scene = {
     var tagSp = lerp(12, 2, tagIn);
     var tagY = (1 - eo3(seg(frame, 26, 56))) * 50;
 
-    // -- Beat 3 (60–92): hairline rule + URL.
+    // -- Beat 3 (60–92): the URL chip.
     var urlIn = ease(frame, 60, 84, eo3);
-    var ruleW = lerp(0, 240, ease(frame, 64, 92, eo3));
 
     // -- Beat 4 (100–120): the mic-drop meta line, then HOLD to the end.
     var metaIn = ease(frame, 100, 118, eo3);
@@ -208,42 +205,52 @@ scene = {
           letterSpacing: tagSp,
         },
       },
-      // Hairline accent rule.
+      // URL on a dark glass chip — plain blue/gray text drowned in the
+      // purple dune field; the chip keeps it readable on any ridge color.
       {
         type: 'container',
         alignment: 'center',
-        offsetY: portrait ? 420 : 330,
-        width: ruleW,
-        height: 2,
-        color: urlColor,
+        offsetY: portrait ? 452 : 368,
         opacity: urlIn,
-      },
-      // URL (link-styled: link blue + underline bar; the renderer's text
-      // style forces TextDecoration.none, so the underline is a container).
-      {
-        type: 'text',
-        alignment: 'center',
-        offsetY: portrait ? 480 : 376,
-        text: url,
-        opacity: urlIn,
-        style: {
-          fontSize: portrait ? 30 : 34,
-          color: urlColor,
-          fontFamily: font,
-          fontWeight: 700,
-          letterSpacing: 4,
+        // Explicit width — a container > row stretches to the frame.
+        width: portrait ? 480 : 460,
+        color: '#c014121f',
+        borderRadius: 999,
+        borderColor: '#40ffffff',
+        borderWidth: 1.5,
+        shadow: { color: '#4014121f', blur: 26, offsetX: 0, offsetY: 10 },
+        child: {
+          type: 'row',
+          crossAxisAlignment: 'center',
+          children: [
+            { type: 'container', width: 30 },
+            {
+              type: 'path',
+              path: 'M 10 14 A 5.6 5.6 0 1 1 14 10 M 14 4 L 14 10 L 20 10',
+              color: '#22d3ee',
+              strokeWidth: 2.4,
+              width: 24,
+              height: 24,
+              margin: { right: 12 },
+            },
+            {
+              type: 'text',
+              text: url,
+              style: {
+                fontSize: portrait ? 28 : 30,
+                color: '#ffffff',
+                fontFamily: font,
+                fontWeight: 700,
+                letterSpacing: 2,
+              },
+            },
+            { type: 'container', width: 32 },
+            { type: 'container', height: 64 },
+          ],
         },
       },
-      {
-        type: 'container',
-        alignment: 'center',
-        offsetY: portrait ? 514 : 408,
-        width: lerp(0, 460, ease(frame, 64, 92, eo3)),
-        height: 2,
-        color: urlColor,
-        opacity: urlIn,
-      },
-      // Mic drop: rendered by yoclip.
+      // Mic drop: rendered by yoclip. Light lavender — the old muted gray
+      // was invisible on the purple dune.
       {
         type: 'text',
         alignment: 'bottomCenter',
@@ -252,7 +259,7 @@ scene = {
         opacity: metaIn,
         style: {
           fontSize: portrait ? 22 : 24,
-          color: muted,
+          color: '#d9d2f2',
           fontFamily: font,
           letterSpacing: 6,
         },

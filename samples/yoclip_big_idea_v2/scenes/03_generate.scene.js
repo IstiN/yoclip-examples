@@ -1,23 +1,28 @@
 // 03 — Generate: the brand sentence builds on the Gamma white world.
 //
-// Reference beat (Gamma 10–14s): back on off-white. CENTER-SPLIT
-// composition: [logo + "Render"] pinned LEFT of screen center, the words
-// cycle RIGHT of it (promos / doc videos / shorts / product demos — each
-// its own ~12f window with a rise-in and a fast full-range fade; the last
-// word holds), then the muted tail lands below. Nothing re-centers per
-// frame, so nothing drifts. No full-line retype — reading the same line
-// typed twice read as a glitch.
+// Reference beat (Gamma 10–14s): back on off-white. The YoClip logo pops in
+// at screen center, then glides left and docks into the center-split
+// position. "Render" types next to it, and the words cycle on the right
+// (promos / doc videos / shorts / product demos — each its own ~12f
+// window with a rise-in and a fast full-range fade; the last word holds),
+// then the muted tail lands below. Nothing re-centers per frame, so
+// nothing drifts.
 //
 // Renderer notes: this scene always lives on the hardcoded #f5f4f1 white
 // world, so it pins the on-light logo asset (yoclipLogoSource() would hand
 // the dark-variant white logo on default variants — invisible on white).
 // 'centerLeft' pins the row's LEFT edge to the screen's left edge (the row
 // is full-width), so offsets are absolute from the left, not from center.
+//
+// No root fade in OR out: the next scene (prompt) is the SAME white world,
+// so the handoff is a plain white-to-white cut at the -6 overlap. Any
+// fade-out here would reveal the dark background layer for a few frames —
+// that was the black gap at ~15.5s.
 
 scene = {
   id: 'generate',
   duration: 165,
-  description: 'White-world brand beat, center-split: logo + "Render" pinned left of screen center, words cycle right of it (promos / doc videos / shorts / product demos, last one holds), tail "from code." lands below. Holds.',
+  description: 'White-world brand beat: YoClip logo pops in at center, glides left and docks, "Render" types beside it, words cycle right of center (promos/doc videos/shorts/product demos, last holds), tail "from code." lands below.',
   voicePrompts: {
     en: 'A confident brand sting; one soft keystroke per cycled word.',
     ru: 'Уверенный бренд-акцент; мягкий клик на каждое слово.',
@@ -39,9 +44,9 @@ scene = {
     // Cycling words: accent cyan washes out on white — primary reads better.
     var cycle = yoclipColor('primary', '#7c3aed');
 
-    // -- Logo: back-eased pop, then shrink to dock size.
+    // -- Logo: back-eased pop at center, then glides left and docks.
     var logoPop = pop(frame, 4, 22);
-    var dock = ease(frame, 30, 52, eio3);
+    var dock = ease(frame, 24, 48, eio3);
     var logoScale = logoPop.scale * (1.5 - 0.5 * dock);
 
     // -- Verb types in once the logo has nearly docked; the caret rides it
@@ -75,32 +80,34 @@ scene = {
     var logoW = portrait ? 130 : 180;
     var logoH = Math.round(logoW * 520 / 820);
 
-    // Center-split geometry: the [logo + verb] group's right edge sits
-    // gapC px left of screen center; the cycling word's left edge sits
-    // gapC px right of it and grows rightward. Both are pinned by fixed
-    // offsets — no per-frame re-centering, no drift.
+    // Center-split geometry: the [logo + verb] group glides from screen
+    // center to its docked left position. At center the group's midpoint
+    // sits at halfW; at dock its right edge sits gapC px left of center.
     var halfW = portrait ? 540 : 960;
     var verbW = Math.ceil(verb.length * fs * 0.55);
     var groupW = logoW + 28 + verbW;
     var gapC = portrait ? 14 : 24;
-    var leftX = halfW - gapC - groupW;
+    var dockedX = halfW - gapC - groupW;
+    var centerX = halfW - groupW / 2;
+    var groupX = lerp(centerX, dockedX, dock);
     var rightX = halfW + gapC;
     var tailY = Math.round(fs * 0.5 + 16 + tailFs * 0.5);
 
     return {
       type: 'stack',
       fit: 'expand',
-      // No entrance fade: the kaleido white flash hands off seamlessly —
-      // fading in here would reveal the dark background layer mid-flash.
-      opacity: fadeOut(frame, 155, 10),
+      // No entrance or exit fade: kaleido's white flash hands off to this
+      // white world, and this white world hands off to prompt's white
+      // world — fading either way would flash the dark background layer.
+      opacity: 1.0,
       children: [
         // Gamma white world.
         { type: 'container', color: '#f5f4f1' },
-        // Left of center: logo + verb + caret.
+        // Logo + verb row, glides from center to left-of-center.
         {
           type: 'row',
           alignment: 'centerLeft',
-          offsetX: leftX,
+          offsetX: groupX,
           crossAxisAlignment: 'center',
           children: [
             {

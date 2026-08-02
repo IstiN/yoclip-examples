@@ -213,8 +213,11 @@ scene = {
       },
     };
 
-    // Prompt line types below the dropzone.
-    var typedField = typewriter(field, frame, 52, 55);
+    // Prompt line types below the dropzone. Hidden remainder keeps the
+    // centered line's width constant — no per-frame re-centering jitter.
+    var typedPair = typewriterParts(field, frame, 52, 55);
+    var typedField = typedPair[0];
+    var typedRest = typedPair[1];
 
     // Beat 2: scan line sweeps the window + thin progress bar fills.
     var scanX = lerp(-320, 320, ease(frame, 58, 98, eio3));
@@ -277,13 +280,25 @@ scene = {
             },
           },
           // Typed prompt line — technical feel via letterSpacing (no mono
-          // variant in the theme fonts).
+          // variant in the theme fonts). Row of typed + invisible rest.
           {
-            type: 'text',
+            type: 'row',
             alignment: 'bottomCenter',
             offsetY: -64,
-            text: typedField,
-            style: { fontSize: portrait ? 22 : 24, color: '#e7e5f4', fontFamily: font, letterSpacing: 1 },
+            mainAxisAlignment: 'center',
+            crossAxisAlignment: 'center',
+            children: [
+              {
+                type: 'text',
+                text: typedField,
+                style: { fontSize: portrait ? 22 : 24, color: '#e7e5f4', fontFamily: font, letterSpacing: 1 },
+              },
+              {
+                type: 'text',
+                text: typedRest,
+                style: { fontSize: portrait ? 22 : 24, color: '#00000000', fontFamily: font, letterSpacing: 1 },
+              },
+            ],
           },
           // Progress bar.
           {

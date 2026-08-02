@@ -1,5 +1,5 @@
 config:
-  duration: 2997
+  duration: auto
   fps: 30
   width: 1920
   height: 1080
@@ -39,6 +39,7 @@ scenes:
   - scenes/03_generate.scene.js
   - scenes/04_prompt.scene.js
   - scenes/05_deck.scene.js
+  - scenes/05b_zoom.scene.js
   - scenes/06_chat.scene.js
   - scenes/07_space.scene.js
   - scenes/08_course.scene.js
@@ -130,8 +131,6 @@ audio:
         - frame: 2877
           volume: 0.0
           ramp: 120
-    # 'Clap Roll Hit.mp3' (1.0 s drum hit, cut from the main track at 13.0s) —
-    # placed as per-transition accents later (start frames TBD).
 
 
 variants:

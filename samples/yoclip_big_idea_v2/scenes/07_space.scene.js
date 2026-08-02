@@ -42,8 +42,10 @@ scene = {
     var fieldIn = seg(frame, 26, 40);
     var fieldOut = seg(frame, 96, 112);
     var fieldOp = fieldIn * (1 - fieldOut);
-    var typed = typewriter(fieldText, frame, 36, 30);
-    var typingDone = typed.length >= fieldText.length;
+    var typedPair = typewriterParts(fieldText, frame, 36, 30);
+    var typed = typedPair[0];
+    var typedRest = typedPair[1];
+    var typingDone = typedRest.length === 0;
     var caretOn = frame >= 36 && (!typingDone || blink(frame, 14) === 1);
 
     // Cursor: appears, glides to the button, clicks (dip), fades.
@@ -283,6 +285,16 @@ scene = {
                 opacity: caretOn ? 1 : 0,
                 margin: { left: 6 },
                 color: accent,
+              },
+              {
+                // Invisible remainder: constant width, no jitter.
+                type: 'text',
+                text: typedRest,
+                style: {
+                  fontSize: portrait ? 26 : 30,
+                  color: '#00000000',
+                  fontFamily: font,
+                },
               },
             ],
           },

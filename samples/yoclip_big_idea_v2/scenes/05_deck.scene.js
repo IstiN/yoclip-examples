@@ -1,23 +1,21 @@
-// 05 — Deck: the generated deck assembles on a sky-blue world.
+// 05 — Deck: light product card (restored original look).
 //
-// Reference beat (Gamma 18–22s): after the prompt click, the sky opens and
-// the generated deck flies in piece by piece — a hero card (golden frame +
-// title), a left thumbnail nav, and feature bullets on the right. Cards fly
-// in from the left with an eoBack stagger; once assembled the whole deck
-// pans slowly upward until the scene hands off.
+// The original deck was a LIGHT scene: periwinkle-blue background, a dark
+// navy preview card center-left with a LIGHT left-aligned caption band,
+// four white feature pills on the right, and the left thumbnail rail.
 //
-// Renderer notes: container styling is direct props only (`decoration` is
-// silently dropped); Geneva lacks icon glyphs so bullet icons are stroked
-// `path` glyphs inside white chips. All positioned children of the root
-// fit:'expand' stack carry `alignment`.
+// Renderer notes: the scene background is opaque from frame 0 and the root
+// stack carries NO opacity — fading the whole scene in once let the dark
+// background layer bleed through at the prompt->deck cut (a "dark frame").
+// Only content (hero, pills, rail) fades/slides, plus a shared outro fade.
 
 scene = {
   id: 'deck',
   duration: 171,
-  description: 'Sky-blue world: hero card (golden_space image + title/subtitle) flies in from the left, 4 thumbnail cards slide into a left nav staggered, 3 bullet rows rise on the right, then the assembled deck pans slowly upward.',
+  description: 'Light product deck: periwinkle background, dark navy preview card with a light left-aligned caption band, four large white feature pills right of center, uniform thumbnail rail on the far left.',
   voicePrompts: {
-    en: 'Bright airy plucks as each card lands; a soft rising pad under the pan.',
-    ru: 'Светлые переборы на каждую карточку; мягкий восходящий пэд под панораму.',
+    en: 'Smooth, confident product narration with subtle UI ticks for each feature pill appearing.',
+    ru: 'Уверенный продуктовый голос, лёгкие тики интерфейса при появлении каждой пилюли.',
   },
   timeline: {
     label: yoclipT('deck').timeline || 'Deck',
@@ -26,96 +24,140 @@ scene = {
   },
   render: function(frame) {
     var t = yoclipT('deck');
-    var title = t.title || 'yoclip golden tests';
-    var subtitle = t.subtitle || 'Every frame is a test fixture';
-    var bullets = t.bullets || [
-      ['Zero setup', 'describe a video in JS, get an MP4'],
-      ['Code-first', 'git-diffable scenes, real reviews'],
-      ['GPU 3D', 'GLB with textures and skeletal clips'],
-    ];
-    // Textless goldens only: golden_hook has baked-in caption text that
-    // reads as noise at thumbnail size.
-    var thumbSrcs = ['golden_endcard', 'golden_monolith', 'golden_kaleido', 'golden_tunnel'];
     var portrait = yoclipIsPortrait();
     var font = yoclipFont();
-    var life = presence(frame, 8, 149, 14);
+    // Outro only: content fades out near the end; the background stays
+    // opaque until the scene cuts (the next scene crossfades over it).
+    var outro = 1 - eo3(seg(frame, 155, 169));
 
-    // Sky-world ink colors (Gamma fidelity — hardcoded sky/UI hexes).
-    var navy = '#0f2a44';
-    var navySoft = '#41617f';
-    var chipBlue = '#2563eb';
+    // ------------------------------------------------------------------
+    // Layout constants (landscape 1920x1080)
+    // ------------------------------------------------------------------
+    var heroW = portrait ? 560 : 640;
+    var heroH = portrait ? 640 : 620;
+    var capH = 140;                    // caption band height inside hero
+    var heroCX = portrait ? 0 : -260;  // offsetX of hero center
+    var heroCY = portrait ? -260 : 0;
+    var pillW = portrait ? 560 : 640;
+    var pillH = 116;
+    var pillStep = 140;
+    var pillCX = portrait ? 0 : 480;   // offsetX of pill centers
+    var pillY0 = portrait ? 210 : -210;
+    var railX = 84;
+    var thumbW = 170;
+    var thumbH = 108;
+    var thumbGap = 18;
+    var iconBox = 60;
+    var textW = pillW - 18 - iconBox - 16 - 24;
 
-    // Slow upward pan once the deck has assembled.
-    var pan = frame > 118 ? (frame - 118) * 0.55 : 0;
+    // Per-bullet accents (teal, blue, violet, amber) like the original.
+    var ACCENTS = ['#14b8a6', '#3b82f6', '#8b5cf6', '#f59e0b'];
+    var TINTS = ['#1f14b8a6', '#1f3b82f6', '#1f8b5cf6', '#1ff59e0b'];
 
-    // -- Hero card: flies in from the left with a back-eased overshoot.
-    var he = ease(frame, 8, 34, eoBack);
-    var heroOp = seg(frame, 8, 20);
-    var heroX = lerp(portrait ? 0 : -880, portrait ? 0 : -180, he);
-    var heroY = (portrait ? -270 : -10) - pan;
-    var heroW = portrait ? 560 : 620;
-    // Golden frames are 1920x1080 — the image box keeps the 16:9 ratio so
-    // fit:'cover' shows the whole frame instead of cropping.
-    var heroImgH = Math.round(heroW * 9 / 16);
-    // Card height = image + text block; the old 740px card left ~200px of
-    // empty navy at the bottom.
-    var heroH = heroImgH + (portrait ? 150 : 158);
+    // ------------------------------------------------------------------
+    // Icon paths drawn inside the icon box (Geneva has no icon glyphs)
+    // ------------------------------------------------------------------
+    function iconPath(type) {
+      if (type === 'wand') {
+        return 'M 26 8 L 31 21 L 44 26 L 31 31 L 26 44 L 21 31 L 8 26 L 21 21 Z';
+      }
+      if (type === 'code') {
+        return 'M 16 14 L 4 26 L 16 38 M 36 14 L 48 26 L 36 38';
+      }
+      if (type === 'chip') {
+        return 'M 14 14 L 38 14 L 38 38 L 14 38 Z M 21 21 L 31 21 L 31 31 L 21 31 Z M 26 4 L 26 14 M 26 38 L 26 48 M 4 26 L 14 26 M 38 26 L 48 26';
+      }
+      // cube
+      return 'M 8 18 L 26 26 L 44 18 L 26 10 Z M 8 18 L 8 34 L 26 42 L 44 34 L 44 18 M 26 26 L 26 42';
+    }
 
-    var hero = {
+    var children = [];
+
+    // ------------------------------------------------------------------
+    // Light background — opaque almost immediately (4f soft-in only, so the
+    // cut from the prompt scene's white world never dips to the dark layer).
+    // ------------------------------------------------------------------
+    children.push({
+      type: 'container',
+      opacity: eo3(seg(frame, 0, 4)),
+      gradient: {
+        type: 'linear',
+        colors: ['#d8e6f8', '#aec9ec'],
+        begin: 'topCenter',
+        end: 'bottomCenter',
+      },
+    });
+
+    // ------------------------------------------------------------------
+    // Hero card — dark navy preview, LIGHT caption band, left-aligned text.
+    // Outer card clips to its radius so the caption band gets rounded
+    // bottom corners for free.
+    // ------------------------------------------------------------------
+    var heroE = eo3(seg(frame, 4, 26));
+    children.push({
       type: 'container',
       alignment: 'center',
-      offsetX: heroX,
-      offsetY: heroY,
+      offsetX: heroCX,
+      offsetY: heroCY + (1 - heroE) * 50,
       width: heroW,
       height: heroH,
-      opacity: heroOp,
-      color: '#16324f',
-      borderRadius: 24,
-      shadow: { color: '#590f2a44', blur: 50, offsetX: 0, offsetY: 24 },
+      opacity: heroE * outro,
+      color: '#0f1730',
+      borderRadius: 28,
       clip: true,
+      shadow: { color: '#331a2b4a', blur: 30, offsetX: 0, offsetY: 14 },
       child: {
         type: 'column',
-        crossAxisAlignment: 'start',
         children: [
           {
-            type: 'image',
-            source: 'external:golden_space',
-            fit: 'cover',
+            type: 'container',
             width: heroW,
-            height: heroImgH,
+            height: heroH - capH,
+            clip: true,
+            child: {
+              type: 'image',
+              source: 'external:golden_space',
+              fit: 'cover',
+              width: heroW,
+              height: heroH - capH,
+            },
           },
           {
-            // Footer: the text block is vertically centered in its band so
-            // the title never hugs the card edge.
             type: 'container',
-            height: heroH - heroImgH,
-            mainAxisAlignment: 'center',
-            crossAxisAlignment: 'start',
-            margin: { left: 36, right: 36 },
+            width: heroW,
+            height: capH,
+            color: '#ffffff',
             child: {
               type: 'column',
+              mainAxisAlignment: 'center',
               crossAxisAlignment: 'start',
               children: [
                 {
                   type: 'text',
-                  text: title,
+                  text: t.heroTitle || 'YoClip sees the frame,\nnot just text',
+                  width: heroW - 64,
                   textAlign: 'left',
+                  margin: { left: 32 },
                   style: {
-                    fontSize: portrait ? 34 : 42,
-                    color: '#ffffff',
+                    fontSize: 26,
+                    color: '#101c33',
                     fontFamily: font,
                     fontWeight: 700,
+                    lineHeight: 1.25,
                   },
                 },
+                { type: 'container', height: 6 },
                 {
                   type: 'text',
-                  text: subtitle,
+                  text: t.heroSubtitle || 'Your code, your visuals, one render graph.',
+                  width: heroW - 64,
                   textAlign: 'left',
-                  margin: { top: 12 },
+                  margin: { left: 32 },
                   style: {
-                    fontSize: portrait ? 22 : 26,
-                    color: '#bcd7f0',
+                    fontSize: 15,
+                    color: '#64748f',
                     fontFamily: font,
+                    lineHeight: 1.3,
                   },
                 },
               ],
@@ -123,164 +165,139 @@ scene = {
           },
         ],
       },
-    };
+    });
 
-    // -- Left thumbnail nav: 4 mini cards sliding in staggered.
-    var thumbs = [];
-    for (var i = 0; i < 4; i++) {
-      var te = eoBack(staggerItem(frame, i, 30, 8, 20));
-      var tOp = seg(frame, 30 + i * 8, 38 + i * 8);
-      thumbs.push({
-        type: 'container',
-        width: portrait ? 140 : 170,
-        height: portrait ? 90 : 108,
-        margin: { top: i === 0 ? 0 : 18 },
-        opacity: tOp,
-        offsetX: (1 - te) * -320,
-        color: '#ffffff',
-        borderRadius: 14,
-        borderColor: '#dfffff',
-        borderWidth: 1.5,
-        shadow: { color: '#330f2a44', blur: 18, offsetX: 0, offsetY: 8 },
-        clip: true,
-        child: {
-          type: 'image',
-          source: 'external:' + thumbSrcs[i],
-          fit: 'cover',
-          width: portrait ? 140 : 170,
-          height: portrait ? 90 : 108,
-        },
-      });
-    }
-    // NOTE: columns expand to the full frame height even with `alignment`
-    // set, so vertical placement goes through mainAxisAlignment.
-    var thumbNav = {
-      type: 'column',
-      alignment: portrait ? 'center' : 'centerLeft',
-      offsetX: portrait ? -330 : 84,
-      offsetY: (portrait ? -270 : -10) - pan,
-      mainAxisAlignment: 'center',
-      crossAxisAlignment: 'center',
-      children: thumbs,
-    };
-
-    // -- Bullet rows: icon chip circle + bold title + muted desc, rising.
-    var glyphPaths = [
-      'M 8 17 L 15 24 L 26 9',                              // check
-      'M 12 8 L 5 16 L 12 24 M 20 8 L 27 16 L 20 24',      // code
-      'M 16 4 L 27 10.5 L 27 21.5 L 16 28 L 5 21.5 L 5 10.5 Z M 5 10.5 L 16 17 L 27 10.5 M 16 17 L 16 28', // cube
+    // ------------------------------------------------------------------
+    // Feature pills — bigger white cards, shifted left, sliding in.
+    // ------------------------------------------------------------------
+    var bullets = t.bullets || [
+      { title: 'Zero setup', lines: ['Describe a video as text or images,', 'and get an MP4.'], icon: 'wand' },
+      { title: 'Code-first', lines: ['Write scenes in JavaScript,', 'animate any property by frame.'], icon: 'code' },
+      { title: 'Native encoding', lines: ['FFmpeg under the hood,', 'MP4, GIF, WebM, image sequences.'], icon: 'chip' },
+      { title: 'GPU 3D', lines: ['Import GLB models, animate', 'skeletons, particles, shaders.'], icon: 'cube' },
     ];
-    var bulletRows = [];
-    for (var b = 0; b < bullets.length; b++) {
-      var be = eo3(staggerItem(frame, b, 62, 12, 22));
-      bulletRows.push({
+
+    for (var i = 0; i < bullets.length; i++) {
+      var b = bullets[i];
+      var e = eio3(staggerItem(frame, i, 10, 8, 22));
+      var accent = ACCENTS[i % ACCENTS.length];
+      var tint = TINTS[i % TINTS.length];
+      children.push({
         type: 'container',
-        width: portrait ? 620 : 560,
-        margin: { top: b === 0 ? 0 : 22 },
-        opacity: be,
-        offsetY: (1 - be) * 60,
-        color: '#f2ffffff',
-        borderRadius: 18,
-        shadow: { color: '#260f2a44', blur: 22, offsetX: 0, offsetY: 10 },
+        alignment: 'center',
+        offsetX: pillCX + (1 - e) * 90,
+        offsetY: pillY0 + i * pillStep,
+        width: pillW,
+        height: pillH,
+        opacity: e * outro,
+        color: '#ffffff',
+        borderRadius: 26,
+        shadow: { color: '#241a2b4a', blur: 18, offsetX: 0, offsetY: 8 },
         child: {
           type: 'row',
           crossAxisAlignment: 'center',
           children: [
-            { type: 'container', width: 22 },
+            { type: 'container', width: 20 },
             {
               type: 'container',
-              width: 56,
-              height: 56,
-              color: '#ffffff',
-              borderRadius: 28,
-              borderColor: '#dce9f5',
-              borderWidth: 1.5,
+              width: iconBox,
+              height: iconBox,
+              borderRadius: 999,
+              color: tint,
               child: {
                 type: 'path',
-                path: glyphPaths[b % glyphPaths.length],
-                color: chipBlue,
-                strokeWidth: 3,
-                width: 32,
-                height: 32,
-                alignment: 'center',
+                path: iconPath(b.icon),
+                color: accent,
+                strokeWidth: 2.5,
+                width: iconBox,
+                height: iconBox,
               },
             },
-            { type: 'container', width: 22 },
+            { type: 'container', width: 18 },
             {
               type: 'column',
               crossAxisAlignment: 'start',
+              mainAxisAlignment: 'center',
               children: [
                 {
                   type: 'text',
-                  text: bullets[b][0],
+                  text: b.title,
+                  width: textW,
                   textAlign: 'left',
                   style: {
-                    fontSize: portrait ? 26 : 30,
-                    color: navy,
+                    fontSize: 24,
+                    color: '#101c33',
                     fontFamily: font,
                     fontWeight: 700,
+                    lineHeight: 1.2,
+                  },
+                },
+                { type: 'container', height: 4 },
+                {
+                  type: 'text',
+                  text: b.lines[0] || '',
+                  width: textW,
+                  textAlign: 'left',
+                  style: {
+                    fontSize: 17,
+                    color: '#64748f',
+                    fontFamily: font,
+                    lineHeight: 1.3,
                   },
                 },
                 {
                   type: 'text',
-                  text: bullets[b][1],
+                  text: b.lines[1] || '',
+                  width: textW,
                   textAlign: 'left',
-                  margin: { top: 4, bottom: 20 },
                   style: {
-                    fontSize: portrait ? 20 : 23,
-                    color: navySoft,
+                    fontSize: 17,
+                    color: '#64748f',
                     fontFamily: font,
+                    lineHeight: 1.3,
                   },
                 },
               ],
             },
-            { type: 'container', height: 84 },
           ],
         },
       });
     }
-    var bulletCol = {
-      type: 'column',
-      alignment: portrait ? 'center' : 'centerRight',
-      offsetX: portrait ? 0 : -120,
-      offsetY: (portrait ? 330 : -10) - pan,
-      mainAxisAlignment: 'center',
-      crossAxisAlignment: 'center',
-      children: bulletRows,
-    };
+
+    // ------------------------------------------------------------------
+    // Left thumbnail rail — five uniform rectangles (the mini kaleidoscope
+    // card is the same 170x108 format as the rest, not a square).
+    // ------------------------------------------------------------------
+    if (!portrait) {
+      var railSrcs = ['golden_kaleido', 'golden_chat', 'golden_space', 'golden_website', 'golden_polish'];
+      var railH = railSrcs.length * thumbH + (railSrcs.length - 1) * thumbGap;
+      for (var j = 0; j < railSrcs.length; j++) {
+        children.push({
+          type: 'container',
+          alignment: 'center',
+          offsetX: railX + thumbW / 2 - 960,
+          offsetY: -railH / 2 + thumbH / 2 + j * (thumbH + thumbGap),
+          width: thumbW,
+          height: thumbH,
+          opacity: eo3(staggerItem(frame, j, 2, 4, 16)) * outro,
+          borderRadius: 14,
+          shadow: { color: '#2e1a2b4a', blur: 16, offsetX: 0, offsetY: 7 },
+          clip: true,
+          child: {
+            type: 'image',
+            source: 'external:' + railSrcs[j],
+            fit: 'cover',
+            width: thumbW,
+            height: thumbH,
+          },
+        });
+      }
+    }
 
     return {
       type: 'stack',
       fit: 'expand',
-      opacity: life,
-      children: [
-        // Sky-blue world (Gamma fidelity).
-        {
-          type: 'container',
-          gradient: {
-            type: 'linear',
-            begin: 'topCenter',
-            end: 'bottomCenter',
-            colors: ['#7db4e8', '#bcd7f0'],
-          },
-        },
-        // Soft sun glow upper-right.
-        {
-          type: 'container',
-          alignment: 'topRight',
-          width: 700,
-          height: 700,
-          gradient: {
-            type: 'radial',
-            center: 'center',
-            radius: 0.5,
-            colors: ['#59ffffff', '#00ffffff'],
-          },
-        },
-        thumbNav,
-        hero,
-        bulletCol,
-      ],
+      children: children,
     };
   },
 };
