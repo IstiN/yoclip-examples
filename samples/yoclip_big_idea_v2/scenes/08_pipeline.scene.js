@@ -65,15 +65,15 @@ scene = {
     });
 
     // -- yoclip.yaml card, left.
-    var cardIn = eio3(seg(frame, 4, 20));
+    var cardIn = eio3(seg(frame, 0, 16));
     var yamlLines = ['scenes:', '  - 00_intro', '  - 01_portal', 'export: mp4'];
     var yamlChildren = [
       {
         type: 'text',
         text: t.chip || 'yoclip.yaml',
         textAlign: 'left',
-        width: 260,
-        style: { fontSize: 19, color: accent, fontFamily: font, fontWeight: 700 },
+        width: 320,
+        style: { fontSize: 22, color: accent, fontFamily: font, fontWeight: 700 },
       },
       { type: 'container', height: 14 },
     ];
@@ -82,17 +82,17 @@ scene = {
         type: 'text',
         text: yamlLines[li],
         textAlign: 'left',
-        width: 260,
-        style: { fontSize: 15, color: muted, fontFamily: font, lineHeight: 1.55 },
+        width: 320,
+        style: { fontSize: 17, color: muted, fontFamily: font, lineHeight: 1.6 },
       });
     }
     children.push({
       type: 'container',
       alignment: 'center',
-      offsetX: portrait ? 0 : -520,
+      offsetX: portrait ? 0 : -540,
       offsetY: (portrait ? -260 : 0) + (1 - cardIn) * 30,
-      width: 320,
-      height: 240,
+      width: 400,
+      height: 300,
       opacity: cardIn,
       color: surface,
       borderRadius: 20,
@@ -104,10 +104,10 @@ scene = {
         crossAxisAlignment: 'start',
         mainAxisAlignment: 'center',
         children: [
-          { type: 'container', height: 0, width: 30 },
+          { type: 'container', height: 0, width: 36 },
           {
             type: 'container',
-            margin: { left: 30 },
+            margin: { left: 36 },
             child: {
               type: 'column',
               crossAxisAlignment: 'start',
@@ -121,22 +121,22 @@ scene = {
     // -- Arrow between the card and the formats (path — Geneva lacks '->').
     // Wrap props go on the path node itself: a wrapping row would keep
     // MainAxisSize.max and break the center+offset anchoring.
-    var bigArrow = arrowNode({ size: 46, color: muted, strokeWidth: 3 });
+    var bigArrow = arrowNode({ size: 56, color: muted, strokeWidth: 3.5 });
     bigArrow.alignment = 'center';
-    bigArrow.offsetX = portrait ? 0 : -292;
+    bigArrow.offsetX = portrait ? 0 : -305;
     bigArrow.offsetY = portrait ? -70 : 0;
-    bigArrow.opacity = eo3(seg(frame, 22, 32));
+    bigArrow.opacity = eo3(seg(frame, 16, 26));
     children.push(bigArrow);
 
     // -- Three format frames with live goldens.
     var defs = [
-      { w: 250, h: 141, src: 'golden_space', x: portrait ? -160 : -60, y: portrait ? 130 : -20 },
-      { w: 141, h: 250, src: 'golden_chat', x: portrait ? 160 : 230, y: portrait ? 130 : -20 },
-      { w: 180, h: 180, src: 'golden_kaleido', x: portrait ? 0 : 490, y: portrait ? 430 : -20 },
+      { w: 330, h: 186, src: 'golden_space', x: portrait ? -160 : -20, y: portrait ? 130 : -20 },
+      { w: 186, h: 330, src: 'golden_chat', x: portrait ? 160 : 260, y: portrait ? 130 : -20 },
+      { w: 230, h: 230, src: 'golden_kaleido', x: portrait ? 0 : 510, y: portrait ? 430 : -20 },
     ];
     for (var i = 0; i < defs.length; i++) {
       var d = defs[i];
-      var p = pop(frame, 42 + i * 18, 16);
+      var p = pop(frame, 34 + i * 16, 16);
       children.push({
         type: 'container',
         alignment: 'center',
@@ -163,10 +163,10 @@ scene = {
         type: 'text',
         alignment: 'center',
         offsetX: d.x,
-        offsetY: d.y + d.h / 2 + 26,
+        offsetY: d.y + d.h / 2 + 30,
         text: formats[i] || '',
-        opacity: eo3(seg(frame, 52 + i * 18, 62 + i * 18)),
-        style: { fontSize: 16, color: muted, fontFamily: font, fontWeight: 600, letterSpacing: 2 },
+        opacity: eo3(seg(frame, 44 + i * 16, 54 + i * 16)),
+        style: { fontSize: 18, color: muted, fontFamily: font, fontWeight: 600, letterSpacing: 2 },
       });
     }
 
@@ -175,9 +175,9 @@ scene = {
     children.push({
       type: 'container',
       alignment: 'center',
-      offsetY: portrait ? 560 : 320,
-      width: 260,
-      height: 62,
+      offsetY: portrait ? 560 : 336,
+      width: 284,
+      height: 68,
       borderRadius: 999,
       opacity: ex.opacity,
       scale: ex.scale,

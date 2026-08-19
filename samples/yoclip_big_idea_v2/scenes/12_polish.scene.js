@@ -42,7 +42,10 @@ scene = {
     var stat3 = chat.stat3 || ['0', 'errors'];
     var portrait = yoclipIsPortrait();
     var font = yoclipFont();
-    var life = presence(frame, 8, 234, 14);
+    // Hold budget fits the project.js duration (181): fade out lands at
+    // 167-181 so the handoff to pipeline cross-fades instead of hard-cutting
+    // (the scene file's own 262f design was trimmed when pipeline was added).
+    var life = presence(frame, 8, 159, 14);
 
     var primary = yoclipColor('primary', '#7c3aed');
     var primaryLight = yoclipColor('primaryLight', '#a78bfa');
