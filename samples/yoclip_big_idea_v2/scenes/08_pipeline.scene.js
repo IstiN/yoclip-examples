@@ -32,6 +32,20 @@ scene = {
     var formats = t.formats || ['16:9', '9:16', '1:1'];
     var children = [];
 
+    // Own backdrop from frame 0: a deep-violet wash so the polish cross-fade
+    // lands on a designed surface instead of the near-black shared background
+    // (the 1:22-1:24 "hole"). Transparent-center radial keeps the animated
+    // background blobs glowing through at the edges.
+    children.push({
+      type: 'container',
+      opacity: eo3(seg(frame, 0, 10)),
+      gradient: {
+        type: 'radial',
+        colors: ['#00201a30', '#c0201a30'],
+        stops: [0.55, 1],
+      },
+    });
+
     // -- Tag chip, top center. The '→' in the dictionary text is drawn as a
     // path (Geneva has no such glyph — a raw '\u2192' shows as a tofu box).
     var tagStyle = {
@@ -148,8 +162,8 @@ scene = {
         scale: p.scale,
         borderRadius: 22,
         clip: true,
-        stroke: yoclipColorA('text', 31),
-        strokeWidth: 1,
+        stroke: yoclipColorA('text', 56),
+        strokeWidth: 1.5,
         shadow: { color: '#66000000', blur: 24, offsetX: 0, offsetY: 10 },
         child: {
           type: 'image',

@@ -62,32 +62,34 @@ scene = {
       crossAxisAlignment: 'center',
       children: [
         {
+          // Hugs its content (no fixed width) — a fixed 250px pill with a
+          // small logo inside read as a sparse, cheap chip.
           type: 'container',
-          width: 250,
           color: yoclipColorA('primary', 0x2e, '#7c3aed'),
           borderRadius: 999,
           borderColor: yoclipColorA('primaryLight', 0x66, '#a78bfa'),
           borderWidth: 1.5,
           child: {
             type: 'row',
+            // min — a container > row otherwise stretches to the frame width.
+            mainAxisSize: 'min',
             crossAxisAlignment: 'center',
             children: [
-              { type: 'container', width: 18 },
+              { type: 'container', width: 22 },
               {
                 // The REAL yoclip wordmark (dark-theme: white on violet).
                 type: 'image',
                 source: 'external:logo',
                 fit: 'contain',
-                width: 96,
-                height: 60,
-                margin: { top: 2 },
+                width: 92,
+                height: 58,
               },
               {
                 type: 'text',
-                text: ' 101',
-                margin: { right: 18, left: 8 },
+                text: '101',
+                margin: { left: 10, right: 26 },
                 style: {
-                  fontSize: 22,
+                  fontSize: 24,
                   color: primaryLight,
                   fontFamily: font,
                   fontWeight: 700,
