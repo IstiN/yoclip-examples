@@ -9,7 +9,8 @@
 //
 // Renderer notes: Geneva lacks ⚙/✖/✓ glyphs (leading symbol characters are
 // stripped); container styling is direct props only; text gradients need an
-// opaque solid `color` as the alpha mask.
+// opaque solid `color` as the alpha mask. rowW must be declared BEFORE the
+// input-viewport math that uses it (var hoisting gave NaN widths).
 
 scene = {
   id: 'chat',
@@ -45,6 +46,8 @@ scene = {
     var ink = '#1f2937';
     var mutedUi = '#64748b';
 
+    var rowW = portrait ? 860 : 688;
+
     // Camera drift toward the stats card once it lands.
     var drift = seg(frame, 90, 154);
     var camScale = 1 + 0.035 * drift;
@@ -59,10 +62,20 @@ scene = {
     var inputIn = ease(frame, 6, 20, eo3);
     var typedPair = typewriterParts(userMsg, frame, 22, 30);
     var typedInput = typedPair[0];
-    var typedRest = typedPair[1];
     var inputTypingDone = typedInput.length >= userMsg.length;
     var btnPulse = seg(frame, 46, 52) * (1 - seg(frame, 52, 58));
     var inputOut = 1 - seg(frame, 56, 66);
+
+    // Long prompts scroll inside the input viewport like a real text field
+    // instead of overflowing the pill (0.55 em per char overshoots slightly —
+    // overscroll only hides leading characters a bit earlier, which is what
+    // real inputs do anyway).
+    var inputFontSize = portrait ? 24 : 26;
+    var inputViewW = rowW - 150 - 34;
+    var inputScroll = Math.max(
+      0,
+      typedInput.length * inputFontSize * 0.55 - inputViewW + 16,
+    );
 
     var userPop = pop(frame, 62, 14);
 
@@ -76,8 +89,6 @@ scene = {
     // The agent starts typing again after the activity line — a live
     // typing indicator fills the panel's empty bottom.
     var typingOp = seg(frame, 134, 140);
-
-    var rowW = portrait ? 860 : 688;
 
     function dot(i) {
       return {
@@ -189,6 +200,8 @@ scene = {
               {
                 type: 'text',
                 text: typedAgent,
+                maxWidth: rowW - 110,
+                textAlign: 'left',
                 style: { fontSize: portrait ? 26 : 28, color: ink, fontFamily: font },
               },
               { type: 'container', width: 24 },
@@ -244,23 +257,34 @@ scene = {
                     children: [
                       { type: 'container', width: 26 },
                       {
-                        type: 'text',
-                        text: typedInput,
-                        style: { fontSize: portrait ? 24 : 26, color: ink, fontFamily: font },
-                      },
-                      {
+                        // Clipped scroll viewport (see inputScroll above).
                         type: 'container',
-                        width: 3,
-                        height: 30,
-                        opacity: !inputTypingDone || blink(frame, 14) === 1 ? 1 : 0,
-                        margin: { left: 4 },
-                        color: accent,
-                      },
-                      {
-                        // Invisible remainder: constant width, no jitter.
-                        type: 'text',
-                        text: typedRest,
-                        style: { fontSize: portrait ? 24 : 26, color: '#00000000', fontFamily: font },
+                        width: inputViewW,
+                        clip: true,
+                        borderRadius: 8,
+                        alignment: 'centerLeft',
+                        child: {
+                          type: 'row',
+                          crossAxisAlignment: 'center',
+                          width: 1200,
+                          alignment: 'centerLeft',
+                          offsetX: -inputScroll,
+                          children: [
+                            {
+                              type: 'text',
+                              text: typedInput,
+                              style: { fontSize: inputFontSize, color: ink, fontFamily: font },
+                            },
+                            {
+                              type: 'container',
+                              width: 3,
+                              height: 30,
+                              opacity: !inputTypingDone || blink(frame, 14) === 1 ? 1 : 0,
+                              margin: { left: 4 },
+                              color: accent,
+                            },
+                          ],
+                        },
                       },
                     ],
                   },
@@ -306,6 +330,8 @@ scene = {
                     {
                       type: 'text',
                       text: userMsg,
+                      maxWidth: rowW - 48,
+                      textAlign: 'left',
                       style: { fontSize: portrait ? 26 : 28, color: '#ffffff', fontFamily: font },
                     },
                     { type: 'container', width: 24 },

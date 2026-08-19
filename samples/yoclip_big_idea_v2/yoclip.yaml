@@ -31,26 +31,27 @@ theme:
 
 project_js: project.js
 
+# Order/durations/anchors are owned by project.js — this list just keeps
+# external tooling pointed at the same files.
 scenes:
   - scenes/background.scene.js
   - scenes/00_hook.scene.js
   - scenes/01_monolith.scene.js
-  - scenes/02_kaleido.scene.js
   - scenes/03_generate.scene.js
   - scenes/04_prompt.scene.js
   - scenes/05_deck.scene.js
   - scenes/05b_zoom.scene.js
+  - scenes/02_kaleido.scene.js
   - scenes/06_chat.scene.js
   - scenes/07_space.scene.js
-  - scenes/08_course.scene.js
   - scenes/09_website.scene.js
-  - scenes/10_carousel.scene.js
-  - scenes/11_upload.scene.js
+  - scenes/08_pipeline.scene.js
+  - scenes/10_compare.scene.js
   - scenes/12_polish.scene.js
-  - scenes/12b_starmap.scene.js
-  - scenes/12c_globe.scene.js
   - scenes/13_tunnel.scene.js
-  - scenes/14_end.scene.js
+  - scenes/14_badge.scene.js
+  - scenes/15_cta.scene.js
+  - scenes/16_outro.scene.js
 
 external_assets:
   logo:

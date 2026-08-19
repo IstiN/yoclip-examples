@@ -3,10 +3,14 @@
 // A deep gradient base plus three slowly drifting color "orbs" keeps the frame
 // alive without distracting from content. Orb colors come from the active
 // theme; on light variants the alpha is boosted so they stay visible on white.
+//
+// NOTE: duration must cover the whole timeline (the end card lands ~3294f
+// with the current scene chain) — when scenes are added/retimed, keep this
+// ahead of the last scene's end.
 
 scene = {
   id: 'background',
-  duration: 2997,
+  duration: 3300,
   from: 0,
   description: 'Full-length animated gradient + drifting theme orbs under all content.',
   voicePrompts: {

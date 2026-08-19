@@ -40,14 +40,7 @@ scene = {
     // "Describe your video..." hint is actually readable before typing
     // begins; the caret idles in the pill from the hint phase on.
     var TYPE_START = 34;
-    var typedPair = typewriterParts(fieldText, frame, TYPE_START, 66);
-    var typed = typedPair[0];
-    var typedRest = typedPair[1];
     var hint = t.hint || 'Describe your video...';
-    var showHint = typed.length === 0 && frame < TYPE_START;
-    var typingDone = typed.length >= fieldText.length;
-    // Caret only appears once real typing starts, then blinks when done.
-    var caretOn = frame >= TYPE_START && (!typingDone || blink(frame, 14) === 1);
 
     // -- Cursor: appears, glides bottom-right -> button (~25f), clicks.
     // Button sits ~+59 below the column center; the tip lands on its
@@ -101,79 +94,35 @@ scene = {
                 crossAxisAlignment: 'center',
                 children: [
                   { type: 'container', width: 36 },
-                  {
-                    type: 'text',
-                    text: showHint ? hint : typed,
-                    style: {
-                      fontSize: portrait ? 28 : 32,
-                      color: showHint ? '#9aa5b1' : '#1f2937',
-                      fontFamily: yoclipFont(),
-                    },
-                  },
-                  {
-                    type: 'container',
-                    width: 3,
-                    height: 36,
-                    opacity: caretOn ? 1 : 0,
-                    margin: { left: 6 },
-                    color: '#2563eb',
-                  },
-                  {
-                    // Invisible remainder: constant line width, no jitter.
-                    type: 'text',
-                    text: showHint ? '' : typedRest,
-                    style: {
-                      fontSize: portrait ? 28 : 32,
-                      color: '#00000000',
-                      fontFamily: yoclipFont(),
-                    },
-                  },
-                ],
+                ].concat(typewriterFieldNodes({
+                  frame: frame,
+                  text: fieldText,
+                  start: TYPE_START,
+                  cps: 66,
+                  hint: hint,
+                  font: yoclipFont(),
+                  fontSize: portrait ? 28 : 32,
+                  color: '#1f2937',
+                  caretColor: '#2563eb',
+                  caretHeight: 36,
+                })),
               },
             },
             { type: 'container', height: 30 },
-            {
-              type: 'container',
+            renderButtonNode({
+              label: buttonLabel,
+              font: yoclipFont(),
+              fontSize: portrait ? 30 : 34,
               width: 300,
               height: 78,
+              colors: ['#60a5fa', '#2563eb'],
               scale: btnScale,
-              gradient: {
-                type: 'linear',
-                colors: ['#60a5fa', '#2563eb'],
-                begin: 'centerLeft',
-                end: 'centerRight',
-              },
-              borderRadius: 999,
-              shadow: { color: '#662563eb', blur: glowBlur, offsetX: 0, offsetY: 12 },
-              child: {
-                type: 'row',
-                mainAxisAlignment: 'center',
-                crossAxisAlignment: 'center',
-                children: [
-                  // 4-point star sparkle (path, not a glyph).
-                  {
-                    type: 'path',
-                    path: 'M 12 0 L 15 9 L 24 12 L 15 15 L 12 24 L 9 15 L 0 12 L 9 9 Z',
-                    color: '#ffffff',
-                    strokeWidth: 2.5,
-                    width: 22,
-                    height: 22,
-                    scale: sparkScale,
-                    margin: { right: 12 },
-                  },
-                  {
-                    type: 'text',
-                    text: buttonLabel,
-                    style: {
-                      fontSize: portrait ? 30 : 34,
-                      color: '#ffffff',
-                      fontFamily: yoclipFont(),
-                      fontWeight: 700,
-                    },
-                  },
-                ],
-              },
-            },
+              shadowColor: '#662563eb',
+              shadowBlur: glowBlur,
+              shadowOffsetY: 12,
+              sparkleSize: 22,
+              sparkleScale: sparkScale,
+            }),
           ],
         },
         // Cursor arrow (stroked pointer, dark), gliding to the button.

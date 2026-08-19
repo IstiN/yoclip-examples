@@ -100,6 +100,8 @@ scene = {
         {
           type: 'text',
           text: titleA,
+          alignment: portrait ? 'center' : 'topLeft',
+          offsetX: portrait ? 0 : 40,
           margin: { top: 10 },
           style: {
             fontSize: portrait ? 26 : 28,
@@ -111,6 +113,8 @@ scene = {
         {
           type: 'text',
           text: titleB,
+          alignment: portrait ? 'center' : 'topLeft',
+          offsetX: portrait ? 0 : 40,
           margin: { top: 2 },
           style: {
             fontSize: portrait ? 46 : 52,
@@ -252,7 +256,10 @@ scene = {
       type: 'container',
       alignment: portrait ? 'center' : 'centerLeft',
       offsetX: (portrait ? 300 : 606),
-      offsetY: (portrait ? -240 : 40) - codeCardH / 2 + 34 + (1 - chipIn) * 18,
+      // Push the chip lower inside the code card so it no longer hovers
+      // over the title at landscape (P1-6): 40 -> 96 below the code card
+      // midline, so it sits inside the code panel's bottom area.
+      offsetY: (portrait ? -240 : 96) - codeCardH / 2 + 34 + (1 - chipIn) * 18,
       width: 230,
       height: 48,
       opacity: chipIn * (1 - chipOut),

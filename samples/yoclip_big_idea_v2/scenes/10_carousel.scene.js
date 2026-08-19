@@ -475,7 +475,7 @@ scene = {
     var followChip = {
       type: 'container',
       alignment: 'bottomCenter',
-      offsetY: portrait ? -40 : -32,
+      offsetY: portrait ? -54 : -46,
       opacity: capPop.opacity,
       scale: Math.max(0.05, capPop.scale),
       color: '#1f2937',

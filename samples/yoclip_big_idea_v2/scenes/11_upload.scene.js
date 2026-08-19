@@ -75,9 +75,9 @@ scene = {
         rotation: ps[2] + float(frame, 2, 0.02, ps[6] * 2),
         scale: depthScale,
         opacity: ps[5] * (1 - 0.7 * push),
-        color: yoclipColorA('primaryLight', 0x14, '#a78bfa'),
+        color: yoclipColorA('primaryLight', 0x32, '#a78bfa'),
         borderRadius: 18,
-        borderColor: yoclipColorA('primaryLight', 0x66, '#a78bfa'),
+        borderColor: yoclipColorA('primaryLight', 0x99, '#a78bfa'),
         borderWidth: 1.5,
       });
     }

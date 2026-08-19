@@ -33,28 +33,36 @@ void main() {
       print('SCREENSHOT: runtime init done');
       addTearDown(runtime.dispose);
 
-      final variant = project.config.variants.firstWhere(
-        (v) => v.id == "dark_en",
-        orElse: () => throw StateError(
-          'Unknown variant "dark_en". Available: ${project.config.variants.map((v) => v.id).join(', ')}',
-        ),
-      );
-      final scenes = await loadYoclipProjectScenes(runtime, project, storage, variant: variant);
+      final scenes = await loadYoclipProjectScenes(runtime, project, storage);
       print('SCREENSHOT: scenes loaded');
 
-      final targetScenes = scenes;
+      final targetScene = scenes.firstWhere(
+        (s) => s.id == "zoom",
+        orElse: () => throw StateError(
+          'Unknown scene "zoom". Available: ${scenes.map((s) => s.id).join(', ')}',
+        ),
+      );
+      // --frame/--at are scene-local: translate to the composition timeline
+      // and keep ALL scenes so background layers and `scene:` snapshots
+      // resolve exactly as in the final render.
+      final localFrame = frame.clamp(0, targetScene.duration - 1);
+      if (localFrame != frame) {
+        print('SCREENSHOT: frame $frame out of range for scene "zoom" '
+            '(duration ${targetScene.duration}), clamped to $localFrame');
+      }
+      final captureFrame = targetScene.from + localFrame;
 
       final renderer = YoclipV2Renderer(
-        project: applyVariantResolution(project, variant),
-        scenes: targetScenes,
+        project: project,
+        scenes: scenes,
         storage: storage,
         externalFiles: {"logo":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/logo/yoclip_logo.svg","logo_on_light":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/logo_on_light/yoclip_logo_on_light.svg","yo_bubble":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/yo_bubble/yo_bubble.svg","golden_hook":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_hook/hook.png","golden_monolith":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_monolith/monolith.png","golden_kaleido":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_kaleido/kaleido.png","golden_space":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_space/space.png","golden_rally":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_rally/rally.png","golden_tunnel":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_tunnel/tunnel.png","golden_prompt":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_prompt/prompt.png","golden_deck":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_deck/deck.png","golden_chat":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_chat/chat.png","golden_website":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_website/website.png","golden_polish":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_polish/polish.png","golden_endcard":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/golden_endcard/endcard.png","ridge_far":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/ridge_far/ridge_far.svg","ridge_mid":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/ridge_mid/ridge_mid.svg","ridge_near":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_big_idea_v2/.yoclip_cache/external/ridge_near/ridge_near.svg"},
         externalFrameDirs: {},
         externalImageBytes: externalImageBytes,
       );
 
-      print('SCREENSHOT: capturing frame $frame');
-      final bytes = await renderer.capturePng(tester, frame);
+      print('SCREENSHOT: capturing frame $captureFrame');
+      final bytes = await renderer.capturePng(tester, captureFrame);
       print('SCREENSHOT: captured png, length ${bytes.length}');
 
       print('SCREENSHOT: writing file');

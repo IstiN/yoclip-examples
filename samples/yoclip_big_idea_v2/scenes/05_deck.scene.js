@@ -7,7 +7,9 @@
 // Renderer notes: the scene background is opaque from frame 0 and the root
 // stack carries NO opacity — fading the whole scene in once let the dark
 // background layer bleed through at the prompt->deck cut (a "dark frame").
-// Only content (hero, pills, rail) fades/slides, plus a shared outro fade.
+// Content also does NOT fade out at the end: the zoom scene opens with a
+// frozen `scene:deck@148` snapshot and must match the live final frames
+// pixel-for-pixel, so everything stays at full opacity until the cut.
 
 scene = {
   id: 'deck',
@@ -26,9 +28,9 @@ scene = {
     var t = yoclipT('deck');
     var portrait = yoclipIsPortrait();
     var font = yoclipFont();
-    // Outro only: content fades out near the end; the background stays
-    // opaque until the scene cuts (the next scene crossfades over it).
-    var outro = 1 - eo3(seg(frame, 155, 169));
+    // No outro fade — the zoom scene's opening `scene:deck@148` freeze must
+    // match these final frames exactly (see header note).
+    var outro = 1;
 
     // ------------------------------------------------------------------
     // Layout constants (landscape 1920x1080)
@@ -173,7 +175,7 @@ scene = {
     var bullets = t.bullets || [
       { title: 'Zero setup', lines: ['Describe a video as text or images,', 'and get an MP4.'], icon: 'wand' },
       { title: 'Code-first', lines: ['Write scenes in JavaScript,', 'animate any property by frame.'], icon: 'code' },
-      { title: 'Native encoding', lines: ['FFmpeg under the hood,', 'MP4, GIF, WebM, image sequences.'], icon: 'chip' },
+      { title: 'Native encoding', lines: ['FFmpeg under the hood — 8K, 60fps,', 'MP4, GIF, WebM, image sequences.'], icon: 'chip' },
       { title: 'GPU 3D', lines: ['Import GLB models, animate', 'skeletons, particles, shaders.'], icon: 'cube' },
     ];
 

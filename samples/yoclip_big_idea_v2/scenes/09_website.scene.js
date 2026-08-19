@@ -51,11 +51,6 @@ scene = {
     // down/out as the site sweeps in.
     var pillOp = seg(frame, 2, 10) * (1 - seg(frame, 52, 64));
     var pillSlide = seg(frame, 52, 64, eio3) * 140;
-    var promptPair = typewriterParts(promptText, frame, 8, 55);
-    var typedPrompt = promptPair[0];
-    var typedRest = promptPair[1];
-    var promptDone = typedPrompt.length >= promptText.length;
-    var promptCaret = frame >= 8 && (!promptDone || blink(frame, 14) === 1);
     var chipPop = pop(frame, 30, 14);
     var chipDip = seg(frame, 44, 48) * (1 - seg(frame, 48, 54));
     var chipGlow = 18 + 16 * seg(frame, 50, 58) * shimmer(frame, 22);
@@ -86,73 +81,35 @@ scene = {
             crossAxisAlignment: 'center',
             children: [
               { type: 'container', width: 28 },
-              {
-                type: 'path',
-                path: 'M 12 0 L 15 9 L 24 12 L 15 15 L 12 24 L 9 15 L 0 12 L 9 9 Z',
-                color: primary,
-                strokeWidth: 2.5,
-                width: 20,
-                height: 20,
-                margin: { right: 12 },
-              },
-              {
-                type: 'text',
-                text: typedPrompt,
-                style: { fontSize: 24, color: ink, fontFamily: font },
-              },
-              {
-                type: 'container',
-                width: 3,
-                height: 30,
-                opacity: promptCaret ? 1 : 0,
-                margin: { left: 4 },
-                color: primary,
-              },
-              {
-                // Invisible remainder: constant width, no jitter.
-                type: 'text',
-                text: typedRest,
-                style: { fontSize: 24, color: '#00000000', fontFamily: font },
-              },
-            ],
+              sparkleNode({ size: 20, color: primary, marginRight: 12 }),
+            ].concat(typewriterFieldNodes({
+              frame: frame,
+              text: promptText,
+              start: 8,
+              cps: 55,
+              font: font,
+              fontSize: 24,
+              color: ink,
+              caretColor: primary,
+              caretHeight: 30,
+              caretMarginLeft: 4,
+            })),
           },
         },
         { type: 'container', height: 24 },
-        {
-          type: 'container',
+        renderButtonNode({
+          label: t.button || 'Render',
+          font: font,
+          fontSize: 26,
           width: 260,
           height: 70,
+          colors: [primaryLight, primary],
           scale: Math.max(0.001, chipPop.scale * (1 - 0.12 * chipDip)),
           opacity: chipPop.opacity,
-          gradient: {
-            colors: [primaryLight, primary],
-            begin: 'centerLeft',
-            end: 'centerRight',
-          },
-          borderRadius: 999,
-          shadow: { color: yoclipColorA('primary', 0x66, '#7c3aed'), blur: chipGlow, offsetX: 0, offsetY: 10 },
-          child: {
-            type: 'row',
-            mainAxisAlignment: 'center',
-            crossAxisAlignment: 'center',
-            children: [
-              {
-                type: 'path',
-                path: 'M 12 0 L 15 9 L 24 12 L 15 15 L 12 24 L 9 15 L 0 12 L 9 9 Z',
-                color: '#ffffff',
-                strokeWidth: 2.5,
-                width: 20,
-                height: 20,
-                margin: { right: 10 },
-              },
-              {
-                type: 'text',
-                text: 'Render',
-                style: { fontSize: 26, color: '#ffffff', fontFamily: font, fontWeight: 700 },
-              },
-            ],
-          },
-        },
+          shadowColor: yoclipColorA('primary', 0x66, '#7c3aed'),
+          shadowBlur: chipGlow,
+          sparkleSize: 20,
+        }),
       ],
     };
     var promptCursor = {
@@ -377,11 +334,11 @@ scene = {
       ],
     };
 
-    // -- Numbered steps. Popped ~20f earlier than before so the bottom
-    // third of the page never sits empty waiting for them.
+    // -- Numbered steps. Popped ~30f earlier so the bottom third of the
+    // page never sits empty waiting for them (P2).
     var stepKids = [];
     for (var st = 0; st < steps.length; st++) {
-      var stPop = pop(frame, 106 + st * 9, 16);
+      var stPop = pop(frame, 86 + st * 8, 16);
       stepKids.push({
         type: 'row',
         crossAxisAlignment: 'center',

@@ -42,11 +42,6 @@ scene = {
     var fieldIn = seg(frame, 26, 40);
     var fieldOut = seg(frame, 96, 112);
     var fieldOp = fieldIn * (1 - fieldOut);
-    var typedPair = typewriterParts(fieldText, frame, 36, 30);
-    var typed = typedPair[0];
-    var typedRest = typedPair[1];
-    var typingDone = typedRest.length === 0;
-    var caretOn = frame >= 36 && (!typingDone || blink(frame, 14) === 1);
 
     // Cursor: appears, glides to the button, clicks (dip), fades.
     var curOp = seg(frame, 58, 64) * (1 - seg(frame, 94, 102));
@@ -269,34 +264,17 @@ scene = {
             crossAxisAlignment: 'center',
             children: [
               { type: 'container', width: 36 },
-              {
-                type: 'text',
-                text: typed,
-                style: {
-                  fontSize: portrait ? 26 : 30,
-                  color: '#ffffff',
-                  fontFamily: font,
-                },
-              },
-              {
-                type: 'container',
-                width: 3,
-                height: 36,
-                opacity: caretOn ? 1 : 0,
-                margin: { left: 6 },
-                color: accent,
-              },
-              {
-                // Invisible remainder: constant width, no jitter.
-                type: 'text',
-                text: typedRest,
-                style: {
-                  fontSize: portrait ? 26 : 30,
-                  color: '#00000000',
-                  fontFamily: font,
-                },
-              },
-            ],
+            ].concat(typewriterFieldNodes({
+              frame: frame,
+              text: fieldText,
+              start: 36,
+              cps: 30,
+              font: font,
+              fontSize: portrait ? 26 : 30,
+              color: '#ffffff',
+              caretColor: accent,
+              caretHeight: 36,
+            })),
           },
         },
         { type: 'container', height: 22 },

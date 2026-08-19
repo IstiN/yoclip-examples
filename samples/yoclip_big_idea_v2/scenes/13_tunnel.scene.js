@@ -38,10 +38,11 @@ scene = {
     var accent = yoclipColor('accent', '#22d3ee');
     var ringColors = [primary, accent, primaryLight];
 
-    // -- Tagline beat: dim the 3D layer as the text lands (~80). 0.38 keeps
-    // the tunnel glowing behind the tagline instead of muddying out.
+    // -- Tagline beat: dim the 3D layer as the text lands (~80). Floor 0.55
+    // keeps rings glowing clean behind the tagline (was 0.38 — the tunnel
+    // turned into a muddy smudge behind the white type).
     var tagIn = ease(frame, 80, 100, eo3);
-    var dim = lerp(1, 0.38, seg(frame, 70, 96));
+    var dim = lerp(1, 0.55, seg(frame, 70, 96));
     var letterSp = lerp(2, 14, ease(frame, 80, 118, eo3));
     var tagScale = 0.94 + 0.06 * ease(frame, 80, 104, eo3);
 

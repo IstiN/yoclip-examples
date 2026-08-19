@@ -65,12 +65,12 @@ scene = {
     var groundY = -1.1;
 
     // ---- The real 3D logo (all GLB parts), bobbing above the near dune. ----
-    // Full wordmark must FIT the frame with air around it: scale 1.0 (the
-    // GLB layout spans ~5.9 units), planted just above the near dune so the
-    // tagline below never collides with it.
+    // The end card IS the brand moment — the logo must dominate but FIT:
+    // 1.15× over the original framing with a gentle push-in keeps the whole
+    // arc inside the frame with air around it (1.5× + camZ 8 overflowed).
     var logoY = groundY + 0.05 + 0.06 * Math.sin(frame * 0.07);
     var logoModels = [];
-    var logoSc = Math.max(0.001, logoPop.scale) * 1.0;
+    var logoSc = Math.max(0.001, logoPop.scale) * 1.15;
     var logoParts = ['arc', 'bubble', 'l', 'i', 'idot', 'p'];
     for (var pi = 0; pi < logoParts.length; pi++) {
       logoModels.push({
@@ -88,7 +88,7 @@ scene = {
     // touch below the logo center so the mark floats above the tagline.
     var push = ease(frame, 0, 179, eio3);
     var camY = lerp(2.0, 1.7, push);
-    var camZ = lerp(11.5, 10.2, push);
+    var camZ = lerp(10.6, 9.6, push);
     var cam = { position: [0, camY, camZ], target: [0, 0.3, 0], fov: 50 };
 
     var layers = [

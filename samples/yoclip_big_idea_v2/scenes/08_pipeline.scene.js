@@ -1,0 +1,221 @@
+// 08 — Pipeline: one yaml -> every screen.
+//
+// A dark UI beat: a yoclip.yaml card on the left, an arrow, then three
+// format frames (16:9 / 9:16 / 1:1) popping in with live goldens inside,
+// and an export chip landing last. Transparent background — the shared
+// animated background layer shows through, like the other dark scenes.
+
+scene = {
+  id: 'pipeline',
+  duration: 180,
+  description: 'One yaml to every screen: dark surface card with yoclip.yaml lines on the left, arrow, three format frames (16:9, 9:16, 1:1) popping in with golden previews, export chip lands at the end.',
+  voicePrompts: {
+    en: 'A quick, satisfying assembly rhythm — three pops for the three formats, a final click on export.',
+    ru: 'Быстрый собирающий ритм — три попа для трёх форматов, финальный клик на экспорте.',
+  },
+  timeline: {
+    label: yoclipT('pipeline').timeline || 'Flow',
+    color: '#22d3ee',
+    lane: 'video',
+  },
+  render: function(frame) {
+    var t = yoclipT('pipeline');
+    var portrait = yoclipIsPortrait();
+    var font = yoclipFont();
+    var primary = yoclipColor('primary', '#7c3aed');
+    var accent = yoclipColor('accent', '#22d3ee');
+    var surface = yoclipColor('surface', '#15131f');
+    var textC = yoclipColor('text', '#ffffff');
+    var muted = yoclipColor('textMuted', '#a1a1aa');
+    var life = presence(frame, 4, 160, 16);
+
+    var formats = t.formats || ['16:9', '9:16', '1:1'];
+    var children = [];
+
+    // -- Tag chip, top center. The '→' in the dictionary text is drawn as a
+    // path (Geneva has no such glyph — a raw '\u2192' shows as a tofu box).
+    var tagStyle = {
+      fontSize: 16,
+      color: muted,
+      fontFamily: font,
+      fontWeight: 600,
+      letterSpacing: 4,
+    };
+    children.push({
+      type: 'container',
+      alignment: 'center',
+      offsetY: -340,
+      height: 46,
+      borderRadius: 999,
+      color: surface,
+      opacity: eo3(seg(frame, 0, 12)),
+      child: {
+        type: 'row',
+        crossAxisAlignment: 'center',
+        children: [{ type: 'container', width: 20 }].concat(
+          splitOnGlyph(
+            t.tag || 'one yaml \u2192 every screen',
+            '\u2192',
+            tagStyle,
+            arrowNode({ size: 18, color: muted, margin: { left: 10, right: 10 } }),
+          ),
+          [{ type: 'container', width: 20 }],
+        ),
+      },
+    });
+
+    // -- yoclip.yaml card, left.
+    var cardIn = eio3(seg(frame, 4, 20));
+    var yamlLines = ['scenes:', '  - 00_intro', '  - 01_portal', 'export: mp4'];
+    var yamlChildren = [
+      {
+        type: 'text',
+        text: t.chip || 'yoclip.yaml',
+        textAlign: 'left',
+        width: 260,
+        style: { fontSize: 19, color: accent, fontFamily: font, fontWeight: 700 },
+      },
+      { type: 'container', height: 14 },
+    ];
+    for (var li = 0; li < yamlLines.length; li++) {
+      yamlChildren.push({
+        type: 'text',
+        text: yamlLines[li],
+        textAlign: 'left',
+        width: 260,
+        style: { fontSize: 15, color: muted, fontFamily: font, lineHeight: 1.55 },
+      });
+    }
+    children.push({
+      type: 'container',
+      alignment: 'center',
+      offsetX: portrait ? 0 : -520,
+      offsetY: (portrait ? -260 : 0) + (1 - cardIn) * 30,
+      width: 320,
+      height: 240,
+      opacity: cardIn,
+      color: surface,
+      borderRadius: 20,
+      stroke: yoclipColorA('text', 26),
+      strokeWidth: 1,
+      shadow: { color: '#59000000', blur: 26, offsetX: 0, offsetY: 12 },
+      child: {
+        type: 'column',
+        crossAxisAlignment: 'start',
+        mainAxisAlignment: 'center',
+        children: [
+          { type: 'container', height: 0, width: 30 },
+          {
+            type: 'container',
+            margin: { left: 30 },
+            child: {
+              type: 'column',
+              crossAxisAlignment: 'start',
+              children: yamlChildren,
+            },
+          },
+        ],
+      },
+    });
+
+    // -- Arrow between the card and the formats (path — Geneva lacks '->').
+    // Wrap props go on the path node itself: a wrapping row would keep
+    // MainAxisSize.max and break the center+offset anchoring.
+    var bigArrow = arrowNode({ size: 46, color: muted, strokeWidth: 3 });
+    bigArrow.alignment = 'center';
+    bigArrow.offsetX = portrait ? 0 : -292;
+    bigArrow.offsetY = portrait ? -70 : 0;
+    bigArrow.opacity = eo3(seg(frame, 22, 32));
+    children.push(bigArrow);
+
+    // -- Three format frames with live goldens.
+    var defs = [
+      { w: 250, h: 141, src: 'golden_space', x: portrait ? -160 : -60, y: portrait ? 130 : -20 },
+      { w: 141, h: 250, src: 'golden_chat', x: portrait ? 160 : 230, y: portrait ? 130 : -20 },
+      { w: 180, h: 180, src: 'golden_kaleido', x: portrait ? 0 : 490, y: portrait ? 430 : -20 },
+    ];
+    for (var i = 0; i < defs.length; i++) {
+      var d = defs[i];
+      var p = pop(frame, 42 + i * 18, 16);
+      children.push({
+        type: 'container',
+        alignment: 'center',
+        offsetX: d.x,
+        offsetY: d.y,
+        width: d.w,
+        height: d.h,
+        opacity: p.opacity,
+        scale: p.scale,
+        borderRadius: 22,
+        clip: true,
+        stroke: yoclipColorA('text', 31),
+        strokeWidth: 1,
+        shadow: { color: '#66000000', blur: 24, offsetX: 0, offsetY: 10 },
+        child: {
+          type: 'image',
+          source: 'external:' + d.src,
+          fit: 'cover',
+          width: d.w,
+          height: d.h,
+        },
+      });
+      children.push({
+        type: 'text',
+        alignment: 'center',
+        offsetX: d.x,
+        offsetY: d.y + d.h / 2 + 26,
+        text: formats[i] || '',
+        opacity: eo3(seg(frame, 52 + i * 18, 62 + i * 18)),
+        style: { fontSize: 16, color: muted, fontFamily: font, fontWeight: 600, letterSpacing: 2 },
+      });
+    }
+
+    // -- Export chip lands last.
+    var ex = pop(frame, 122, 16);
+    children.push({
+      type: 'container',
+      alignment: 'center',
+      offsetY: portrait ? 560 : 320,
+      width: 260,
+      height: 62,
+      borderRadius: 999,
+      opacity: ex.opacity,
+      scale: ex.scale,
+      gradient: {
+        type: 'linear',
+        colors: [primary, accent],
+        begin: 'centerLeft',
+        end: 'centerRight',
+      },
+      shadow: { color: yoclipColorA('primary', 110), blur: 30, offsetX: 0, offsetY: 10 },
+      child: {
+        type: 'row',
+        mainAxisAlignment: 'center',
+        crossAxisAlignment: 'center',
+        // The '\u25b8' in the dictionary text is drawn as a path (Geneva
+        // lacks the glyph and would show a tofu box).
+        children: splitOnGlyph(
+          t.export || '\u25b8 export.mp4',
+          '\u25b8',
+          { fontSize: 21, color: textC, fontFamily: font, fontWeight: 700 },
+          {
+            type: 'path',
+            path: 'M 8 4 L 20 12 L 8 20 Z',
+            color: textC,
+            strokeWidth: 2.5,
+            width: 18,
+            height: 18,
+            margin: { right: 8 },
+          },
+        ),
+      },
+    });
+
+    return {
+      type: 'stack',
+      fit: 'expand',
+      opacity: life,
+      children: children,
+    };
+  },
+};

@@ -445,3 +445,160 @@ function voxelLetterMesh(ch, v, depth, color) {
 function voxelWordWidth(text, v) {
   return text.length * 6 * v - v;
 }
+
+// ---- Shared components -------------------------------------------------------
+//
+// The "type a prompt, hit Render" Studio UI appears in several scenes
+// (04_prompt, 05b_zoom, 07_space, 09_website). These builders keep the
+// caret behaviour, the invisible-remainder jitter fix and the 4-point
+// sparkle identical everywhere — scenes only pass their own sizes/colors.
+
+/// Typewriter field content as row children: [typed, caret, rest].
+/// THE shared caret behaviour: hidden before typing starts, solid while
+/// typing, blinking (period 14) once done. `rest` is fully transparent so
+/// the line's measured width never changes mid-typing (no jitter/drift).
+///
+/// opts: frame, text, start, cps, font, fontSize, color, caretColor;
+/// optional: hint + hintColor (placeholder shown before `start`),
+/// caretHeight (default ~1.12 x fontSize), caretMarginLeft (default 6).
+function typewriterFieldNodes(opts) {
+  var pair = typewriterParts(opts.text, opts.frame, opts.start, opts.cps);
+  var showHint = opts.hint != null && pair[0].length === 0 && opts.frame < opts.start;
+  var caretOn = opts.frame >= opts.start &&
+    (pair[1].length > 0 || blink(opts.frame, 14) === 1);
+  var fontSize = opts.fontSize;
+  return [
+    {
+      type: 'text',
+      text: showHint ? opts.hint : pair[0],
+      style: {
+        fontSize: fontSize,
+        color: showHint ? (opts.hintColor || '#9aa5b1') : opts.color,
+        fontFamily: opts.font,
+      },
+    },
+    {
+      type: 'container',
+      width: 3,
+      height: opts.caretHeight || Math.round(fontSize * 1.12),
+      opacity: caretOn ? 1 : 0,
+      margin: { left: opts.caretMarginLeft != null ? opts.caretMarginLeft : 6 },
+      color: opts.caretColor,
+    },
+    {
+      type: 'text',
+      text: showHint ? '' : pair[1],
+      style: { fontSize: fontSize, color: '#00000000', fontFamily: opts.font },
+    },
+  ];
+}
+
+/// The canonical 4-point sparkle (Geneva lacks the ✦ glyph, so it is a
+/// path). Drawn in a 24x24 box; `size` scales it down, `scale` is the
+/// animated twinkle factor.
+function sparkleNode(opts) {
+  var node = {
+    type: 'path',
+    path: 'M 12 0 L 15 9 L 24 12 L 15 15 L 12 24 L 9 15 L 0 12 L 9 9 Z',
+    color: opts.color || '#ffffff',
+    strokeWidth: 2.5,
+    width: 24,
+    height: 24,
+    scale: ((opts.size || 22) / 24) * (opts.scale || 1),
+  };
+  if (opts.marginRight) node.margin = { right: opts.marginRight };
+  return node;
+}
+
+/// The shared gradient Render button: pill with sparkle + bold label,
+/// content centered. opts: label, font, fontSize, width, height, colors
+/// ([from, to] left-to-right); optional: scale, opacity, shadowColor,
+/// shadowBlur, shadowOffsetY (default 10), sparkleSize, sparkleScale.
+function renderButtonNode(opts) {
+  var node = {
+    type: 'container',
+    width: opts.width,
+    height: opts.height,
+    gradient: {
+      type: 'linear',
+      colors: opts.colors,
+      begin: 'centerLeft',
+      end: 'centerRight',
+    },
+    borderRadius: 999,
+    child: {
+      type: 'row',
+      mainAxisAlignment: 'center',
+      crossAxisAlignment: 'center',
+      children: [
+        sparkleNode({
+          size: opts.sparkleSize || 22,
+          scale: opts.sparkleScale,
+          marginRight: 10,
+        }),
+        {
+          type: 'text',
+          text: opts.label,
+          style: {
+            fontSize: opts.fontSize,
+            color: '#ffffff',
+            fontFamily: opts.font,
+            fontWeight: 700,
+          },
+        },
+      ],
+    },
+  };
+  if (opts.scale != null) node.scale = opts.scale;
+  if (opts.opacity != null) node.opacity = opts.opacity;
+  if (opts.shadowColor) {
+    node.shadow = {
+      color: opts.shadowColor,
+      blur: opts.shadowBlur != null ? opts.shadowBlur : 24,
+      offsetX: 0,
+      offsetY: opts.shadowOffsetY != null ? opts.shadowOffsetY : 10,
+    };
+  }
+  return node;
+}
+
+/// Right-arrow drawn as a stroked path (Geneva lacks the → glyph, so a text
+/// '\u2192' renders as a tofu box). Drawn in a 24x24 box; `size` scales it.
+/// opts: size, color; optional: strokeWidth (default 2.5), margin (map).
+function arrowNode(opts) {
+  // Sized via width/height (the painter scales the 24-box path into them).
+  // Never `scale` here: scale wraps OUTSIDE alignment, and around a
+  // full-frame Align's center it multiplies any offsetX/offsetY.
+  var size = opts.size || 24;
+  var node = {
+    type: 'path',
+    path: 'M 3 12 L 21 12 M 14 5 L 21 12 L 14 19',
+    color: opts.color || '#ffffff',
+    strokeWidth: opts.strokeWidth || 2.5,
+    width: size,
+    height: size,
+  };
+  if (opts.margin) node.margin = opts.margin;
+  return node;
+}
+
+/// Splits `text` on a glyph Geneva can't render (`needle`, e.g. '\u2192')
+/// and returns row children with the glyph drawn as a path node instead.
+/// `style` is shared by the text parts; `mark` builds the replacement node.
+function splitOnGlyph(text, needle, style, mark) {
+  var parts = text.split(needle);
+  var kids = [{
+    type: 'text',
+    text: parts[0].replace(/\s+$/, ''),
+    style: style,
+  }];
+  if (parts.length > 1) {
+    kids.push(mark);
+    kids.push({
+      type: 'text',
+      text: parts.slice(1).join(needle).replace(/^\s+/, ''),
+      style: style,
+    });
+  }
+  return kids;
+}

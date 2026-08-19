@@ -13,16 +13,14 @@
 // the dark-variant white logo on default variants — invisible on white).
 // 'centerLeft' pins the row's LEFT edge to the screen's left edge (the row
 // is full-width), so offsets are absolute from the left, not from center.
-//
-// No root fade in OR out: the next scene (prompt) is the SAME white world,
-// so the handoff is a plain white-to-white cut at the -6 overlap. Any
-// fade-out here would reveal the dark background layer for a few frames —
-// that was the black gap at ~15.5s.
+// The white world NEVER fades (only the content does) — fading the root
+// stack let the dark background layer bleed through before the prompt
+// scene's white world covers (the "dark frame" at ~15.8s).
 
 scene = {
   id: 'generate',
   duration: 165,
-  description: 'White-world brand beat: YoClip logo pops in at center, glides left and docks, "Render" types beside it, words cycle right of center (promos/doc videos/shorts/product demos, last holds), tail "from code." lands below.',
+  description: 'White-world brand beat: YoClip logo pops in at center, glides left and docks, "Render" types beside it, words cycle right of center (promos/doc videos/shorts/product demos, last holds), tail "from code." lands below; content fades out over the persistent white world.',
   voicePrompts: {
     en: 'A confident brand sting; one soft keystroke per cycled word.',
     ru: 'Уверенный бренд-акцент; мягкий клик на каждое слово.',
@@ -75,6 +73,9 @@ scene = {
     // -- Tail lands below once the last word has settled.
     var tailIn = eo3(seg(frame, HOLD_START + 12, HOLD_START + 24));
 
+    // -- Outro: CONTENT fades, the white world stays opaque (see header).
+    var outro = fadeOut(frame, 155, 10);
+
     var fs = portrait ? 34 : 58;
     var tailFs = portrait ? 26 : 34;
     var logoW = portrait ? 130 : 180;
@@ -96,10 +97,8 @@ scene = {
     return {
       type: 'stack',
       fit: 'expand',
-      // No entrance or exit fade: kaleido's white flash hands off to this
-      // white world, and this white world hands off to prompt's white
-      // world — fading either way would flash the dark background layer.
-      opacity: 1.0,
+      // No root opacity: the white world below stays fully opaque until the
+      // scene cuts (the prompt scene covers the cut with its own white).
       children: [
         // Gamma white world.
         { type: 'container', color: '#f5f4f1' },
@@ -109,6 +108,7 @@ scene = {
           alignment: 'centerLeft',
           offsetX: groupX,
           crossAxisAlignment: 'center',
+          opacity: outro,
           children: [
             {
               // White world pins the on-light logo (see header note).
@@ -148,7 +148,7 @@ scene = {
           offsetX: rightX,
           offsetY: wordRise,
           text: wordText,
-          opacity: wordOp,
+          opacity: wordOp * outro,
           style: {
             fontSize: fs,
             color: cycle,
@@ -162,7 +162,7 @@ scene = {
           alignment: 'center',
           offsetY: tailY,
           text: tailIn > 0 ? tail : '',
-          opacity: tailIn,
+          opacity: tailIn * outro,
           style: {
             fontSize: tailFs,
             color: muted,
