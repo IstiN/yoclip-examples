@@ -66,16 +66,15 @@ scene = {
     var btnPulse = seg(frame, 46, 52) * (1 - seg(frame, 52, 58));
     var inputOut = 1 - seg(frame, 56, 66);
 
-    // Long prompts scroll inside the input viewport like a real text field
-    // instead of overflowing the pill (0.55 em per char overshoots slightly —
-    // overscroll only hides leading characters a bit earlier, which is what
-    // real inputs do anyway).
+    // Long prompts show the tail, like a real input. The visible window is
+    // computed in JS (conservative 0.62 em/char): a clipped wide row inside
+    // the pill still trips RenderFlex overflow in the Studio preview because
+    // the Align loosens-then-clamps the inner SizedBox to the viewport.
     var inputFontSize = portrait ? 24 : 26;
-    var inputViewW = rowW - 150 - 34;
-    var inputScroll = Math.max(
-      0,
-      typedInput.length * inputFontSize * 0.55 - inputViewW + 16,
-    );
+    var inputViewChars = Math.floor((rowW - 150 - 34) / (inputFontSize * 0.62));
+    var typedVisible = typedInput.length <= inputViewChars
+      ? typedInput
+      : typedInput.slice(typedInput.length - inputViewChars);
 
     var userPop = pop(frame, 62, 14);
 
@@ -258,34 +257,17 @@ scene = {
                     children: [
                       { type: 'container', width: 26 },
                       {
-                        // Clipped scroll viewport (see inputScroll above).
+                        type: 'text',
+                        text: typedVisible,
+                        style: { fontSize: inputFontSize, color: ink, fontFamily: font },
+                      },
+                      {
                         type: 'container',
-                        width: inputViewW,
-                        clip: true,
-                        borderRadius: 8,
-                        alignment: 'centerLeft',
-                        child: {
-                          type: 'row',
-                          crossAxisAlignment: 'center',
-                          width: 1200,
-                          alignment: 'centerLeft',
-                          offsetX: -inputScroll,
-                          children: [
-                            {
-                              type: 'text',
-                              text: typedInput,
-                              style: { fontSize: inputFontSize, color: ink, fontFamily: font },
-                            },
-                            {
-                              type: 'container',
-                              width: 3,
-                              height: 30,
-                              opacity: !inputTypingDone || blink(frame, 14) === 1 ? 1 : 0,
-                              margin: { left: 4 },
-                              color: accent,
-                            },
-                          ],
-                        },
+                        width: 3,
+                        height: 30,
+                        opacity: !inputTypingDone || blink(frame, 14) === 1 ? 1 : 0,
+                        margin: { left: 4 },
+                        color: accent,
                       },
                     ],
                   },
