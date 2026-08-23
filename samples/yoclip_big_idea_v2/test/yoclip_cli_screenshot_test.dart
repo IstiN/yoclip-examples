@@ -37,9 +37,9 @@ void main() {
       print('SCREENSHOT: scenes loaded');
 
       final targetScene = scenes.firstWhere(
-        (s) => s.id == "zoom",
+        (s) => s.id == "chat",
         orElse: () => throw StateError(
-          'Unknown scene "zoom". Available: ${scenes.map((s) => s.id).join(', ')}',
+          'Unknown scene "chat". Available: ${scenes.map((s) => s.id).join(', ')}',
         ),
       );
       // --frame/--at are scene-local: translate to the composition timeline
@@ -47,7 +47,7 @@ void main() {
       // resolve exactly as in the final render.
       final localFrame = frame.clamp(0, targetScene.duration - 1);
       if (localFrame != frame) {
-        print('SCREENSHOT: frame $frame out of range for scene "zoom" '
+        print('SCREENSHOT: frame $frame out of range for scene "chat" '
             '(duration ${targetScene.duration}), clamped to $localFrame');
       }
       final captureFrame = targetScene.from + localFrame;
