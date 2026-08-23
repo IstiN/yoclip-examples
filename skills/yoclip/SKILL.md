@@ -602,13 +602,14 @@ yoclip init my_video                                        # scaffold a new V2 
 yoclip preview --project .                                  # launch Studio for a project
 yoclip render --project . --output video.mp4
 yoclip render --project . --output video.mp4 --preset youtube_4k --variant shorts_en
+yoclip render --project . --output video.mp4 --clean-cache     # delete raw frame cache after render
 yoclip render --project . --output frames/                  # non-.mp4 output → PNG sequence
 yoclip screenshot --project . --frame 3200 --output frame.png   # one golden frame
 yoclip screenshot --project . --at 1.5 --scene intro --output frame.png
 ```
 
 - `render` flags: `--output/-o`, `--project/-C`, `--preset/-p`, `--variant/-V`,
-  `--test`, `--no-run`. `--preset` accepts **only** `youtube_1080`,
+  `--test`, `--no-run`, `--clean-cache`. `--preset` accepts **only** `youtube_1080`,
   `shorts_1080`, `square_1080`, `youtube_4k` (no `qhd_1440`/`uhd_8k`), and
   overrides a variant's resolution retargeting.
 - `screenshot` flags: `--frame`, `--at <seconds>`, `--scene <id>`,
