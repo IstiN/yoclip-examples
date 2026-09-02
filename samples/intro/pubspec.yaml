@@ -18,11 +18,11 @@ dependencies:
   path: ^1.9.0
   path_provider: ^2.1.0
   yoclip_core:
-    path: ../../packages/yoclip_core
+    path: ../../../packages/yoclip_core
   yoclip_encoder:
-    path: ../../packages/yoclip_encoder
+    path: ../../../packages/yoclip_encoder
   yoclip_player:
-    path: ../../packages/yoclip_player
+    path: ../../../packages/yoclip_player
 
 dev_dependencies:
   flutter_test:

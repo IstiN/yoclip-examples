@@ -16,9 +16,9 @@ dependencies:
     sdk: flutter
   path: ^1.9.0
   yoclip_core:
-    path: /Users/Uladzimir_Klyshevich/git/yoclip/packages/yoclip_core
+    path: ../../../packages/yoclip_core
   yoclip_encoder:
-    path: /Users/Uladzimir_Klyshevich/git/yoclip/packages/yoclip_encoder
+    path: ../../../packages/yoclip_encoder
 
 dev_dependencies:
   flutter_test:
