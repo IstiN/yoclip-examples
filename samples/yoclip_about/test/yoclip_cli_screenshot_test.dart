@@ -27,7 +27,7 @@ void main() {
       final project = await YoclipProject.load(storage, projectPath);
       print('SCREENSHOT: project loaded');
 
-      final runtime = YoclipQuickJsRuntime();
+      final runtime = createYoclipJsRuntime();
       print('SCREENSHOT: init runtime');
       await runtime.init();
       print('SCREENSHOT: runtime init done');
@@ -36,19 +36,19 @@ void main() {
       final scenes = await loadYoclipProjectScenes(runtime, project, storage);
       print('SCREENSHOT: scenes loaded');
 
-      final targetScenes = scenes;
+      final captureFrame = frame;
 
       final renderer = YoclipV2Renderer(
         project: project,
-        scenes: targetScenes,
+        scenes: scenes,
         storage: storage,
-        externalFiles: {"logo":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/yoclip_about/.yoclip_cache/external/logo/yoclip_logo.svg","logo_on_light":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/yoclip_about/.yoclip_cache/external/logo_on_light/yoclip_logo_on_light.svg","studio":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/yoclip_about/.yoclip_cache/external/studio/studio.png"},
+        externalFiles: {"logo":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_about/.yoclip_cache/external/logo/yoclip_logo.svg","logo_on_light":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_about/.yoclip_cache/external/logo_on_light/yoclip_logo_on_light.svg","studio":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_about/.yoclip_cache/external/studio/studio.png"},
         externalFrameDirs: {},
         externalImageBytes: externalImageBytes,
       );
 
-      print('SCREENSHOT: capturing frame $frame');
-      final bytes = await renderer.capturePng(tester, frame);
+      print('SCREENSHOT: capturing frame $captureFrame');
+      final bytes = await renderer.capturePng(tester, captureFrame);
       print('SCREENSHOT: captured png, length ${bytes.length}');
 
       print('SCREENSHOT: writing file');

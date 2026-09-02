@@ -8,7 +8,7 @@ config:
 external_assets:
   laptop_open:
     type: video
-    path: /Users/Uladzimir_Klyshevich/Downloads/laptop_open.mp4
+    path: assets/laptop_open.mp4
   logo:
     type: image
-    path: /Users/Uladzimir_Klyshevich/Downloads/1780588269066.png
+    path: assets/logo.png
