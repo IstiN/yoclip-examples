@@ -42,8 +42,8 @@ void main() {
         project: project,
         scenes: scenes,
         storage: storage,
-        externalFiles: {"laptop_open":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_intro/.yoclip_cache/external/laptop_open/laptop_open.mp4","logo":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_intro/.yoclip_cache/external/logo/logo.png"},
-        externalFrameDirs: {"laptop_open":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/yoclip_intro/.yoclip_cache/external/laptop_open/frames"},
+        externalFiles: {"laptop_open":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/intro/.yoclip_cache/external/laptop_open/laptop_open.mp4","logo":"/Users/Uladzimir_Klyshevich/git/yoclip/samples/samples/intro/.yoclip_cache/external/logo/logo.png"},
+        externalFrameDirs: {},
         externalImageBytes: externalImageBytes,
       );
 

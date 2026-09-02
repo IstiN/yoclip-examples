@@ -134,57 +134,61 @@ class _PreviewScaffoldState extends State<_PreviewScaffold> {
               audio: const IntroVideo().audio,
               child: const Intro(),
             ),
-            tracks: const [
-              TimelineTrack(
-                id: 'video-1',
-                label: 'Video 1',
-                color: Color(0xFF3B82F6),
-                icon: Icons.videocam,
-                clips: [
-                  TimelineClip(
-                    id: 'intro',
-                    label: 'Intro scene',
-                    start: 0,
-                    duration: 90,
-                  ),
-                  TimelineClip(
-                    id: 'laptop',
-                    label: 'Laptop clip',
-                    start: 15,
-                    duration: 60,
-                  ),
-                ],
-              ),
-              TimelineTrack(
-                id: 'image-1',
-                label: 'Image 1',
-                color: Color(0xFFF59E0B),
-                icon: Icons.image,
-                clips: [
-                  TimelineClip(
-                    id: 'logo',
-                    label: 'Logo overlay',
-                    start: 0,
-                    duration: 90,
-                  ),
-                ],
-              ),
-              TimelineTrack(
-                id: 'audio-1',
-                label: 'Audio 1',
-                color: Color(0xFF10B981),
-                icon: Icons.audiotrack,
-                clips: [
-                  TimelineClip(
-                    id: 'music',
-                    label: 'Background music',
-                    start: 0,
-                    duration: 90,
-                  ),
-                ],
-              ),
-            ],
-            onPresetChanged: (preset) => setState(() => _preset = preset),
+            options: YoclipPlayerOptions(
+              // The player derives its iMovie-style lanes from the tracks
+              // handed to it; the composition's audio track becomes the
+              // audio lane automatically.
+              tracks: const [
+                TimelineTrack(
+                  id: 'video-1',
+                  label: 'Video 1',
+                  color: Color(0xFF3B82F6),
+                  icon: Icons.videocam,
+                  clips: [
+                    TimelineClip(
+                      id: 'intro',
+                      label: 'Intro scene',
+                      start: 0,
+                      duration: 90,
+                    ),
+                    TimelineClip(
+                      id: 'laptop',
+                      label: 'Laptop clip',
+                      start: 15,
+                      duration: 60,
+                    ),
+                  ],
+                ),
+                TimelineTrack(
+                  id: 'image-1',
+                  label: 'Image 1',
+                  color: Color(0xFFF59E0B),
+                  icon: Icons.image,
+                  clips: [
+                    TimelineClip(
+                      id: 'logo',
+                      label: 'Logo overlay',
+                      start: 0,
+                      duration: 90,
+                    ),
+                  ],
+                ),
+                TimelineTrack(
+                  id: 'audio-1',
+                  label: 'Audio 1',
+                  color: Color(0xFF10B981),
+                  icon: Icons.audiotrack,
+                  clips: [
+                    TimelineClip(
+                      id: 'music',
+                      label: 'Background music',
+                      start: 0,
+                      duration: 90,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
