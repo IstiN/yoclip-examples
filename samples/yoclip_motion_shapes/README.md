@@ -1,16 +1,19 @@
 # yoclip_motion_shapes
 
-A tiny playground project that exercises the newest yoclip scene features
-end to end — **three scenes, twelve seconds, no assets**:
+A showreel-style playground modeled on the Motion Canvas anniversary
+thumbnail: a mosaic wall of video-card tiles washing from steel blue to
+muted red, and the mark assembling over it from rounded bars. **Three
+scenes, twelve seconds, no assets** — everything on screen is shape nodes
+and text, every motion runs through `jsr.motion`:
 
 | Scene | Feature | What it shows |
 |-------|---------|---------------|
-| `01_shapes` | Shape nodes (jsr 0.4.115) | `rect` / `circle` / `line` / `polygon` in a 2×2 grid, each card popping in via `jsr.motion.tween` |
-| `02_motion` | `jsr.motion` builtins (jsr 0.4.114) | A bar race with three visible easing curves (`linear` vs `easeInOutCubic` vs `backOut`), a `wave`-driven orbiting dot, and a `mapRange` percent counter |
-| `03_sequence` | `sequence()` helper (`lib/animation.js`) | One call choreographs the whole build: title, three staggered stat cards, footer — every timing lives in a single steps array |
+| `01_shapes` (`wall`) | Shape nodes + shared component | `buildWall()` from `lib/animation.js`: 7×5 tiles, center-out ripple entrance (backOut pops), wave drift, per-column color journey driven by `mapRange` |
+| `02_motion` (`logo`) | `jsr.motion` + absolute layout | The wall recedes and dims; rounded bars stamp in with backOut overshoot; the white asterisk (three rotated rounded bars) twists into place. Stack `positioned: {left, top}` |
+| `03_sequence` (`finale`) | `sequence()` helper | The whole finale — headline stamp, underline sweep, end dot, chip — choreographed in ONE steps array; rising particle loop |
 
 Requires **js_widget_runtime 0.4.115+** — the runtime ships `jsr.ease` /
-`jsr.motion` to every scene, so no easing math is hand-rolled anywhere here.
+`jsr.motion` to every scene, so no easing math is hand-rolled anywhere.
 
 ## Run
 
@@ -26,12 +29,16 @@ dart run ../../../packages/yoclip_cli/bin/yoclip.dart preview
 
 ```bash
 flutter test
+
+# Dump every probed frame as PNG for a visual golden check
+YOCLIP_CAPTURE_DIR=/tmp/mc_frames flutter test
 ```
 
-The test loads every scene through the QuickJS runtime, compiles it with
-`YoclipWidgetRenderer` at entrance / hold / late frames, and fails on any
-graph or widget error — the fastest way to verify runtime + shapes + motion
-stay compatible after an upgrade.
+The test loads the scenes through `loadYoclipProjectScenes` (the house
+loader: project.js lib + anchors + theme), compiles entrance / hold / late
+frames into real widgets and fails on any graph or widget error. With
+`YOCLIP_CAPTURE_DIR` it also saves 1920×1080 PNGs of each probe (Geneva
+loaded via FontLoader, so text is real).
 
 ## Notes for authors
 
@@ -40,6 +47,10 @@ stay compatible after an upgrade.
   scene's frame clock.
 - `sequence(frame, fps, steps)` keeps thinking in **frames** and converts
   internally; see the doc comment in `lib/animation.js` for the step shape.
-- Shape props are pinned in the skill (`skills/yoclip/SKILL.md` → node
-  types): `rect` stroke draws inside, `line` takes `x1/y1/x2/y2`,
-  `polygon.points` is a flat `[x, y, x, y, …]` array.
+- Stack children accept `positioned: {left, top, right, bottom}` (the jsr
+  contract, mirrored by the yoclip compiler).
+- `backOut` / `elastic` overshoot past 1 — clamp anything you feed to
+  `opacity`; `scale` and `width` can keep the snap.
+- `Array.concat` does **not** flatten nested arrays more than one level —
+  collect generated node groups (like the asterisk bars) with `push`, or
+  the compiler silently drops the nested list.

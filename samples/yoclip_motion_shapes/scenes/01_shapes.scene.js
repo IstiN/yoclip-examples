@@ -1,128 +1,61 @@
-// Demo 1 — shape nodes (js_widget_runtime 0.4.115).
+// Showreel 1 — the thumbnail wall.
 //
-// rect / circle / line / polygon in a 2x2 grid. Every card fades and pops in
-// through jsr.motion.tween (opacity + scale + offsetY), staggered left to
-// right, so one scene exercises shapes AND motion together.
+// Modeled on the Motion Canvas anniversary showreel cover: a mosaic of
+// video-card tiles, steel blue on the left washing to muted red on the
+// right, tiles landing in a center-out ripple while the surface drifts.
+// Everything on screen is shape nodes + text; motion is jsr.motion +
+// the shared buildWall() component from lib/animation.js.
 
 scene = {
-  id: 'shapes',
+  id: 'wall',
   duration: 120,
   from: 0,
   timeline: {
-    label: 'Shapes',
-    color: '#7c3aed',
+    label: 'The wall',
+    color: '#22d3ee',
     lane: 'video',
   },
   render: function(frame) {
     var ms = elapsedMs(frame, 30);
     var colors = yoclipTheme.colors;
 
-    // Card entrance: opacity + scale + offsetY off one tween window,
-    // staggered 10 frames (333 ms) per card.
-    function cardIn(i) {
-      var start = i * 333;
-      return {
-        opacity: jsr.motion.tween(ms, start, 450, 0, 1, 'easeOutExpo'),
-        scale: jsr.motion.tween(ms, start, 450, 0.7, 1, 'easeOutExpo'),
-        offsetY: jsr.motion.tween(ms, start, 450, 40, 0, 'easeOutExpo'),
-      };
-    }
-
-    function spacer(h) {
-      return { type: 'container', width: 0, height: h };
-    }
-
-    function shapeCard(label, shape, i) {
-      var fx = cardIn(i);
-      return {
-        type: 'container',
-        width: 560,
-        height: 360,
-        borderRadius: 28,
-        color: colors.surface,
-        opacity: fx.opacity,
-        scale: fx.scale,
-        offsetY: fx.offsetY,
-        child: {
-          type: 'column',
-          mainAxisAlignment: 'center',
-          crossAxisAlignment: 'center',
-          children: [
-            shape,
-            spacer(20),
-            {
-              type: 'text',
-              text: label,
-              style: { fontSize: 28, color: colors.textMuted, fontFamily: 'Geneva' },
-            },
-          ],
-        },
-      };
-    }
+    // Caption chip fades up late, bottom-left — like a montage title card.
+    var capO = jsr.motion.tween(ms, 2400, 500, 0, 1, 'easeOutExpo');
+    var capY = jsr.motion.tween(ms, 2400, 500, 26, 0, 'easeOutExpo');
 
     return {
       type: 'stack',
       fit: 'expand',
-      children: [
-        { type: 'fill', color: colors.background },
+      children: buildWall(frame, 30, {}).concat([
         {
-          type: 'column',
-          mainAxisAlignment: 'center',
-          crossAxisAlignment: 'center',
-          children: [
-            {
+          type: 'container',
+          width: 560,
+          height: 74,
+          radius: 37,
+          color: '#0a0a12',
+          opacity: capO,
+          offsetY: capY,
+          positioned: { left: 96, top: 930 },
+          padding: { left: 30, right: 30 },
+          child: {
+            type: 'align',
+            alignment: 'center',
+            child: {
               type: 'text',
-              text: 'SHAPE NODES',
-              style: yoclipTheme.label,
-              opacity: jsr.motion.tween(ms, 0, 400, 0, 1, 'easeOutExpo'),
-              offsetY: jsr.motion.tween(ms, 0, 400, 20, 0, 'easeOutExpo'),
+              text: 'ONE WALL OF IDEAS',
+              style: { fontSize: 26, color: '#e8eaf2', fontFamily: 'Geneva', fontWeight: '700', letterSpacing: 6 },
             },
-            spacer(48),
-            {
-              type: 'row',
-              children: [
-                shapeCard('rect', {
-                  type: 'rect',
-                  width: 260,
-                  height: 130,
-                  radius: 22,
-                  fill: colors.primary,
-                  stroke: '#ffffff',
-                  strokeWidth: 3,
-                }, 0),
-                spacer(28),
-                shapeCard('circle', {
-                  type: 'circle',
-                  size: 130,
-                  fill: colors.accent,
-                }, 1),
-              ],
-            },
-            spacer(28),
-            {
-              type: 'row',
-              children: [
-                shapeCard('line', {
-                  type: 'line',
-                  x1: 0,
-                  y1: 90,
-                  x2: 260,
-                  y2: 10,
-                  stroke: colors.warning,
-                  strokeWidth: 6,
-                }, 2),
-                spacer(28),
-                shapeCard('polygon', {
-                  type: 'polygon',
-                  points: [120, 0, 240, 88, 194, 226, 46, 226, 0, 88],
-                  fill: colors.danger,
-                  opacity: 0.92,
-                }, 3),
-              ],
-            },
-          ],
+          },
         },
-      ],
+        {
+          type: 'text',
+          text: 'motion & shapes',
+          style: { fontSize: 22, color: colors.textMuted, fontFamily: 'Geneva' },
+          opacity: capO,
+          offsetY: capY,
+          positioned: { left: 100, top: 1014 },
+        },
+      ]),
     };
   },
 };

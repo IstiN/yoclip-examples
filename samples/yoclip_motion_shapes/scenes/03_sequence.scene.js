@@ -1,117 +1,114 @@
-// Demo 3 — the sequence() helper (lib/animation.js, this sample's lib).
+// Showreel 3 — the finale.
 //
-// Motion-Canvas style: ONE call sequences the whole build. Steps are frames
-// on the scene clock; under the hood each one is a jsr.motion.tween. The
-// destructure keeps the choreography readable — every stage is a named
-// local, every timing lives in one place instead of being scattered across
-// the render body.
-//
-//   title  — slides up and fades in from frame 0
-//   bar1-3 — staggered card entrances from frames 15/30/45
-//   footer — drops in late, at frame 70
+// The red-washed wall holds; the mark dissolves and big kinetic type takes
+// over: "MADE WITH CODE" stamps in, an underline sweeps beneath it (backOut
+// overshoot — width may exceed briefly, that's the snap), a dot pops at its
+// end, particles drift up, and the yoclip chip lands last. The whole beat
+// structure lives in ONE sequence() call — timings read like a score.
 
 scene = {
-  id: 'sequence',
+  id: 'finale',
   duration: 120,
   from: 240,
   timeline: {
-    label: 'sequence()',
-    color: '#f59e0b',
+    label: 'Finale',
+    color: '#ef4444',
     lane: 'video',
   },
   render: function(frame) {
     var fps = 30;
     var colors = yoclipTheme.colors;
+    var ms = elapsedMs(frame, fps);
 
-    var [titleY, titleO, bar1, bar2, bar3, footerY, footerO] = sequence(frame, fps, [
-      // title: offset + opacity legs of the same window
-      { at: 0,  dur: 22, from: 36, to: 0, easing: 'easeOutExpo' },
-      { at: 0,  dur: 22, from: 0,  to: 1, easing: 'easeOutExpo' },
-      // three stat cards, staggered
-      { at: 15, dur: 24, from: 0,  to: 1, easing: 'backOut' },
-      { at: 30, dur: 24, from: 0,  to: 1, easing: 'backOut' },
-      { at: 45, dur: 24, from: 0,  to: 1, easing: 'backOut' },
-      // footer joins last: offset + opacity
-      { at: 70, dur: 20, from: 24, to: 0, easing: 'easeOutExpo' },
-      { at: 70, dur: 20, from: 0,  to: 1, easing: 'easeOutExpo' },
+    // The score: every beat of the finale in one place.
+    var [textScale, textO, lineW, dotP, chipY, chipO] = sequence(frame, fps, [
+      { at: 0,  dur: 22, from: 0.6, to: 1, easing: 'backOut' },     // type stamp
+      { at: 0,  dur: 14, from: 0,   to: 1 },                        // type fade
+      { at: 18, dur: 20, from: 0,   to: 560, easing: 'backOut' },   // underline sweep
+      { at: 34, dur: 12, from: 0,   to: 1, easing: 'backOut' },     // end dot
+      { at: 62, dur: 20, from: 40,  to: 0, easing: 'easeOutExpo' }, // chip rise
+      { at: 62, dur: 16, from: 0,   to: 1 },                        // chip fade
     ]);
 
-    function statCard(labelText, valueText, progress, i) {
+    // Rising particles — modulo loop, fading out as they climb.
+    function particle(i) {
+      var speed = 2.4 + (i % 3) * 0.7;
+      var span = 560;
+      var h = ((frame * speed + i * 97) % span);
+      var x = 240 + i * 290 + jsr.motion.wave(ms, 5200 + i * 400, 22, i * 0.35);
       return {
-        type: 'container',
-        width: 380,
-        height: 240,
-        borderRadius: 26,
-        color: colors.surface,
-        // backOut overshoots past 1 — that's the pop; but Flutter opacity
-        // only accepts [0,1], so clamp it and let scale keep the overshoot.
-        opacity: Math.min(progress, 1),
-        scale: 0.8 + 0.2 * progress,
-        offsetY: (1 - progress) * 30,
-        child: {
-          type: 'column',
-          mainAxisAlignment: 'center',
-          crossAxisAlignment: 'center',
-          children: [
-            {
-              type: 'text',
-              text: valueText,
-              style: { fontSize: 64, color: [colors.primaryLight, colors.accent, colors.warning][i], fontFamily: 'Geneva', fontWeight: '700' },
-            },
-            { type: 'container', width: 0, height: 10 },
-            {
-              type: 'text',
-              text: labelText,
-              style: { fontSize: 26, color: colors.textMuted, fontFamily: 'Geneva' },
-            },
-          ],
-        },
+        type: 'circle',
+        size: 8 + (i % 3) * 5,
+        fill: i % 2 ? colors.accent : '#f2989f',
+        opacity: 0.5 * (1 - h / span),
+        positioned: { left: x, top: 780 - h },
       };
     }
 
-    function spacer(h) {
-      return { type: 'container', width: 0, height: h };
+    var particles = [];
+    for (var i = 0; i < 6; i++) {
+      particles.push(particle(i));
     }
 
     return {
       type: 'stack',
       fit: 'expand',
-      children: [
-        { type: 'fill', color: colors.background },
+      children: buildWall(frame, fps, { scale: 0.86, dim: 0.75, dimmedOpacity: 0.8 }).concat([
+        ...particles,
+
+        // Headline — oversized, tight, dead center.
         {
-          type: 'column',
-          mainAxisAlignment: 'center',
-          crossAxisAlignment: 'center',
-          children: [
-            {
-              type: 'text',
-              text: 'ONE CALL, WHOLE BUILD',
-              style: yoclipTheme.headline,
-              opacity: titleO,
-              offsetY: titleY,
-            },
-            spacer(56),
-            {
-              type: 'row',
-              children: [
-                statCard('scenes', '3', bar1, 0),
-                spacer(24),
-                statCard('helpers', '2', bar2, 1),
-                spacer(24),
-                statCard('tweens', '7', bar3, 2),
-              ],
-            },
-            spacer(48),
-            {
-              type: 'text',
-              text: 'sequence(frame, fps, steps) — frames in, eased values out',
-              style: { fontSize: 28, color: colors.textMuted, fontFamily: 'Geneva' },
-              opacity: footerO,
-              offsetY: footerY,
-            },
-          ],
+          type: 'text',
+          text: 'MADE WITH CODE',
+          style: { fontSize: 118, color: '#f4f5f9', fontFamily: 'Geneva', fontWeight: '700', letterSpacing: 2 },
+          scale: textScale,
+          opacity: textO,
+          positioned: { left: 0, right: 0, top: 400 },
+          textAlign: 'center',
         },
-      ],
+
+        // Underline sweeping beneath the headline; backOut overshoot is
+        // fine here — width isn't clamped.
+        {
+          type: 'rect',
+          width: Math.max(lineW, 0),
+          height: 14,
+          radius: 7,
+          fill: colors.primary,
+          positioned: { left: 960 - Math.max(lineW, 0) / 2, top: 620 },
+        },
+
+        // Dot at the end of the underline.
+        {
+          type: 'circle',
+          size: 34,
+          fill: colors.accent,
+          scale: dotP,
+          opacity: Math.min(dotP, 1),
+          positioned: { left: 960 + Math.max(lineW, 0) / 2 - 40, top: 610 },
+        },
+
+        // yoclip chip, last beat.
+        {
+          type: 'container',
+          width: 380,
+          height: 66,
+          radius: 33,
+          color: colors.surface,
+          opacity: chipO,
+          offsetY: chipY,
+          positioned: { left: 960 - 190, top: 730 },
+          child: {
+            type: 'align',
+            alignment: 'center',
+            child: {
+              type: 'text',
+              text: 'yoclip · code-first video',
+              style: { fontSize: 24, color: '#e8eaf2', fontFamily: 'Geneva', fontWeight: '600' },
+            },
+          },
+        },
+      ]),
     };
   },
 };
