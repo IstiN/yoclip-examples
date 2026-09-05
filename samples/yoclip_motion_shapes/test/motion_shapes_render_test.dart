@@ -112,7 +112,7 @@ void main() {
   // post-footer settle.
   const probes = <String, List<int>>{
     'wall': [10, 40, 119],
-    'logo': [16, 46, 100],
+    'logo': [16, 46, 60, 100, 119],
     'finale': [16, 40, 110],
   };
 
