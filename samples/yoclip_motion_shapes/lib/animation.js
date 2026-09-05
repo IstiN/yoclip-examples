@@ -79,7 +79,7 @@ var WALL = {
 
 var TILE_LABELS = [
   'MERGE SORT', 'BUBBLE SORT', 'RAY TRACING', 'COMPILATION', 'KRUSKAL',
-  'REFLECTIONS', 'GROUP RESPAWN', 'SELECTION SORT', 'DAY 1 → DAY 30',
+  'REFLECTIONS', 'GROUP RESPAWN', 'SELECTION SORT', 'DAY 1 - DAY 30',
 ];
 
 /// Tile color: column position sets the base blue→red mix, the scene clock
@@ -97,30 +97,41 @@ function tileAccent(frame, col) {
 }
 
 /// Small deterministic "thumbnail" content per tile — mini charts, play
-/// buttons, orbit rings and mono labels, all from shape nodes.
-function tileContent(v, accent, label) {
+/// buttons, orbit rings and mono labels, all from shape nodes. Everything
+/// shapes moves: bars breathe, the play button pulses, the orbit dot rides
+/// the ring, progress bars sweep. `ms` is the scene's elapsed clock.
+function tileContent(v, accent, label, ms) {
   function spacer(w, h) {
     return { type: 'container', width: w, height: h };
   }
   switch (v % 5) {
-    case 0: // mini bar chart
-      return {
-        type: 'row',
-        crossAxisAlignment: 'end',
-        children: [
-          { type: 'rect', width: 28, height: 56, radius: 7, fill: accent, opacity: 0.7 },
-          spacer(10, 0),
-          { type: 'rect', width: 28, height: 104, radius: 7, fill: accent, opacity: 0.85 },
-          spacer(10, 0),
-          { type: 'rect', width: 28, height: 76, radius: 7, fill: accent },
-        ],
-      };
-    case 1: // play button + label
+    case 0: { // mini bar chart — bars breathe with staggered phases
+      var bars = [];
+      var bases = [56, 104, 76];
+      for (var b = 0; b < 3; b++) {
+        bars.push({
+          type: 'rect',
+          width: 28,
+          height: bases[b] + jsr.motion.wave(ms, 1250 + b * 260, bases[b] * 0.22, b * 0.9),
+          radius: 7,
+          fill: accent,
+          opacity: b === 2 ? 1 : b === 1 ? 0.85 : 0.7,
+        });
+        if (b < 2) bars.push(spacer(10, 0));
+      }
+      return { type: 'row', crossAxisAlignment: 'end', children: bars };
+    }
+    case 1: { // play button (pulsing) + label
       return {
         type: 'row',
         crossAxisAlignment: 'center',
         children: [
-          { type: 'polygon', points: [0, 0, 38, 22, 0, 44], fill: accent },
+          {
+            type: 'polygon',
+            points: [0, 0, 38, 22, 0, 44],
+            fill: accent,
+            scale: 1 + jsr.motion.wave(ms, 1700, 0.09, 0),
+          },
           spacer(12, 0),
           {
             type: 'expanded',
@@ -132,34 +143,64 @@ function tileContent(v, accent, label) {
           },
         ],
       };
-    case 2: // big mono label, two lines
+    }
+    case 2: { // big mono label, two lines; the accent line shimmers
       return {
         type: 'column',
         crossAxisAlignment: 'start',
         children: [
           { type: 'text', text: label.split(' ')[0], style: { fontSize: 30, color: '#f4f5f9', fontFamily: 'Geneva', fontWeight: '700' } },
-          { type: 'text', text: label.split(' ').slice(1).join(' ') || ' ', style: { fontSize: 30, color: accent, fontFamily: 'Geneva', fontWeight: '700' } },
+          spacer(0, 6),
+          {
+            type: 'text',
+            text: label.split(' ').slice(1).join(' ') || ' ',
+            style: { fontSize: 30, color: accent, fontFamily: 'Geneva', fontWeight: '700' },
+            opacity: 0.75 + 0.25 * jsr.motion.wave(ms, 2600, 1, 1.2),
+          },
         ],
       };
-    case 3: // orbit ring + dot
+    }
+    case 3: { // orbit ring + a dot actually orbiting it
+      var theta = (2 * Math.PI * ms) / 2600;
       return {
         type: 'stack',
         children: [
           { type: 'circle', size: 110, fill: '#00000000', stroke: accent, strokeWidth: 3 },
-          { type: 'circle', size: 22, fill: accent, offsetX: 40, offsetY: -6 },
+          {
+            type: 'circle',
+            size: 18,
+            fill: accent,
+            offsetX: 46 + jsr.motion.wave(ms, 2600, 44, 0),
+            offsetY: 46 + jsr.motion.wave(ms, 2600, 44, Math.PI / 2),
+          },
         ],
       };
-    default: // progress line
+    }
+    default: { // progress line sweeping back and forth
+      var fillW = 62 + 63 * (0.5 + 0.5 * jsr.motion.wave(ms, 2400, 1, 0));
       return {
         type: 'column',
         crossAxisAlignment: 'start',
         children: [
           { type: 'text', text: label, style: { fontSize: 18, color: '#e8eaf2', fontFamily: 'Geneva' } },
           spacer(0, 12),
-          { type: 'rect', width: 190, height: 10, radius: 5, fill: accent, opacity: 0.35 },
-          { type: 'rect', width: 122, height: 10, radius: 5, fill: accent },
+          {
+            type: 'stack',
+            children: [
+              { type: 'rect', width: 190, height: 10, radius: 5, fill: accent, opacity: 0.35 },
+              { type: 'rect', width: fillW, height: 10, radius: 5, fill: accent },
+              {
+                type: 'circle',
+                size: 16,
+                fill: accent,
+                offsetX: fillW - 8,
+                offsetY: -3,
+              },
+            ],
+          },
         ],
       };
+    }
   }
 }
 
@@ -192,9 +233,9 @@ function buildWall(frame, fps, opts) {
   for (var j = 0; j < WALL.rows; j++) {
     for (var i = 0; i < WALL.cols; i++) {
       var idx = j * WALL.cols + i;
-      // Center-out ripple: inner tiles land first.
+      // Center-out ripple: the middle assembles first, the wave spreads out.
       var ring = Math.max(Math.abs(i - (WALL.cols - 1) / 2), Math.abs(j - (WALL.rows - 1) / 2));
-      var delay = (3.7 - ring) * 110;
+      var delay = ring * 110; // center lands first, ripple spreads out
 
       var k = scale;
       var bx = x0 + i * pitchX;
@@ -214,12 +255,12 @@ function buildWall(frame, fps, opts) {
         opacity: Math.min(fade, tileOpacity),
         scale: 0.55 + 0.45 * pop,
         positioned: { left: px, top: py },
-        padding: 18,
+        padding: 22,
         child: {
           type: 'column',
           crossAxisAlignment: 'start',
           mainAxisAlignment: 'center',
-          children: [tileContent(idx, tileAccent(frame, i), TILE_LABELS[idx % TILE_LABELS.length])],
+          children: [tileContent(idx, tileAccent(frame, i), TILE_LABELS[idx % TILE_LABELS.length], ms)],
         },
       });
     }
