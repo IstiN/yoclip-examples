@@ -91,15 +91,62 @@ scene = {
       scale: 0.92 + 0.08 * bP,
       positioned: { left: 701.13, top: 445.0 },
     });
+    // The tail is painted by the SAME gradient field as the bubble — the
+    // SVG gives both one userSpaceOnUse gradient, so they blend seamlessly.
+    // jsr polygons only take a flat fill, so the tail is tiled with thin
+    // vertical strips, each filled with the bubble gradient sampled at the
+    // strip's centroid (adjacent strips differ by ~1/255 — no visible
+    // seams; a 0.5px overlap hides antialiasing hairlines).
+    function bubbleField(bx, by) {
+      // LinearGradient topLeft->bottomRight over the bubble's 304x190 box.
+      var t = (bx * 304 + by * 190) / (304 * 304 + 190 * 190);
+      t = Math.max(0, Math.min(1, t));
+      var gs = [[0, 139, 92, 246], [0.55, 99, 102, 241], [1, 59, 130, 246]];
+      var i = t < 0.55 ? 0 : 1;
+      var f = (t - gs[i][0]) / (gs[i + 1][0] - gs[i][0]);
+      function ch(a, b) {
+        var v = Math.round(a + (b - a) * f).toString(16);
+        return v.length < 2 ? '0' + v : v;
+      }
+      return '#' + ch(gs[i][1], gs[i + 1][1]) +
+        ch(gs[i][2], gs[i + 1][2]) + ch(gs[i][3], gs[i + 1][3]);
+    }
+    function gradientTail() {
+      // Tail-local geometry: top edge (0,10)->(85,0), tip B(45,65).
+      var strips = [];
+      var edges = [];
+      for (var k = 0; k <= 6; k++) edges.push(85 * k / 6);
+      function yTop(x) { return 10 - x * (10 / 85); }
+      function yBot(x) {
+        return x <= 45 ? 10 + x * (55 / 45) : 65 - (x - 45) * (65 / 40);
+      }
+      for (var k = 0; k < 6; k++) {
+        var x0 = edges[k] - (k > 0 ? 0.5 : 0);
+        var x1 = edges[k + 1];
+        var yt0 = yTop(x0), yt1 = yTop(x1);
+        var yb0 = yBot(x0), yb1 = yBot(x1);
+        var xm = (x0 + x1) / 2;
+        var ym = (Math.max(yt0, yt1) + Math.min(yb0, yb1)) / 2;
+        strips.push({
+          type: 'polygon',
+          points: [x0, yt0, x1, yt1, x1, yb1, x0, yb0],
+          // Bubble-local = tail position (889.25, 606.5) - bubble (701.13, 445).
+          fill: bubbleField(188.12 + xm, 161.5 + ym),
+          positioned: { left: x0, top: Math.min(yt0, yt1) },
+        });
+      }
+      return {
+        type: 'stack',
+        width: 85, height: 65,
+        children: strips,
+        positioned: { left: 889.25, top: 606.5 },
+      };
+    }
     var tP = jsr.motion.tween(ms, 1400, 300, 0, 1, 'backOut');
-    kids.push({
-      type: 'polygon',
-      points: [0, 10, 45, 65, 85, 0],
-      fill: '#5f68f3',
-      opacity: Math.min(1, jsr.motion.tween(ms, 1400, 200, 0, 1, 'linear')),
-      scale: 0.6 + 0.4 * tP,
-      positioned: { left: 889.25, top: 606.5 },
-    });
+    var tail = gradientTail();
+    tail.opacity = Math.min(1, jsr.motion.tween(ms, 1400, 200, 0, 1, 'linear'));
+    tail.scale = 0.6 + 0.4 * tP;
+    kids.push(tail);
 
     // -- 3. "Yo" writes itself on the bubble --------------------------------
     kids.push(trace(
