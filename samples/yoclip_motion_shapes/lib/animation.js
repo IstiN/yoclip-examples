@@ -100,7 +100,11 @@ function tileAccent(frame, col) {
 /// buttons, orbit rings and mono labels, all from shape nodes. Everything
 /// shapes moves: bars breathe, the play button pulses, the orbit dot rides
 /// the ring, progress bars sweep. `ms` is the scene's elapsed clock.
-function tileContent(v, accent, label, ms) {
+function tileContent(v, accent, label, ms, k) {
+  // All content geometry scales with the wall scale k, so a receded
+  // wall (logo backdrop, k=0.86) keeps proportions AND fits its smaller
+  // padded box (the inner-padding fix surfaced the overflow, 2026-09-05).
+  var s = k == null ? 1 : k;
   function spacer(w, h) {
     return { type: 'container', width: w, height: h };
   }
@@ -111,13 +115,13 @@ function tileContent(v, accent, label, ms) {
       for (var b = 0; b < 3; b++) {
         bars.push({
           type: 'rect',
-          width: 28,
-          height: bases[b] + jsr.motion.wave(ms, 1250 + b * 260, bases[b] * 0.22, b * 0.9),
-          radius: 7,
+          width: 28 * s,
+          height: (bases[b] + jsr.motion.wave(ms, 1250 + b * 260, bases[b] * 0.22, b * 0.9)) * s,
+          radius: 7 * s,
           fill: accent,
           opacity: b === 2 ? 1 : b === 1 ? 0.85 : 0.7,
         });
-        if (b < 2) bars.push(spacer(10, 0));
+        if (b < 2) bars.push(spacer(10 * s, 0));
       }
       return { type: 'row', crossAxisAlignment: 'end', children: bars };
     }
@@ -128,17 +132,17 @@ function tileContent(v, accent, label, ms) {
         children: [
           {
             type: 'polygon',
-            points: [0, 0, 38, 22, 0, 44],
+            points: [0, 0, 38 * s, 22 * s, 0, 44 * s],
             fill: accent,
             scale: 1 + jsr.motion.wave(ms, 1700, 0.09, 0),
           },
-          spacer(12, 0),
+          spacer(12 * s, 0),
           {
             type: 'expanded',
             child: {
               type: 'text',
               text: label,
-              style: { fontSize: 18, color: '#e8eaf2', fontFamily: 'Geneva', fontWeight: '700' },
+              style: { fontSize: 18 * s, color: '#e8eaf2', fontFamily: 'Geneva', fontWeight: '700' },
             },
           },
         ],
@@ -149,12 +153,12 @@ function tileContent(v, accent, label, ms) {
         type: 'column',
         crossAxisAlignment: 'start',
         children: [
-          { type: 'text', text: label.split(' ')[0], style: { fontSize: 30, color: '#f4f5f9', fontFamily: 'Geneva', fontWeight: '700' } },
-          spacer(0, 6),
+          { type: 'text', text: label.split(' ')[0], style: { fontSize: 30 * s, color: '#f4f5f9', fontFamily: 'Geneva', fontWeight: '700' } },
+          spacer(0, 6 * s),
           {
             type: 'text',
             text: label.split(' ').slice(1).join(' ') || ' ',
-            style: { fontSize: 30, color: accent, fontFamily: 'Geneva', fontWeight: '700' },
+            style: { fontSize: 30 * s, color: accent, fontFamily: 'Geneva', fontWeight: '700' },
             opacity: 0.75 + 0.25 * jsr.motion.wave(ms, 2600, 1, 1.2),
           },
         ],
@@ -165,36 +169,36 @@ function tileContent(v, accent, label, ms) {
       return {
         type: 'stack',
         children: [
-          { type: 'circle', size: 110, fill: '#00000000', stroke: accent, strokeWidth: 3 },
+          { type: 'circle', size: 110 * s, fill: '#00000000', stroke: accent, strokeWidth: 3 * s },
           {
             type: 'circle',
-            size: 18,
+            size: 18 * s,
             fill: accent,
-            offsetX: 46 + jsr.motion.wave(ms, 2600, 44, 0),
-            offsetY: 46 + jsr.motion.wave(ms, 2600, 44, Math.PI / 2),
+            offsetX: 46 * s + jsr.motion.wave(ms, 2600, 44 * s, 0),
+            offsetY: 46 * s + jsr.motion.wave(ms, 2600, 44 * s, Math.PI / 2),
           },
         ],
       };
     }
     default: { // progress line sweeping back and forth
-      var fillW = 62 + 63 * (0.5 + 0.5 * jsr.motion.wave(ms, 2400, 1, 0));
+      var fillW = (62 + 63 * (0.5 + 0.5 * jsr.motion.wave(ms, 2400, 1, 0))) * s;
       return {
         type: 'column',
         crossAxisAlignment: 'start',
         children: [
-          { type: 'text', text: label, style: { fontSize: 18, color: '#e8eaf2', fontFamily: 'Geneva' } },
-          spacer(0, 12),
+          { type: 'text', text: label, style: { fontSize: 18 * s, color: '#e8eaf2', fontFamily: 'Geneva' } },
+          spacer(0, 12 * s),
           {
             type: 'stack',
             children: [
-              { type: 'rect', width: 190, height: 10, radius: 5, fill: accent, opacity: 0.35 },
-              { type: 'rect', width: fillW, height: 10, radius: 5, fill: accent },
+              { type: 'rect', width: 190 * s, height: 10 * s, radius: 5 * s, fill: accent, opacity: 0.35 },
+              { type: 'rect', width: fillW, height: 10 * s, radius: 5 * s, fill: accent },
               {
                 type: 'circle',
-                size: 16,
+                size: 16 * s,
                 fill: accent,
-                offsetX: fillW - 8,
-                offsetY: -3,
+                offsetX: fillW - 8 * s,
+                offsetY: -3 * s,
               },
             ],
           },
@@ -250,17 +254,17 @@ function buildWall(frame, fps, opts) {
         type: 'container',
         width: WALL.tileW * k,
         height: WALL.tileH * k,
-        radius: 18,
+        radius: 18 * k,
         color: tileColor(frame, i),
         opacity: Math.min(fade, tileOpacity),
         scale: 0.55 + 0.45 * pop,
         positioned: { left: px, top: py },
-        padding: 22,
+        padding: Math.round(22 * k),
         child: {
           type: 'column',
           crossAxisAlignment: 'start',
           mainAxisAlignment: 'center',
-          children: [tileContent(idx, tileAccent(frame, i), TILE_LABELS[idx % TILE_LABELS.length], ms)],
+          children: [tileContent(idx, tileAccent(frame, i), TILE_LABELS[idx % TILE_LABELS.length], ms, k)],
         },
       });
     }
