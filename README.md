@@ -18,10 +18,11 @@ dart run ../../../yoclip/packages/yoclip_cli/bin/yoclip.dart render -V dark -o a
 
 ```
 samples/
-  demo_ai/          — small AI-assisted demo scenes
-  intro/            — Flutter-integrated intro sample
-  yoclip_about/     — yoclip self-promo film
-  yoclip_intro/     — minimal intro film
+  demo_ai/            — small AI-assisted demo scenes
+  intro/              — Flutter-integrated intro sample
+  yoclip_about/       — yoclip self-promo film
+  yoclip_intro/       — minimal intro film
+  yoclip_motion_shapes/ — motion & shapes playground (jsr.motion, shape nodes, sequence helper)
 
 branded/epam/
   yoclip/           — EPAM-branded yoclip promo
