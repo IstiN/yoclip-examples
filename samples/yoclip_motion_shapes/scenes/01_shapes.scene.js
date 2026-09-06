@@ -42,7 +42,7 @@ scene = {
             alignment: 'center',
             child: {
               type: 'text',
-              text: 'ONE WALL OF IDEAS',
+              text: 'ONE WALL OF IDEAS1',
               style: { fontSize: 26, color: '#e8eaf2', fontFamily: 'Geneva', fontWeight: '700', letterSpacing: 6 },
             },
           },
