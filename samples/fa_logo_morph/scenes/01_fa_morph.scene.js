@@ -1,17 +1,21 @@
 // The Fa brand morph — one 240-frame shot:
 //
-//   01  0–40    the app tile: white rounded square, `>_` inside, soft halo
-//   02  40–78   glitch dissolve — the tile shreds into horizontal slices
-//               flying right, blue/teal streaks tagging the glyph bands
-//   05  75–100  the bare prompt re-centers and grows (streak residue fades)
-//   06  92–108  glow pulse around the chevron
-//   07  108–150 morph: chevron arms split away, the F stem + top bar stamp
-//               in, the teal underscore glides up-left into the F accent
+//   01  0–40    the app icon: dark-glass rounded square, `>_` inside, the
+//               underscore pulsing like a terminal cursor
+//   02  40–74   boot scan — one teal line sweeps the icon top to bottom,
+//               its edge lifting as the line passes (no shattering: the
+//               icon is the stage, it stays)
+//   05  75–100  the icon grows to hero scale (the composition zooms in)
+//   06  96–110  a soft teal band breathes over the glyph row — the cue
+//   07  108–150 morph: chevron arms split away, the F writes itself as one
+//               round-capped stroke (stem up, bar right), the teal
+//               underscore glides up-left into the F accent
 //   11  150–192 the `a` writes itself — arc trace for the bowl, stem trace
-//   16  192–240 settle: breathing mark, ground glow, final teal bloom
+//   16  192–240 settle: ground glow, final teal bloom — the finished icon
 //
-// Everything is placed through the shared svg→screen mapper (lib/brand.js),
-// so scale/anchor animation never breaks continuity between the pieces.
+// Everything is placed through the shared svg→screen mapper (lib/brand.js)
+// with the tile center pinned for the whole run, so the icon, the morph and
+// the wordmark share one composition.
 
 scene = {
   id: 'fa_morph',
@@ -30,10 +34,8 @@ scene = {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
-    // ---- The mapper: which svg point sits at screen center, and how big --
-    // Icon phase: the glyph center rides the icon center at icon scale.
-    // Frame 75: the bare prompt grows (easeOutExpo). Frame 108: the
-    // WORDMARK center takes over as the anchor and the scale settles.
+    // ---- The mapper: the tile center is pinned at screen center for the
+    // whole film; only the scale breathes — icon size, hero zoom, hold.
     var kIcon = 0.371;
     var kGlyph = 0.62;
     var kHero = 0.86;
@@ -45,9 +47,7 @@ scene = {
     k *= breathe;
     // Icon-phase settle: the tile lands at frame 0 with a soft exhale.
     if (frame < 16) k *= tw(0, 16, 1.03, 1, 'easeOutCubic');
-    var ax = 520 + (634 - 520) * anchorT;
-    var ay = 592 + (547 - 592) * anchorT;
-    setMapper(k, ax, ay, 960, 540);
+    setMapper(k, BRAND.anchor[0], BRAND.anchor[1], 960, 540);
 
     var kids = [];
 
@@ -58,104 +58,71 @@ scene = {
       opacity: 0.55, positioned: { left: 0, top: 0 },
     });
 
-    // ---- The halo ----------------------------------------------------------
-    // White halo behind the tile, teal glow behind the wordmark later.
-    var haloWhiteP = Math.min(1, tw(0, 300, 0.6, 1, 'linear')) *
-        (1 - tw(108, 40, 0, 1, 'easeInOutCubic'));
-    var haloTealP = tw(108, 50, 0, 1, 'easeOutExpo');
-    if (haloWhiteP > 0.01) {
-      var hw = 540 * k;
+    // ---- Beat 01/02: the tile — dark glass, on stage the whole film -------
+    // The icon never shatters. Deep navy fill, hairline cool stroke; the
+    // stroke lifts where the boot-scan line crosses it.
+    var scanT = tw(40, 34, 0, 1, 'easeInOutCubic');
+    var scanning = scanT > 0.001 && scanT < 0.999;
+    var scanY = BRAND.tile.x + scanT * BRAND.tile.w;
+    var edgeLift = scanning
+      ? Math.exp(-Math.pow(scanY - 512, 2) / (2 * 90 * 90))
+      : 0;
+    var tl = brandToScreen(BRAND.tile.x, BRAND.tile.y);
+    kids.push({
+      type: 'rect',
+      width: BRAND.tile.w * k, height: BRAND.tile.h * k,
+      radius: BRAND.tile.rx * k,
+      fill: '#17223B',
+      stroke: lerpColor('#2E3C5F', '#3E5C86', edgeLift),
+      strokeWidth: Math.max(2, 5.5 * k),
+      opacity: 1,
+      positioned: { left: tl.x, top: tl.y },
+    });
+
+    // The boot scan — one teal line sweeping the icon, glow band trailing.
+    if (scanning) {
+      var linePt = brandToScreen(512, scanY);
+      var lw = BRAND.tile.w * k;
       kids.push({
-        type: 'circle', size: hw,
-        fill: '#ffffff',
-        opacity: 0.05 * haloWhiteP,
-        positioned: { left: 960 - hw / 2, top: 540 - hw / 2 },
+        type: 'rect', width: lw, height: 18 * k, radius: 9 * k,
+        fill: colors.tealLight, opacity: 0.13,
+        positioned: { left: linePt.x - lw / 2, top: linePt.y - 9 * k },
       });
-    }
-    if (haloTealP > 0.01) {
-      var hc = brandToScreen(577, 547);
-      var htw = 760 * k * (0.8 + 0.2 * haloTealP);
       kids.push({
-        type: 'circle', size: htw,
-        fill: '#48C7E8',
-        opacity: 0.05 * haloTealP *
-            (0.8 + 0.2 * jsr.motion.wave(ms, 3600, 1, 0)),
-        positioned: { left: hc.x - htw / 2, top: hc.y - htw / 2 },
+        type: 'rect', width: lw, height: Math.max(2, 2.5 * k), radius: 1,
+        fill: colors.tealSpark, opacity: 0.6,
+        positioned: {
+          left: linePt.x - lw / 2,
+          top: linePt.y - Math.max(1, 1.25 * k),
+        },
       });
     }
 
-    // ---- Beat 01: the tile (0..78) -----------------------------------------
-    var dissolveT = tw(40, 30, 0, 1, 'easeInOutCubic');
-    var tileLife = 1 - dissolveT;
-    if (dissolveT <= 0.001) {
-      // The whole tile — one rounded rect with its subtle edge stroke.
-      var tl = brandToScreen(16, 16);
+    // ---- Beat 06: the cue — a soft band breathing over the glyph row ------
+    var pulseP = tw(96, 14, 0, 1, 'easeOutCubic');
+    if (pulseP > 0.001 && pulseP < 0.999) {
+      var vpt = brandToScreen(512, 560);
+      var pw = BRAND.tile.w * k * (0.7 + 0.3 * pulseP);
       kids.push({
-        type: 'rect',
-        width: 992 * k, height: 992 * k, radius: 224 * k,
-        fill: colors.iconLight,
-        stroke: colors.iconEdge, strokeWidth: Math.max(2.5, 10 * k),
-        opacity: 1,
-        positioned: { left: tl.x, top: tl.y },
+        type: 'rect', width: pw, height: 120 * k, radius: 60 * k,
+        fill: colors.tealLight, opacity: 0.07 * (1 - pulseP),
+        positioned: { left: vpt.x - pw / 2, top: vpt.y - 60 * k },
       });
-    } else if (tileLife > 0.01) {
-      // The tile shreds from the right edge: each slice keeps its left edge
-      // and thins away with a rightward throw. Bright to the last moment —
-      // each slice fades only by its own p (no global dim on top).
-      var bands = 12;
-      var bandH = 992 / bands;
-      for (var i = 0; i < bands; i++) {
-        var at = 40 + prand(i) * 16;
-        var p = jsr.motion.tween(ms, at * 1000 / 30, 26 * 1000 / 30, 0, 1, 'easeInCubic');
-        if (p >= 1) continue;
-        var ySvg = 16 + i * bandH;
-        var pt = brandToScreen(16, ySvg);
-        var wSvg = 992 * (1 - p);
-        kids.push({
-          type: 'rect',
-          width: Math.max(wSvg * k, 2),
-          height: Math.max(bandH * k - 2, 2),
-          radius: 10 * k,
-          fill: colors.iconLight,
-          opacity: 1 - p * 0.45,
-          positioned: { left: pt.x, top: pt.y + 1 },
-        });
-      }
-      // The tile's leading edge streaks while it shreds, in white, blue and
-      // teal — the glyph bands and underscore band tag their own colors.
-      for (var s = 0; s < 5; s++) {
-        var st = streak(s, 80 + prand(s + 40) * 860, 1010,
-          120 + prand(s + 80) * 260, 8 + prand(s + 120) * 10,
-          colors.iconLight, frame, 30, 42 + s * 3, 30);
-        if (st != null) kids.push(st);
-      }
-      for (var g = 0; g < 4; g++) {
-        var gy = 434 + g * 54;
-        var gs = streak(g + 30, gy, 460 + g * 40,
-          140 + prand(g + 60) * 180, 10 + prand(g + 90) * 8,
-          g % 2 == 0 ? colors.blue : colors.teal, frame, 30, 46 + g * 4, 28);
-        if (gs != null) kids.push(gs);
-      }
-      for (var u = 0; u < 2; u++) {
-        var us = streak(u + 50, 718 + u * 26, 500 + u * 80, 120, 12,
-          colors.tealLight, frame, 30, 52 + u * 6, 26);
-        if (us != null) kids.push(us);
-      }
     }
 
-    // ---- The chevron (01..07): two butt-capped polygon arms, blue split ---
-    // Top arm keeps the lighter stop, bottom arm blends toward #3566FF —
-    // flat fills per arm, the eye reads the pair as the gradient. During
-    // the morph the arms drift apart (the centerlines themselves shift) and
-    // die into blue streaks.
+    // ---- The chevron (01..07): mitered halves, blue split, round ends -----
+    // Top arm keeps the lighter stop, bottom arm blends deeper — flat fills
+    // per arm, the eye reads the pair as the gradient. During the morph the
+    // arms drift apart (the centerlines themselves shift) and die into
+    // blue streaks.
     var armLife = 1 - tw(108, 14, 0, 1, 'easeInCubic');
     if (armLife > 0.01) {
       var spread = tw(108, 16, 0, 30, 'easeInCubic');
-      var halves = chevronHalves(spread, colors.blue, '#3D6BF8');
-      halves[0].opacity = armLife;
-      kids.push(halves[0]);
-      halves[1].opacity = armLife;
-      kids.push(halves[1]);
+      var halves = chevronHalves(spread, colors.blueBright, colors.blueDeep);
+      for (var hi = 0; hi < halves.length; hi++) {
+        halves[hi].opacity = armLife;
+        kids.push(halves[hi]);
+      }
       if (frame >= 106) {
         for (var b = 0; b < 3; b++) {
           var bs = streak(b, 470 + b * 60, 500, 200 + prand(b + 7) * 160, 12,
@@ -166,24 +133,20 @@ scene = {
     }
 
     // ---- The underscore → F accent (continuous through the whole film) -----
+    // It pulses like a terminal cursor until the morph takes it.
     var tealM = Math.min(1, tw(110, 30, 0, 1, 'easeInOutCubic'));
-    kids.push.apply(kids, tealBar(tealM, 1));
+    var cursorP = frame < 110
+      ? 1 - 0.22 * (0.5 + 0.5 * jsr.motion.wave(ms, 950, 1, 0))
+      : 1;
+    kids.push.apply(kids, tealBar(tealM, cursorP));
 
-    // ---- Beat 07: the F materializes (108..150) -----------------------------
-    // Stem and top bar draw from ONE aligned y-band gradient (see
-    // pushFRect): the corner they share has the exact same band color on
-    // both pieces — no seam, no color break.
-    var stemP = tw(118, 14, 0, 1, 'backOut');
-    if (stemP > 0.01) {
-      var fStem = BRAND.f.stem;
-      pushFRect(kids, fStem.x, fStem.w, fStem.y,
-        fStem.y + fStem.h * stemP, Math.min(1, tw(118, 5, 0, 1, 'linear')));
-    }
-    var topP = tw(128, 12, 0, 1, 'backOut');
-    if (topP > 0.01) {
-      var fTop = BRAND.f.top;
-      pushFRect(kids, fTop.x, fTop.w * topP, fTop.y, fTop.y + fTop.h,
-        Math.min(1, tw(128, 5, 0, 1, 'linear')));
+    // ---- Beat 07: the F writes itself (118..144) ---------------------------
+    // One round-capped stroke: up the stem, right across the top bar. The
+    // elbow rounds like a drawn letterform — no seams anywhere.
+    var fP = tw(118, 26, 0, 1, 'easeInOutCubic');
+    if (fP > 0.001) {
+      kids.push(fPathNode(fP, colors.blue,
+        Math.min(1, tw(118, 5, 0, 1, 'linear'))));
     }
 
     // ---- Beat 11: the `a` writes itself (150..192) --------------------------
@@ -194,19 +157,19 @@ scene = {
         ' A' + bowl.r + ',' + bowl.r + ' 0 1 1 ' + bowl.cx + ',' + (bowl.cy + bowl.r) +
         ' A' + bowl.r + ',' + bowl.r + ' 0 1 1 ' + bowl.cx + ',' + (bowl.cy - bowl.r);
       kids.push(trace(d, 38, bowl.cx - bowl.r, bowl.cy - bowl.r,
-        bowl.r * 2, bowl.r * 2, bowlP, '#2EBD9E'));
+        bowl.r * 2, bowl.r * 2, bowlP, colors.teal));
     }
     var aStemP = tw(170, 14, 0, 1, 'easeInOutCubic');
     if (aStemP > 0.01) {
       var aStem = BRAND.a.stem;
       kids.push(trace(
         'M' + aStem.x + ',' + aStem.y + ' L' + aStem.x + ',' + (aStem.y + aStem.h),
-        38, aStem.x, aStem.y, 0, aStem.h, aStemP, '#48C7E8'));
+        38, aStem.x, aStem.y, 0, aStem.h, aStemP, colors.tealLight));
     }
     if (frame >= 150 && frame < 162) {
       for (var t = 0; t < 3; t++) {
-        var ts = streak(t, 600 + t * 40, 830, 140 + prand(t + 21) * 120, 10,
-          '#48C7E8', frame, 30, 150 + t * 2, 22);
+        var ts = streak(t, 600 + t * 40, 780, 140 + prand(t + 21) * 120, 10,
+          colors.tealLight, frame, 30, 150 + t * 2, 22);
         if (ts != null) kids.push(ts);
       }
     }
@@ -216,13 +179,13 @@ scene = {
     if (settleP > 0.01) {
       // Ground glow: a flat teal bar under the baseline, breathing wide,
       // centered on the finished wordmark.
-      var gb = brandToScreen(724, 742);
+      var gb = brandToScreen(640, 742);
       var gw = (560 + 30 * jsr.motion.wave(ms, 2800, 1, 0)) * k;
       kids.push({
         type: 'rect',
         width: gw, height: 10 * k,
         radius: 5 * k,
-        fill: '#48C7E8',
+        fill: colors.tealLight,
         opacity: 0.22 * settleP,
         positioned: { left: gb.x - gw / 2, top: gb.y },
       });
@@ -237,21 +200,23 @@ scene = {
     }
     var bloomP = tw(216, 24, 0, 1, 'easeOutExpo');
     if (bloomP > 0.01 && bloomP < 1) {
-      var fb = brandToScreen(760, 700);
+      var fb = brandToScreen(638, 700);
       kids.push({
         type: 'circle',
         size: 90 * k * (1 + 0.25 * (1 - bloomP)),
-        fill: '#eafffb',
+        fill: '#7FE9DC',
         opacity: 0.6 * bloomP * (1 - bloomP),
         positioned: { left: fb.x - 45 * k, top: fb.y - 45 * k },
       });
+      // A short shine sweeping under the mark — same width class as the
+      // ground glow, so it never reads as an edge-to-edge stray hairline.
       kids.push({
         type: 'rect',
-        width: 900 * k * bloomP, height: 3,
+        width: 420 * k * bloomP, height: 3,
         radius: 1.5,
         fill: '#bffaf1',
         opacity: 0.5 * (1 - bloomP * 0.55),
-        positioned: { left: fb.x - 450 * k * bloomP, top: fb.y + 42 * k },
+        positioned: { left: fb.x - 210 * k * bloomP, top: fb.y + 42 * k },
       });
     }
 

@@ -3,7 +3,14 @@
 // All brand geometry lives in ONE coordinate system — the 1024x1024
 // `icon_light.svg` viewBox — so every piece (tile, chevron, underscore,
 // F, a) is placed through the same svg→screen mapper and the morph stays
-// continuous even while scale and anchor animate.
+// continuous even while the scale breathes.
+//
+// Design language (v3): the tile is a dark-glass app icon that stays on
+// stage for the whole film — the morph happens INSIDE it, and the final
+// wordmark composes the finished icon. Stroke-like shapes are built the
+// way a type designer would draw them: round-capped strokes and true
+// capsules, with the brand gradient tiled by square strips and closed by
+// semicircular caps.
 
 /// Scene-local elapsed milliseconds — the unit jsr.motion speaks natively.
 function elapsedMs(frame, fps) {
@@ -44,23 +51,26 @@ function lerpColor(a, b, t) {
 // ---- Brand geometry (icon_light.svg units) --------------------------------
 
 var BRAND = {
-  // The tile the glyph lives in (01 — the app icon).
-  tile: { x: 0, y: 0, w: 1024, h: 1024, rx: 224, edge: 32 },
+  // The tile the glyph lives in (01 — the app icon). It never leaves:
+  // icon beats, morph and wordmark all compose inside one surface.
+  tile: { x: 16, y: 16, w: 992, h: 992, rx: 224 },
   // Chevron `>_` — two strokes meeting at the right vertex.
   chevron: { sw: 48, a1: [280, 434, 492, 541], a2: [492, 541, 280, 648] },
-  // Teal underscore — a gradient bar (sampled by vertical strips).
+  // Teal underscore — a gradient capsule (square strips + semicircular
+  // caps); it glides up-left to become the F's accent bar.
   under: { x: 512, y: 712, w: 248, h: 38 },
-  // F — stem + top bar (blue), accent bar (teal, the underscore's target).
+  // F — stem + top bar as ONE round-capped stroke path, plus the teal
+  // accent bar. The wordmark is laid out so its center matches the tile
+  // center (svg 512): the film anchors the tile center for its entire run,
+  // so the icon and the finished wordmark share one composition.
   f: {
-    stem: { x: 388, y: 372, w: 48, h: 344 },
-    top: { x: 388, y: 372, w: 284, h: 48 },
-    accent: { x: 388, y: 545, w: 212, h: 38 },
+    stemX: 266, topX2: 550, top: 372, bottom: 716, w: 48,
+    accent: { x: 266, y: 545, w: 212, h: 38 },
   },
   // a — bowl (drawn arc) + stem, teal.
-  a: { bowl: { cx: 760, cy: 640, r: 82 }, stem: { x: 861, y: 558, h: 164 } },
-  // Anchor points: the glyph's own center, and the finished wordmark's.
-  glyphCenter: [520, 592],
-  wordmarkCenter: [634, 547],
+  a: { bowl: { cx: 638, cy: 640, r: 82 }, stem: { x: 739, y: 558, h: 164 } },
+  // The anchor: the tile center, pinned at screen center for the whole film.
+  anchor: [512, 512],
 };
 
 /// Teal gradient of the underscore/accent sampled at svg-x.
@@ -69,43 +79,10 @@ function tealField(xSvg) {
   return lerpColor('#2EBD9E', '#48C7E8', t);
 }
 
-/// The underscore (or the F accent it becomes) as gradient strips.
-/// `m` 0 = underscore slot, 1 = F-accent slot (scene tweens it); positions
-/// lerp between the two slots. Gradient samples stay pinned per slot index,
-/// so the bar reads as one continuous teal gradient through the morph.
-function tealBar(m, opacity) {
-  var strips = [];
-  var n = 6;
-  var w0 = BRAND.under.w / n;
-  var w1 = BRAND.f.accent.w / n;
-  for (var i = 0; i < n; i++) {
-    var w = w0 + (w1 - w0) * m;
-    var y = BRAND.under.y + (BRAND.f.accent.y - BRAND.under.y) * m;
-    var x = lerp(BRAND.under.x, BRAND.f.accent.x, m) + i * w;
-    var pt = brandToScreen(x + w / 2, y + BRAND.under.h / 2);
-    strips.push({
-      type: 'rect',
-      // +0.8 svg of overlap kills the hairline seams between strips.
-      width: (w + 0.8) * mapper.k,
-      height: BRAND.under.h * mapper.k,
-      // Square strips tile into ONE solid gradient bar — per-strip rounding
-      // leaves corner notches at every seam (read as beads).
-      radius: 0,
-      fill: tealField(BRAND.under.x + (i + 0.5) * w0),
-      opacity: opacity,
-      positioned: {
-        left: pt.x - (w + 0.8) * mapper.k / 2,
-        top: pt.y - (BRAND.under.h / 2) * mapper.k,
-      },
-    });
-  }
-  return strips;
-}
-
 // ---- The svg→screen mapper -------------------------------------------------
 // Scene code sets `mapper` every frame (see the scene file): k = svg→screen
 // scale, ax/ay = the svg point pinned at screen (sx, sy).
-var mapper = { k: 0.371, ax: 520, ay: 592, sx: 960, sy: 540 };
+var mapper = { k: 0.371, ax: 512, ay: 512, sx: 960, sy: 540 };
 
 function setMapper(k, ax, ay, sx, sy) {
   mapper.k = k;
@@ -122,9 +99,61 @@ function brandToScreen(x, y) {
   };
 }
 
+/// A filled polygon in svg coords, flattened into the renderer's relative
+/// point format (points rebased to the node's top-left).
+function flatPoly(pts, fill, opacity) {
+  var flat = [];
+  var minX, minY;
+  for (var i = 0; i < pts.length; i++) {
+    var p = brandToScreen(pts[i].x, pts[i].y);
+    if (minX == null || p.x < minX) minX = p.x;
+    if (minY == null || p.y < minY) minY = p.y;
+    flat.push(p.x, p.y);
+  }
+  for (var j = 0; j < flat.length; j += 2) {
+    flat[j] -= minX;
+    flat[j + 1] -= minY;
+  }
+  return {
+    type: 'polygon',
+    points: flat,
+    fill: fill,
+    opacity: opacity,
+    positioned: { left: minX, top: minY },
+  };
+}
+
+/// Semicircular end cap for a stroke-like bar: closes an end face whose
+/// half-direction is `e` (unit vector along the edge from the center),
+/// bulging along the outward normal `o`. 13 arc points — chord error under
+/// 0.3 svg at brand radii, invisible on screen. Same flat color as the bar
+/// end, so the union is seamless.
+function capArc(cx, cy, r, e, o, fill, opacity) {
+  function norm(v) {
+    var l = Math.sqrt(v.x * v.x + v.y * v.y);
+    return { x: v.x / l, y: v.y / l };
+  }
+  function adist(a, b) {
+    var d = Math.abs(a - b) % (2 * Math.PI);
+    return d > Math.PI ? 2 * Math.PI - d : d;
+  }
+  var en = norm(e), on = norm(o);
+  var a0 = Math.atan2(en.y, en.x);
+  var aOut = Math.atan2(on.y, on.x);
+  // Sweep a half-turn from the edge direction; pick the rotation whose
+  // midpoint passes through the outward normal.
+  var s = adist(a0 + Math.PI / 2, aOut) < adist(a0 - Math.PI / 2, aOut) ? 1 : -1;
+  var pts = [];
+  for (var i = 0; i <= 12; i++) {
+    var th = a0 + s * Math.PI * i / 12;
+    pts.push({ x: cx + r * Math.cos(th), y: cy + r * Math.sin(th) });
+  }
+  return flatPoly(pts, fill, opacity);
+}
+
 /// Stroke-drawing path node (the motion_shapes `trace` contract): the box is
 /// (pathBounds + stroke) so the painter's fit-to-box lands at exactly k.
-function trace(d, sw, bx, by, bw, bh, progress, color) {
+function trace(d, sw, bx, by, bw, bh, progress, color, opacity) {
   var sk = sw * mapper.k;
   var origin = brandToScreen(bx, by);
   return {
@@ -135,6 +164,7 @@ function trace(d, sw, bx, by, bw, bh, progress, color) {
     progress: progress,
     width: (bw + sw) * mapper.k,
     height: (bh + sw) * mapper.k,
+    opacity: opacity == null ? 1 : opacity,
     positioned: { left: origin.x - sk / 2, top: origin.y - sk / 2 },
   };
 }
@@ -144,7 +174,8 @@ function trace(d, sw, bx, by, bw, bh, progress, color) {
 /// vertex-for-vertex, so the joint has no gap and no notch (two butt-capped
 /// strokes meeting at the vertex always leave both). `split` translates the
 /// halves apart vertically — the morph's arm separation — opening only the
-/// shared seam.
+/// shared seam. The free arm ends get semicircular caps (round terminals,
+/// like every other stroke in the system).
 function chevronHalves(split, upperColor, lowerColor) {
   var half = BRAND.chevron.sw / 2;
   var S = { x: BRAND.chevron.a1[0], y: BRAND.chevron.a1[1] };
@@ -171,70 +202,76 @@ function chevronHalves(split, upperColor, lowerColor) {
   // pair. (n2 points up-left, so A2's lower edge passes through E1.)
   var Mout = isect(D, d1, E1, d2);
   var Min = isect(C, d1, E2, d2);
-  function poly(pts, color, dy) {
-    var flat = [];
-    var minX, minY;
+  function shifted(pts, dy) {
+    var out = [];
     for (var i = 0; i < pts.length; i++) {
-      var p = brandToScreen(pts[i].x, pts[i].y + dy);
-      if (minX == null || p.x < minX) minX = p.x;
-      if (minY == null || p.y < minY) minY = p.y;
-      flat.push(p.x, p.y);
+      out.push({ x: pts[i].x, y: pts[i].y + dy });
     }
-    for (var j = 0; j < flat.length; j += 2) {
-      flat[j] -= minX;
-      flat[j + 1] -= minY;
-    }
-    return {
-      type: 'polygon',
-      points: flat,
-      fill: color,
-      opacity: 1,
-      positioned: { left: minX, top: minY },
-    };
+    return out;
   }
-  return [
-    poly([B, Mout, Min, A], upperColor, -split),
-    poly([Mout, F2, F1, Min], lowerColor, split),
-  ];
+  var upper = flatPoly(shifted([B, Mout, Min, A], -split), upperColor, 1);
+  var lower = flatPoly(shifted([Mout, F2, F1, Min], split), lowerColor, 1);
+  // Round terminals on the free ends: each cap bulges along the arm's
+  // outward normal (perpendicular to the angled end face).
+  var capU = capArc(S.x, S.y - split, half, n1, { x: -d1.x, y: -d1.y },
+    upperColor, 1);
+  var capL = capArc(E.x, E.y + split, half, n2, d2, lowerColor, 1);
+  return [upper, capU, lower, capL];
 }
 
-// ---- The F: one vertical gradient, cut into aligned y-bands ---------------
-// Stem and top bar sample the SAME band table, so wherever the pieces touch
-// (the corner) the colors match exactly — no seam, no color break. Bands are
-// fine enough (12 over the stem) that adjacent bands differ imperceptibly.
-var F_GRAD = { y0: 372, y1: 716, top: '#6C74FF', bottom: '#4353F2', bands: 12 };
-
-function fBandColor(bi) {
-  return lerpColor(F_GRAD.top, F_GRAD.bottom, (bi + 0.5) / F_GRAD.bands);
-}
-
-/// Draws the x/w column of the F gradient between svg y0..y1. Pieces overlap
-/// the shared band colors; each band overdraws 0.75 svg downward so float
-/// rounding never opens a hairline between bands.
-function pushFRect(kids, x, w, y0, y1, opacity) {
-  var bh = (F_GRAD.y1 - F_GRAD.y0) / F_GRAD.bands;
-  var b0 = Math.max(0, Math.floor((y0 - F_GRAD.y0) / bh));
-  var b1 = Math.min(F_GRAD.bands, Math.ceil((y1 - F_GRAD.y0) / bh));
-  for (var bi = b0; bi < b1; bi++) {
-    var by0 = F_GRAD.y0 + bi * bh;
-    var cy0 = Math.max(by0, y0);
-    var cy1 = Math.min(by0 + bh, y1);
-    if (cy1 - cy0 < 0.01) continue;
-    var h = cy1 - cy0 + (bi < b1 - 1 ? 0.75 : 0);
-    var pt = brandToScreen(x + w / 2, (cy0 + cy1) / 2);
+/// The teal gradient bar — underscore slot (m=0) morphing to the F accent
+/// slot (m=1); the scene tweens m. Square strips tile the gradient and
+/// semicircular caps close the ends, so the bar reads as ONE rounded
+/// capsule while keeping its brand gradient. Strip/cap colors stay pinned
+/// per index (sampled on the underscore span), so nothing swims mid-morph.
+/// Strips overdraw 0.8 svg — float rounding must never open a hairline.
+function tealBar(m, opacity) {
+  var kids = [];
+  var n = 10;
+  var h = BRAND.under.h;
+  var r = h / 2;
+  var x0 = lerp(BRAND.under.x, BRAND.f.accent.x, m);
+  var x1 = x0 + lerp(BRAND.under.w, BRAND.f.accent.w, m);
+  var cy = lerp(BRAND.under.y, BRAND.f.accent.y, m) + r;
+  var cx0 = x0 + r, cx1 = x1 - r;
+  var w0 = BRAND.under.w / n;
+  var stripW = (cx1 - cx0) / n;
+  for (var i = 0; i < n; i++) {
+    var sx = cx0 + (i + 0.5) * stripW;
+    var pt = brandToScreen(sx, cy);
     kids.push({
       type: 'rect',
-      width: w * mapper.k,
+      width: (stripW + 0.8) * mapper.k,
       height: h * mapper.k,
       radius: 0,
-      fill: fBandColor(bi),
+      fill: tealField(BRAND.under.x + (i + 0.5) * w0),
       opacity: opacity,
       positioned: {
-        left: pt.x - (w / 2) * mapper.k,
-        top: pt.y - (h / 2) * mapper.k,
+        left: pt.x - (stripW + 0.8) * mapper.k / 2,
+        top: pt.y - r * mapper.k,
       },
     });
   }
+  kids.push(capArc(cx0, cy, r, { x: 0, y: 1 }, { x: -1, y: 0 },
+    tealField(BRAND.under.x), opacity));
+  kids.push(capArc(cx1, cy, r, { x: 0, y: 1 }, { x: 1, y: 0 },
+    tealField(BRAND.under.x + BRAND.under.w), opacity));
+  return kids;
+}
+
+/// The F stem + top bar as ONE round-capped, round-joined stroke — a real
+/// letterform: rounded terminals, rounded elbow, sharp inner corner, and
+/// not a single seam (flat brand blue). `progress` writes it on: up the
+/// stem, then right across the top bar — the same write-on language the
+/// `a` uses.
+function fPathNode(progress, color, opacity) {
+  var f = BRAND.f;
+  var hw = f.w / 2;
+  var d = 'M' + (f.stemX + hw) + ',' + (f.bottom - hw) +
+    ' L' + (f.stemX + hw) + ',' + (f.top + hw) +
+    ' L' + (f.topX2 - hw) + ',' + (f.top + hw);
+  return trace(d, f.w, f.stemX, f.top, f.topX2 - f.stemX,
+    f.bottom - f.top, progress, color, opacity);
 }
 
 /// A horizontal streak: thin rounded rect flying right from svg point

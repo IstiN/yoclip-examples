@@ -14,9 +14,9 @@ scenes:
 theme:
   colors:
     background: '#070a12'
-    iconLight: '#fafbfe'
-    iconEdge: '#e5eaf2'
     blue: '#5B61F6'
-    blueDeep: '#3566FF'
+    blueBright: '#6E74FF'
+    blueDeep: '#4A5BF5'
     teal: '#2EBD9E'
     tealLight: '#48C7E8'
+    tealSpark: '#5CE8CF'

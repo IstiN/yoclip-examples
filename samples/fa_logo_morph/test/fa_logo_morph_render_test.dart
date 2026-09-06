@@ -95,11 +95,11 @@ void main() {
 
   // Probes the single morph scene at one frame per storyboard beat.
   const probes = <int>[
-    10, // 01 tile hold
-    60, // 02–04 glitch dissolve peak
-    84, // 05 bare prompt re-centering
-    100, // 06 glow pulse
-    130, // 07–10 F forming
+    10, // 01 icon hold (dark glass, cursor pulse)
+    60, // 02 boot scan — teal line sweeping the icon
+    84, // 05 hero zoom settling
+    100, // 06 cue band + pre-morph hold
+    130, // 07–10 F writing itself
     165, // 11–15 the a writing itself
     205, // 16–19 settle
     236, // 20 final bloom
