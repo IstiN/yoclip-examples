@@ -41,8 +41,9 @@ scene = {
             type: 'align',
             alignment: 'center',
             child: {
+              id: 'text-1pg765z',
               type: 'text',
-              text: 'ONE WALL OF IDEAS1',
+              text: 'ONE WALL OF IDEAS',
               style: { fontSize: 26, color: '#e8eaf2', fontFamily: 'Geneva', fontWeight: '700', letterSpacing: 6 },
             },
           },
