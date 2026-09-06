@@ -179,7 +179,7 @@ scene = {
     if (settleP > 0.01) {
       // Ground glow: a flat teal bar under the baseline, breathing wide,
       // centered on the finished wordmark.
-      var gb = brandToScreen(640, 742);
+      var gb = brandToScreen(522, 742);
       var gw = (560 + 30 * jsr.motion.wave(ms, 2800, 1, 0)) * k;
       kids.push({
         type: 'rect',
