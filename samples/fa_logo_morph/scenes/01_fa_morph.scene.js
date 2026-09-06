@@ -151,14 +151,11 @@ scene = {
     var armLife = 1 - tw(108, 14, 0, 1, 'easeInCubic');
     if (armLife > 0.01) {
       var spread = tw(108, 16, 0, 30, 'easeInCubic');
-      var a1 = armPolygon(280, 434, 492, 541, 48, -spread);
-      a1.fill = colors.blue;
-      a1.opacity = armLife;
-      kids.push(a1);
-      var a2 = armPolygon(492, 541, 280, 648, 48, spread);
-      a2.fill = '#3D6BF8';
-      a2.opacity = armLife;
-      kids.push(a2);
+      var halves = chevronHalves(spread, colors.blue, '#3D6BF8');
+      halves[0].opacity = armLife;
+      kids.push(halves[0]);
+      halves[1].opacity = armLife;
+      kids.push(halves[1]);
       if (frame >= 106) {
         for (var b = 0; b < 3; b++) {
           var bs = streak(b, 470 + b * 60, 500, 200 + prand(b + 7) * 160, 12,
@@ -173,31 +170,20 @@ scene = {
     kids.push.apply(kids, tealBar(tealM, 1));
 
     // ---- Beat 07: the F materializes (108..150) -----------------------------
+    // Stem and top bar draw from ONE aligned y-band gradient (see
+    // pushFRect): the corner they share has the exact same band color on
+    // both pieces — no seam, no color break.
     var stemP = tw(118, 14, 0, 1, 'backOut');
     if (stemP > 0.01) {
       var fStem = BRAND.f.stem;
-      var sp = brandToScreen(fStem.x, fStem.y);
-      kids.push({
-        type: 'rect',
-        width: fStem.w * k, height: fStem.h * k * stemP,
-        radius: 6 * k,
-        fill: '#4F66F6',
-        opacity: Math.min(1, tw(118, 5, 0, 1, 'linear')),
-        positioned: { left: sp.x, top: sp.y },
-      });
+      pushFRect(kids, fStem.x, fStem.w, fStem.y,
+        fStem.y + fStem.h * stemP, Math.min(1, tw(118, 5, 0, 1, 'linear')));
     }
     var topP = tw(128, 12, 0, 1, 'backOut');
     if (topP > 0.01) {
       var fTop = BRAND.f.top;
-      var tp = brandToScreen(fTop.x, fTop.y);
-      kids.push({
-        type: 'rect',
-        width: fTop.w * k * topP, height: fTop.h * k,
-        radius: 6 * k,
-        fill: colors.blue,
-        opacity: Math.min(1, tw(128, 5, 0, 1, 'linear')),
-        positioned: { left: tp.x, top: tp.y },
-      });
+      pushFRect(kids, fTop.x, fTop.w * topP, fTop.y, fTop.y + fTop.h,
+        Math.min(1, tw(128, 5, 0, 1, 'linear')));
     }
 
     // ---- Beat 11: the `a` writes itself (150..192) --------------------------
@@ -208,19 +194,19 @@ scene = {
         ' A' + bowl.r + ',' + bowl.r + ' 0 1 1 ' + bowl.cx + ',' + (bowl.cy + bowl.r) +
         ' A' + bowl.r + ',' + bowl.r + ' 0 1 1 ' + bowl.cx + ',' + (bowl.cy - bowl.r);
       kids.push(trace(d, 38, bowl.cx - bowl.r, bowl.cy - bowl.r,
-        bowl.r * 2, bowl.r * 2, bowlP, colors.teal));
+        bowl.r * 2, bowl.r * 2, bowlP, '#2EBD9E'));
     }
     var aStemP = tw(170, 14, 0, 1, 'easeInOutCubic');
     if (aStemP > 0.01) {
       var aStem = BRAND.a.stem;
       kids.push(trace(
         'M' + aStem.x + ',' + aStem.y + ' L' + aStem.x + ',' + (aStem.y + aStem.h),
-        38, aStem.x, aStem.y, 0, aStem.h, aStemP, colors.tealLight));
+        38, aStem.x, aStem.y, 0, aStem.h, aStemP, '#48C7E8'));
     }
     if (frame >= 150 && frame < 162) {
       for (var t = 0; t < 3; t++) {
         var ts = streak(t, 600 + t * 40, 830, 140 + prand(t + 21) * 120, 10,
-          colors.tealLight, frame, 30, 150 + t * 2, 22);
+          '#48C7E8', frame, 30, 150 + t * 2, 22);
         if (ts != null) kids.push(ts);
       }
     }

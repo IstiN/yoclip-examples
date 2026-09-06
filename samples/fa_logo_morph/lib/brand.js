@@ -139,44 +139,102 @@ function trace(d, sw, bx, by, bw, bh, progress, color) {
   };
 }
 
-/// The chevron arm as a filled polygon — butt-capped stroke geometry, so
-/// the ends are sharp and the shared vertex stays clean (the path node
-/// strokes with round caps, which blobs the vertex). `(x0,y0)->(x1,y1)` is
-/// the svg centerline, `thick` the svg stroke width, `shift` a vertical
-/// drift applied to both endpoints (the morph splits the arms apart).
-function armPolygon(x0, y0, x1, y1, thick, shift) {
-  y0 += shift || 0;
-  y1 += shift || 0;
-  var dx = x1 - x0, dy = y1 - y0;
-  var len = Math.sqrt(dx * dx + dy * dy);
-  var px = -dy / len * thick / 2, py = dx / len * thick / 2;
-  var corners = [
-    x0 + px, y0 + py,
-    x1 + px, y1 + py,
-    x1 - px, y1 - py,
-    x0 - px, y0 - py,
+/// The mitered chevron: one filled `>` shape split along the exact miter
+/// edge into an upper and a lower half. The halves share the miter segment
+/// vertex-for-vertex, so the joint has no gap and no notch (two butt-capped
+/// strokes meeting at the vertex always leave both). `split` translates the
+/// halves apart vertically — the morph's arm separation — opening only the
+/// shared seam.
+function chevronHalves(split, upperColor, lowerColor) {
+  var half = BRAND.chevron.sw / 2;
+  var S = { x: BRAND.chevron.a1[0], y: BRAND.chevron.a1[1] };
+  var V = { x: BRAND.chevron.a1[2], y: BRAND.chevron.a1[3] };
+  var E = { x: BRAND.chevron.a2[2], y: BRAND.chevron.a2[3] };
+  function unit(a, b) {
+    var dx = b.x - a.x, dy = b.y - a.y, l = Math.sqrt(dx * dx + dy * dy);
+    return { x: dx / l, y: dy / l };
+  }
+  function perp(d) { return { x: -d.y, y: d.x }; }
+  function off(p, n, s) { return { x: p.x + n.x * s, y: p.y + n.y * s }; }
+  function isect(p, v, q, w) {
+    var t = ((q.x - p.x) * w.y - (q.y - p.y) * w.x) /
+      (v.x * w.y - v.y * w.x);
+    return { x: p.x + v.x * t, y: p.y + v.y * t };
+  }
+  var d1 = unit(S, V), d2 = unit(V, E), n1 = perp(d1), n2 = perp(d2);
+  // End-face corners of the two strokes.
+  var B = off(S, n1, -half), A = off(S, n1, half);       // A1 start
+  var D = off(V, n1, -half), C = off(V, n1, half);       // A1 end @vertex
+  var E1 = off(V, n2, -half), E2 = off(V, n2, half);     // A2 start @vertex
+  var F2 = off(E, n2, -half), F1 = off(E, n2, half);     // A2 end
+  // Miter points: outer = A1 upper edge x A2 lower edge; inner = the other
+  // pair. (n2 points up-left, so A2's lower edge passes through E1.)
+  var Mout = isect(D, d1, E1, d2);
+  var Min = isect(C, d1, E2, d2);
+  function poly(pts, color, dy) {
+    var flat = [];
+    var minX, minY;
+    for (var i = 0; i < pts.length; i++) {
+      var p = brandToScreen(pts[i].x, pts[i].y + dy);
+      if (minX == null || p.x < minX) minX = p.x;
+      if (minY == null || p.y < minY) minY = p.y;
+      flat.push(p.x, p.y);
+    }
+    for (var j = 0; j < flat.length; j += 2) {
+      flat[j] -= minX;
+      flat[j + 1] -= minY;
+    }
+    return {
+      type: 'polygon',
+      points: flat,
+      fill: color,
+      opacity: 1,
+      positioned: { left: minX, top: minY },
+    };
+  }
+  return [
+    poly([B, Mout, Min, A], upperColor, -split),
+    poly([Mout, F2, F1, Min], lowerColor, split),
   ];
-  var flat = [];
-  var minX, minY;
-  for (var i = 0; i < corners.length; i += 2) {
-    var p = brandToScreen(corners[i], corners[i + 1]);
-    if (minX == null || p.x < minX) minX = p.x;
-    if (minY == null || p.y < minY) minY = p.y;
-    flat.push(p.x, p.y);
+}
+
+// ---- The F: one vertical gradient, cut into aligned y-bands ---------------
+// Stem and top bar sample the SAME band table, so wherever the pieces touch
+// (the corner) the colors match exactly — no seam, no color break. Bands are
+// fine enough (12 over the stem) that adjacent bands differ imperceptibly.
+var F_GRAD = { y0: 372, y1: 716, top: '#6C74FF', bottom: '#4353F2', bands: 12 };
+
+function fBandColor(bi) {
+  return lerpColor(F_GRAD.top, F_GRAD.bottom, (bi + 0.5) / F_GRAD.bands);
+}
+
+/// Draws the x/w column of the F gradient between svg y0..y1. Pieces overlap
+/// the shared band colors; each band overdraws 0.75 svg downward so float
+/// rounding never opens a hairline between bands.
+function pushFRect(kids, x, w, y0, y1, opacity) {
+  var bh = (F_GRAD.y1 - F_GRAD.y0) / F_GRAD.bands;
+  var b0 = Math.max(0, Math.floor((y0 - F_GRAD.y0) / bh));
+  var b1 = Math.min(F_GRAD.bands, Math.ceil((y1 - F_GRAD.y0) / bh));
+  for (var bi = b0; bi < b1; bi++) {
+    var by0 = F_GRAD.y0 + bi * bh;
+    var cy0 = Math.max(by0, y0);
+    var cy1 = Math.min(by0 + bh, y1);
+    if (cy1 - cy0 < 0.01) continue;
+    var h = cy1 - cy0 + (bi < b1 - 1 ? 0.75 : 0);
+    var pt = brandToScreen(x + w / 2, (cy0 + cy1) / 2);
+    kids.push({
+      type: 'rect',
+      width: w * mapper.k,
+      height: h * mapper.k,
+      radius: 0,
+      fill: fBandColor(bi),
+      opacity: opacity,
+      positioned: {
+        left: pt.x - (w / 2) * mapper.k,
+        top: pt.y - (h / 2) * mapper.k,
+      },
+    });
   }
-  // Polygon points are relative to the positioned box: rebase to the
-  // points' own min and park the box there.
-  for (var j = 0; j < flat.length; j += 2) {
-    flat[j] -= minX;
-    flat[j + 1] -= minY;
-  }
-  return {
-    type: 'polygon',
-    points: flat,
-    fill: '#5B61F6',
-    opacity: 1,
-    positioned: { left: minX, top: minY },
-  };
 }
 
 /// A horizontal streak: thin rounded rect flying right from svg point

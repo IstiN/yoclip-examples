@@ -25,11 +25,16 @@ stays geometrically continuous while scale and anchor animate:
   point to any screen point; the scene retargets it mid-film (icon center →
   wordmark center) while every child keeps drawing through the same
   `brandToScreen`.
-- **Stroke geometry without round caps** — the chevron is two filled
-  `polygon` arms (`armPolygon`), because the path node strokes with round
-  caps and blobs the shared vertex.
-- **Gradient bars from flat strips** — `tealBar()` tiles the underscore's
-  teal→cyan gradient as square strips; per-strip rounding reads as beads.
+- **Stroke geometry without round caps** — the chevron is two miter-halves
+  (`chevronHalves`): one filled `>` split along the exact miter edge, so the
+  vertex has no gap and no notch (two butt-capped strokes meeting at a
+  vertex always leave both). The halves share the miter segment
+  vertex-for-vertex, which is also the seam the morph pulls apart.
+- **One gradient, no seams** — the F draws from a single vertical gradient
+  cut into aligned y-bands (`pushFRect`): stem and top bar sample the same
+  band table, so their shared corner matches color-exactly. The teal
+  underscore/accent tiles its gradient as square strips (radius 0 — any
+  per-strip rounding reads as beads).
 - **Real letterforms** — the `a` bowl is a path-arc drawn through the
   `progress` contract, not an image.
 
