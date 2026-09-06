@@ -1,0 +1,27 @@
+name: fa_logo_morph
+description: Fa brand morph sample for Yoclip — terminal icon glitch-dissolves into the Fa wordmark (jsr.motion + path draw-on + gradient strips).
+publish_to: none
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+  flutter: ^3.44.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  yoclip_core:
+    path: ../../../packages/yoclip_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - yoclip.yaml

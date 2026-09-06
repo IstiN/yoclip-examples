@@ -1,0 +1,22 @@
+config:
+  duration: 240
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#070a12'
+
+# Brand geometry and the trace()/gradient-strip helpers live in project.js.
+project_js: project.js
+
+scenes:
+  - scenes/01_fa_morph.scene.js
+
+theme:
+  colors:
+    background: '#070a12'
+    iconLight: '#fafbfe'
+    iconEdge: '#e5eaf2'
+    blue: '#5B61F6'
+    blueDeep: '#3566FF'
+    teal: '#2EBD9E'
+    tealLight: '#48C7E8'
