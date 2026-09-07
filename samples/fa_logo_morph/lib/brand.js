@@ -213,20 +213,31 @@ function chevronHalves(split, upperColor, lowerColor, pinch) {
   var Min = isect(C, d1, E2, d2);
   // The pinch steepens the arms, so the sharp miter grows into a spike
   // that would poke past the round caps of the fold's strokes at the
-  // handoff. Bevel the tip back toward V.x + half in proportion to the
-  // pinch: at rest the tip stays sharp; at full pinch the flat face lands
-  // exactly on the round-cap line, and the fold picks up the silhouette
-  // with no spike.
-  var P1 = Mout, P2 = Mout;
-  if (pinch != null && pinch > 0) {
-    var bevelX = lerp(Mout.x, V.x + half,
-      Math.min(1, pinch / half));
-    if (bevelX < Mout.x - 0.01) {
-      P1 = { x: bevelX,
-        y: B.y + (Mout.y - B.y) * (bevelX - B.x) / (Mout.x - B.x) };
-      P2 = { x: bevelX,
-        y: F2.y + (Mout.y - F2.y) * (bevelX - F2.x) / (Mout.x - F2.x) };
+  // handoff. So as the eye pinches, the tip is cut by a circle around V
+  // whose radius glides from the sharp tip's distance (pinch 0 — the
+  // circle passes exactly through Mout: untouched) down to `half` (full
+  // pinch — the tip IS a round cap, tangent to both outer edges, the
+  // exact silhouette the fold's strokes pick up). The two halves still
+  // tile the shape and share the horizontal centerline seam, so the color
+  // boundary between them stays level.
+  var tipPts = null; // extra tip points (the arc), or null for the sharp tip
+  if (pinch != null && pinch > 0.01) {
+    var rFar = Math.hypot(Mout.x - V.x, Mout.y - V.y);
+    var r = lerp(rFar, half, Math.min(1, pinch / half));
+    var s = Math.sqrt(Math.max(0, r * r - half * half));
+    var P1 = { x: D.x + d1.x * s, y: D.y + d1.y * s };
+    var P2 = { x: E1.x + d2.x * s, y: E1.y + d2.y * s };
+    var a1 = Math.atan2(P1.y - V.y, P1.x - V.x);
+    var a2 = Math.atan2(P2.y - V.y, P2.x - V.x);
+    var NA = 8;
+    var arcU = [], arcL = [];
+    for (var ai = 0; ai <= NA; ai++) {
+      var thU = a1 + (0 - a1) * ai / NA;
+      arcU.push({ x: V.x + r * Math.cos(thU), y: V.y + r * Math.sin(thU) });
+      var thL = 0 + (a2 - 0) * ai / NA;
+      arcL.push({ x: V.x + r * Math.cos(thL), y: V.y + r * Math.sin(thL) });
     }
+    tipPts = { arcU: arcU, arcL: arcL };
   }
   function shifted(pts, dy) {
     var out = [];
@@ -235,12 +246,17 @@ function chevronHalves(split, upperColor, lowerColor, pinch) {
     }
     return out;
   }
-  var upper = P1 === Mout
+  // arcU runs P1 -> the centerline point; arcL runs the centerline -> P2.
+  // The seam (centerline -> Min) is horizontal, so the upper/lower color
+  // split stays level through the tip.
+  var upper = tipPts == null
     ? flatPoly(shifted([B, Mout, Min, A], -split), upperColor, 1)
-    : flatPoly(shifted([B, P1, P2, Min, A], -split), upperColor, 1);
-  var lower = P1 === Mout
+    : flatPoly(shifted([B].concat(tipPts.arcU, [Min, A]), -split),
+        upperColor, 1);
+  var lower = tipPts == null
     ? flatPoly(shifted([Mout, F2, F1, Min], split), lowerColor, 1)
-    : flatPoly(shifted([P2, F2, F1, Min], split), lowerColor, 1);
+    : flatPoly(shifted(tipPts.arcL.concat([F2, F1, Min]), split),
+        lowerColor, 1);
   // Round terminals on the free ends: each cap bulges along the arm's
   // outward normal (perpendicular to the angled end face).
   var su = { x: S.x, y: S.y - split };
