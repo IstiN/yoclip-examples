@@ -157,12 +157,13 @@ scene = {
     // capsule it replaces.
     var OX = BRAND.under.x + BRAND.under.w / 2;
     var UY = BRAND.under.y + BRAND.under.h / 2;
-    var OR = 76;
-    // The wink slot: right of the eye's vertex, at its height — `>o`.
-    var NX = 660, NY = 541;
+    var OR = 104;
+    // The second square: equal to the eye's, 40 units of daylight between
+    // them — two smiley eyes, `>` in the left one, `o` in the right one.
+    var NX = 674, NY = 541;
     var oColor = '#3BC2C3';
     var CAP = BRAND.under.h / 2;
-    var DASH = 76; // half-width of the `-` mouth — matches the squashed o
+    var DASH = 104; // half-width of the `-` mouth — matches the squashed o
     var liftT    = tw(128, 8, 0, 1, 'easeInOutCubic');
     var squeezeT = tw(136, 7, 0, 1, 'easeInOutCubic');
     var bendT    = tw(143, 13, 0, 1, 'easeInOutCubic');

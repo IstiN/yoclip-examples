@@ -55,7 +55,10 @@ var BRAND = {
   // icon beats, morph and wordmark all compose inside one surface.
   tile: { x: 16, y: 16, w: 992, h: 992, rx: 224 },
   // Chevron `>_` — two strokes meeting at the right vertex.
-  chevron: { sw: 48, a1: [280, 434, 492, 541], a2: [492, 541, 280, 648] },
+  // The `>` is inscribed in an invisible square: with the vertex at 478 its
+  // full visual bbox (caps + miter tip) is a 246.6 x 246.6 square. The `o`
+  // is inscribed in an equal square beside it — the smiley's two eyes.
+  chevron: { sw: 48, a1: [280, 434, 478, 541], a2: [478, 541, 280, 648] },
   // Teal underscore — a gradient capsule (square strips + semicircular
   // caps); it glides up-left to become the F's accent bar.
   under: { x: 512, y: 712, w: 248, h: 38 },

@@ -48,6 +48,13 @@ continuous while the scale breathes:
   semicircular end caps. Its handoff to the stroked bar is seamless by
   construction: the stroke endpoints are inset by the cap radius, so the
   two silhouettes match to the pixel.
+- **Two equal squares — the smiley's eyes** — the `>` and the `o` are
+  inscribed in two invisible squares of the same size (246.6 svg units),
+  40 units of daylight between them, like a smiley's `o o`. For that the
+  chevron's vertex sits at 478: with the caps and the miter tip its
+  visual bbox is a perfect square, and the `o`'s outer circle (r 104 +
+  stroke 38 = 123.3) is inscribed in the matching square beside it. The
+  squares are never drawn — they are the grid the face snaps to.
 - **A face that winks, then becomes the letter** — the prompt `>_` stays
   a face: the chevron holds as the eye while the mouth lifts, purses
   into a dash and curls into an `o` beside it (`>o`). Then the smiley
