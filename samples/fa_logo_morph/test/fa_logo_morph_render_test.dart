@@ -102,8 +102,8 @@ void main() {
     132, // 08 the mouth lifted off its slot
     140, // 08 the mouth pursed to a dash: `>-`
     150, // 08 the wire mid-curl
-    168, // 09 the blink cycle: mouth closed flat, eye squinting `>-`
-    174, // 09 the mouth popped back open: `>o`
+    168, // 09 the wink: mouth closed flat, eye pinched `>-`
+    174, // 09 the mouth popped back open: `>o` (fold begins)
     192, // 10 the arms folded into the stem line
     214, // 11 the a's stem gradient drawing
     236, // 16 final bloom

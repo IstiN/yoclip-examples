@@ -24,8 +24,8 @@ continuous while the scale breathes:
 | 05–06 | 75–110 | Hero zoom (easeOutExpo) + a soft teal cue band breathing over the glyph row |
 | 07 | 108–128 | The face holds: `>` eye + `_` mouth |
 | 08 | 128–162 | The note: the mouth lifts, purses into a dash, and curls into a ring beside the eye — `>o` |
-| 09 | 162–186 | The smiley blinks twice: `>o` → `>-` → `>o` → `>-` → `>o`; the eye narrows in sync |
-| 10 | 186–236 | The assembly: the two arms fold into ONE vertical line — the stem; the top bar winds out of it, a new line grows from its center (the accent), the `o` drops into the `a`'s bowl |
+| 09 | 162–174 | ONE wink: `>o` → `>-` → `>o`; the eye narrows in sync |
+| 10 | 174–228 | The assembly: the two arms fold into ONE vertical line — the stem; the top bar winds out of it, a new line grows from its center (the accent), the `o` drops into the `a`'s bowl |
 | 11 | 212–228 | The `a`'s stem draws bottom-up in micro-segments, green at the junction → cyan at the free end |
 | 16–20 | 218–240 | Settle: breathing ground glow, final teal bloom, hold |
 
@@ -57,12 +57,12 @@ continuous while the scale breathes:
   squares are never drawn — they are the grid the face snaps to.
 - **A face that winks, then becomes the letter** — the prompt `>_` stays
   a face: the chevron holds as the eye while the mouth lifts, purses
-  into a dash and curls into an `o` beside it (`>o`). Then the smiley
-  blinks twice — the ring squashes flat to a dash and pops open
-  (a 12-frame close/open triangle wave on the ring's y), the eye
-  narrowing in sync — `chevronHalves` takes a `pinch`: the right tip
-  slides left over rigid geometry (a vertical squash once left seams on
-  the miter). Then the two arms fold into one vertical line (two
+  into a dash and curls into an `o` beside it (`>o`). Then ONE wink —
+  the ring squashes flat to a dash and pops open (a 12-frame close/open
+  triangle wave on the ring's y), the eye narrowing in sync —
+  `chevronHalves` takes a `pinch`: the right tip slides left over rigid
+  geometry (a vertical squash once left seams on the miter). One wink,
+  not two: the face twitches once, then the fold begins. Then the two arms fold into one vertical line (two
   polylines lerping onto the halves of the stem line, meeting
   cap-to-cap) that lands as the F's stem. Nothing shatters: the eye is
   the letter.

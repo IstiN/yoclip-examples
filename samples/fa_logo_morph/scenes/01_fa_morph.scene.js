@@ -119,13 +119,14 @@ scene = {
       });
     }
 
-    // ---- The mouth blink cycle (162..186) ----------------------------------
+    // ---- The mouth blink cycle (162..174) ----------------------------------
+    // ONE wink — the mouth closes flat and pops back open once.
     // Once the note has formed, the face plays it twice: the mouth closes
     // flat into a dash and pops back open — `>o`, `>-`, `>o`, `>-`, `>o` —
     // while the eye narrows in sync: its right tip just slides left —
     // rigid pieces, no bending. A real winking smiley.
     var mouthSq = 0;
-    if (frame >= 162 && frame < 186) {
+    if (frame >= 162 && frame < 174) {
       var mu = (frame - 162) % 12;
       mouthSq = mu < 6 ? mu / 6 : (12 - mu) / 6;
     }
@@ -135,7 +136,7 @@ scene = {
     // The eye NEVER falls apart and NEVER bends: at each blink it just
     // pinches — the right tip slides 24 units left and back. Then the two
     // arms fold into ONE vertical line that slides up as the F's stem.
-    var foldT = tw(186, 14, 0, 1, 'easeInOutCubic');
+    var foldT = tw(174, 14, 0, 1, 'easeInOutCubic');
     if (foldT <= 0.001) {
       var halves = chevronHalves(0, colors.blueBright, colors.blueDeep,
         24 * mouthSq);
@@ -148,7 +149,7 @@ scene = {
       : 1;
     if (frame < 122) kids.push.apply(kids, tealBar(cursorP));
 
-    // ---- The note «фа» (122..186) ------------------------------------------
+    // ---- The note «фа» (122..174) ------------------------------------------
     // In Russian solfège the note is written «фа» — Fa. The mouth lifts off
     // its slot, purses into a dash `-`, and only then the wire curls into a
     // note head beside the eye — the face reads `>o`, then plays the blink
@@ -167,7 +168,7 @@ scene = {
     var liftT    = tw(128, 8, 0, 1, 'easeInOutCubic');
     var squeezeT = tw(136, 7, 0, 1, 'easeInOutCubic');
     var bendT    = tw(143, 13, 0, 1, 'easeInOutCubic');
-    if (frame >= 122 && frame < 186) {
+    if (frame >= 122 && frame < 174) {
       // Gradient capsule fades as the identical-silhouette stroke takes over.
       kids.push.apply(kids, tealBar(1 - tw(122, 5, 0, 1, 'linear')));
       // `_` lifts, purses to `-`, then curls into `o`.
@@ -189,20 +190,20 @@ scene = {
     }
 
     // ---- The assembly: the eye becomes the F, the note becomes the a ----
-    // (186..236). The two arms fold into ONE vertical line — the eye opens
+    // (174..228). The two arms fold into ONE vertical line — the eye opens
     // into a stem — which slides up into place as the F's stem. From its
     // top the top bar winds out around a rounded elbow; from its very
     // center a new line grows out — the accent, the note's teal, the
     // underscore's legacy. Meanwhile the `o` drops and swells into the
     // `a`'s bowl: the wink becomes the word.
     var aBowlColor = '#2EBD9E';
-    if (frame >= 186) {
+    if (frame >= 174) {
       var f = BRAND.f;
       var scx = f.stemX + f.w / 2;
       var stop = f.top + f.w / 2;
       var sbot = f.bottom - f.w / 2;
       var smid = (stop + sbot) / 2;
-      var settle = tw(198, 18, 0, 1, 'linear');
+      var settle = tw(186, 18, 0, 1, 'linear');
       var armBlue = lerpColor(colors.blueBright, colors.blue, settle);
       var armDeep = lerpColor(colors.blueDeep, colors.blue, settle);
       // The fold: upper arm → upper half of the stem line, lower arm → the
@@ -219,7 +220,7 @@ scene = {
         { x: lerp(loA.x, scx, foldT), y: lerp(loA.y, sbot, foldT) },
       ], f.w, 1, armDeep, 1));
       // Top bar: winds out of the stem's top around a rounded elbow.
-      var topP = tw(198, 14, 0, 1, 'easeInOutCubic');
+      var topP = tw(186, 14, 0, 1, 'easeInOutCubic');
       if (topP > 0.001) {
         kids.push(trace(
           'M' + scx + ',' + (stop + 44) +
@@ -229,7 +230,7 @@ scene = {
           f.w, scx, stop, f.topX2 - f.stemX, 44, topP, colors.blue, 1));
       }
       // The accent: a new line growing out of the stem's center.
-      var accP = tw(206, 14, 0, 1, 'easeInOutCubic');
+      var accP = tw(194, 14, 0, 1, 'easeInOutCubic');
       if (accP > 0.001) {
         var acc = f.accent;
         var accY = acc.y + acc.h / 2;
@@ -239,7 +240,7 @@ scene = {
           acc.h, scx, accY, accX2 - scx, 0, accP, oColor, 1));
       }
       // The `o` drops and swells into the `a`'s bowl.
-      var bowlT = tw(196, 16, 0, 1, 'easeInOutCubic');
+      var bowlT = tw(184, 16, 0, 1, 'easeInOutCubic');
       var bowl = ringPoints(
         lerp(NX, BRAND.a.bowl.cx, bowlT),
         lerp(NY, BRAND.a.bowl.cy, bowlT),
@@ -252,7 +253,7 @@ scene = {
     // The bowl IS the note (it arrived as the ring). The stem draws down
     // from it in micro-segments whose color glides green → cyan — the `a`
     // carries the brand gradient instead of switching between its anchors.
-    var stemP = tw(212, 16, 0, 1, 'easeInOutCubic');
+    var stemP = tw(200, 16, 0, 1, 'easeInOutCubic');
     if (stemP > 0.001) {
       var segs = 8;
       var aStem = BRAND.a.stem;
@@ -272,7 +273,7 @@ scene = {
     }
 
     // ---- Beat 16: settle + the final bloom (218..240) ------------------------
-    var settleP = tw(218, 22, 0, 1, 'easeOutExpo');
+    var settleP = tw(206, 22, 0, 1, 'easeOutExpo');
     if (settleP > 0.01) {
       // Ground glow: a flat teal bar under the baseline, breathing wide,
       // centered on the finished wordmark.
@@ -295,7 +296,7 @@ scene = {
         positioned: { left: gb.x - gw * 0.275, top: gb.y - 4 * k },
       });
     }
-    var bloomP = tw(228, 12, 0, 1, 'easeOutExpo');
+    var bloomP = tw(216, 12, 0, 1, 'easeOutExpo');
     if (bloomP > 0.01 && bloomP < 1) {
       var fb = brandToScreen(638, 700);
       kids.push({
