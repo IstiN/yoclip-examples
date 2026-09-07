@@ -176,11 +176,16 @@ function trace(d, sw, bx, by, bw, bh, progress, color, opacity) {
 /// halves apart vertically — the morph's arm separation — opening only the
 /// shared seam. The free arm ends get semicircular caps (round terminals,
 /// like every other stroke in the system).
-function chevronHalves(split, upperColor, lowerColor) {
+function chevronHalves(split, upperColor, lowerColor, squint) {
   var half = BRAND.chevron.sw / 2;
   var S = { x: BRAND.chevron.a1[0], y: BRAND.chevron.a1[1] };
   var V = { x: BRAND.chevron.a1[2], y: BRAND.chevron.a1[3] };
   var E = { x: BRAND.chevron.a2[2], y: BRAND.chevron.a2[3] };
+  // The wink: squash the whole `>` vertically around its mid-height so the
+  // eye squints in sync with the `o`'s blink-off.
+  var EYE_Y = (S.y + E.y) / 2;
+  var sq = squint == null ? 1 : squint;
+  function q(p) { return { x: p.x, y: EYE_Y + (p.y - EYE_Y) * sq }; }
   function unit(a, b) {
     var dx = b.x - a.x, dy = b.y - a.y, l = Math.sqrt(dx * dx + dy * dy);
     return { x: dx / l, y: dy / l };
@@ -209,13 +214,15 @@ function chevronHalves(split, upperColor, lowerColor) {
     }
     return out;
   }
-  var upper = flatPoly(shifted([B, Mout, Min, A], -split), upperColor, 1);
-  var lower = flatPoly(shifted([Mout, F2, F1, Min], split), lowerColor, 1);
+  var upper = flatPoly(shifted([B, Mout, Min, A], -split).map(q), upperColor, 1);
+  var lower = flatPoly(shifted([Mout, F2, F1, Min], split).map(q), lowerColor, 1);
   // Round terminals on the free ends: each cap bulges along the arm's
   // outward normal (perpendicular to the angled end face).
-  var capU = capArc(S.x, S.y - split, half, n1, { x: -d1.x, y: -d1.y },
+  var su = q({ x: S.x, y: S.y - split });
+  var se = q({ x: E.x, y: E.y + split });
+  var capU = capArc(su.x, su.y, half, n1, { x: -d1.x, y: -d1.y },
     upperColor, 1);
-  var capL = capArc(E.x, E.y + split, half, n2, d2, lowerColor, 1);
+  var capL = capArc(se.x, se.y, half, n2, d2, lowerColor, 1);
   return [upper, capU, lower, capL];
 }
 

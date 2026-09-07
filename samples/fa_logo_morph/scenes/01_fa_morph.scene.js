@@ -7,15 +7,17 @@
 //               icon is the stage, it stays)
 //   05  75–100  the icon grows to hero scale (the composition zooms in)
 //   06  96–110  a soft teal band breathes over the glyph row — the cue
-//   07  108–122 morph: chevron arms split away and die into blue streaks
-//   08  122–166 the note: three beats — the underscore lifts off its
-//               slot, the tip reaches right like a hand winding up, and
-//               only then the wire CURLS into a ring — the note head `o`
-//               (in Russian solfège the note is written «фа» = Fa)
-//   09  166–192 the `o` blinks like the cursor it always was, and on the
-//               blink splits: one ring glides up-left and flattens into
-//               the F's accent bar, the other swells into the `a`'s bowl;
-//               the F writes itself as one round-capped stroke (184..212)
+//   07  108–122 the prompt `>_` is a face: the `>` holds as the eye,
+//               the underscore is its mouth
+//   08  122–166 the note: three beats — the mouth lifts off its slot,
+//               the tip reaches right like a hand winding up, and only
+//               then the wire CURLS into a ring beside the eye: the face
+//               reads `>o` (in Russian solfège the note is «фа» = Fa)
+//   09  166–192 the wink: the `o` blinks and the eye squints in sync —
+//               and on that blink the face breaks: the eye dies into blue
+//               streaks, the rings split (one flattens into the F accent,
+//               one swells into the `a` bowl) and the F's stem grows out
+//               of the eye's socket (184..212)
 //   11  206–222 the `a`'s stem draws through the bowl in micro-segments,
 //               its color gliding green → cyan (one continuous gradient)
 //   16  218–240 settle: ground glow, final teal bloom — the finished icon
@@ -117,23 +119,27 @@ scene = {
       });
     }
 
-    // ---- The chevron (01..07): mitered halves, blue split, round ends -----
-    // Top arm keeps the lighter stop, bottom arm blends deeper — flat fills
-    // per arm, the eye reads the pair as the gradient. During the morph the
-    // arms drift apart (the centerlines themselves shift) and die into
-    // blue streaks.
-    var armLife = 1 - tw(108, 14, 0, 1, 'easeInCubic');
+    // ---- The chevron: the winking eye (01..08) -----------------------------
+    // `>_` is a face: the chevron is the squinting eye, the underscore its
+    // mouth. The eye holds while the mouth lifts, reaches and curls into an
+    // `o` — the prompt becomes `>o`. When the `o` blinks, the eye squints in
+    // sync — the face winks — and on that same blink the face breaks: the
+    // eye dies into blue streaks and the F's stem grows out of its socket.
+    var winkT = tw(171, 4, 0, 1, 'easeInOutCubic') *
+      (1 - tw(177, 4, 0, 1, 'easeInOutCubic'));
+    var armLife = 1 - tw(180, 14, 0, 1, 'easeInCubic');
     if (armLife > 0.01) {
-      var spread = tw(108, 16, 0, 30, 'easeInCubic');
-      var halves = chevronHalves(spread, colors.blueBright, colors.blueDeep);
+      var spread = tw(180, 16, 0, 30, 'easeInCubic');
+      var halves = chevronHalves(spread, colors.blueBright, colors.blueDeep,
+        1 - 0.16 * winkT);
       for (var hi = 0; hi < halves.length; hi++) {
         halves[hi].opacity = armLife;
         kids.push(halves[hi]);
       }
-      if (frame >= 106) {
+      if (frame >= 178) {
         for (var b = 0; b < 3; b++) {
           var bs = streak(b, 470 + b * 60, 500, 200 + prand(b + 7) * 160, 12,
-            b % 2 == 0 ? colors.blue : colors.blueDeep, frame, 30, 106 + b * 2, 26);
+            b % 2 == 0 ? colors.blue : colors.blueDeep, frame, 30, 180 + b * 2, 26);
           if (bs != null) kids.push(bs);
         }
       }
@@ -153,8 +159,8 @@ scene = {
     var OX = BRAND.under.x + BRAND.under.w / 2;
     var UY = BRAND.under.y + BRAND.under.h / 2;
     var OR = 52;
-    // Center stage, where the blink happens.
-    var NX = 512, NY = 555;
+    // The wink slot: right of the eye's vertex, at its height — `>o`.
+    var NX = 610, NY = 541;
     var oColor = '#3BC2C3';
     var liftT  = tw(128, 12, 0, 1, 'easeInOutCubic');
     var reachT = tw(140, 10, 0, 1, 'easeInOutCubic');
@@ -166,7 +172,7 @@ scene = {
         : (Math.floor((frame - 166) / 6) % 2 == 0 ? 1 : 0.06);
       // The bar's own geometry glides: up off the slot, then the tip
       // reaches right, and through the bend both ends fold in onto the
-      // ring's span while the target circle drifts up to center stage.
+      // ring's span while the target circle drifts up beside the eye.
       var barX0 = lerp(BRAND.under.x + OR, NX - OR, bendT);
       var barX1 = lerp(
         lerp(BRAND.under.x + BRAND.under.w - OR, 838, reachT),
