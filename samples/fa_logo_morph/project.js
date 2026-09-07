@@ -1,7 +1,8 @@
 // Fa logo morph — one continuous shot (8s @ 30fps). The dark-glass app
 // icon boots with a teal scan line, grows to hero scale — and the
-// terminal's underscore curls up into a note head: in Russian solfège the
-// note is written «фа» = Fa. The `o` blinks like a cursor, then splits:
+// terminal's underscore lifts, its tip reaches right like a hand winding
+// up, and only then the wire curls into a note head: in Russian solfège
+// the note is written «фа» = Fa. The `o` blinks like a cursor, then splits:
 // one ring flattens into the F's accent bar, the other swells into the
 // `a`'s bowl — the note spells its own name. The F writes itself as one
 // round-capped stroke, the `a`'s stem draws green → cyan, and the mark

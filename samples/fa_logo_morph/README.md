@@ -3,8 +3,10 @@
 A single eight-second brand film on ONE persistent surface: the dark-glass
 app icon boots with a teal scan line, grows to hero scale — and then the
 terminal's underscore curls up into a note head: **in Russian solfège the
-note is written «фа» — Fa**. The `o` blinks like the cursor it always was,
-and on a blink it splits: one ring flattens into the F's accent bar, the
+note is written «фа» — Fa**. The bar lifts off its slot, the tip
+reaches right like a hand winding up, and only then the wire curls into
+an `o` that blinks like the cursor it always was — and on the blink it
+splits: one ring flattens into the F's accent bar, the
 other swells into the `a`'s bowl. The note becomes its own name. The F
 writes itself as one round-capped stroke, the `a`'s stem draws through its
 bowl with the color gliding green → cyan, and everything settles into the
@@ -21,10 +23,10 @@ continuous while the scale breathes:
 | 02 | 40–74 | Boot scan — one teal line sweeps the icon; its edge stroke lifts as the line passes |
 | 05–06 | 75–110 | Hero zoom (easeOutExpo) + a soft teal cue band breathing over the glyph row |
 | 07 | 108–122 | Morph: chevron arms split away and die into blue streaks |
-| 08 | 122–164 | The note: the underscore bends into a ring (`o`), drifts center stage and blinks ×2 |
-| 09 | 164–196 | The split: ring → F accent (flattening), ring → `a` bowl (swelling); the F writes itself |
-| 11 | 192–208 | The `a`'s stem draws in micro-segments, green → cyan |
-| 16–20 | 204–240 | Settle: breathing ground glow, final teal bloom, hold |
+| 08 | 122–166 | The note: the bar lifts off its slot, the tip reaches right, the wire curls into a ring (`o`) |
+| 09 | 166–192 | The `o` blinks once at center stage, and on the blink splits: ring → F accent (flattening), ring → `a` bowl (swelling); the F writes itself |
+| 11 | 206–222 | The `a`'s stem draws in micro-segments, green → cyan |
+| 16–20 | 218–240 | Settle: breathing ground glow, final teal bloom, hold |
 
 ## Why it's a good engine test
 
@@ -44,11 +46,13 @@ continuous while the scale breathes:
   strips (radius 0 — any per-strip rounding reads as beads) closed by
   semicircular end caps.
 - **A bar bends into a ring** — the underscore → note `o` → split is one
-  continuous stroke morph (`bendPoints`): the centerline is sampled at 32
-  points, each interpolating between its place on the bar and on the
-  circle — the wire visibly curls. The round caps end up stacked on the
-  same point, so the open-bar → closed-ring topology change is invisible.
-  The same engine reversed flattens the ring into the F's accent bar.
+  continuous stroke morph (`bendPoints`) with classic anticipation: the
+  bar first lifts off its slot, then the tip reaches right like a hand
+  winding up, and only then the centerline — sampled at 32 points, each
+  interpolating between its place on the bar and on the circle — visibly
+  curls. The round caps end up stacked on the same point, so the
+  open-bar → closed-ring topology change is invisible. The same engine
+  reversed flattens the ring into the F's accent bar.
 - **Real letterforms** — the F is ONE round-capped, round-joined stroke
   path (`fPathNode`): up the stem, right across the bar — rounded
   terminals, rounded elbow, not a single seam. The `a`'s stem draws in 8

@@ -8,16 +8,17 @@
 //   05  75–100  the icon grows to hero scale (the composition zooms in)
 //   06  96–110  a soft teal band breathes over the glyph row — the cue
 //   07  108–122 morph: chevron arms split away and die into blue streaks
-//   08  122–140 the note: the underscore CURLS UP into a ring — the note
-//               head `o` (in Russian solfège the note is written «фа» =
-//               Fa) — and blinks like the cursor it always was
-//   09  164–192 on a blink the `o` splits: one ring glides up-left and
-//               flattens into the F's accent bar, the other swells into
-//               the `a`'s bowl — the note becomes its own name; the F
-//               writes itself as one round-capped stroke (168..196)
-//   11  192–208 the `a`'s stem draws through the bowl in micro-segments,
+//   08  122–166 the note: three beats — the underscore lifts off its
+//               slot, the tip reaches right like a hand winding up, and
+//               only then the wire CURLS into a ring — the note head `o`
+//               (in Russian solfège the note is written «фа» = Fa)
+//   09  166–192 the `o` blinks like the cursor it always was, and on the
+//               blink splits: one ring glides up-left and flattens into
+//               the F's accent bar, the other swells into the `a`'s bowl;
+//               the F writes itself as one round-capped stroke (184..212)
+//   11  206–222 the `a`'s stem draws through the bowl in micro-segments,
 //               its color gliding green → cyan (one continuous gradient)
-//   16  204–240 settle: ground glow, final teal bloom — the finished icon
+//   16  218–240 settle: ground glow, final teal bloom — the finished icon
 //
 // Everything is placed through the shared svg→screen mapper (lib/brand.js)
 // with the tile center pinned for the whole run, so the icon, the morph and
@@ -144,39 +145,45 @@ scene = {
       : 1;
     if (frame < 122) kids.push.apply(kids, tealBar(cursorP));
 
-    // ---- The note «фа» (122..164) ------------------------------------------
-    // In Russian solfège the note is written «фа» — Fa. The underscore
-    // curls up into a note head — an `o` — and blinks like the cursor it
-    // always was. The gradient capsule hands off to a flat stroked path of
-    // the identical silhouette, which then bends: the wire's ends lift,
-    // curl through the sides and meet at the top of the ring.
+    // ---- The note «фа» (122..180) ------------------------------------------
+    // In Russian solfège the note is written «фа» — Fa. Three beats: the
+    // underscore lifts off its slot, the tip reaches right like a hand
+    // winding up, and only then the wire curls into a note head — an `o` —
+    // that blinks like the cursor it always was. On the blink it splits.
     var OX = BRAND.under.x + BRAND.under.w / 2;
-    var OY = BRAND.under.y + BRAND.under.h / 2;
+    var UY = BRAND.under.y + BRAND.under.h / 2;
     var OR = 52;
-    // The note's stage position: it drifts from the underscore slot to the
-    // glyph center while it blinks — the blink happens center stage.
+    // Center stage, where the blink happens.
     var NX = 512, NY = 555;
     var oColor = '#3BC2C3';
-    var bendT = tw(122, 18, 0, 1, 'easeInOutCubic');
-    if (bendT > 0.001 && frame < 164) {
+    var liftT  = tw(128, 12, 0, 1, 'easeInOutCubic');
+    var reachT = tw(140, 10, 0, 1, 'easeInOutCubic');
+    var bendT  = tw(150, 16, 0, 1, 'easeInOutCubic');
+    if (frame >= 122 && frame < 180) {
       // Gradient capsule fades as the identical-silhouette stroke takes over.
       kids.push.apply(kids, tealBar(1 - tw(122, 5, 0, 1, 'linear')));
-      var blink = frame < 140 ? 1
-        : (Math.floor((frame - 140) / 6) % 2 == 0 ? 1 : 0.06);
-      var driftT = frame < 140 ? 0 : tw(140, 20, 0, 1, 'easeInOutCubic');
-      var bend = bendPoints(
-        BRAND.under.x + OR, OY, BRAND.under.x + BRAND.under.w - OR,
-        lerp(OX, NX, driftT), lerp(OY, NY, driftT), OR, bendT, 32);
+      var blink = frame < 166 ? 1
+        : (Math.floor((frame - 166) / 6) % 2 == 0 ? 1 : 0.06);
+      // The bar's own geometry glides: up off the slot, then the tip
+      // reaches right, and through the bend both ends fold in onto the
+      // ring's span while the target circle drifts up to center stage.
+      var barX0 = lerp(BRAND.under.x + OR, NX - OR, bendT);
+      var barX1 = lerp(
+        lerp(BRAND.under.x + BRAND.under.w - OR, 838, reachT),
+        NX + OR, bendT);
+      var barY = lerp(lerp(UY, 644, liftT), NY, bendT);
+      var bend = bendPoints(barX0, barY, barX1,
+        lerp(OX, NX, bendT), lerp(644, NY, bendT), OR, bendT, 32);
       kids.push(polylineNode(bend, BRAND.under.h, 1, oColor, blink));
     }
 
-    // ---- The split: the note spells «Fa» (164..192) -------------------------
+    // ---- The split: the note spells «Fa» (180..206) -------------------------
     // On a blink the `o` divides. One ring glides up-left, flattening into
     // the F's accent bar; the other glides up-right and swells into the
     // `a`'s bowl. The note becomes its own name.
     var aBowlColor = '#2EBD9E';
-    if (frame >= 164) {
-      var splitT = tw(164, 28, 0, 1, 'easeInOutCubic');
+    if (frame >= 180) {
+      var splitT = tw(180, 26, 0, 1, 'easeInOutCubic');
       var acc = BRAND.f.accent;
       var bendA = bendPoints(
         acc.x + acc.h / 2, acc.y + acc.h / 2,
@@ -191,29 +198,29 @@ scene = {
         lerp(OR, BRAND.a.bowl.r, splitT), 32);
       kids.push(polylineNode(bendB, 38, 1,
         lerpColor(oColor, aBowlColor, splitT), 1));
-      if (frame < 176) {
+      if (frame < 192) {
         for (var t2 = 0; t2 < 3; t2++) {
           var ts = streak(t2, 560 + t2 * 40, 540, 140 + prand(t2 + 21) * 120, 10,
-            colors.tealLight, frame, 30, 164 + t2 * 2, 22);
+            colors.tealLight, frame, 30, 180 + t2 * 2, 22);
           if (ts != null) kids.push(ts);
         }
       }
     }
 
-    // ---- Beat 07: the F writes itself (168..196) ---------------------------
+    // ---- Beat 07: the F writes itself (184..212) ---------------------------
     // One round-capped stroke: up the stem, right across the top bar. The
     // elbow rounds like a drawn letterform — no seams anywhere.
-    var fP = tw(168, 28, 0, 1, 'easeInOutCubic');
+    var fP = tw(184, 28, 0, 1, 'easeInOutCubic');
     if (fP > 0.001) {
       kids.push(fPathNode(fP, colors.blue,
-        Math.min(1, tw(168, 5, 0, 1, 'linear'))));
+        Math.min(1, tw(184, 5, 0, 1, 'linear'))));
     }
 
-    // ---- Beat 11: the `a`'s stem (192..208) ---------------------------------
+    // ---- Beat 11: the `a`'s stem (206..222) ---------------------------------
     // The bowl IS the note (it arrived as the ring). The stem draws down
     // from it in micro-segments whose color glides green → cyan — the `a`
     // carries the brand gradient instead of switching between its anchors.
-    var stemP = tw(192, 16, 0, 1, 'easeInOutCubic');
+    var stemP = tw(206, 16, 0, 1, 'easeInOutCubic');
     if (stemP > 0.001) {
       var segs = 8;
       var aStem = BRAND.a.stem;
@@ -229,8 +236,8 @@ scene = {
       }
     }
 
-    // ---- Beat 16: settle + the final bloom (192..240) ------------------------
-    var settleP = tw(204, 30, 0, 1, 'easeOutExpo');
+    // ---- Beat 16: settle + the final bloom (218..240) ------------------------
+    var settleP = tw(218, 22, 0, 1, 'easeOutExpo');
     if (settleP > 0.01) {
       // Ground glow: a flat teal bar under the baseline, breathing wide,
       // centered on the finished wordmark.
@@ -253,7 +260,7 @@ scene = {
         positioned: { left: gb.x - gw * 0.275, top: gb.y - 4 * k },
       });
     }
-    var bloomP = tw(220, 18, 0, 1, 'easeOutExpo');
+    var bloomP = tw(224, 16, 0, 1, 'easeOutExpo');
     if (bloomP > 0.01 && bloomP < 1) {
       var fb = brandToScreen(638, 700);
       kids.push({
