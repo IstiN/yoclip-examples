@@ -119,27 +119,29 @@ scene = {
       });
     }
 
-    // ---- The mouth blink cycle (162..174) ----------------------------------
-    // ONE wink — the mouth closes flat and pops back open once.
-    // Once the note has formed, the face plays it twice: the mouth closes
-    // flat into a dash and pops back open — `>o`, `>-`, `>o`, `>-`, `>o` —
-    // while the eye narrows in sync: its right tip just slides left —
-    // rigid pieces, no bending. A real winking smiley.
+    // ---- The wink (162..174) -----------------------------------------------
+    // ONE wink: the mouth closes flat into a dash and pops back open. The
+    // eye narrows WITH it — the right tip slides 24 units left, rigid
+    // pieces, no bending — and STAYS narrowed: the face keeps the squint
+    // all the way into the fold.
+    var PINCH = 24; // how far the eye's right tip slides left, svg units
     var mouthSq = 0;
     if (frame >= 162 && frame < 174) {
       var mu = (frame - 162) % 12;
       mouthSq = mu < 6 ? mu / 6 : (12 - mu) / 6;
     }
+    // Rises once during the mouth's close and holds at 1 forever after.
+    var eyePinch = tw(162, 6, 0, 1, 'easeInOutCubic');
 
-    // ---- The chevron: the winking eye (01..09) -----------------------------
+    // ---- The chevron: the eye (01..09) -------------------------------------
     // `>_` is a face: the chevron is the eye, the underscore its mouth.
-    // The eye NEVER falls apart and NEVER bends: at each blink it just
-    // pinches — the right tip slides 24 units left and back. Then the two
-    // arms fold into ONE vertical line that slides up as the F's stem.
+    // The eye NEVER falls apart and NEVER bends. It narrows once at the
+    // wink and keeps the squint; then the two arms fold into ONE vertical
+    // line that slides up as the F's stem.
     var foldT = tw(174, 14, 0, 1, 'easeInOutCubic');
     if (foldT <= 0.001) {
       var halves = chevronHalves(0, colors.blueBright, colors.blueDeep,
-        24 * mouthSq);
+        PINCH * eyePinch);
       for (var hi = 0; hi < halves.length; hi++) kids.push(halves[hi]);
     }
 
@@ -209,7 +211,8 @@ scene = {
       // The fold: upper arm → upper half of the stem line, lower arm → the
       // lower half. They meet at the stem's middle, caps overlapping.
       var upA = { x: BRAND.chevron.a1[0], y: BRAND.chevron.a1[1] };
-      var vt = { x: BRAND.chevron.a1[2], y: BRAND.chevron.a1[3] };
+      // The vertex as the wink left it: already pinched 24 left.
+      var vt = { x: BRAND.chevron.a1[2] - PINCH, y: BRAND.chevron.a1[3] };
       var loA = { x: BRAND.chevron.a2[2], y: BRAND.chevron.a2[3] };
       kids.push(polylineNode([
         { x: lerp(upA.x, scx, foldT), y: lerp(upA.y, stop, foldT) },

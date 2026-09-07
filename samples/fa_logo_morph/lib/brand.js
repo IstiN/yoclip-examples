@@ -211,6 +211,23 @@ function chevronHalves(split, upperColor, lowerColor, pinch) {
   // pair. (n2 points up-left, so A2's lower edge passes through E1.)
   var Mout = isect(D, d1, E1, d2);
   var Min = isect(C, d1, E2, d2);
+  // The pinch steepens the arms, so the sharp miter grows into a spike
+  // that would poke past the round caps of the fold's strokes at the
+  // handoff. Bevel the tip back toward V.x + half in proportion to the
+  // pinch: at rest the tip stays sharp; at full pinch the flat face lands
+  // exactly on the round-cap line, and the fold picks up the silhouette
+  // with no spike.
+  var P1 = Mout, P2 = Mout;
+  if (pinch != null && pinch > 0) {
+    var bevelX = lerp(Mout.x, V.x + half,
+      Math.min(1, pinch / half));
+    if (bevelX < Mout.x - 0.01) {
+      P1 = { x: bevelX,
+        y: B.y + (Mout.y - B.y) * (bevelX - B.x) / (Mout.x - B.x) };
+      P2 = { x: bevelX,
+        y: F2.y + (Mout.y - F2.y) * (bevelX - F2.x) / (Mout.x - F2.x) };
+    }
+  }
   function shifted(pts, dy) {
     var out = [];
     for (var i = 0; i < pts.length; i++) {
@@ -218,8 +235,12 @@ function chevronHalves(split, upperColor, lowerColor, pinch) {
     }
     return out;
   }
-  var upper = flatPoly(shifted([B, Mout, Min, A], -split), upperColor, 1);
-  var lower = flatPoly(shifted([Mout, F2, F1, Min], split), lowerColor, 1);
+  var upper = P1 === Mout
+    ? flatPoly(shifted([B, Mout, Min, A], -split), upperColor, 1)
+    : flatPoly(shifted([B, P1, P2, Min, A], -split), upperColor, 1);
+  var lower = P1 === Mout
+    ? flatPoly(shifted([Mout, F2, F1, Min], split), lowerColor, 1)
+    : flatPoly(shifted([P2, F2, F1, Min], split), lowerColor, 1);
   // Round terminals on the free ends: each cap bulges along the arm's
   // outward normal (perpendicular to the angled end face).
   var su = { x: S.x, y: S.y - split };
