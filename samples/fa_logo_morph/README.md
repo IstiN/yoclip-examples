@@ -1,11 +1,14 @@
 # fa_logo_morph
 
 A single eight-second brand film on ONE persistent surface: the dark-glass
-app icon boots with a teal scan line, grows to hero scale, then its `>_`
-prompt writes itself into the **Fa** wordmark — the F draws as one
-round-capped stroke, the teal underscore glides up into the F accent, the
-`a` draws its bowl and stem, everything settles with a breathing ground
-glow and a final teal bloom. The film ends on the finished app icon.
+app icon boots with a teal scan line, grows to hero scale — and then the
+terminal's underscore curls up into a note head: **in Russian solfège the
+note is written «фа» — Fa**. The `o` blinks like the cursor it always was,
+and on a blink it splits: one ring flattens into the F's accent bar, the
+other swells into the `a`'s bowl. The note becomes its own name. The F
+writes itself as one round-capped stroke, the `a`'s stem draws through its
+bowl with the color gliding green → cyan, and everything settles into the
+finished app icon.
 
 One scene, 240 frames at 30 fps, no assets. Every element is placed through
 the shared svg→screen mapper in `lib/brand.js` with the tile center pinned
@@ -17,9 +20,11 @@ continuous while the scale breathes:
 | 01 | 0–40 | The icon: dark-glass rounded square, `>_` prompt, underscore pulsing like a terminal cursor |
 | 02 | 40–74 | Boot scan — one teal line sweeps the icon; its edge stroke lifts as the line passes |
 | 05–06 | 75–110 | Hero zoom (easeOutExpo) + a soft teal cue band breathing over the glyph row |
-| 07–10 | 108–150 | Morph: chevron arms split and die, the F writes itself as one stroke, the underscore glides into the F accent |
-| 11–15 | 150–192 | The `a` writes itself — arc trace for the bowl, stem trace |
-| 16–20 | 192–240 | Settle: breathing ground glow, final teal bloom, hold |
+| 07 | 108–122 | Morph: chevron arms split away and die into blue streaks |
+| 08 | 122–164 | The note: the underscore bends into a ring (`o`), drifts center stage and blinks ×2 |
+| 09 | 164–196 | The split: ring → F accent (flattening), ring → `a` bowl (swelling); the F writes itself |
+| 11 | 192–208 | The `a`'s stem draws in micro-segments, green → cyan |
+| 16–20 | 204–240 | Settle: breathing ground glow, final teal bloom, hold |
 
 ## Why it's a good engine test
 
@@ -35,14 +40,20 @@ continuous while the scale breathes:
   miter segment vertex-for-vertex — which is also the seam the morph pulls
   apart — and the free ends get semicircular caps built along each arm's
   outward normal (`capArc`), so the terminals round like real strokes.
-- **Gradient capsules** — the teal underscore/accent tiles its gradient as
-  square strips (radius 0 — any per-strip rounding reads as beads) closed
-  by semicircular end caps; colors stay pinned per strip index, so nothing
-  swims mid-morph.
+- **Gradient capsules** — the teal underscore tiles its gradient as square
+  strips (radius 0 — any per-strip rounding reads as beads) closed by
+  semicircular end caps.
+- **A bar bends into a ring** — the underscore → note `o` → split is one
+  continuous stroke morph (`bendPoints`): the centerline is sampled at 32
+  points, each interpolating between its place on the bar and on the
+  circle — the wire visibly curls. The round caps end up stacked on the
+  same point, so the open-bar → closed-ring topology change is invisible.
+  The same engine reversed flattens the ring into the F's accent bar.
 - **Real letterforms** — the F is ONE round-capped, round-joined stroke
   path (`fPathNode`): up the stem, right across the bar — rounded
-  terminals, rounded elbow, not a single seam, and the same `progress`
-  write-on the `a` uses for its bowl and stem.
+  terminals, rounded elbow, not a single seam. The `a`'s stem draws in 8
+  micro-segments whose colors step green → cyan, so the letter is one
+  continuous gradient instead of two flat anchors.
 - **Persistent stage** — the tile never shatters or leaves: one dark-glass
   rounded rect carries the film from icon boot to finished wordmark.
 

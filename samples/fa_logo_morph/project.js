@@ -1,10 +1,11 @@
-// Fa logo morph — one continuous shot (8s @ 30fps) retelling the brand
-// storyboard on ONE persistent surface: the dark-glass app icon boots with
-// a teal scan line, grows to hero scale, and its `>_` prompt morphs into
-// the Fa wordmark inside it — the chevron arms split and re-form as the F
-// (one round-capped stroke), the teal underscore glides in to become the
-// F's accent bar, the `a` writes itself, and the mark settles into its
-// glow. The film ends on the finished app icon.
+// Fa logo morph — one continuous shot (8s @ 30fps). The dark-glass app
+// icon boots with a teal scan line, grows to hero scale — and the
+// terminal's underscore curls up into a note head: in Russian solfège the
+// note is written «фа» = Fa. The `o` blinks like a cursor, then splits:
+// one ring flattens into the F's accent bar, the other swells into the
+// `a`'s bowl — the note spells its own name. The F writes itself as one
+// round-capped stroke, the `a`'s stem draws green → cyan, and the mark
+// settles into the finished app icon.
 //
 // Requires js_widget_runtime 0.4.115+ (jsr.ease, jsr.motion, path progress).
 

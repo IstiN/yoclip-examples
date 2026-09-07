@@ -99,10 +99,11 @@ void main() {
     60, // 02 boot scan — teal line sweeping the icon
     84, // 05 hero zoom settling
     100, // 06 cue band + pre-morph hold
-    130, // 07–10 F writing itself
-    165, // 11–15 the a writing itself
-    205, // 16–19 settle
-    236, // 20 final bloom
+    130, // 08 the underscore curling into the note-o
+    155, // 08 the note-o mid-blink
+    175, // 09 the split — rings gliding to accent + bowl, F writing
+    200, // 11 the a's stem gradient drawing
+    236, // 16 final bloom
   ];
 
   for (final frame in probes) {

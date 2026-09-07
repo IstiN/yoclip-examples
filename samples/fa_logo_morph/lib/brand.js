@@ -219,21 +219,17 @@ function chevronHalves(split, upperColor, lowerColor) {
   return [upper, capU, lower, capL];
 }
 
-/// The teal gradient bar — underscore slot (m=0) morphing to the F accent
-/// slot (m=1); the scene tweens m. Square strips tile the gradient and
-/// semicircular caps close the ends, so the bar reads as ONE rounded
-/// capsule while keeping its brand gradient. Strip/cap colors stay pinned
-/// per index (sampled on the underscore span), so nothing swims mid-morph.
-/// Strips overdraw 0.8 svg — float rounding must never open a hairline.
-function tealBar(m, opacity) {
+/// The teal gradient capsule — the underscore in its icon slot. Square
+/// strips tile the gradient; semicircular caps close the ends. It hands
+/// off to a flat stroked path when it starts to bend (see bendPath) — the
+/// silhouette is identical, so the swap is invisible.
+function tealBar(opacity) {
   var kids = [];
   var n = 10;
   var h = BRAND.under.h;
   var r = h / 2;
-  var x0 = lerp(BRAND.under.x, BRAND.f.accent.x, m);
-  var x1 = x0 + lerp(BRAND.under.w, BRAND.f.accent.w, m);
-  var cy = lerp(BRAND.under.y, BRAND.f.accent.y, m) + r;
-  var cx0 = x0 + r, cx1 = x1 - r;
+  var cx0 = BRAND.under.x + r, cx1 = BRAND.under.x + BRAND.under.w - r;
+  var cy = BRAND.under.y + r;
   var w0 = BRAND.under.w / n;
   var stripW = (cx1 - cx0) / n;
   for (var i = 0; i < n; i++) {
@@ -257,6 +253,63 @@ function tealBar(m, opacity) {
   kids.push(capArc(cx1, cy, r, { x: 0, y: 1 }, { x: 1, y: 0 },
     tealField(BRAND.under.x + BRAND.under.w), opacity));
   return kids;
+}
+
+// ---- The bend: a stroke that curls from a bar into a ring ------------------
+// The note beat's engine. The centerline is sampled at n points; each point
+// interpolates between its place on a straight bar and its place on a
+// circle. The bar's ends meet at the circle's TOP (the wire bends through
+// the left side, sags to the bottom, and comes back up the right), so the
+// round caps end up stacked on the same point — the topology change from
+// open bar to closed ring is invisible. The path node strokes the polyline
+// with round caps and joins, flat color.
+
+function ringPoint(cx, cy, r, s) {
+  var th = -Math.PI / 2 - 2 * Math.PI * s;
+  return { x: cx + r * Math.cos(th), y: cy + r * Math.sin(th) };
+}
+
+function boundsOf(pts) {
+  var minX, minY, maxX, maxY;
+  for (var i = 0; i < pts.length; i++) {
+    if (minX == null || pts[i].x < minX) minX = pts[i].x;
+    if (minY == null || pts[i].y < minY) minY = pts[i].y;
+    if (maxX == null || pts[i].x > maxX) maxX = pts[i].x;
+    if (maxY == null || pts[i].y > maxY) maxY = pts[i].y;
+  }
+  return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+}
+
+function polylineNode(pts, sw, progress, color, opacity) {
+  var b = boundsOf(pts);
+  var d = 'M' + pts[0].x.toFixed(2) + ',' + pts[0].y.toFixed(2);
+  for (var i = 1; i < pts.length; i++) {
+    d += ' L' + pts[i].x.toFixed(2) + ',' + pts[i].y.toFixed(2);
+  }
+  return trace(d, sw, b.x, b.y, b.w, b.h, progress, color, opacity);
+}
+
+/// Interpolated bar→ring centerline, t: 0 = straight bar, 1 = closed ring.
+function bendPoints(bx0, by, bx1, cx, cy, r, t, n) {
+  var pts = [];
+  for (var i = 0; i <= n; i++) {
+    var s = i / n;
+    var rp = ringPoint(cx, cy, r, s);
+    pts.push({
+      x: lerp(bx0 + s * (bx1 - bx0), rp.x, t),
+      y: lerp(by, rp.y, t),
+    });
+  }
+  return pts;
+}
+
+/// A closed ring centerline (t=1 of the bend, anywhere, any radius).
+function ringPoints(cx, cy, r, n) {
+  var pts = [];
+  for (var i = 0; i <= n; i++) {
+    pts.push(ringPoint(cx, cy, r, i / n));
+  }
+  return pts;
 }
 
 /// The F stem + top bar as ONE round-capped, round-joined stroke — a real
