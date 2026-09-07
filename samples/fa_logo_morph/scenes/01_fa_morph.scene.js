@@ -235,12 +235,14 @@ scene = {
           acc.h, scx, accY, accX2 - scx, 0, accP, oColor, 1));
       }
       // The fold arms go LAST: they cover the bar's and the accent's
-      // hidden caps and form the stem. The DEEP arm draws first so the
-      // blue emerges from under the bright arm's round cap — the joint
-      // seam is the cap's convex arc, tangent to both bodies (a reversed
-      // order once let the cap bite a concave chunk out of the bright
-      // arm).
+      // hidden caps and form the stem. The BLUE arm draws as ONE bent
+      // polyline (upA → joint → loA): a single stroked path fills the
+      // inner corner between the arms, which two separate strips leave
+      // as a background wedge. The BRIGHT upper arm then draws on top,
+      // so the two-tone seam is its own bottom edge + round cap, all
+      // tangent-smooth.
       kids.push(polylineNode([
+        { x: lerp(upA.x, scx, foldT), y: lerp(upA.y, stop, foldT) },
         { x: lerp(vt.x, scx, foldT), y: lerp(vt.y, smid, foldT) },
         { x: lerp(loA.x, scx, foldT), y: lerp(loA.y, sbot, foldT) },
       ], f.w, 1, armDeep, 1));
