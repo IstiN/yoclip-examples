@@ -22,10 +22,11 @@ continuous while the scale breathes:
 | 01 | 0–40 | The icon: dark-glass rounded square, `>_` prompt, underscore pulsing like a terminal cursor |
 | 02 | 40–74 | Boot scan — one teal line sweeps the icon; its edge stroke lifts as the line passes |
 | 05–06 | 75–110 | Hero zoom (easeOutExpo) + a soft teal cue band breathing over the glyph row |
-| 07 | 108–122 | The face holds: `>` eye + `_` mouth |
-| 08 | 122–166 | The note: the mouth lifts, the tip reaches right, the wire curls into a ring beside the eye — `>o` |
-| 09 | 166–192 | The wink: the `o` blinks, the eye squints in sync; on the blink the face breaks — the eye dies into blue streaks, ring → F accent, ring → `a` bowl; the F writes itself |
-| 11 | 206–222 | The `a`'s stem draws in micro-segments, green → cyan |
+| 07 | 108–128 | The face holds: `>` eye + `_` mouth |
+| 08 | 128–166 | The note: the mouth lifts, the tip reaches right, the wire curls into a ring beside the eye — `>o` |
+| 09 | 166–192 | The wink: the `o` blinks, the eye squints in sync; then the two arms fold into ONE vertical line — the stem |
+| 10 | 192–228 | The assembly: the top bar winds out of the stem's top, a new line grows out of its center (the accent), the `o` drops into the `a`'s bowl |
+| 11 | 212–228 | The `a`'s stem draws bottom-up in micro-segments, green at the junction → cyan at the free end |
 | 16–20 | 218–240 | Settle: breathing ground glow, final teal bloom, hold |
 
 ## Why it's a good engine test
@@ -44,13 +45,17 @@ continuous while the scale breathes:
   outward normal (`capArc`), so the terminals round like real strokes.
 - **Gradient capsules** — the teal underscore tiles its gradient as square
   strips (radius 0 — any per-strip rounding reads as beads) closed by
-  semicircular end caps.
-- **A face that winks** — the prompt `>_` is kept alive as a face: the
-  chevron holds as the eye while the underscore lifts, reaches and curls
-  into an `o` beside it (`>o`). The eye squints (`chevronHalves` takes a
-  vertical squash around its mid-height) in sync with the `o`'s blink,
-  and dies only when the wordmark starts — the F's stem writes straight
-  out of the eye's socket.
+  semicircular end caps. Its handoff to the stroked bar is seamless by
+  construction: the stroke endpoints are inset by the cap radius, so the
+  two silhouettes match to the pixel.
+- **A face that winks, then becomes the letter** — the prompt `>_` stays
+  a face: the chevron holds as the eye while the underscore lifts,
+  reaches and curls into an `o` beside it (`>o`). The eye squints
+  (`chevronHalves` takes a vertical squash around its mid-height) in
+  sync with the `o`'s blink — and then the two arms fold into one
+  vertical line (two polylines lerping onto the halves of the stem line,
+  meeting cap-to-cap) that lands as the F's stem. Nothing shatters: the
+  eye is the letter.
 - **A bar bends into a ring** — the mouth → note `o` → split is one
   continuous stroke morph (`bendPoints`) with classic anticipation: the
   bar first lifts off its slot, then the tip reaches right like a hand

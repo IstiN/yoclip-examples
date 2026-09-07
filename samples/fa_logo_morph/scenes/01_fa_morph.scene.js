@@ -119,30 +119,19 @@ scene = {
       });
     }
 
-    // ---- The chevron: the winking eye (01..08) -----------------------------
+    // ---- The chevron: the winking eye (01..09) -----------------------------
     // `>_` is a face: the chevron is the squinting eye, the underscore its
-    // mouth. The eye holds while the mouth lifts, reaches and curls into an
-    // `o` — the prompt becomes `>o`. When the `o` blinks, the eye squints in
-    // sync — the face winks — and on that same blink the face breaks: the
-    // eye dies into blue streaks and the F's stem grows out of its socket.
-    var winkT = tw(171, 4, 0, 1, 'easeInOutCubic') *
-      (1 - tw(177, 4, 0, 1, 'easeInOutCubic'));
-    var armLife = 1 - tw(180, 14, 0, 1, 'easeInCubic');
-    if (armLife > 0.01) {
-      var spread = tw(180, 16, 0, 30, 'easeInCubic');
-      var halves = chevronHalves(spread, colors.blueBright, colors.blueDeep,
+    // mouth. The eye NEVER falls apart. It holds while the mouth lifts,
+    // reaches and curls into an `o` — the prompt reads `>o`; it squints in
+    // sync with the `o`'s blink (the wink) — and then the two arms fold
+    // into ONE vertical line that slides up into place as the F's stem.
+    var winkT = tw(167, 5, 0, 1, 'easeInOutCubic') *
+      (1 - tw(172, 5, 0, 1, 'easeInOutCubic'));
+    var foldT = tw(178, 14, 0, 1, 'easeInOutCubic');
+    if (foldT <= 0.001) {
+      var halves = chevronHalves(0, colors.blueBright, colors.blueDeep,
         1 - 0.16 * winkT);
-      for (var hi = 0; hi < halves.length; hi++) {
-        halves[hi].opacity = armLife;
-        kids.push(halves[hi]);
-      }
-      if (frame >= 178) {
-        for (var b = 0; b < 3; b++) {
-          var bs = streak(b, 470 + b * 60, 500, 200 + prand(b + 7) * 160, 12,
-            b % 2 == 0 ? colors.blue : colors.blueDeep, frame, 30, 180 + b * 2, 26);
-          if (bs != null) kids.push(bs);
-        }
-      }
+      for (var hi = 0; hi < halves.length; hi++) kids.push(halves[hi]);
     }
 
     // ---- The underscore: terminal cursor until the note takes it -----------
@@ -151,31 +140,33 @@ scene = {
       : 1;
     if (frame < 122) kids.push.apply(kids, tealBar(cursorP));
 
-    // ---- The note «фа» (122..180) ------------------------------------------
+    // ---- The note «фа» (122..178) ------------------------------------------
     // In Russian solfège the note is written «фа» — Fa. Three beats: the
-    // underscore lifts off its slot, the tip reaches right like a hand
-    // winding up, and only then the wire curls into a note head — an `o` —
-    // that blinks like the cursor it always was. On the blink it splits.
+    // mouth lifts off its slot, the tip reaches right like a hand winding
+    // up, and only then the wire curls into a note head beside the eye —
+    // the face reads `>o`. The handoff is seamless: the stroked bar's
+    // endpoints are inset by the cap radius, so its silhouette is
+    // pixel-identical to the capsule it replaces.
     var OX = BRAND.under.x + BRAND.under.w / 2;
     var UY = BRAND.under.y + BRAND.under.h / 2;
-    var OR = 52;
+    var OR = 58;
     // The wink slot: right of the eye's vertex, at its height — `>o`.
-    var NX = 610, NY = 541;
+    var NX = 640, NY = 541;
     var oColor = '#3BC2C3';
+    var CAP = BRAND.under.h / 2;
     var liftT  = tw(128, 12, 0, 1, 'easeInOutCubic');
     var reachT = tw(140, 10, 0, 1, 'easeInOutCubic');
     var bendT  = tw(150, 16, 0, 1, 'easeInOutCubic');
-    if (frame >= 122 && frame < 180) {
+    if (frame >= 122 && frame < 178) {
       // Gradient capsule fades as the identical-silhouette stroke takes over.
       kids.push.apply(kids, tealBar(1 - tw(122, 5, 0, 1, 'linear')));
-      var blink = frame < 166 ? 1
-        : (Math.floor((frame - 166) / 6) % 2 == 0 ? 1 : 0.06);
+      var blink = (frame >= 170 && frame < 176) ? 0.06 : 1;
       // The bar's own geometry glides: up off the slot, then the tip
       // reaches right, and through the bend both ends fold in onto the
       // ring's span while the target circle drifts up beside the eye.
-      var barX0 = lerp(BRAND.under.x + OR, NX - OR, bendT);
+      var barX0 = lerp(BRAND.under.x + CAP, NX - OR, bendT);
       var barX1 = lerp(
-        lerp(BRAND.under.x + BRAND.under.w - OR, 838, reachT),
+        lerp(BRAND.under.x + BRAND.under.w - CAP, 810, reachT),
         NX + OR, bendT);
       var barY = lerp(lerp(UY, 644, liftT), NY, bendT);
       var bend = bendPoints(barX0, barY, barX1,
@@ -183,50 +174,71 @@ scene = {
       kids.push(polylineNode(bend, BRAND.under.h, 1, oColor, blink));
     }
 
-    // ---- The split: the note spells «Fa» (180..206) -------------------------
-    // On a blink the `o` divides. One ring glides up-left, flattening into
-    // the F's accent bar; the other glides up-right and swells into the
-    // `a`'s bowl. The note becomes its own name.
+    // ---- The assembly: the eye becomes the F, the note becomes the a ----
+    // (178..228). The two arms fold into ONE vertical line — the eye opens
+    // into a stem — which slides up into place as the F's stem. From its
+    // top the top bar winds out around a rounded elbow; from its very
+    // center a new line grows out — the accent, the note's teal, the
+    // underscore's legacy. Meanwhile the `o` drops and swells into the
+    // `a`'s bowl: the wink becomes the word.
     var aBowlColor = '#2EBD9E';
-    if (frame >= 180) {
-      var splitT = tw(180, 26, 0, 1, 'easeInOutCubic');
-      var acc = BRAND.f.accent;
-      var bendA = bendPoints(
-        acc.x + acc.h / 2, acc.y + acc.h / 2,
-        acc.x + acc.w - acc.h / 2,
-        lerp(NX, acc.x + acc.w / 2, splitT),
-        lerp(NY, acc.y + acc.h / 2, splitT),
-        OR, 1 - splitT, 32);
-      kids.push(polylineNode(bendA, acc.h, 1, oColor, 1));
-      var bendB = ringPoints(
-        lerp(NX, BRAND.a.bowl.cx, splitT),
-        lerp(NY, BRAND.a.bowl.cy, splitT),
-        lerp(OR, BRAND.a.bowl.r, splitT), 32);
-      kids.push(polylineNode(bendB, 38, 1,
-        lerpColor(oColor, aBowlColor, splitT), 1));
-      if (frame < 192) {
-        for (var t2 = 0; t2 < 3; t2++) {
-          var ts = streak(t2, 560 + t2 * 40, 540, 140 + prand(t2 + 21) * 120, 10,
-            colors.tealLight, frame, 30, 180 + t2 * 2, 22);
-          if (ts != null) kids.push(ts);
-        }
+    if (frame >= 178) {
+      var f = BRAND.f;
+      var scx = f.stemX + f.w / 2;
+      var stop = f.top + f.w / 2;
+      var sbot = f.bottom - f.w / 2;
+      var smid = (stop + sbot) / 2;
+      var settle = tw(192, 18, 0, 1, 'linear');
+      var armBlue = lerpColor(colors.blueBright, colors.blue, settle);
+      var armDeep = lerpColor(colors.blueDeep, colors.blue, settle);
+      // The fold: upper arm → upper half of the stem line, lower arm → the
+      // lower half. They meet at the stem's middle, caps overlapping.
+      var upA = { x: BRAND.chevron.a1[0], y: BRAND.chevron.a1[1] };
+      var vt = { x: BRAND.chevron.a1[2], y: BRAND.chevron.a1[3] };
+      var loA = { x: BRAND.chevron.a2[2], y: BRAND.chevron.a2[3] };
+      kids.push(polylineNode([
+        { x: lerp(upA.x, scx, foldT), y: lerp(upA.y, stop, foldT) },
+        { x: lerp(vt.x, scx, foldT), y: lerp(vt.y, smid, foldT) },
+      ], f.w, 1, armBlue, 1));
+      kids.push(polylineNode([
+        { x: lerp(vt.x, scx, foldT), y: lerp(vt.y, smid, foldT) },
+        { x: lerp(loA.x, scx, foldT), y: lerp(loA.y, sbot, foldT) },
+      ], f.w, 1, armDeep, 1));
+      // Top bar: winds out of the stem's top around a rounded elbow.
+      var topP = tw(200, 14, 0, 1, 'easeInOutCubic');
+      if (topP > 0.001) {
+        kids.push(trace(
+          'M' + scx + ',' + (stop + 44) +
+            ' L' + scx + ',' + (stop + 22) +
+            ' Q' + scx + ',' + stop + ' ' + (scx + f.w / 2) + ',' + stop +
+            ' L' + (f.topX2 - f.w / 2) + ',' + stop,
+          f.w, scx, stop, f.topX2 - f.stemX, 44, topP, colors.blue, 1));
       }
+      // The accent: a new line growing out of the stem's center.
+      var accP = tw(208, 14, 0, 1, 'easeInOutCubic');
+      if (accP > 0.001) {
+        var acc = f.accent;
+        var accY = acc.y + acc.h / 2;
+        var accX2 = acc.x + acc.w - acc.h / 2;
+        kids.push(trace(
+          'M' + scx + ',' + accY + ' L' + accX2 + ',' + accY,
+          acc.h, scx, accY, accX2 - scx, 0, accP, oColor, 1));
+      }
+      // The `o` drops and swells into the `a`'s bowl.
+      var bowlT = tw(192, 18, 0, 1, 'easeInOutCubic');
+      var bowl = ringPoints(
+        lerp(NX, BRAND.a.bowl.cx, bowlT),
+        lerp(NY, BRAND.a.bowl.cy, bowlT),
+        lerp(OR, BRAND.a.bowl.r, bowlT), 32);
+      kids.push(polylineNode(bowl, 38, 1,
+        lerpColor(oColor, aBowlColor, bowlT), 1));
     }
 
-    // ---- Beat 07: the F writes itself (184..212) ---------------------------
-    // One round-capped stroke: up the stem, right across the top bar. The
-    // elbow rounds like a drawn letterform — no seams anywhere.
-    var fP = tw(184, 28, 0, 1, 'easeInOutCubic');
-    if (fP > 0.001) {
-      kids.push(fPathNode(fP, colors.blue,
-        Math.min(1, tw(184, 5, 0, 1, 'linear'))));
-    }
-
-    // ---- Beat 11: the `a`'s stem (206..222) ---------------------------------
+    // ---- Beat 11: the `a`'s stem (212..228) ---------------------------------
     // The bowl IS the note (it arrived as the ring). The stem draws down
     // from it in micro-segments whose color glides green → cyan — the `a`
     // carries the brand gradient instead of switching between its anchors.
-    var stemP = tw(206, 16, 0, 1, 'easeInOutCubic');
+    var stemP = tw(212, 16, 0, 1, 'easeInOutCubic');
     if (stemP > 0.001) {
       var segs = 8;
       var aStem = BRAND.a.stem;
@@ -234,9 +246,12 @@ scene = {
       for (var si = 0; si < segs; si++) {
         var sp = jsr.motion.clamp(stemP * segs - si, 0, 1);
         if (sp <= 0) continue;
-        var sy0 = aStem.y + si * segH - (si > 0 ? 2 : 0);
+        // Bottom-up: the stem grows out of the bowl's shoulder — green at
+        // the junction, cyan at the free top end. Drawing upward keeps the
+        // newborn stroke attached to the bowl.
+        var sy0 = aStem.y + aStem.h - (si + 1) * segH;
         kids.push(trace(
-          'M' + aStem.x + ',' + sy0 + ' L' + aStem.x + ',' + (aStem.y + (si + 1) * segH),
+          'M' + aStem.x + ',' + (sy0 + segH) + ' L' + aStem.x + ',' + sy0,
           38, aStem.x, sy0, 0, segH, sp,
           lerpColor(aBowlColor, colors.tealLight, si / (segs - 1))));
       }
@@ -266,7 +281,7 @@ scene = {
         positioned: { left: gb.x - gw * 0.275, top: gb.y - 4 * k },
       });
     }
-    var bloomP = tw(224, 16, 0, 1, 'easeOutExpo');
+    var bloomP = tw(226, 14, 0, 1, 'easeOutExpo');
     if (bloomP > 0.01 && bloomP < 1) {
       var fb = brandToScreen(638, 700);
       kids.push({
