@@ -122,7 +122,8 @@ scene = {
     // ---- The mouth blink cycle (162..186) ----------------------------------
     // Once the note has formed, the face plays it twice: the mouth closes
     // flat into a dash and pops back open — `>o`, `>-`, `>o`, `>-`, `>o` —
-    // while the eye squints in sync. A real winking smiley.
+    // while the eye narrows in sync: its right tip just slides left —
+    // rigid pieces, no bending. A real winking smiley.
     var mouthSq = 0;
     if (frame >= 162 && frame < 186) {
       var mu = (frame - 162) % 12;
@@ -130,15 +131,14 @@ scene = {
     }
 
     // ---- The chevron: the winking eye (01..09) -----------------------------
-    // `>_` is a face: the chevron is the squinting eye, the underscore its
-    // mouth. The eye NEVER falls apart. It holds while the mouth lifts,
-    // purses and curls into an `o`, squints in sync with the mouth's blink
-    // cycle — and then the two arms fold into ONE vertical line that slides
-    // up into place as the F's stem.
+    // `>_` is a face: the chevron is the eye, the underscore its mouth.
+    // The eye NEVER falls apart and NEVER bends: at each blink it just
+    // pinches — the right tip slides 24 units left and back. Then the two
+    // arms fold into ONE vertical line that slides up as the F's stem.
     var foldT = tw(186, 14, 0, 1, 'easeInOutCubic');
     if (foldT <= 0.001) {
       var halves = chevronHalves(0, colors.blueBright, colors.blueDeep,
-        1 - 0.16 * mouthSq);
+        24 * mouthSq);
       for (var hi = 0; hi < halves.length; hi++) kids.push(halves[hi]);
     }
 
@@ -158,9 +158,9 @@ scene = {
     var OX = BRAND.under.x + BRAND.under.w / 2;
     var UY = BRAND.under.y + BRAND.under.h / 2;
     var OR = 104;
-    // The second square: equal to the eye's, 40 units of daylight between
+    // The second square: equal to the eye's, 64 units of daylight between
     // them — two smiley eyes, `>` in the left one, `o` in the right one.
-    var NX = 674, NY = 541;
+    var NX = 698, NY = 541;
     var oColor = '#3BC2C3';
     var CAP = BRAND.under.h / 2;
     var DASH = 104; // half-width of the `-` mouth — matches the squashed o
