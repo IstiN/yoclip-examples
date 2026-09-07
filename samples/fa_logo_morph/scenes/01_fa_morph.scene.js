@@ -214,25 +214,17 @@ scene = {
       // The vertex as the wink left it: already pinched 24 left.
       var vt = { x: BRAND.chevron.a1[2] - PINCH, y: BRAND.chevron.a1[3] };
       var loA = { x: BRAND.chevron.a2[2], y: BRAND.chevron.a2[3] };
-      kids.push(polylineNode([
-        { x: lerp(upA.x, scx, foldT), y: lerp(upA.y, stop, foldT) },
-        { x: lerp(vt.x, scx, foldT), y: lerp(vt.y, smid, foldT) },
-      ], f.w, 1, armBlue, 1));
-      kids.push(polylineNode([
-        { x: lerp(vt.x, scx, foldT), y: lerp(vt.y, smid, foldT) },
-        { x: lerp(loA.x, scx, foldT), y: lerp(loA.y, sbot, foldT) },
-      ], f.w, 1, armDeep, 1));
-      // Top bar: winds out of the stem's top around a rounded elbow.
+      // Top bar: slides out from BEHIND the stem's top cap — drawn under
+      // the arms, its left cap coincides with the stem's, so the emergence
+      // is flush (a Q-elbow path once started visibly ON the stem).
       var topP = tw(186, 14, 0, 1, 'easeInOutCubic');
       if (topP > 0.001) {
         kids.push(trace(
-          'M' + scx + ',' + (stop + 44) +
-            ' L' + scx + ',' + (stop + 22) +
-            ' Q' + scx + ',' + stop + ' ' + (scx + f.w / 2) + ',' + stop +
-            ' L' + (f.topX2 - f.w / 2) + ',' + stop,
-          f.w, scx, stop, f.topX2 - f.stemX, 44, topP, colors.blue, 1));
+          'M' + scx + ',' + stop + ' L' + (f.topX2 - f.w / 2) + ',' + stop,
+          f.w, scx, stop, f.topX2 - f.w / 2 - scx, 0, topP, colors.blue, 1));
       }
-      // The accent: a new line growing out of the stem's center.
+      // The accent: slides out from BEHIND the stem's center — also under
+      // the arms, its left cap hides inside the stem.
       var accP = tw(194, 14, 0, 1, 'easeInOutCubic');
       if (accP > 0.001) {
         var acc = f.accent;
@@ -242,6 +234,20 @@ scene = {
           'M' + scx + ',' + accY + ' L' + accX2 + ',' + accY,
           acc.h, scx, accY, accX2 - scx, 0, accP, oColor, 1));
       }
+      // The fold arms go LAST: they cover the bar's and the accent's
+      // hidden caps and form the stem. The DEEP arm draws first so the
+      // blue emerges from under the bright arm's round cap — the joint
+      // seam is the cap's convex arc, tangent to both bodies (a reversed
+      // order once let the cap bite a concave chunk out of the bright
+      // arm).
+      kids.push(polylineNode([
+        { x: lerp(vt.x, scx, foldT), y: lerp(vt.y, smid, foldT) },
+        { x: lerp(loA.x, scx, foldT), y: lerp(loA.y, sbot, foldT) },
+      ], f.w, 1, armDeep, 1));
+      kids.push(polylineNode([
+        { x: lerp(upA.x, scx, foldT), y: lerp(upA.y, stop, foldT) },
+        { x: lerp(vt.x, scx, foldT), y: lerp(vt.y, smid, foldT) },
+      ], f.w, 1, armBlue, 1));
       // The `o` drops and swells into the `a`'s bowl.
       var bowlT = tw(184, 16, 0, 1, 'easeInOutCubic');
       var bowl = ringPoints(

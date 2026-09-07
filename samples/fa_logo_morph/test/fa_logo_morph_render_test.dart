@@ -104,6 +104,10 @@ void main() {
     150, // 08 the wire mid-curl
     168, // 09 the wink: mouth closed flat, eye pinched `>-`
     174, // 09 the mouth popped back open: `>o` (fold begins)
+    176, // tmp fold vertex
+    180, // tmp fold vertex
+    184, // tmp fold vertex
+    190, // tmp bar+accent emerging
     192, // 10 the arms folded into the stem line
     214, // 11 the a's stem gradient drawing
     236, // 16 final bloom
