@@ -1,12 +1,12 @@
 // Fa logo morph — one continuous shot (8s @ 30fps). The dark-glass app
 // icon boots with a teal scan line, grows to hero scale — and the
 // prompt `>_` turns out to be a face — the underscore is its mouth. The
-// mouth lifts, its tip reaches right like a hand winding up, and only then
-// the wire curls into a note head beside the eye: the face reads `>o` — in
-// Russian solfège the note is written «фа» = Fa. The `o` blinks, the eye
-// squints in sync, then the eye's two arms fold into one vertical line —
-// the F's stem; the top bar winds out of it, a new line grows from its
-// center (the accent), and the `o` drops into the `a`'s bowl:
+// mouth lifts, purses into a dash, and curls into a note head beside the
+// eye: the face reads `>o` — in Russian solfège the note is «фа» = Fa.
+// The smiley blinks twice (`>o >- >o >- >o`), the eye squinting in sync,
+// then the eye's two arms fold into one vertical line — the F's stem; the
+// top bar winds out of it, a new line grows from its center (the accent),
+// and the `o` drops into the `a`'s bowl:
 // one ring flattens into the F's accent bar, the other swells into the
 // `a`'s bowl — the note spells its own name. The F writes itself as one
 // round-capped stroke, the `a`'s stem draws green → cyan, and the mark

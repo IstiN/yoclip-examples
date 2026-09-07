@@ -119,18 +119,26 @@ scene = {
       });
     }
 
+    // ---- The mouth blink cycle (162..186) ----------------------------------
+    // Once the note has formed, the face plays it twice: the mouth closes
+    // flat into a dash and pops back open — `>o`, `>-`, `>o`, `>-`, `>o` —
+    // while the eye squints in sync. A real winking smiley.
+    var mouthSq = 0;
+    if (frame >= 162 && frame < 186) {
+      var mu = (frame - 162) % 12;
+      mouthSq = mu < 6 ? mu / 6 : (12 - mu) / 6;
+    }
+
     // ---- The chevron: the winking eye (01..09) -----------------------------
     // `>_` is a face: the chevron is the squinting eye, the underscore its
     // mouth. The eye NEVER falls apart. It holds while the mouth lifts,
-    // reaches and curls into an `o` — the prompt reads `>o`; it squints in
-    // sync with the `o`'s blink (the wink) — and then the two arms fold
-    // into ONE vertical line that slides up into place as the F's stem.
-    var winkT = tw(167, 5, 0, 1, 'easeInOutCubic') *
-      (1 - tw(172, 5, 0, 1, 'easeInOutCubic'));
-    var foldT = tw(178, 14, 0, 1, 'easeInOutCubic');
+    // purses and curls into an `o`, squints in sync with the mouth's blink
+    // cycle — and then the two arms fold into ONE vertical line that slides
+    // up into place as the F's stem.
+    var foldT = tw(186, 14, 0, 1, 'easeInOutCubic');
     if (foldT <= 0.001) {
       var halves = chevronHalves(0, colors.blueBright, colors.blueDeep,
-        1 - 0.16 * winkT);
+        1 - 0.16 * mouthSq);
       for (var hi = 0; hi < halves.length; hi++) kids.push(halves[hi]);
     }
 
@@ -140,55 +148,60 @@ scene = {
       : 1;
     if (frame < 122) kids.push.apply(kids, tealBar(cursorP));
 
-    // ---- The note «фа» (122..178) ------------------------------------------
-    // In Russian solfège the note is written «фа» — Fa. Three beats: the
-    // mouth lifts off its slot, the tip reaches right like a hand winding
-    // up, and only then the wire curls into a note head beside the eye —
-    // the face reads `>o`. The handoff is seamless: the stroked bar's
-    // endpoints are inset by the cap radius, so its silhouette is
-    // pixel-identical to the capsule it replaces.
+    // ---- The note «фа» (122..186) ------------------------------------------
+    // In Russian solfège the note is written «фа» — Fa. The mouth lifts off
+    // its slot, purses into a dash `-`, and only then the wire curls into a
+    // note head beside the eye — the face reads `>o`, then plays the blink
+    // cycle. The handoff is seamless: the stroked bar's endpoints are inset
+    // by the cap radius, so its silhouette is pixel-identical to the
+    // capsule it replaces.
     var OX = BRAND.under.x + BRAND.under.w / 2;
     var UY = BRAND.under.y + BRAND.under.h / 2;
-    var OR = 58;
+    var OR = 64;
     // The wink slot: right of the eye's vertex, at its height — `>o`.
     var NX = 640, NY = 541;
     var oColor = '#3BC2C3';
     var CAP = BRAND.under.h / 2;
-    var liftT  = tw(128, 12, 0, 1, 'easeInOutCubic');
-    var reachT = tw(140, 10, 0, 1, 'easeInOutCubic');
-    var bendT  = tw(150, 16, 0, 1, 'easeInOutCubic');
-    if (frame >= 122 && frame < 178) {
+    var DASH = 58; // half-width of the `-` mouth — matches the squashed o
+    var liftT    = tw(128, 8, 0, 1, 'easeInOutCubic');
+    var squeezeT = tw(136, 7, 0, 1, 'easeInOutCubic');
+    var bendT    = tw(143, 13, 0, 1, 'easeInOutCubic');
+    if (frame >= 122 && frame < 186) {
       // Gradient capsule fades as the identical-silhouette stroke takes over.
       kids.push.apply(kids, tealBar(1 - tw(122, 5, 0, 1, 'linear')));
-      var blink = (frame >= 170 && frame < 176) ? 0.06 : 1;
-      // The bar's own geometry glides: up off the slot, then the tip
-      // reaches right, and through the bend both ends fold in onto the
-      // ring's span while the target circle drifts up beside the eye.
-      var barX0 = lerp(BRAND.under.x + CAP, NX - OR, bendT);
+      // `_` lifts, purses to `-`, then curls into `o`.
+      var barX0 = lerp(lerp(BRAND.under.x + CAP, OX - DASH, squeezeT),
+        NX - OR, bendT);
       var barX1 = lerp(
-        lerp(BRAND.under.x + BRAND.under.w - CAP, 810, reachT),
+        lerp(BRAND.under.x + BRAND.under.w - CAP, OX + DASH, squeezeT),
         NX + OR, bendT);
       var barY = lerp(lerp(UY, 644, liftT), NY, bendT);
       var bend = bendPoints(barX0, barY, barX1,
         lerp(OX, NX, bendT), lerp(644, NY, bendT), OR, bendT, 32);
-      kids.push(polylineNode(bend, BRAND.under.h, 1, oColor, blink));
+      // The blink cycle: the mouth closes flat to a dash and pops open.
+      if (mouthSq > 0) {
+        for (var qi = 0; qi < bend.length; qi++) {
+          bend[qi] = { x: bend[qi].x, y: lerp(bend[qi].y, NY, mouthSq) };
+        }
+      }
+      kids.push(polylineNode(bend, BRAND.under.h, 1, oColor, 1));
     }
 
     // ---- The assembly: the eye becomes the F, the note becomes the a ----
-    // (178..228). The two arms fold into ONE vertical line — the eye opens
+    // (186..236). The two arms fold into ONE vertical line — the eye opens
     // into a stem — which slides up into place as the F's stem. From its
     // top the top bar winds out around a rounded elbow; from its very
     // center a new line grows out — the accent, the note's teal, the
     // underscore's legacy. Meanwhile the `o` drops and swells into the
     // `a`'s bowl: the wink becomes the word.
     var aBowlColor = '#2EBD9E';
-    if (frame >= 178) {
+    if (frame >= 186) {
       var f = BRAND.f;
       var scx = f.stemX + f.w / 2;
       var stop = f.top + f.w / 2;
       var sbot = f.bottom - f.w / 2;
       var smid = (stop + sbot) / 2;
-      var settle = tw(192, 18, 0, 1, 'linear');
+      var settle = tw(198, 18, 0, 1, 'linear');
       var armBlue = lerpColor(colors.blueBright, colors.blue, settle);
       var armDeep = lerpColor(colors.blueDeep, colors.blue, settle);
       // The fold: upper arm → upper half of the stem line, lower arm → the
@@ -205,7 +218,7 @@ scene = {
         { x: lerp(loA.x, scx, foldT), y: lerp(loA.y, sbot, foldT) },
       ], f.w, 1, armDeep, 1));
       // Top bar: winds out of the stem's top around a rounded elbow.
-      var topP = tw(200, 14, 0, 1, 'easeInOutCubic');
+      var topP = tw(198, 14, 0, 1, 'easeInOutCubic');
       if (topP > 0.001) {
         kids.push(trace(
           'M' + scx + ',' + (stop + 44) +
@@ -215,7 +228,7 @@ scene = {
           f.w, scx, stop, f.topX2 - f.stemX, 44, topP, colors.blue, 1));
       }
       // The accent: a new line growing out of the stem's center.
-      var accP = tw(208, 14, 0, 1, 'easeInOutCubic');
+      var accP = tw(206, 14, 0, 1, 'easeInOutCubic');
       if (accP > 0.001) {
         var acc = f.accent;
         var accY = acc.y + acc.h / 2;
@@ -225,7 +238,7 @@ scene = {
           acc.h, scx, accY, accX2 - scx, 0, accP, oColor, 1));
       }
       // The `o` drops and swells into the `a`'s bowl.
-      var bowlT = tw(192, 18, 0, 1, 'easeInOutCubic');
+      var bowlT = tw(196, 16, 0, 1, 'easeInOutCubic');
       var bowl = ringPoints(
         lerp(NX, BRAND.a.bowl.cx, bowlT),
         lerp(NY, BRAND.a.bowl.cy, bowlT),
@@ -281,7 +294,7 @@ scene = {
         positioned: { left: gb.x - gw * 0.275, top: gb.y - 4 * k },
       });
     }
-    var bloomP = tw(226, 14, 0, 1, 'easeOutExpo');
+    var bloomP = tw(228, 12, 0, 1, 'easeOutExpo');
     if (bloomP > 0.01 && bloomP < 1) {
       var fb = brandToScreen(638, 700);
       kids.push({

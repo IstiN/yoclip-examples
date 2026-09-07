@@ -23,9 +23,9 @@ continuous while the scale breathes:
 | 02 | 40–74 | Boot scan — one teal line sweeps the icon; its edge stroke lifts as the line passes |
 | 05–06 | 75–110 | Hero zoom (easeOutExpo) + a soft teal cue band breathing over the glyph row |
 | 07 | 108–128 | The face holds: `>` eye + `_` mouth |
-| 08 | 128–166 | The note: the mouth lifts, the tip reaches right, the wire curls into a ring beside the eye — `>o` |
-| 09 | 166–192 | The wink: the `o` blinks, the eye squints in sync; then the two arms fold into ONE vertical line — the stem |
-| 10 | 192–228 | The assembly: the top bar winds out of the stem's top, a new line grows out of its center (the accent), the `o` drops into the `a`'s bowl |
+| 08 | 128–162 | The note: the mouth lifts, purses into a dash, and curls into a ring beside the eye — `>o` |
+| 09 | 162–186 | The smiley blinks twice: `>o` → `>-` → `>o` → `>-` → `>o`; the eye squints in sync |
+| 10 | 186–236 | The assembly: the two arms fold into ONE vertical line — the stem; the top bar winds out of it, a new line grows from its center (the accent), the `o` drops into the `a`'s bowl |
 | 11 | 212–228 | The `a`'s stem draws bottom-up in micro-segments, green at the junction → cyan at the free end |
 | 16–20 | 218–240 | Settle: breathing ground glow, final teal bloom, hold |
 
@@ -49,13 +49,15 @@ continuous while the scale breathes:
   construction: the stroke endpoints are inset by the cap radius, so the
   two silhouettes match to the pixel.
 - **A face that winks, then becomes the letter** — the prompt `>_` stays
-  a face: the chevron holds as the eye while the underscore lifts,
-  reaches and curls into an `o` beside it (`>o`). The eye squints
-  (`chevronHalves` takes a vertical squash around its mid-height) in
-  sync with the `o`'s blink — and then the two arms fold into one
-  vertical line (two polylines lerping onto the halves of the stem line,
-  meeting cap-to-cap) that lands as the F's stem. Nothing shatters: the
-  eye is the letter.
+  a face: the chevron holds as the eye while the mouth lifts, purses
+  into a dash and curls into an `o` beside it (`>o`). Then the smiley
+  blinks twice — the ring squashes flat to a dash and pops open
+  (a 12-frame close/open triangle wave on the ring's y), the eye
+  squinting in sync (`chevronHalves` takes a vertical squash around its
+  mid-height). Then the two arms fold into one vertical line (two
+  polylines lerping onto the halves of the stem line, meeting
+  cap-to-cap) that lands as the F's stem. Nothing shatters: the eye is
+  the letter.
 - **A bar bends into a ring** — the mouth → note `o` → split is one
   continuous stroke morph (`bendPoints`) with classic anticipation: the
   bar first lifts off its slot, then the tip reaches right like a hand

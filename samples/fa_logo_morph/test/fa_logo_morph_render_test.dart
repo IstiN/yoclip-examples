@@ -99,11 +99,12 @@ void main() {
     60, // 02 boot scan — teal line sweeping the icon
     84, // 05 hero zoom settling
     100, // 06 cue band + pre-morph hold
-    134, // 08 the bar lifted off its slot
-    145, // 08 the tip reaching right
-    158, // 08 the wire mid-curl
-    174, // 09 the o's blink-off at center stage
-    193, // 09 the split — rings gliding to accent + bowl
+    132, // 08 the mouth lifted off its slot
+    140, // 08 the mouth pursed to a dash: `>-`
+    150, // 08 the wire mid-curl
+    168, // 09 the blink cycle: mouth closed flat, eye squinting `>-`
+    174, // 09 the mouth popped back open: `>o`
+    192, // 10 the arms folded into the stem line
     214, // 11 the a's stem gradient drawing
     236, // 16 final bloom
   ];
