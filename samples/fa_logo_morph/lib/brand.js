@@ -237,7 +237,10 @@ function chevronHalves(split, upperColor, lowerColor, pinch, tipRound) {
     var T1 = { x: t1, y: t1y };
     var t2 = Mout.x + d2.x * (rho / tanA), t2y = Mout.y + d2.y * (rho / tanA);
     var T2 = { x: t2, y: t2y };
-    var phi = Math.abs(Math.atan2(C.y - T1.y, C.x - T1.x));
+    // Half-sweep of the fillet arc around C: the angle from C to the
+    // tangent point T1 (NOT the reverse vector — that off-by-180° turns
+    // the 123° fillet into a 237° two-thirds circle, i.e. the ball).
+    var phi = Math.abs(Math.atan2(T1.y - C.y, T1.x - C.x));
     var NA = 16;
     var arcU = [], arcL = [];
     // Coincident points poison Impeller's tessellator (a run of 9 equal
