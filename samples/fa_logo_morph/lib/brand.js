@@ -179,7 +179,7 @@ function trace(d, sw, bx, by, bw, bh, progress, color, opacity) {
 /// halves apart vertically — the morph's arm separation — opening only the
 /// shared seam. The free arm ends get semicircular caps (round terminals,
 /// like every other stroke in the system).
-function chevronHalves(split, upperColor, lowerColor, pinch) {
+function chevronHalves(split, upperColor, lowerColor, pinch, tipRound) {
   var half = BRAND.chevron.sw / 2;
   var S = { x: BRAND.chevron.a1[0], y: BRAND.chevron.a1[1] };
   // The wink: the right tip simply SLIDES LEFT — every piece stays rigid
@@ -213,17 +213,20 @@ function chevronHalves(split, upperColor, lowerColor, pinch) {
   var Min = isect(C, d1, E2, d2);
   // The pinch steepens the arms, so the sharp miter grows into a spike
   // that would poke past the round caps of the fold's strokes at the
-  // handoff. So as the eye pinches, the tip is cut by a circle around V
-  // whose radius glides from the sharp tip's distance (pinch 0 — the
-  // circle passes exactly through Mout: untouched) down to `half` (full
-  // pinch — the tip IS a round cap, tangent to both outer edges, the
-  // exact silhouette the fold's strokes pick up). The two halves still
-  // tile the shape and share the horizontal centerline seam, so the color
-  // boundary between them stays level.
+  // handoff. So the tip is cut by a circle around V whose radius glides
+  // from the sharp tip's distance (round 0 — the circle passes exactly
+  // through Mout, which sits ON the centerline: untouched) down to `half`
+  // (round 1 — the tip IS a round cap, tangent to both outer edges, the
+  // exact silhouette the fold's strokes pick up). The cut is driven by
+  // `tipRound`, NOT by the slide: the eye narrows with a SHARP tip and
+  // only rounds once the narrowing is done (the caller owns the clock).
+  // The two halves still tile the shape and share the horizontal
+  // centerline seam, so the color boundary stays level through the tip.
   var tipPts = null; // extra tip points (the arc), or null for the sharp tip
   if (pinch != null && pinch > 0.01) {
     var rFar = Math.hypot(Mout.x - V.x, Mout.y - V.y);
-    var r = lerp(rFar, half, Math.min(1, pinch / half));
+    var tr = (tipRound == null) ? Math.min(1, pinch / half) : tipRound;
+    var r = lerp(rFar, half, Math.max(0, Math.min(1, tr)));
     var s = Math.sqrt(Math.max(0, r * r - half * half));
     var P1 = { x: D.x + d1.x * s, y: D.y + d1.y * s };
     var P2 = { x: E1.x + d2.x * s, y: E1.y + d2.y * s };
@@ -231,13 +234,31 @@ function chevronHalves(split, upperColor, lowerColor, pinch) {
     var a2 = Math.atan2(P2.y - V.y, P2.x - V.x);
     var NA = 8;
     var arcU = [], arcL = [];
+    // Coincident points poison Impeller's tessellator (a run of 9 equal
+    // points renders as a round blob in Studio). Keep only points that
+    // actually move; near round=0 the whole arc collapses to Mout and the
+    // halves degrade to the exact sharp polygons.
+    function keep(run, last, p) {
+      if (last[0] == null ||
+        Math.hypot(p.x - last[0].x, p.y - last[0].y) > 0.5) {
+        run.push(p);
+        last[0] = p;
+      }
+    }
+    var lastU = [null], lastL = [null];
     for (var ai = 0; ai <= NA; ai++) {
       var thU = a1 + (0 - a1) * ai / NA;
-      arcU.push({ x: V.x + r * Math.cos(thU), y: V.y + r * Math.sin(thU) });
+      keep(arcU, lastU, {
+        x: V.x + r * Math.cos(thU), y: V.y + r * Math.sin(thU),
+      });
       var thL = 0 + (a2 - 0) * ai / NA;
-      arcL.push({ x: V.x + r * Math.cos(thL), y: V.y + r * Math.sin(thL) });
+      keep(arcL, lastL, {
+        x: V.x + r * Math.cos(thL), y: V.y + r * Math.sin(thL),
+      });
     }
-    tipPts = { arcU: arcU, arcL: arcL };
+    if (arcU.length >= 2 && arcL.length >= 2) {
+      tipPts = { arcU: arcU, arcL: arcL };
+    }
   }
   function shifted(pts, dy) {
     var out = [];

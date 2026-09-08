@@ -123,7 +123,9 @@ scene = {
     // ONE wink: the mouth closes flat into a dash and pops back open. The
     // eye narrows WITH it — the right tip slides 24 units left, rigid
     // pieces, no bending — and STAYS narrowed: the face keeps the squint
-    // all the way into the fold.
+    // all the way into the fold. The tip stays SHARP while it slides;
+    // only once the slide is done does the tip round up (168..174), so it
+    // meets the fold's round caps as an exact silhouette match.
     var PINCH = 24; // how far the eye's right tip slides left, svg units
     var mouthSq = 0;
     if (frame >= 162 && frame < 174) {
@@ -132,6 +134,9 @@ scene = {
     }
     // Rises once during the mouth's close and holds at 1 forever after.
     var eyePinch = tw(162, 6, 0, 1, 'easeInOutCubic');
+    // Tip rounding: 0 while the tip slides (sharp miter in motion), then
+    // eases to a full round cap right at the fold handoff (frame 174).
+    var tipRound = tw(168, 6, 0, 1, 'easeInOutCubic');
 
     // ---- The chevron: the eye (01..09) -------------------------------------
     // `>_` is a face: the chevron is the eye, the underscore its mouth.
@@ -141,7 +146,7 @@ scene = {
     var foldT = tw(174, 14, 0, 1, 'easeInOutCubic');
     if (foldT <= 0.001) {
       var halves = chevronHalves(0, colors.blueBright, colors.blueDeep,
-        PINCH * eyePinch);
+        PINCH * eyePinch, tipRound);
       for (var hi = 0; hi < halves.length; hi++) kids.push(halves[hi]);
     }
 
