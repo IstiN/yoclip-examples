@@ -238,7 +238,7 @@ function chevronHalves(split, upperColor, lowerColor, pinch, tipRound) {
     var t2 = Mout.x + d2.x * (rho / tanA), t2y = Mout.y + d2.y * (rho / tanA);
     var T2 = { x: t2, y: t2y };
     var phi = Math.abs(Math.atan2(C.y - T1.y, C.x - T1.x));
-    var NA = 8;
+    var NA = 16;
     var arcU = [], arcL = [];
     // Coincident points poison Impeller's tessellator (a run of 9 equal
     // points renders as a round blob in Studio). Keep only points that
@@ -271,17 +271,51 @@ function chevronHalves(split, upperColor, lowerColor, pinch, tipRound) {
     }
     return out;
   }
-  // arcU runs P1 -> the centerline point; arcL runs the centerline -> P2.
+  // Each half is emitted as TWO fat polygons, never as one long thin
+  // convex wedge: Impeller's tessellator inflates a 190-unit sliver
+  // (the quad B..Mout..Min..A tapers to ~15 degrees) into round blobs in
+  // the live Studio at any zoom. Splitting along the Mout-A / Mout-F1
+  // diagonals (sharp tip) or along the B-seam / T2-F2 diagonals (fillet)
+  // keeps every piece wide; the shared internal diagonals are invisible —
+  // the painter's same-color hairline re-stroke covers the AA seam.
+  // arcU runs T1 -> the centerline point; arcL runs the centerline -> T2.
   // The seam (centerline -> Min) is horizontal, so the upper/lower color
   // split stays level through the tip.
-  var upper = tipPts == null
-    ? flatPoly(shifted([B, Mout, Min, A], -split), upperColor, 1)
-    : flatPoly(shifted([B].concat(tipPts.arcU, [Min, A]), -split),
-        upperColor, 1);
-  var lower = tipPts == null
-    ? flatPoly(shifted([Mout, F2, F1, Min], split), lowerColor, 1)
-    : flatPoly(shifted(tipPts.arcL.concat([F2, F1, Min]), split),
-        lowerColor, 1);
+  var upPieces = [];
+  var loPieces = [];
+  if (tipPts == null) {
+    upPieces = [[B, Mout, A], [Mout, Min, A]];
+    loPieces = [[Mout, F2, F1], [Mout, F1, Min]];
+  } else {
+    // The rounding tip splits into the CAP SEGMENT (just the arc, closed
+    // by its own short chord — fat) and the ARM (a wide pentagon whose
+    // chord edge the segment exactly covers). NB: the segment must NOT
+    // be merged with the far corner B — that union is a long thin
+    // crescent, which Impeller inflates into a round blob.
+    if (tipPts.arcU.length >= 3) upPieces.push(tipPts.arcU);
+    upPieces.push([
+      B,
+      tipPts.arcU[0],
+      tipPts.arcU[tipPts.arcU.length - 1],
+      Min,
+      A,
+    ]);
+    if (tipPts.arcL.length >= 3) loPieces.push(tipPts.arcL);
+    loPieces.push([
+      tipPts.arcL[tipPts.arcL.length - 1],
+      F2,
+      F1,
+      Min,
+      tipPts.arcL[0],
+    ]);
+  }
+  var pieces = [];
+  for (var ui = 0; ui < upPieces.length; ui++) {
+    pieces.push(flatPoly(shifted(upPieces[ui], -split), upperColor, 1));
+  }
+  for (var li = 0; li < loPieces.length; li++) {
+    pieces.push(flatPoly(shifted(loPieces[li], split), lowerColor, 1));
+  }
   // Round terminals on the free ends: each cap bulges along the arm's
   // outward normal (perpendicular to the angled end face).
   var su = { x: S.x, y: S.y - split };
@@ -289,7 +323,7 @@ function chevronHalves(split, upperColor, lowerColor, pinch, tipRound) {
   var capU = capArc(su.x, su.y, half, n1, { x: -d1.x, y: -d1.y },
     upperColor, 1);
   var capL = capArc(se.x, se.y, half, n2, d2, lowerColor, 1);
-  return [upper, capU, lower, capL];
+  return pieces.concat([capU, capL]);
 }
 
 /// The teal gradient capsule — the underscore in its icon slot. Square
