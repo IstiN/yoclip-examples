@@ -213,25 +213,31 @@ function chevronHalves(split, upperColor, lowerColor, pinch, tipRound) {
   var Min = isect(C, d1, E2, d2);
   // The pinch steepens the arms, so the sharp miter grows into a spike
   // that would poke past the round caps of the fold's strokes at the
-  // handoff. So the tip is cut by a circle around V whose radius glides
-  // from the sharp tip's distance (round 0 — the circle passes exactly
-  // through Mout, which sits ON the centerline: untouched) down to `half`
-  // (round 1 — the tip IS a round cap, tangent to both outer edges, the
-  // exact silhouette the fold's strokes pick up). The cut is driven by
-  // `tipRound`, NOT by the slide: the eye narrows with a SHARP tip and
-  // only rounds once the narrowing is done (the caller owns the clock).
-  // The two halves still tile the shape and share the horizontal
-  // centerline seam, so the color boundary stays level through the tip.
+  // handoff. So the tip's corner at Mout is rounded with a true FILLET:
+  // an arc tangent to BOTH outer edges (center on the centerline at
+  // Mout - rho/sin(A), tangent points rho/tan(A) back down each edge).
+  // Tangency means zero silhouette kinks at any round amount; rho=0 is
+  // the untouched sharp miter (the fillet degenerates into Mout) and
+  // rho=half is the full round cap centered at V — the exact silhouette
+  // the fold's strokes pick up. The cut is driven by `tipRound`, NOT by
+  // the slide: the eye narrows with a SHARP tip and only rounds once the
+  // narrowing is done (the caller owns the clock). The two halves still
+  // tile the shape and share the horizontal centerline seam, so the color
+  // boundary stays level through the tip.
   var tipPts = null; // extra tip points (the arc), or null for the sharp tip
   if (pinch != null && pinch > 0.01) {
     var rFar = Math.hypot(Mout.x - V.x, Mout.y - V.y);
+    var sFar = Math.sqrt(Math.max(0, rFar * rFar - half * half));
+    var sinA = half / rFar;
+    var tanA = half / sFar;
     var tr = (tipRound == null) ? Math.min(1, pinch / half) : tipRound;
-    var r = lerp(rFar, half, Math.max(0, Math.min(1, tr)));
-    var s = Math.sqrt(Math.max(0, r * r - half * half));
-    var P1 = { x: D.x + d1.x * s, y: D.y + d1.y * s };
-    var P2 = { x: E1.x + d2.x * s, y: E1.y + d2.y * s };
-    var a1 = Math.atan2(P1.y - V.y, P1.x - V.x);
-    var a2 = Math.atan2(P2.y - V.y, P2.x - V.x);
+    var rho = half * Math.max(0, Math.min(1, tr));
+    var C = { x: Mout.x - rho / sinA, y: V.y };
+    var t1 = Mout.x - d1.x * (rho / tanA), t1y = Mout.y - d1.y * (rho / tanA);
+    var T1 = { x: t1, y: t1y };
+    var t2 = Mout.x + d2.x * (rho / tanA), t2y = Mout.y + d2.y * (rho / tanA);
+    var T2 = { x: t2, y: t2y };
+    var phi = Math.abs(Math.atan2(C.y - T1.y, C.x - T1.x));
     var NA = 8;
     var arcU = [], arcL = [];
     // Coincident points poison Impeller's tessellator (a run of 9 equal
@@ -247,14 +253,12 @@ function chevronHalves(split, upperColor, lowerColor, pinch, tipRound) {
     }
     var lastU = [null], lastL = [null];
     for (var ai = 0; ai <= NA; ai++) {
-      var thU = a1 + (0 - a1) * ai / NA;
-      keep(arcU, lastU, {
-        x: V.x + r * Math.cos(thU), y: V.y + r * Math.sin(thU),
-      });
-      var thL = 0 + (a2 - 0) * ai / NA;
-      keep(arcL, lastL, {
-        x: V.x + r * Math.cos(thL), y: V.y + r * Math.sin(thL),
-      });
+      var th = -phi + (phi - (-phi)) * ai / NA;
+      var px = C.x + rho * Math.cos(th), py = C.y + rho * Math.sin(th);
+      // The seam splits the fillet: the upper half owns -phi..0, the
+      // lower half 0..+phi; both share the centerline point at th=0.
+      if (th <= 0) keep(arcU, lastU, { x: px, y: py });
+      if (th >= 0) keep(arcL, lastL, { x: px, y: py });
     }
     if (arcU.length >= 2 && arcL.length >= 2) {
       tipPts = { arcU: arcU, arcL: arcL };

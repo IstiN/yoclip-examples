@@ -95,8 +95,14 @@ void main() {
 
   // Probes the single morph scene at one frame per storyboard beat.
   const probes = <int>[
+    156, // wink pre-roll
+    159, // wink pre-roll
     163, // wink mid-slide sharp
-    171, // wink rounding at rest
+    166, // wink slide end
+    169, // rounding start
+    172, // rounding near-done
+    175, // fold first frames
+    178, // fold early
     10, // 01 icon hold (dark glass, cursor pulse)
     60, // 02 boot scan — teal line sweeping the icon
     84, // 05 hero zoom settling
