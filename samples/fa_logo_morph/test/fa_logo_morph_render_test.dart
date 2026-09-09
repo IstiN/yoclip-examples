@@ -119,51 +119,36 @@ void main() {
     }
   }
 
-  // Probes the single morph scene at one frame per storyboard beat.
-  const probes = <int>[
-    156, // wink pre-roll
-    159, // wink pre-roll
-    163, // wink mid-slide sharp
-    166, // wink slide end
-    169, // rounding start
-    172, // rounding near-done
-    175, // fold first frames
-    178, // fold early
-    10, // 01 icon hold (dark glass, cursor pulse)
-    60, // 02 boot scan — teal line sweeping the icon
-    84, // 05 hero zoom settling
-    100, // 06 cue band + pre-morph hold
-    132, // 08 the mouth lifted off its slot
-    140, // 08 the mouth pursed to a dash: `>-`
-    150, // 08 the wire mid-curl
-    168, // 09 the wink: mouth closed flat, eye pinched `>-`
-    174, // 09 the mouth popped back open: `>o` (fold begins)
-    176, // tmp fold vertex
-    180, // tmp fold vertex
-    184, // tmp fold vertex
-    190, // tmp bar+accent emerging
-    192, // 10 the arms folded into the stem line
-    214, // 11 the a's stem gradient drawing
-    236, // 16 final bloom
+  // The find: the running wall with the hidden face, both winks, the
+  // mid-zoom color reveal, the focus pull and the settled push-in —
+  // the beats a silent regression would flatten.
+  const findProbes = <int>[
+    40, // the wall running, the face still below center and dim
+    104, // the wall parked: the face at center, indistinguishable
+    110, // wink #1: ( 0_- )
+    170, // mid-zoom: the face warming violet, wall still readable
+    200, // zoom nearly done: wall blurring out, face glowing
+    234, // settled: slow push-in, breathing glow
   ];
 
-  for (final frame in probes) {
-    testWidgets('frame $frame compiles and renders', (tester) async {
+  for (final frame in findProbes) {
+    testWidgets('code_find frame $frame compiles and renders', (tester) async {
       await ensureLoaded();
-      final scene = _scenes['fa_morph'];
-      expect(scene, isNotNull, reason: 'scene fa_morph must load');
+      await ensureTestFont();
+      final scene = _scenes['code_find'];
+      expect(scene, isNotNull, reason: 'scene code_find must load');
       final graph = scene!.render(frame);
       expect(graph, isA<Map<String, dynamic>>());
-      await pumpGraph(tester, graph, 'fa_morph-$frame');
+      await pumpGraph(tester, graph, 'code_find-$frame');
       expect(tester.takeException(), isNull);
     });
   }
 
-  test('the project anchors the morph scene with the 240-frame timeline',
+  test('the project anchors the find scene with the 240-frame timeline',
       () async {
     await ensureLoaded();
-    expect(_scenes.keys, contains('fa_morph'));
-    expect(_scenes['fa_morph']!.duration, 240);
+    expect(_scenes.keys, contains('code_find'));
+    expect(_scenes['code_find']!.duration, 240);
   });
 
   // The kaomoji face: eyes open with the bar cursor, the solid-block

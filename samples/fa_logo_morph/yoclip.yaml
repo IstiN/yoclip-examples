@@ -9,7 +9,7 @@ config:
 project_js: project.js
 
 scenes:
-  - scenes/01_fa_morph.scene.js
+  - scenes/01_code_find.scene.js
   - scenes/02_kaomoji.scene.js
   - scenes/03_code_face.scene.js
 
