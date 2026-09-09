@@ -19,5 +19,6 @@ project = {
   scenes: [
     { path: 'scenes/01_fa_morph.scene.js', layer: 'content', start: 0 },
     { path: 'scenes/02_kaomoji.scene.js', layer: 'content', start: 240 },
+    { path: 'scenes/03_code_face.scene.js', layer: 'content', start: 480 },
   ],
 };

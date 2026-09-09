@@ -52,15 +52,24 @@ void main() {
 
   // Real glyphs for the golden captures: the tester's default font paints
   // every glyph as a solid block, which is useless for text-driven scenes
-  // (the kaomoji IS text). Load the SDK's Roboto into the family "Roboto".
+  // (the kaomoji IS text). Load the SDK's Roboto as "Roboto" and also as
+  // "monospace" — the terminal scenes ask for the mono family, and the
+  // tester has no platform font fallback.
   Future<void> ensureTestFont() async {
-    final loader = FontLoader('Roboto');
-    loader.addFont(
+    final mono = FontLoader('monospace');
+    mono.addFont(
       Future.value(ByteData.view(io.File('/opt/homebrew/share/flutter/bin/'
               'cache/artifacts/material_fonts/Roboto-Regular.ttf')
           .readAsBytesSync().buffer)),
     );
-    await loader.load();
+    await mono.load();
+    final roboto = FontLoader('Roboto');
+    roboto.addFont(
+      Future.value(ByteData.view(io.File('/opt/homebrew/share/flutter/bin/'
+              'cache/artifacts/material_fonts/Roboto-Regular.ttf')
+          .readAsBytesSync().buffer)),
+    );
+    await roboto.load();
   }
 
   Future<void> pumpGraph(
@@ -166,6 +175,30 @@ void main() {
     100, // ( > < ) first squint
     198, // ( > < ) second squint
   ];
+
+  // The code-wall face: the glitch stop, the four face states, and the
+  // final icon bloom.
+  const codeFaceProbes = <int>[
+    45, // mid-glitch: tear bars + flashing rows
+    100, // ( 0_0 ) with the sharp ___ mouth
+    130, // ( >|< )
+    160, // ( > o )
+    182, // ( > - )
+    234, // the Fa icon bloom
+  ];
+
+  for (final frame in codeFaceProbes) {
+    testWidgets('code_face frame $frame compiles and renders', (tester) async {
+      await ensureLoaded();
+      await ensureTestFont();
+      final scene = _scenes['code_face'];
+      expect(scene, isNotNull, reason: 'scene code_face must load');
+      final graph = scene!.render(frame);
+      expect(graph, isA<Map<String, dynamic>>());
+      await pumpGraph(tester, graph, 'code_face-$frame');
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   for (final frame in kaomojiProbes) {
     testWidgets('kaomoji frame $frame compiles and renders', (tester) async {
