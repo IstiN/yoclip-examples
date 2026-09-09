@@ -40,12 +40,12 @@ scene = {
         easing);
     }
 
-    // ---- The mapper: tile center pinned at (960, 500) ----------------------
-    // The materialize beat scales k (0.94 → 1.0 of the film's 0.371) about
+    // ---- The mapper: tile center pinned at (960, 390) ----------------------
+    // The materialize beat scales k (0.94 → 1.0 of 0.44) about
     // the anchor, so tile and wordmark breathe as one surface.
     var tileT = tw(20, 40, 0, 1, 'easeOutExpo');      // 20–60
-    var k = 0.371 * lerp(0.94, 1.0, tileT);
-    setMapper(k, BRAND.anchor[0], BRAND.anchor[1], 960, 500);
+    var k = 0.44 * lerp(0.94, 1.0, tileT);
+    setMapper(k, BRAND.anchor[0], BRAND.anchor[1], 960, 390);
 
     var kids = [];
 
@@ -67,14 +67,14 @@ scene = {
         type: 'circle', size: haloS, fill: C.violet,
         opacity: 0.14 * ptIn * (1 - ptOut),
         blur: 26,
-        positioned: { left: 960 - haloS / 2, top: 500 - haloS / 2 },
+        positioned: { left: 960 - haloS / 2, top: 390 - haloS / 2 },
       });
       var coreS = Math.max(1, 14 * ptIn);
       kids.push({
         type: 'circle', size: coreS, fill: C.violet,
         opacity: ptA,
         blur: 8,
-        positioned: { left: 960 - coreS / 2, top: 500 - coreS / 2 },
+        positioned: { left: 960 - coreS / 2, top: 390 - coreS / 2 },
       });
     }
 
@@ -83,12 +83,12 @@ scene = {
     var glowT = tw(18, 18, 0, 1, 'easeOut') *
       (1 - tw(56, 28, 0, 1, 'easeInOutCubic'));
     if (glowT > 0.003) {
-      var washS = 470;
+      var washS = 520;
       kids.push({
         type: 'circle', size: washS, fill: C.violet,
-        opacity: 0.12 * glowT,
+        opacity: 0.14 * glowT,
         blur: 80,
-        positioned: { left: 960 - washS / 2, top: 500 - washS / 2 },
+        positioned: { left: 960 - washS / 2, top: 390 - washS / 2 },
       });
     }
 
@@ -166,40 +166,49 @@ scene = {
     }
 
     // ---- 80–160: the lockup below the tile ---------------------------------
-    var FA_TOP = 700;                    // the tile's bottom edge sits at ~684
+    var FA_TOP = 615;
     var faIn = tw(80, 26, 0, 1, 'easeOutExpo');
     var tagIn = tw(92, 26, 0, 1, 'easeOutExpo');
     var avIn = tw(120, 26, 0, 1, 'easeOutExpo');
 
+    var silverGrad = {
+      begin: 'topCenter',
+      end: 'bottomCenter',
+      colors: ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+      stops: [0.0, 0.45, 1.0],
+    };
+
     kids.push({
-      type: 'text', text: 'Fa', width: 1920,
+      type: 'text', text: 'FA', width: 1920,
       opacity: faIn,
       offsetY: 26 * (1 - faIn),
       style: {
-        fontSize: 120,
-        color: '#EAEAF2',
-        fontFamily: 'Roboto',
+        fontSize: 210,
+        color: '#FFFFFF',
+        fontFamily: 'Impact',
         fontWeight: '700',
-        letterSpacing: 4,
+        letterSpacing: 8,
         textAlign: 'center',
-        textShadows: [{ color: '#66000000', blur: 30 }],
+        gradient: silverGrad,
+        textShadows: [{ color: '#448F6BFF', blur: 48 }],
       },
       positioned: { left: 0, top: FA_TOP },
     });
 
     kids.push({
-      type: 'text', text: 'One agent harness, every device.', width: 1920,
+      type: 'text', text: 'ONE AGENT HARNESS. EVERY DEVICE.', width: 1920,
       opacity: tagIn,
       offsetY: 18 * (1 - tagIn),
       style: {
         fontSize: 38,
-        color: '#9BA3B5',
-        fontFamily: 'Roboto',
-        fontWeight: '400',
-        letterSpacing: 3,
+        color: '#C0C0C8',
+        fontFamily: 'Impact',
+        fontWeight: '700',
+        letterSpacing: 4,
         textAlign: 'center',
+        textShadows: [{ color: '#33000000', blur: 16 }],
       },
-      positioned: { left: 0, top: FA_TOP + 120 },
+      positioned: { left: 0, top: FA_TOP + 230 },
     });
 
     kids.push({
@@ -207,13 +216,13 @@ scene = {
       opacity: avIn,
       offsetY: 14 * (1 - avIn),
       style: {
-        fontSize: 34,
+        fontSize: 32,
         color: C.tealLight,
         fontFamily: 'monospace',
         letterSpacing: 2,
         textAlign: 'center',
       },
-      positioned: { left: 0, top: FA_TOP + 200 },
+      positioned: { left: 0, top: FA_TOP + 290 },
     });
 
     // ---- 160–180: the final bloom ------------------------------------------

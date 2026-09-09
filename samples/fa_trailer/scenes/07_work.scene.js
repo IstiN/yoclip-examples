@@ -93,29 +93,41 @@ scene = {
       });
     }
 
-    // ---- The caption slams (second half) ------------------------------------
-    var CAPS = ['tests green', 'refactored', 'shipped'];
+    // ---- The caption slams (second half) — Apple rapid-fire style ---------
+    var SLAMS = [
+      { text: 'TEST.', fs: 340, at: 84, colors: ['#FFFFFF', '#ECECEF', '#A4A4AF'], blurCol: '#338F6BFF' },
+      { text: 'REFACTOR.', fs: 270, at: 104, colors: ['#D6F4FF', '#7BE8FF', '#2EBD9E'], blurCol: '#4448C7E8' },
+      { text: 'SHIP.', fs: 360, at: 124, colors: ['#E6C4FF', '#A368FF', '#6222D6'], blurCol: '#888F6BFF' },
+    ];
     var capKids = [];
     if (!firstHalf) {
-      for (var k = 0; k < CAPS.length; k++) {
-        var t0 = 84 + k * 15;
-        if (frame < t0) continue;
-        var pop = tw(t0, 8, 0, 1, 'easeOutExpo');
+      for (var k = 0; k < SLAMS.length; k++) {
+        var s = SLAMS[k];
+        var sNext = (k < SLAMS.length - 1) ? SLAMS[k + 1].at : 144;
+        if (frame < s.at || frame >= sNext) continue;
+        var pop = tw(s.at, 6, 0, 1, 'easeOutExpo');
+        var op = tw(s.at, 4, 0, 1, 'easeOut');
+        var grad = {
+          begin: 'topCenter',
+          end: 'bottomCenter',
+          colors: s.colors,
+          stops: [0.0, 0.5, 1.0],
+        };
         capKids.push({
           type: 'text',
-          text: CAPS[k],
+          text: s.text,
           width: 1920,
-          opacity: tw(t0, 4, 0, 1, 'easeOut'),
-          scale: lerp(1.2, 1.0, pop),
+          opacity: op,
+          scale: lerp(1.12, 1.0, pop),
           style: {
-            fontSize: 44,
-            color: '#EAEAF2',
-            fontFamily: 'Roboto',
+            fontSize: s.fs,
+            fontFamily: 'Impact',
             fontWeight: '700',
-            letterSpacing: 2,
             textAlign: 'center',
+            gradient: grad,
+            textShadows: [{ color: s.blurCol, blur: 48 }],
           },
-          positioned: { left: 0, top: 462 + k * 78 },
+          positioned: { left: 0, top: 540 - s.fs / 2 },
         });
       }
     }

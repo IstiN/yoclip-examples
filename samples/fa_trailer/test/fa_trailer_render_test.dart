@@ -47,12 +47,14 @@ void main() {
 
   Future<void> ensureTestFont() async {
     Future<void> load(String family, String file) async {
+      final fileObj = file.startsWith('/')
+          ? io.File(file)
+          : io.File('/opt/homebrew/share/flutter/bin/'
+              'cache/artifacts/material_fonts/$file');
+      if (!fileObj.existsSync()) return;
       final loader = FontLoader(family)
         ..addFont(
-          Future.value(ByteData.view(io.File('/opt/homebrew/share/flutter/bin/'
-                  'cache/artifacts/material_fonts/$file')
-              .readAsBytesSync()
-              .buffer)),
+          Future.value(ByteData.view(fileObj.readAsBytesSync().buffer)),
         );
       await loader.load();
     }
@@ -60,6 +62,8 @@ void main() {
     await load('monospace', 'Roboto-Regular.ttf');
     await load('Roboto', 'Roboto-Regular.ttf');
     await load('RobotoCondensed', 'RobotoCondensed-Bold.ttf');
+    await load('DINCondensed', '/System/Library/Fonts/Supplemental/DIN Condensed Bold.ttf');
+    await load('Impact', '/System/Library/Fonts/Supplemental/Impact.ttf');
   }
 
   Future<void> pumpGraph(
@@ -115,7 +119,7 @@ void main() {
     '01_dark': [10, 60, 150, 200],
     '02_alive': [40, 170],
     '03_hardware': [40, 100, 170, 205],
-    '04_core': [20, 70, 160],
+    '04_core': [20, 70, 110, 160],
     '05_everywhere': [30, 90, 200],
     '06_power': [30, 110, 180],
     '07_work': [40, 120],

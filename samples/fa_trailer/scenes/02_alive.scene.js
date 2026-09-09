@@ -130,22 +130,33 @@ scene = {
     };
 
     // ---- The type beat -----------------------------------------------------
+    var silverGrad = {
+      begin: 'topCenter',
+      end: 'bottomCenter',
+      colors: ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+      stops: [0.0, 0.45, 1.0],
+    };
+
     var typeLine = {
       type: 'text',
-      text: 'It lives in your code.',
+      text: 'IT LIVES IN YOUR CODE.',
       width: 1920,
-      opacity: typeIn * (1 - fadeT), // it fades to black with everything else
+      opacity: typeIn * (1 - fadeT),
       offsetY: typeOffY,
       style: {
-        fontSize: 96,
-        color: '#EAEAF2',
-        fontFamily: 'Roboto',
+        fontSize: 130,
+        color: '#FFFFFF',
+        fontFamily: 'Impact',
         fontWeight: '700',
-        letterSpacing: 3,
+        letterSpacing: 2,
         textAlign: 'center',
-        textShadows: [{ color: '#8C000000', blur: 26 }],
+        gradient: silverGrad,
+        textShadows: [
+          { color: '#8C000000', blur: 30 },
+          { color: '#448F6BFF', blur: 48 },
+        ],
       },
-      positioned: { left: 0, top: 784 }, // centered at ~78% height (y≈842)
+      positioned: { left: 0, top: 760 },
     };
 
     // ---- Compose -----------------------------------------------------------
