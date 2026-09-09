@@ -108,45 +108,14 @@ scene = {
       });
     }
 
-    // ---- 20–80: the wordmark writes itself, exactly like the brand --------
-    // The F: up the stem, then right across the top bar — one round-capped
-    // stroke in brand blue.
+    // ---- 20–80: the wordmark writes itself: complete, canonical Fa --------
     var fP = tw(26, 32, 0, 1, 'easeInOutCubic');
-    if (fP > 0.001) {
-      kids.push(fPathNode(fP, C.blue, 1));
-    }
-
-    // The teal accent fades in under the finished F (the brand's bar).
-    var accentA = tw(50, 18, 0, 1, 'easeOut');
-    if (accentA > 0.003) {
-      var accentKids = tealBar(accentA);
-      for (var ak = 0; ak < accentKids.length; ak++) kids.push(accentKids[ak]);
-    }
-
-    // The a's bowl: the brand ring draws on in teal, from the top.
+    var accentP = tw(44, 22, 0, 1, 'easeOut');
     var bowlP = tw(38, 30, 0, 1, 'easeInOutCubic');
-    if (bowlP > 0.001) {
-      kids.push(polylineNode(
-        ringPoints(BRAND.a.bowl.cx, BRAND.a.bowl.cy, BRAND.a.bowl.r, 24),
-        38, bowlP, '#2EBD9E', 1));
-    }
-
-    // The a's stem: gradient segments growing up out of the bowl — the
-    // morph's stem pattern (teal → tealLight, bottom-up write-on).
     var stemP = tw(56, 24, 0, 1, 'easeInOutCubic');
-    if (stemP > 0.001) {
-      var segs = 8;
-      var aStem = BRAND.a.stem;
-      var segH = aStem.h / segs;
-      for (var si = 0; si < segs; si++) {
-        var sp = jsr.motion.clamp(stemP * segs - si, 0, 1);
-        if (sp <= 0) continue;
-        var sy0 = aStem.y + aStem.h - (si + 1) * segH;
-        kids.push(trace(
-          'M' + aStem.x + ',' + (sy0 + segH) + ' L' + aStem.x + ',' + sy0,
-          38, aStem.x, sy0, 0, segH, sp,
-          lerpColor('#2EBD9E', '#48C7E8', si / (segs - 1))));
-      }
+    var faMarkKids = completeFaMark(fP, accentP, bowlP, stemP, 1);
+    for (var fmi = 0; fmi < faMarkKids.length; fmi++) {
+      kids.push(faMarkKids[fmi]);
     }
 
     // ---- 120–160: the ground glow ------------------------------------------

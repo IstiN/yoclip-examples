@@ -374,6 +374,46 @@ function tealBar(opacity) {
 // open bar to closed ring is invisible. The path node strokes the polyline
 // with round caps and joins, flat color.
 
+function morphPts(a, b, t) {
+  var out = [];
+  var len = Math.max(a.length, b.length);
+  for (var i = 0; i < len; i++) {
+    var pa = a[Math.min(i, a.length - 1)];
+    var pb = b[Math.min(i, b.length - 1)];
+    out.push({ x: lerp(pa.x, pb.x, t), y: lerp(pa.y, pb.y, t) });
+  }
+  return out;
+}
+
+function arcPts(cx, cy, r, a0, a1, n) {
+  var pts = [];
+  for (var i = 0; i <= n; i++) {
+    var th = a0 + (a1 - a0) * i / n;
+    pts.push({ x: cx + r * Math.cos(th), y: cy + r * Math.sin(th) });
+  }
+  return pts;
+}
+
+function chevPoints(cx, cy, w, h, n) {
+  var pts = [];
+  var halfN = Math.floor(n / 2);
+  for (var i = 0; i <= halfN; i++) {
+    var t = i / halfN;
+    pts.push({
+      x: lerp(cx - w, cx + w, t),
+      y: lerp(cy - h, cy, t),
+    });
+  }
+  for (var j = 1; j <= halfN; j++) {
+    var t2 = j / halfN;
+    pts.push({
+      x: lerp(cx + w, cx - w, t2),
+      y: lerp(cy, cy + h, t2),
+    });
+  }
+  return pts;
+}
+
 function ringPoint(cx, cy, r, s) {
   var th = -Math.PI / 2 - 2 * Math.PI * s;
   return { x: cx + r * Math.cos(th), y: cy + r * Math.sin(th) };
@@ -435,6 +475,69 @@ function fPathNode(progress, color, opacity) {
     ' L' + (f.topX2 - hw) + ',' + (f.top + hw);
   return trace(d, f.w, f.stemX, f.top, f.topX2 - f.stemX,
     f.bottom - f.top, progress, color, opacity);
+}
+
+/// The F's middle accent crossbar (capsule from x: 266, y: 545, w: 212, h: 44).
+/// Gradient from teal '#2EBD9E' to cyan '#48C7E8', with rounded caps.
+function fAccentBar(progress, opacity) {
+  var kids = [];
+  var fa = BRAND.f.accent;
+  var p = jsr.motion.clamp(progress, 0, 1);
+  if (p <= 0.001) return kids;
+  var curW = fa.w * p;
+  var h = fa.h;
+  var r = h / 2;
+  var pt = brandToScreen(fa.x, fa.y);
+  kids.push({
+    type: 'rect',
+    width: curW * mapper.k,
+    height: h * mapper.k,
+    radius: r * mapper.k,
+    fill: '#2EBD9E',
+    opacity: opacity == null ? 1 : opacity,
+    positioned: {
+      left: pt.x,
+      top: pt.y - r * mapper.k,
+    },
+  });
+  return kids;
+}
+
+/// The complete, canonical Fa wordmark:
+/// 1. F stem + top bar (blue)
+/// 2. F middle teal accent bar
+/// 3. a circular bowl (teal)
+/// 4. a vertical stem (cyan)
+function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, opacity) {
+  var kids = [];
+  var op = opacity == null ? 1 : opacity;
+  if (fProgress > 0.001) {
+    kids.push(fPathNode(fProgress, '#5B61F6', op));
+  }
+  if (accentProgress > 0.001) {
+    var acc = fAccentBar(accentProgress, op);
+    for (var i = 0; i < acc.length; i++) kids.push(acc[i]);
+  }
+  if (bowlProgress > 0.001) {
+    kids.push(polylineNode(
+      ringPoints(BRAND.a.bowl.cx, BRAND.a.bowl.cy, BRAND.a.bowl.r, 24),
+      38, bowlProgress, '#2EBD9E', op));
+  }
+  if (stemProgress > 0.001) {
+    var segs = 8;
+    var aStem = BRAND.a.stem;
+    var segH = aStem.h / segs;
+    for (var si = 0; si < segs; si++) {
+      var sp = jsr.motion.clamp(stemProgress * segs - si, 0, 1);
+      if (sp <= 0) continue;
+      var sy0 = aStem.y + aStem.h - (si + 1) * segH;
+      kids.push(trace(
+        'M' + aStem.x + ',' + (sy0 + segH) + ' L' + aStem.x + ',' + sy0,
+        38, aStem.x, sy0, 0, segH, sp,
+        lerpColor('#2EBD9E', '#48C7E8', si / (segs - 1)), op));
+    }
+  }
+  return kids;
 }
 
 /// A horizontal streak: thin rounded rect flying right from svg point

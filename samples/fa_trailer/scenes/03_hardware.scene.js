@@ -190,15 +190,14 @@ scene = {
       kids.push(polylineNode(eyePts, 38, eyeRingP, C.violetBright, eyeFade));
     }
 
-    // Underscore mouth bar
+    // Underscore mouth bar morphing into the a's bowl
     var mouthP = tw(120, 22, 0, 1, 'easeOut');
-    var mouthEnd = 1 - tw(184, 18, 0, 1, 'easeInOutCubic');
     var flyT = tw(150, 26, 0, 1, 'easeInOutCubic');
     var bendAt = tw(156, 30, 0, 1, 'easeInOutCubic');
     var bowlT = tw(184, 22, 0, 1, 'easeInOutCubic');
-    if (mouthP > 0.001 && mouthEnd > 0.003) {
+    if (mouthP > 0.001) {
       var mCol = lerpColor(C.violetBright, '#2EBD9E', bowlT);
-      var mSw = lerp(38, 38, bowlT);
+      var mSw = 38;
       var mPts;
       if (bendAt >= 0.999) {
         mPts = ringPoints(
@@ -221,10 +220,10 @@ scene = {
       kids.push(fPathNode(fP, C.blue, 1));
     }
 
-    // Teal bar accent
-    var accentA = tw(182, 16, 0, 1, 'easeOut');
-    if (accentA > 0.003) {
-      var accentKids = tealBar(accentA);
+    // F middle teal accent bar
+    var accentP = tw(188, 22, 0, 1, 'easeOut');
+    if (accentP > 0.001) {
+      var accentKids = fAccentBar(accentP, 1);
       for (var ak = 0; ak < accentKids.length; ak++) kids.push(accentKids[ak]);
     }
 
