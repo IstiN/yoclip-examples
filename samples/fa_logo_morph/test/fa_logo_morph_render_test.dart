@@ -34,7 +34,11 @@ void main() {
     // The project scenes loader is the house entry point: it evaluates
     // project.js, loads the shared lib (project.js `lib`), applies anchors,
     // and wires yoclipTheme for every scene.
-    final loaded = await loadYoclipProjectScenes(runtime, project, storage);
+    final loaded = await loadYoclipProjectScenes(runtime, project, storage,
+        onSceneError: (path, sceneId, error) {
+      // ignore: avoid_print
+      print('SCENE ERROR $path ($sceneId): $error');
+    });
     for (final scene in loaded) {
       _scenes[scene.id] = scene;
     }
@@ -45,6 +49,19 @@ void main() {
   });
 
   final compiler = YoclipWidgetRenderer();
+
+  // Real glyphs for the golden captures: the tester's default font paints
+  // every glyph as a solid block, which is useless for text-driven scenes
+  // (the kaomoji IS text). Load the SDK's Roboto into the family "Roboto".
+  Future<void> ensureTestFont() async {
+    final loader = FontLoader('Roboto');
+    loader.addFont(
+      Future.value(ByteData.view(io.File('/opt/homebrew/share/flutter/bin/'
+              'cache/artifacts/material_fonts/Roboto-Regular.ttf')
+          .readAsBytesSync().buffer)),
+    );
+    await loader.load();
+  }
 
   Future<void> pumpGraph(
     WidgetTester tester,
@@ -139,4 +156,27 @@ void main() {
     expect(_scenes.keys, contains('fa_morph'));
     expect(_scenes['fa_morph']!.duration, 240);
   });
+
+  // The kaomoji face: eyes open with the bar cursor, the solid-block
+  // cursor phase, and both squint beats — the glyph-swap beats are the
+  // ones a silent regression would flatten.
+  const kaomojiProbes = <int>[
+    60, // 0_0, solid-block cursor (fully appeared)
+    42, // 0_0, thin-bar cursor
+    100, // ( > < ) first squint
+    198, // ( > < ) second squint
+  ];
+
+  for (final frame in kaomojiProbes) {
+    testWidgets('kaomoji frame $frame compiles and renders', (tester) async {
+      await ensureLoaded();
+      await ensureTestFont();
+      final scene = _scenes['kaomoji'];
+      expect(scene, isNotNull, reason: 'scene kaomoji must load');
+      final graph = scene!.render(frame);
+      expect(graph, isA<Map<String, dynamic>>());
+      await pumpGraph(tester, graph, 'kaomoji-$frame');
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

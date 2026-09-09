@@ -1,5 +1,5 @@
 config:
-  duration: 240
+  duration: 480
   fps: 30
   width: 1920
   height: 1080
@@ -10,6 +10,7 @@ project_js: project.js
 
 scenes:
   - scenes/01_fa_morph.scene.js
+  - scenes/02_kaomoji.scene.js
 
 theme:
   colors:

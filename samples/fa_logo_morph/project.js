@@ -18,5 +18,6 @@ project = {
   lib: 'lib/brand.js',
   scenes: [
     { path: 'scenes/01_fa_morph.scene.js', layer: 'content', start: 0 },
+    { path: 'scenes/02_kaomoji.scene.js', layer: 'content', start: 240 },
   ],
 };
