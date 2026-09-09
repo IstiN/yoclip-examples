@@ -44,40 +44,44 @@ scene = {
     // The wall sprints upward, then brakes onto the face line: the whole
     // group's offset eases from its start to the value that parks the face
     // row exactly at screen center (the zoom's anchor).
-    var ROW_H = 50;
-    var FONT = 34;
+    var ROW_H = 52;
+    var FONT = 38;
     var FACE_I = 13; // the face's row index in the wall
-    var FACE_STOP = 540 - ROW_H / 2; // its top when parked at center
+    var FACE_STOP = 540 - ROW_H / 2 - 4; // its top when parked at center
     var sStop = FACE_STOP - FACE_I * ROW_H;
     var sStart = sStop + 430; // it enters from below
-    var s = lerp(sStart, sStop, tw(0, 104, 0, 1, 'easeOutCubic'));
+    // NOTE: jsr.ease has no easeOutCubic — pass a bezier (a tween accepts
+    // an easing function too), otherwise the brake silently falls back to
+    // linear and the wall stops dead.
+    var brake = jsr.ease.cubicBezier(0.22, 1, 0.36, 1);
+    var s = lerp(sStart, sStop, tw(0, 104, 0, 1, brake));
 
     // ---- The code wall -----------------------------------------------------
     // Fifty rows of plausible agent code. Two alternating grays; nothing
     // about the face line stands out yet.
     var POOL = [
-      '28  final take = takes.first;   if (take.ok) keep(take);  // the keeper',
-      '29  if (busy) return null;               // do not interrupt a run',
-      '30  onSelect(take.frame);  timeline.mark(beat, tag: \'ok\');  sync()',
-      '31  await agent.run(goal);  // the long way round, every single time',
-      '32  const stage = stage();  resize(1920, 1080); fit: cover',
-      '33  */section: morph  // ---- begin the shape work ----',  // wip
-      '34  RobotMode: focus;  attention: narrow;  drift: 0.0',
-      '35  render(frame + 1);  pump();  boundary.toImage(pixelRatio: 1);  flush()',
-      '36  timeline.mark(beat);  label: \'note\';  color: teal',
-      '37  export preset: shorts_1080;  fps: 30;  bitrate: 8_000k',
-      '38  storage.readBytes(path);  cache.warm(asset);  eviction: lru',
-      '39  scene.evaluate(frame);  graph.compile();  paint()',
-      '40  interp(frame, [0, 30], [0, 1]);  easing: easeInOutCubic',
-      '41  spring(config: wobbly);  damping: 0.8;  mass: 1.0;  v0: 0',
-      '42  // TODO: hot reload the scene on save  // soon',
-      '43  mux(audio: aac, video: h264);  sync: drift < 1ms  // tight',
-      '44  boundary.toImage(pixelRatio: 1);  rawRgba;  append()',
-      '45  seek(frame: 128);  play();  loop: false;  scrubbing: on',
-      '46  opacity: interpolate(frame, [0, 30], [0, 1]);  // fade the old',
-      '47  yoclip render --output video.mp4  // the whole point of all this',
-      '48  watch(scenes/*.js);  reload(onSave: true);  debounce: 80ms',
-      '49  commit: the wall is alive  // it winked back',
+      '28  final take = takes.first;   if (take.ok) keep(take);  // the keeper — again, always the keeper',
+      '29  if (busy) return null;     // do not interrupt a run; the run remembers being interrupted',
+      '30  onSelect(take.frame);  timeline.mark(beat, tag: \'ok\');  sync();  drift: 0.4ms  // fine',
+      '31  await agent.run(goal);     // the long way round, every single time, and it never complains',
+      '32  const stage = stage();  resize(1920, 1080);  fit: cover;  background: #070a12;  grain: off',
+      '33  */section: morph   // ---- begin the shape work ----   shapes: arc, ring, chevron, bar',
+      '34  RobotMode: focus;  attention: narrow;  drift: 0.0;  blink: occasionally  // it is alive',
+      '35  render(frame + 1);  pump();  boundary.toImage(pixelRatio: 1);  flush();  repeat();  seek(0)',
+      '36  timeline.mark(beat);  label: \'note\';  color: teal;  // «фа» — the note knows its own name',
+      '37  export preset: shorts_1080;  fps: 30;  bitrate: 8_000k;  audio: aac 128k;  mux: single-pass',
+      '38  storage.readBytes(path);  cache.warm(asset);  eviction: lru;  ttl: 30s;  hits: 99.2%',
+      '39  scene.evaluate(frame);  graph.compile();  paint();  // 51 fps at 1080p — not bad at all',
+      '40  interp(frame, [0, 30], [0, 1]);  easing: easeInOutCubic;  clamp: true;  // smooth in, smooth out',
+      '41  spring(config: wobbly);  damping: 0.8;  mass: 1.0;  v0: 0;  // settle, do not bounce',
+      '42  // TODO: hot reload the scene on save   // soon   // okay, fine — it already works',
+      '43  mux(audio: aac, video: h264);  sync: drift < 1ms  // tight — tighter than tight',
+      '44  boundary.toImage(pixelRatio: 1);  rawRgba;  append();  // frame by frame by frame by frame',
+      '45  seek(frame: 128);  play();  loop: false;  scrubbing: on;  markers: 3;  beats: 4/4',
+      '46  opacity: interpolate(frame, [0, 30], [0, 1]);  // fade the old world out, gently',
+      '47  yoclip render --output video.mp4   // the whole point of all of this, really',
+      '48  watch(scenes/*.js);  reload(onSave: true);  debounce: 80ms;  errors: inline  // kind',
+      '49  commit: the wall is alive   // it winked back and nobody was ready for it',
     ];
 
     var rows = [];
@@ -143,7 +147,7 @@ scene = {
     // ---- The dive ----------------------------------------------------------
     // One continuous zoom about the screen center, where the face parks.
     var zoom = tw(136, 70, 1, 5.2, 'easeInOutCubic');
-    if (frame >= 206) zoom = lerp(5.2, 5.75, tw(206, 34, 0, 1, 'easeOutCubic'));
+    if (frame >= 206) zoom = lerp(5.2, 5.75, tw(206, 34, 0, 1, 'easeOutExpo'));
 
     // The focus pull: the wall falls out of focus and dims as the face
     // warms up, so the eye has nowhere else to go.
