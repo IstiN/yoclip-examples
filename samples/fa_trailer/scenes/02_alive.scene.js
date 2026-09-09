@@ -30,14 +30,18 @@ scene = {
       stops: [0.0, 0.42, 0.72, 1.0],
     };
 
-    // Zoom and position of the tile
-    var zoom = lerp(1.0, 1.14, tw(0, 180, 0, 1, 'easeInOutCubic'));
-    var tileScale = 0.38 * zoom;
-    setMapper(tileScale, 512, 512, 960, 360);
+    // Seamless camera transition from 01_dark:
+    // Frame 0 matches 01_dark frame 210 EXACTLY (sy: 540, tileScale: 0.42).
+    // Over frames 0–44 it smoothly glides up to (960, 360) and scales to 0.38
+    // to give room for the title rising below it.
+    var glideT = tw(0, 44, 0, 1, 'easeInOutCubic');
+    var sy = lerp(540, 360, glideT);
+    var tileScale = lerp(0.42, 0.38, glideT);
+    setMapper(tileScale, 512, 512, 960, sy);
 
     // Typography motion
-    var typeIn = tw(24, 38, 0, 1, 'easeOutExpo');
-    var typeOffY = 32 * (1 - typeIn);
+    var typeIn = tw(18, 42, 0, 1, 'easeOutExpo');
+    var typeOffY = 40 * (1 - typeIn);
     var fadeT = tw(145, 35, 0, 1, 'easeInOutCubic');
 
     var kids = [];
@@ -48,7 +52,7 @@ scene = {
       positioned: { left: 0, top: 0 },
     });
 
-    // ---- The Obsidian Tile at (960, 360) -----------------------------------
+    // ---- The Obsidian Tile at (960, sy) ------------------------------------
     var tl = brandToScreen(BRAND.tile.x, BRAND.tile.y);
     var tw_w = BRAND.tile.w * tileScale;
     var tw_h = BRAND.tile.h * tileScale;
@@ -57,11 +61,11 @@ scene = {
     // Ambient purple/blue backlight
     kids.push({
       type: 'circle',
-      size: 520 * zoom,
+      size: 540 * tileScale / 0.38,
       fill: '#5B61F6',
       opacity: 0.18 * (1 - fadeT),
       blur: 64,
-      positioned: { left: 960 - (520 * zoom) / 2, top: 360 - (520 * zoom) / 2 },
+      positioned: { left: 960 - (540 * tileScale / 0.38) / 2, top: sy - (540 * tileScale / 0.38) / 2 },
     });
 
     // Tile body
@@ -77,10 +81,12 @@ scene = {
       positioned: { left: tl.x, top: tl.y },
     });
 
-    // ---- Living Vector Face `>o` -------------------------------------------
-    var eyeR_cx = 675, eyeR_cy = 512, eyeR = 76;
-    var pL = brandToScreen(345, 512);
-    var pR = brandToScreen(eyeR_cx, eyeR_cy);
+    // ---- Living Vector Face `( > _ o )` with smile -------------------------
+    var eyeY = 430;
+    var eyeR_cx = 675, eyeR = 76;
+    var pL = brandToScreen(345, eyeY);
+    var pR = brandToScreen(eyeR_cx, eyeY);
+    var pMouth = brandToScreen(512, 635);
 
     // Cyan/blue iris glow
     kids.push({
@@ -101,7 +107,7 @@ scene = {
     });
 
     // Left eye: chevron > in brand blue
-    var chPts = chevPoints(345, 512, 85, 95, 24);
+    var chPts = chevPoints(345, eyeY, 80, 88, 24);
     kids.push(polylineNode(chPts, 38, 1, '#5B61F6', 1));
 
     // Right eye: wink at frame 90–108
@@ -137,9 +143,33 @@ scene = {
         });
       }
     } else {
-      var eyeRPtsOpen = ringPoints(eyeR_cx, eyeR_cy, eyeR, 24);
+      var eyeRPtsOpen = ringPoints(eyeR_cx, eyeY, eyeR, 24);
       kids.push(polylineNode(eyeRPtsOpen, 38, 1, '#2EBD9E', 1));
     }
+
+    // Smile `_`: the iconic terminal underscore smiling
+    var mouthPulse = 1 + 0.08 * (winkT > 0.5 ? 1 : 0);
+    var mouthW = 180 * mouthPulse;
+    var mouthH = 34;
+    kids.push({
+      type: 'circle',
+      size: 160 * tileScale,
+      fill: '#48C7E8',
+      opacity: 0.18,
+      blur: 20,
+      positioned: { left: pMouth.x - (160 * tileScale) / 2, top: pMouth.y - (160 * tileScale) / 2 },
+    });
+    kids.push({
+      type: 'rect',
+      width: mouthW * tileScale,
+      height: mouthH * tileScale,
+      radius: (mouthH / 2) * tileScale,
+      fill: '#48C7E8',
+      positioned: {
+        left: pMouth.x - (mouthW * tileScale) / 2,
+        top: pMouth.y - (mouthH * tileScale) / 2,
+      },
+    });
 
     // ---- The Type Beat: IT LIVES IN YOUR CODE. ------------------------------
     kids.push({

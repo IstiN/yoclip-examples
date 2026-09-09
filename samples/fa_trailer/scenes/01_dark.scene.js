@@ -24,9 +24,8 @@ scene = {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
-    // Cinematic zoom push-in across the scene
-    var pushZoom = tw(0, 210, 0.94, 1.06, 'easeInOutCubic');
-    var tileScale = 0.44 * pushZoom;
+    // Cinematic zoom push-in across the scene: lands at exactly 0.42 at frame 210
+    var tileScale = lerp(0.38, 0.42, tw(0, 210, 0, 1, 'easeInOutCubic'));
     setMapper(tileScale, 512, 512, 960, 540);
 
     var kids = [];
@@ -75,11 +74,11 @@ scene = {
         (1 + 0.04 * jsr.motion.wave(ms, 2400, 1, 0));
       kids.push({
         type: 'circle',
-        size: 580 * pushZoom,
+        size: 580 * tileScale / 0.38,
         fill: '#5B61F6',
         opacity: backGlow * tileIn,
         blur: 70,
-        positioned: { left: 960 - (580 * pushZoom) / 2, top: 540 - (580 * pushZoom) / 2 },
+        positioned: { left: 960 - (580 * tileScale / 0.38) / 2, top: 540 - (580 * tileScale / 0.38) / 2 },
       });
 
       // The obsidian body
@@ -161,36 +160,38 @@ scene = {
       for (var tbi = 0; tbi < tb.length; tbi++) kids.push(tb[tbi]);
     }
 
-    // ---- 95–210: Living Vector Face `>o` -----------------------------------
+    // ---- 95–210: Living Vector Face `( > _ o )` with smile ----------------
     var faceIn = tw(95, 25, 0, 1, 'easeInOutCubic');
     if (faceIn > 0.001) {
-      // Left eye: chevron `>` centered at (345, 512)
-      // Right eye: circular ring `o` centered at (675, 512), r=80
-      var eyeR_cx = 675, eyeR_cy = 512, eyeR = 76;
-      var pL = brandToScreen(345, 512);
-      var pR = brandToScreen(eyeR_cx, eyeR_cy);
+      // Eyes at y=430: Left chevron `>` at x=345, Right ring `o` at x=675
+      // Smile underscore `_` centered at (512, 635)
+      var eyeY = 430;
+      var eyeR_cx = 675, eyeR = 76;
+      var pL = brandToScreen(345, eyeY);
+      var pR = brandToScreen(eyeR_cx, eyeY);
+      var pMouth = brandToScreen(512, 635);
 
       // Cyan/blue iris aura
       var irisGlow = 0.22 * faceIn * (1 + 0.05 * jsr.motion.wave(ms, 2000, 1, 0));
       kids.push({
         type: 'circle',
-        size: 220 * tileScale,
+        size: 200 * tileScale,
         fill: '#5B61F6',
         opacity: irisGlow,
-        blur: 28,
-        positioned: { left: pL.x - (220 * tileScale) / 2, top: pL.y - (220 * tileScale) / 2 },
+        blur: 26,
+        positioned: { left: pL.x - (200 * tileScale) / 2, top: pL.y - (200 * tileScale) / 2 },
       });
       kids.push({
         type: 'circle',
-        size: 220 * tileScale,
+        size: 200 * tileScale,
         fill: '#2EBD9E',
         opacity: irisGlow,
-        blur: 28,
-        positioned: { left: pR.x - (220 * tileScale) / 2, top: pR.y - (220 * tileScale) / 2 },
+        blur: 26,
+        positioned: { left: pR.x - (200 * tileScale) / 2, top: pR.y - (200 * tileScale) / 2 },
       });
 
       // Left eye: chevron > in brand blue
-      var chPts = chevPoints(345, 512, 85, 95, 24);
+      var chPts = chevPoints(345, eyeY, 80, 88, 24);
       kids.push(polylineNode(chPts, 38, faceIn, '#5B61F6', faceIn));
 
       // Right eye: ring `o` winks into `-` between frame 144 and 160
@@ -229,8 +230,38 @@ scene = {
         }
       } else {
         // Open ring
-        var eyeRPts = ringPoints(eyeR_cx, eyeR_cy, eyeR, 24);
+        var eyeRPts = ringPoints(eyeR_cx, eyeY, eyeR, 24);
         kids.push(polylineNode(eyeRPts, 38, faceIn, '#2EBD9E', faceIn));
+      }
+
+      // ---- Smile `_`: the iconic terminal underscore smiling ---------------
+      var mouthIn = tw(102, 22, 0, 1, 'easeOut');
+      if (mouthIn > 0.001) {
+        var mouthPulse = 1 + 0.08 * (winkT > 0.5 ? 1 : 0);
+        var mouthW = 180 * mouthPulse;
+        var mouthH = 34;
+        // Soft smile backlight
+        kids.push({
+          type: 'circle',
+          size: 160 * tileScale,
+          fill: '#48C7E8',
+          opacity: 0.18 * mouthIn * faceIn,
+          blur: 20,
+          positioned: { left: pMouth.x - (160 * tileScale) / 2, top: pMouth.y - (160 * tileScale) / 2 },
+        });
+        // Underscore smile capsule
+        kids.push({
+          type: 'rect',
+          width: mouthW * tileScale,
+          height: mouthH * tileScale,
+          radius: (mouthH / 2) * tileScale,
+          fill: '#48C7E8',
+          opacity: mouthIn * faceIn,
+          positioned: {
+            left: pMouth.x - (mouthW * tileScale) / 2,
+            top: pMouth.y - (mouthH * tileScale) / 2,
+          },
+        });
       }
     }
 
