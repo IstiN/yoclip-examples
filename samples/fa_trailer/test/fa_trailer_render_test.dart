@@ -117,7 +117,7 @@ void main() {
   // flatten. Scene id -> the frames the director reviews.
   final probes = <String, List<int>>{
     '01_dark': [10, 60, 150, 200],
-    '02_alive': [40, 170],
+    '02_alive': [40, 95, 170],
     '03_hardware': [40, 100, 170, 205],
     '04_core': [20, 70, 110, 160],
     '05_everywhere': [30, 90, 200],

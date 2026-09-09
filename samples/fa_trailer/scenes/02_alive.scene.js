@@ -52,6 +52,77 @@ scene = {
       positioned: { left: 0, top: 0 },
     });
 
+    // ---- Apple-grade Running Code Stream on the Background -----------------
+    // High-speed, syntax-highlighted agent code streaming upward behind the
+    // tile and typography, exactly like Apple's developer runtime cadence.
+    var codeLines = [
+      [['01  ', '#3A4456'], ['import ', '#8F6BFF'], ['"package:flutter_agent/flutter_agent.dart";', '#E2E8F0']],
+      [['02  ', '#3A4456'], ['@Observable final ', '#8F6BFF'], ['class ', '#8F6BFF'], ['FaEngine ', '#B8A5FF'], ['{', '#8090A0']],
+      [['03  ', '#3A4456'], ['  final ', '#8F6BFF'], ['sandbox = ', '#E2E8F0'], ['Cubes.mount', '#48C7E8'], ['(Workspace.root);', '#E2E8F0']],
+      [['04  ', '#3A4456'], ['  final ', '#8F6BFF'], ['session = ', '#E2E8F0'], ['await ', '#8F6BFF'], ['Fa.session', '#48C7E8'], ['(name: "trailer");', '#E2E8F0']],
+      [['05  ', '#3A4456'], ['  final ', '#8F6BFF'], ['memory = ', '#E2E8F0'], ['SessionMemory', '#B8A5FF'], ['(recall: "apple_cadence");', '#E2E8F0']],
+      [['06  ', '#3A4456'], ['  final ', '#8F6BFF'], ['tools = [', '#E2E8F0'], ['ShellTool', '#B8A5FF'], ['(), ', '#E2E8F0'], ['AstAnalyzer', '#B8A5FF'], ['()];', '#E2E8F0']],
+      [['07  ', '#3A4456'], ['  await ', '#8F6BFF'], ['session.stream', '#48C7E8'], ['(task: "render --preset youtube_1080");', '#E2E8F0']],
+      [['08  ', '#3A4456'], ['  final ', '#8F6BFF'], ['provider = ', '#E2E8F0'], ['MultiProvider', '#B8A5FF'], ['([Claude37Sonnet(), Gpt4o()]);', '#E2E8F0']],
+      [['09  ', '#3A4456'], ['  final ', '#8F6BFF'], ['frame = ', '#E2E8F0'], ['renderer.pump', '#48C7E8'], ['(frame: 40, fps: 30);', '#E2E8F0']],
+      [['10  ', '#3A4456'], ['  boundary.toImage', '#48C7E8'], ['(pixelRatio: 1.0);  // 120 fps pipeline', '#68788C']],
+      [['11  ', '#3A4456'], ['  audio.mixdown', '#48C7E8'], ['(tracks: [soundtrack, sfx], aacBitrate: 128000);', '#E2E8F0']],
+      [['12  ', '#3A4456'], ['  // it is alive: pure Dart core, 10 providers, session memory', '#506075']],
+      [['13  ', '#3A4456'], ['  final ', '#8F6BFF'], ['subagent = ', '#E2E8F0'], ['await ', '#8F6BFF'], ['session.delegate', '#48C7E8'], ['(agent: "explore");', '#E2E8F0']],
+      [['14  ', '#3A4456'], ['  subagent.observe', '#48C7E8'], ['(status: AgentStatus.alive, blink: true);', '#E2E8F0']],
+      [['15  ', '#3A4456'], ['  git.commit', '#48C7E8'], ['(scope: "fa_trailer", message: "it lives in your code");', '#E2E8F0']],
+      [['16  ', '#3A4456'], ['  storage.write', '#48C7E8'], ['(path: "output/trailer.mp4", bytes: encoded);', '#E2E8F0']],
+    ];
+
+    var ROW_H = 46;
+    var totalH = ROW_H * codeLines.length;
+    var scrollY = frame * 14;
+
+    var codeRows = [];
+    for (var ri = 0; ri < 28; ri++) {
+      var lData = codeLines[ri % codeLines.length];
+      var rowY = (ri * ROW_H - (scrollY % totalH));
+      if (rowY < -ROW_H) rowY += totalH * 2;
+      
+      var tokens = [];
+      for (var ti = 0; ti < lData.length; ti++) {
+        tokens.push({
+          type: 'text',
+          text: lData[ti][0],
+          style: {
+            color: lData[ti][1],
+            fontSize: 25,
+            fontFamily: 'monospace',
+            fontWeight: '500',
+          },
+        });
+      }
+      codeRows.push({
+        type: 'row',
+        positioned: { left: 140, top: rowY },
+        children: tokens,
+      });
+    }
+
+    // Code stream layer (subtle opacity 0.26, soft blur 1.5)
+    kids.push({
+      type: 'stack',
+      fit: 'expand',
+      opacity: 0.26 * (1 - fadeT),
+      blur: 1.5,
+      children: codeRows,
+    });
+
+    // Soft dark radial mask behind the hero tile to ensure maximum contrast
+    kids.push({
+      type: 'circle',
+      size: 960,
+      fill: '#05070D',
+      opacity: 0.72,
+      blur: 85,
+      positioned: { left: 960 - 480, top: sy - 480 },
+    });
+
     // ---- The Obsidian Tile at (960, sy) ------------------------------------
     var tl = brandToScreen(BRAND.tile.x, BRAND.tile.y);
     var tw_w = BRAND.tile.w * tileScale;
