@@ -1,0 +1,44 @@
+config:
+  duration: 1560
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#070a12'
+
+# Brand geometry and the trace()/gradient-strip helpers live in lib/brand.js.
+project_js: project.js
+
+# AI-generated footage placeholders (Grok). These PNGs are the START frames;
+# when the real clips land they become `type: video` assets with the same keys.
+external_assets:
+  ai_desk:
+    type: image
+    path: assets/ai/G1_desk.png
+  ai_swarm:
+    type: image
+    path: assets/ai/G3_swarm.png
+  ai_corridor:
+    type: image
+    path: assets/ai/G4_corridor.png
+
+scenes:
+  - scenes/01_dark.scene.js
+  - scenes/02_alive.scene.js
+  - scenes/03_hardware.scene.js
+  - scenes/04_core.scene.js
+  - scenes/05_everywhere.scene.js
+  - scenes/06_power.scene.js
+  - scenes/07_work.scene.js
+  - scenes/08_lockup.scene.js
+
+theme:
+  colors:
+    background: '#070a12'
+    blue: '#5B61F6'
+    blueBright: '#6E74FF'
+    blueDeep: '#4A5BF5'
+    teal: '#2EBD9E'
+    tealLight: '#48C7E8'
+    tealSpark: '#5CE8CF'
+    violet: '#8F6BFF'
+    violetBright: '#C9B8FF'
