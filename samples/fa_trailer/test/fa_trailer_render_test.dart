@@ -61,6 +61,7 @@ void main() {
 
     await load('monospace', 'Roboto-Regular.ttf');
     await load('Roboto', 'Roboto-Regular.ttf');
+    await load('sans-serif', 'Roboto-Regular.ttf');
     await load('RobotoCondensed', 'RobotoCondensed-Bold.ttf');
     await load('DINCondensed', '/System/Library/Fonts/Supplemental/DIN Condensed Bold.ttf');
     await load('Impact', '/System/Library/Fonts/Supplemental/Impact.ttf');
@@ -117,7 +118,7 @@ void main() {
   // flatten. Scene id -> the frames the director reviews.
   final probes = <String, List<int>>{
     '01_dark': [10, 60, 150, 200],
-    '02_alive': [40, 95, 170],
+    '02_alive': [25, 60, 105, 140],
     '03_hardware': [40, 100, 170, 205],
     '04_core': [20, 70, 110, 160],
     '05_everywhere': [30, 90, 200],

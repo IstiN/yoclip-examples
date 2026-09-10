@@ -1,22 +1,20 @@
-// 07 — Work — the fast montage: one image, two directions.
+// 07 — Work / Studio — The YoClip Timeline: SDK FIRST. YOCLIP INTEGRATED.
 //
-//   ·  0–75    the AI desk placeholder, Ken-Burns 1.08 → 1.18 (linear) with
-//              a slow upward drift; violet tint 0.06 on top; three terminal
-//              autofire rows type on staggered (the text is sliced per
-//              frame), monospace 30px teal with a two-layer glow
-//   ·  75–78   hard cut to black — the film breathes for 3 frames
-//   ·  78–150  the SAME desk runs BACKWARDS (1.18 → 1.08, drift rewound)
-//              under a darker scrim while three captions slam in every 15
-//              frames — scale 1.2 → 1.0 pops, Roboto 700 44px, centered
-//   ·  140–150 fade to #070a12 — out on black
+// Mirroring Apple Mac Studio M5 (3uAIqqg8ZHo) 22.8s–25.5s:
+//   ·   0–35   The headline slams in: `SDK FIRST.` / `YOCLIP INTEGRATED.`
+//   ·  25–150  The authentic multi-track YoClip Studio timeline materializes:
+//              - Video tracks with scene sequence blocks
+//              - Overlay tracks with AnimVideo / AnimImage
+//              - Audio soundtrack and SFX tracks with live waveforms
+//              - Neon violet playhead needle scrubs smoothly across the timeline
 
 scene = {
   id: '07_work',
   duration: 150,
   from: 1230,
   timeline: {
-    label: 'Work',
-    color: '#48C7E8',
+    label: 'Studio Timeline',
+    color: '#8F6BFF',
     lane: 'video',
   },
   render: function(frame) {
@@ -24,165 +22,387 @@ scene = {
     var C = yoclipTheme.colors;
 
     function tw(at, dur, from, to, easing) {
-      return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to,
-        easing);
+      return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
-    function hex2(a) {
-      var v = Math.round(Math.max(0, Math.min(1, a)) * 255);
-      var s = v.toString(16);
-      return (s.length < 2 ? '0' : '') + s;
-    }
-
-    // ---- The two halves ----------------------------------------------------
-    // First half: push in. Three black frames. Second half: the rewind.
-    var FLIP = 75;                    // the hard cut
-    var BACK = 78;                    // the desk returns, running backwards
-    var firstHalf = frame < FLIP;
-    var showDesk = firstHalf || frame >= BACK;
-
-    var kb1 = tw(0, FLIP, 0, 1, 'linear');   // push in 0–75
-    var kb2 = tw(BACK, 70, 0, 1, 'linear');  // rewind 78–148
-    var deskScale = firstHalf
-      ? lerp(1.08, 1.18, kb1)
-      : lerp(1.18, 1.08, kb2);
-    var deskDrift = firstHalf
-      ? lerp(0, -26, kb1)
-      : lerp(-26, 0, kb2);
-
-    var desk = {
-      type: 'image',
-      source: 'external:ai_desk',
-      fit: 'cover',
-      width: 1920,
-      height: 1080,
+    var silverGrad = {
+      type: 'linear',
+      begin: 'topCenter',
+      end: 'bottomCenter',
+      colors: ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+      stops: [0.0, 0.45, 1.0],
     };
 
-    // ---- The terminal autofire rows ----------------------------------------
-    // Typing = slicing the string per frame; a `_` rides the last typed
-    // character until the row completes. The rows sit lower-left, the way a
-    // real run log does, on a soft dark band so they read over the photo.
-    var ROWS = [
-      { text: 'fa run --goal "ship the release"', at: 6, dur: 34 },
-      { text: '▸ 12 tests passed', at: 30, dur: 14 },
-      { text: '▸ rewound 1 checkpoint', at: 44, dur: 16 },
-    ];
+    var purpleGrad = {
+      type: 'linear',
+      begin: 'topCenter',
+      end: 'bottomCenter',
+      colors: ['#E6C4FF', '#A368FF', '#6222D6'],
+      stops: [0.0, 0.45, 1.0],
+    };
 
-    var termRows = [];
-    for (var i = 0; i < ROWS.length; i++) {
-      var r = ROWS[i];
-      var t = tw(r.at, r.dur, 0, 1, 'linear');
-      if (t <= 0) continue;
-      var n = Math.floor(t * (r.text.length + 0.0001));
-      var shown = r.text.slice(0, n);
-      if (t < 1) shown += '_';
-      termRows.push({
-        type: 'text',
-        text: shown,
-        style: {
-          fontSize: 30,
-          color: C.tealLight,
-          fontFamily: 'monospace',
-          letterSpacing: 1,
-          textShadows: [
-            { color: '#' + hex2(0.55) + '48C7E8', blur: 14 },
-            { color: '#' + hex2(0.25) + '48C7E8', blur: 38 },
-          ],
-        },
-        positioned: { left: 130, top: 776 + i * 62 },
-      });
-    }
-
-    // ---- The caption slams (second half) — Apple rapid-fire style ---------
-    var SLAMS = [
-      { text: 'TEST.', fs: 340, at: 84, colors: ['#FFFFFF', '#ECECEF', '#A4A4AF'], blurCol: '#338F6BFF' },
-      { text: 'REFACTOR.', fs: 270, at: 104, colors: ['#D6F4FF', '#7BE8FF', '#2EBD9E'], blurCol: '#4448C7E8' },
-      { text: 'SHIP.', fs: 360, at: 124, colors: ['#E6C4FF', '#A368FF', '#6222D6'], blurCol: '#888F6BFF' },
-    ];
-    var capKids = [];
-    if (!firstHalf) {
-      for (var k = 0; k < SLAMS.length; k++) {
-        var s = SLAMS[k];
-        var sNext = (k < SLAMS.length - 1) ? SLAMS[k + 1].at : 144;
-        if (frame < s.at || frame >= sNext) continue;
-        var pop = tw(s.at, 6, 0, 1, 'easeOutExpo');
-        var op = tw(s.at, 4, 0, 1, 'easeOut');
-        var grad = {
-          begin: 'topCenter',
-          end: 'bottomCenter',
-          colors: s.colors,
-          stops: [0.0, 0.5, 1.0],
-        };
-        capKids.push({
-          type: 'text',
-          text: s.text,
-          width: 1920,
-          opacity: op,
-          scale: lerp(1.12, 1.0, pop),
-          style: {
-            fontSize: s.fs,
-            fontFamily: 'Impact',
-            fontWeight: '700',
-            textAlign: 'center',
-            gradient: grad,
-            textShadows: [{ color: s.blurCol, blur: 48 }],
-          },
-          positioned: { left: 0, top: 540 - s.fs / 2 },
-        });
-      }
-    }
-
-    // ---- Compose -----------------------------------------------------------
     var kids = [];
 
+    // Deep void
     kids.push({
-      type: 'rect', width: 1920, height: 1080, fill: C.background,
+      type: 'rect', width: 1920, height: 1080, fill: '#05070D',
       positioned: { left: 0, top: 0 },
     });
 
-    if (showDesk) {
-      // The Ken-Burns wrap: the image scales about screen center while the
-      // whole group drifts — push in forward, rewind backward.
-      kids.push({
-        type: 'stack',
-        fit: 'expand',
-        scale: deskScale,
-        offsetY: deskDrift,
-        children: [desk],
-      });
-
-      // The violet tint — the film's light on the placeholder footage.
-      kids.push({
-        type: 'rect', width: 1920, height: 1080, fill: C.violet,
-        opacity: 0.06,
-        positioned: { left: 0, top: 0 },
-      });
-    }
-
-    // First half: the dark band + the autofire rows.
-    if (firstHalf && termRows.length > 0) {
-      kids.push({
-        type: 'rect', width: 700, height: 218, radius: 12,
-        fill: C.background, opacity: 0.45,
-        positioned: { left: 96, top: 748 },
-      });
-      for (var tr = 0; tr < termRows.length; tr++) kids.push(termRows[tr]);
-    }
-
-    // Second half: a heavier scrim so the captions own the frame.
-    if (!firstHalf) {
-      kids.push({
-        type: 'rect', width: 1920, height: 1080, fill: C.background,
-        opacity: 0.5 * tw(BACK, 8, 0, 1, 'easeOut'),
-        positioned: { left: 0, top: 0 },
-      });
-      for (var ck = 0; ck < capKids.length; ck++) kids.push(capKids[ck]);
-    }
-
-    // Out on black: the last 10 frames go to #070a12.
+    // Ambient backlight
     kids.push({
-      type: 'rect', width: 1920, height: 1080, fill: C.background,
-      opacity: tw(140, 10, 0, 1, 'easeInOutCubic'),
+      type: 'circle',
+      size: 960,
+      fill: '#5B61F6',
+      opacity: 0.14,
+      blur: 120,
+      positioned: { left: 960 - 480, top: 600 - 480 },
+    });
+
+    // ---- Headline: SDK FIRST. / YOCLIP INTEGRATED. -------------------------
+    var headIn1 = tw(0, 30, 0, 1, 'easeOutExpo');
+    var headIn2 = tw(6, 30, 0, 1, 'easeOutExpo');
+    var fadeOut = tw(132, 18, 0, 1, 'easeInOutCubic');
+
+    kids.push({
+      type: 'text',
+      text: 'SDK FIRST.',
+      width: 1920,
+      opacity: headIn1 * (1 - fadeOut),
+      offsetY: 25 * (1 - headIn1),
+      style: {
+        fontSize: 140,
+        fontFamily: 'Impact',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        gradient: silverGrad,
+        letterSpacing: 2,
+        shadows: [{ color: '#8F6BFF', blur: 36, offset: { x: 0, y: 6 } }],
+      },
+      positioned: { left: 0, top: 35 },
+    });
+
+    kids.push({
+      type: 'text',
+      text: 'YOCLIP INTEGRATED.',
+      width: 1920,
+      opacity: headIn2 * (1 - fadeOut),
+      offsetY: 25 * (1 - headIn2),
+      style: {
+        fontSize: 74,
+        fontFamily: 'Impact',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        gradient: purpleGrad,
+        letterSpacing: 2,
+        shadows: [{ color: '#000000', blur: 24, offset: { x: 0, y: 8 } }],
+      },
+      positioned: { left: 0, top: 175 },
+    });
+
+    // ---- Multi-Track Studio Timeline ---------------------------------------
+    var timeIn = tw(24, 28, 0, 1, 'easeOutCubic');
+    if (timeIn > 0.01) {
+      var TL_X = 160;
+      var TL_W = 1600;
+      var TL_TOP = 290;
+
+      // Timeline background panel
+      kids.push({
+        type: 'rect',
+        width: TL_W,
+        height: 640,
+        radius: 18,
+        fill: '#0B101E',
+        stroke: '#24324F',
+        strokeWidth: 2,
+        opacity: timeIn * (1 - fadeOut),
+        positioned: { left: TL_X, top: TL_TOP },
+      });
+
+      // ---- Time Ruler (Top of Timeline) ------------------------------------
+      kids.push({
+        type: 'rect',
+        width: TL_W,
+        height: 44,
+        fill: '#10162A',
+        opacity: timeIn * (1 - fadeOut),
+        positioned: { left: TL_X, top: TL_TOP },
+      });
+
+      var RULER_STEPS = ['00:00', '00:05', '00:10', '00:15', '00:20', '00:25', '00:30', '00:35', '00:40', '00:45', '00:50'];
+      for (var r = 0; r < RULER_STEPS.length; r++) {
+        var rx = TL_X + 40 + r * (TL_W - 80) / (RULER_STEPS.length - 1);
+        kids.push({
+          type: 'rect',
+          width: 1.5,
+          height: 12,
+          fill: '#485672',
+          opacity: timeIn * (1 - fadeOut),
+          positioned: { left: rx, top: TL_TOP + 32 },
+        });
+        kids.push({
+          type: 'text',
+          text: RULER_STEPS[r],
+          opacity: timeIn * (1 - fadeOut),
+          style: {
+            fontSize: 12,
+            fontFamily: 'monospace',
+            color: '#6A7D9E',
+            fontWeight: '600',
+          },
+          positioned: { left: rx - 18, top: TL_TOP + 12 },
+        });
+      }
+
+      // ---- Track Lanes -----------------------------------------------------
+      var lanes = [
+        { name: 'VIDEO 1 · SCENES', top: TL_TOP + 60, h: 110 },
+        { name: 'VIDEO 2 · OVERLAYS', top: TL_TOP + 190, h: 90 },
+        { name: 'AUDIO 1 · SOUNDTRACK', top: TL_TOP + 300, h: 100 },
+        { name: 'AUDIO 2 · SFX STEMS', top: TL_TOP + 420, h: 90 },
+      ];
+
+      for (var l = 0; l < lanes.length; l++) {
+        var lane = lanes[l];
+        // Lane background
+        kids.push({
+          type: 'rect',
+          width: TL_W - 40,
+          height: lane.h,
+          radius: 10,
+          fill: '#080C16',
+          stroke: '#182236',
+          strokeWidth: 1,
+          opacity: timeIn * (1 - fadeOut),
+          positioned: { left: TL_X + 20, top: lane.top },
+        });
+        // Lane label
+        kids.push({
+          type: 'text',
+          text: lane.name,
+          opacity: 0.75 * timeIn * (1 - fadeOut),
+          style: {
+            fontSize: 11,
+            fontFamily: 'monospace',
+            color: '#506380',
+            fontWeight: '700',
+          },
+          positioned: { left: TL_X + 32, top: lane.top + 8 },
+        });
+      }
+
+      // ---- Lane 1: Video Scene Blocks --------------------------------------
+      var sceneClips = [
+        { name: '01_dark', dur: '7.0s', x: TL_X + 40, w: 230, col: '#1E2340', stroke: '#5B61F6' },
+        { name: '02_alive', dur: '6.0s', x: TL_X + 280, w: 210, col: '#2A1F48', stroke: '#8F6BFF' },
+        { name: '03_hardware', dur: '6.0s', x: TL_X + 500, w: 220, col: '#162C42', stroke: '#48C7E8' },
+        { name: '04_core', dur: '7.0s', x: TL_X + 730, w: 240, col: '#1C2038', stroke: '#6B7AFF' },
+        { name: '05_everywhere', dur: '8.0s', x: TL_X + 980, w: 270, col: '#142C38', stroke: '#2EBD9E' },
+        { name: '06_power', dur: '7.0s', x: TL_X + 1260, w: 240, col: '#2B1A42', stroke: '#A368FF' },
+      ];
+
+      for (var sc = 0; sc < sceneClips.length; sc++) {
+        var clip = sceneClips[sc];
+        kids.push({
+          type: 'rect',
+          width: clip.w,
+          height: 72,
+          radius: 8,
+          fill: clip.col,
+          stroke: clip.stroke,
+          strokeWidth: 1.5,
+          opacity: timeIn * (1 - fadeOut),
+          positioned: { left: clip.x, top: TL_TOP + 88 },
+        });
+        kids.push({
+          type: 'text',
+          text: clip.name,
+          opacity: timeIn * (1 - fadeOut),
+          style: {
+            fontSize: 13,
+            fontFamily: 'monospace',
+            color: '#FFFFFF',
+            fontWeight: '700',
+          },
+          positioned: { left: clip.x + 12, top: TL_TOP + 102 },
+        });
+        kids.push({
+          type: 'text',
+          text: clip.dur,
+          opacity: 0.7 * timeIn * (1 - fadeOut),
+          style: {
+            fontSize: 11,
+            fontFamily: 'monospace',
+            color: '#8A99B0',
+          },
+          positioned: { left: clip.x + 12, top: TL_TOP + 128 },
+        });
+      }
+
+      // ---- Lane 2: Video Overlay Blocks ------------------------------------
+      var overlayClips = [
+        { name: 'AnimVideo: laptop_open', x: TL_X + 180, w: 320, col: '#16223A', stroke: '#3A5078' },
+        { name: 'CodeStream_Rush', x: TL_X + 560, w: 420, col: '#241638', stroke: '#8F6BFF' },
+        { name: 'NodeGraph_Bezier', x: TL_X + 1040, w: 380, col: '#142832', stroke: '#2EBD9E' },
+      ];
+      for (var oc = 0; oc < overlayClips.length; oc++) {
+        var oclip = overlayClips[oc];
+        kids.push({
+          type: 'rect',
+          width: oclip.w,
+          height: 52,
+          radius: 6,
+          fill: oclip.col,
+          stroke: oclip.stroke,
+          strokeWidth: 1.2,
+          opacity: timeIn * (1 - fadeOut),
+          positioned: { left: oclip.x, top: TL_TOP + 218 },
+        });
+        kids.push({
+          type: 'text',
+          text: oclip.name,
+          opacity: timeIn * (1 - fadeOut),
+          style: {
+            fontSize: 12,
+            fontFamily: 'monospace',
+            color: '#D0DCF0',
+            fontWeight: '600',
+          },
+          positioned: { left: oclip.x + 12, top: TL_TOP + 234 },
+        });
+      }
+
+      // ---- Lane 3: Audio Soundtrack with Waveforms -------------------------
+      kids.push({
+        type: 'rect',
+        width: TL_W - 80,
+        height: 64,
+        radius: 8,
+        fill: '#241242',
+        stroke: '#8F6BFF',
+        strokeWidth: 1.5,
+        opacity: timeIn * (1 - fadeOut),
+        positioned: { left: TL_X + 40, top: TL_TOP + 326 },
+      });
+      kids.push({
+        type: 'text',
+        text: 'soundtrack.mp3 [44.1kHz · Stereo · AAC 128k]',
+        opacity: timeIn * (1 - fadeOut),
+        style: {
+          fontSize: 12,
+          fontFamily: 'monospace',
+          color: '#E6C4FF',
+          fontWeight: '700',
+        },
+        positioned: { left: TL_X + 54, top: TL_TOP + 334 },
+      });
+
+      // Waveform vertical bars across soundtrack
+      var WAVE_BARS = 75;
+      for (var wb = 0; wb < WAVE_BARS; wb++) {
+        var barX = TL_X + 54 + wb * 20;
+        var barH = 10 + 26 * Math.abs(Math.sin((wb * 0.28) + (frame * 0.05)));
+        kids.push({
+          type: 'rect',
+          width: 3.5,
+          height: barH,
+          radius: 1.5,
+          fill: '#A368FF',
+          opacity: 0.85 * timeIn * (1 - fadeOut),
+          positioned: { left: barX, top: TL_TOP + 376 - barH / 2 },
+        });
+      }
+
+      // ---- Lane 4: SFX Stems -----------------------------------------------
+      var sfxClips = [
+        { name: 'whoosh.wav', x: TL_X + 120, w: 160 },
+        { name: 'spark_wink.wav', x: TL_X + 420, w: 140 },
+        { name: 'chip_laser.wav', x: TL_X + 680, w: 190 },
+        { name: 'slam_bass.wav', x: TL_X + 980, w: 150 },
+        { name: 'pulse_wire.wav', x: TL_X + 1240, w: 180 },
+      ];
+      for (var sf = 0; sf < sfxClips.length; sf++) {
+        var sclip = sfxClips[sf];
+        kids.push({
+          type: 'rect',
+          width: sclip.w,
+          height: 52,
+          radius: 6,
+          fill: '#102430',
+          stroke: '#48C7E8',
+          strokeWidth: 1.2,
+          opacity: timeIn * (1 - fadeOut),
+          positioned: { left: sclip.x, top: TL_TOP + 448 },
+        });
+        kids.push({
+          type: 'text',
+          text: sclip.name,
+          opacity: timeIn * (1 - fadeOut),
+          style: {
+            fontSize: 11,
+            fontFamily: 'monospace',
+            color: '#48C7E8',
+            fontWeight: '600',
+          },
+          positioned: { left: sclip.x + 10, top: TL_TOP + 466 },
+        });
+      }
+
+      // ---- Scrubbing Playhead Needle ---------------------------------------
+      // Scrubs smoothly across the timeline from left to right as frame advances
+      var playheadT = Math.min(1.0, frame / 150);
+      var playheadX = TL_X + 40 + playheadT * (TL_W - 80);
+
+      // Playhead vertical needle glow
+      kids.push({
+        type: 'rect',
+        width: 10,
+        height: 610,
+        fill: '#8F6BFF',
+        opacity: 0.35 * timeIn * (1 - fadeOut),
+        blur: 8,
+        positioned: { left: playheadX - 5, top: TL_TOP + 20 },
+      });
+
+      // Playhead crisp core line
+      kids.push({
+        type: 'rect',
+        width: 2.5,
+        height: 610,
+        fill: '#FFFFFF',
+        opacity: 0.95 * timeIn * (1 - fadeOut),
+        positioned: { left: playheadX - 1.2, top: TL_TOP + 20 },
+      });
+
+      // Playhead marker badge on top
+      kids.push({
+        type: 'rect',
+        width: 32,
+        height: 22,
+        radius: 4,
+        fill: '#8F6BFF',
+        opacity: timeIn * (1 - fadeOut),
+        positioned: { left: playheadX - 16, top: TL_TOP + 4 },
+      });
+      kids.push({
+        type: 'text',
+        text: 'F' + (frame < 10 ? '0' : '') + frame,
+        opacity: timeIn * (1 - fadeOut),
+        style: {
+          fontSize: 10,
+          fontFamily: 'monospace',
+          color: '#FFFFFF',
+          fontWeight: '700',
+        },
+        positioned: { left: playheadX - 13, top: TL_TOP + 8 },
+      });
+    }
+
+    // Outer subtle vignette
+    kids.push({
+      type: 'rect', width: 1920, height: 1080, fill: '#000000',
+      opacity: 0.28,
       positioned: { left: 0, top: 0 },
     });
 
