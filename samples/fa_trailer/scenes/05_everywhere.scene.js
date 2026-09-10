@@ -237,37 +237,65 @@ scene = {
         positioned: { left: mx + 26, top: modY + 40 },
       });
 
-      // Data conduits streaming from module down to Fa Core
+      // Vertical line dropping from module down to horizontal bus rail
       var conduitStartX = mx + modW / 2;
       var conduitStartY = modY + modH;
+      var busRailY = 295;
       var coreTopY = 325;
-      var coreCenterX = 960;
 
       var streamP = tw(25 + mi * 4, 25, 0, 1, 'easeOut');
       if (streamP > 0.01) {
-        // Vertical bus line
         kids.push({
           type: 'rect',
           width: 2,
-          height: (coreTopY - conduitStartY) * streamP,
+          height: (busRailY - conduitStartY) * streamP,
           fill: '#24324F',
-          opacity: 0.6,
+          opacity: 0.75,
           positioned: { left: conduitStartX - 1, top: conduitStartY },
         });
-
-        // Pulsing data packet
-        var packetT = ((frame * 0.06 + mi * 0.25) % 1.0);
-        var packetY = lerp(conduitStartY, coreTopY, packetT);
-        var packetX = lerp(conduitStartX, coreCenterX, packetT * 0.7);
-        kids.push({
-          type: 'circle',
-          size: 6,
-          fill: mod.icon,
-          opacity: clamp01(0.85 * topModulesIn),
-          blur: 2,
-          positioned: { left: packetX - 3, top: packetY - 3 },
-        });
       }
+    }
+
+    // Horizontal circuit bus rail connecting all modules to Fa Core
+    var busRailY = 295;
+    var coreTopY = 325;
+    var firstModX = startModX + modW / 2;
+    var lastModX = startModX + 3 * (modW + modSpacing) + modW / 2;
+
+    kids.push({
+      type: 'rect',
+      width: (lastModX - firstModX) * topModulesIn,
+      height: 2,
+      radius: 1,
+      fill: '#24324F',
+      opacity: clamp01(topModulesIn * 0.8),
+      positioned: { left: firstModX, top: busRailY },
+    });
+
+    // 4 feeder drops from bus rail into top hardware pins of Fa Core
+    var coreTopPinsX = [900, 940, 980, 1020];
+    for (var cti = 0; cti < coreTopPinsX.length; cti++) {
+      var pinX = coreTopPinsX[cti];
+      kids.push({
+        type: 'rect',
+        width: 2,
+        height: coreTopY - busRailY,
+        fill: '#3B4F76',
+        opacity: clamp01(topModulesIn * 0.85),
+        positioned: { left: pinX - 1, top: busRailY },
+      });
+
+      // Pulsing data packet flowing into core
+      var packetT = ((frame * 0.06 + cti * 0.25) % 1.0);
+      var pPacketY = lerp(busRailY, coreTopY, packetT);
+      kids.push({
+        type: 'circle',
+        size: 6,
+        fill: '#48C7E8',
+        opacity: clamp01(0.85 * topModulesIn),
+        blur: 2,
+        positioned: { left: pinX - 3, top: pPacketY - 3 },
+      });
     }
 
     // ------------------------------------------------------------------------
@@ -560,66 +588,67 @@ scene = {
         },
       });
 
-      // EMBEDDED BADGE: "Fa inside" chip (The iconic Intel-inside style badge with real Fa mark!)
+      // EMBEDDED BADGE: "Fa inside" chip (Generous padding, crisp pixel layout!)
       if (hasInjected) {
         var badgeT = clamp01(Math.min(1.0, (frame - landFrame) / 5));
-        var badgeW = 92;
-        var badgeH = 24;
+        var badgeW = 98;
+        var badgeH = 26;
         var badgeX = targetX + (cardW - badgeW) / 2;
-        var badgeY = currentCardY + 86;
+        var badgeY = currentCardY + 85;
 
         // Badge chip background
         kids.push({
           type: 'rect',
           width: badgeW,
           height: badgeH,
-          radius: 12,
+          radius: 13,
           fill: '#080E1C',
-          border: { color: '#48C7E8', width: 1.5 },
+          border: { color: '#00F0FF', width: 1.5 },
           opacity: clamp01(0.95 * badgeT),
           positioned: { left: badgeX, top: badgeY },
         });
 
-        // "Fa" in brand blue & teal, followed by "inside"
+        // F in brand blue
         kids.push({
-          type: 'row',
-          mainAxisAlignment: 'center',
-          crossAxisAlignment: 'center',
+          type: 'text',
+          text: 'F',
           opacity: badgeT,
-          children: [
-            {
-              type: 'text',
-              text: 'F',
-              style: {
-                fontSize: 13,
-                fontFamily: 'Impact',
-                fontWeight: '900',
-                color: '#5B61F6',
-              },
-            },
-            {
-              type: 'text',
-              text: 'a',
-              style: {
-                fontSize: 13,
-                fontFamily: 'Impact',
-                fontWeight: '900',
-                color: '#2EBD9E',
-              },
-            },
-            {
-              type: 'text',
-              text: ' inside',
-              style: {
-                fontSize: 10,
-                fontFamily: 'monospace',
-                fontWeight: '800',
-                color: '#FFFFFF',
-                letterSpacing: 0.5,
-              },
-            },
-          ],
-          positioned: { left: badgeX, top: badgeY + 4, width: badgeW },
+          style: {
+            fontSize: 14,
+            fontFamily: 'Impact',
+            fontWeight: '900',
+            color: '#5B61F6',
+          },
+          positioned: { left: badgeX + 12, top: badgeY + 4 },
+        });
+
+        // a in brand teal
+        kids.push({
+          type: 'text',
+          text: 'a',
+          opacity: badgeT,
+          style: {
+            fontSize: 14,
+            fontFamily: 'Impact',
+            fontWeight: '900',
+            color: '#2EBD9E',
+          },
+          positioned: { left: badgeX + 22, top: badgeY + 4 },
+        });
+
+        // inside in bold monospace with comfortable spacing
+        kids.push({
+          type: 'text',
+          text: 'inside',
+          opacity: badgeT,
+          style: {
+            fontSize: 11,
+            fontFamily: 'monospace',
+            fontWeight: '800',
+            color: '#FFFFFF',
+            letterSpacing: 0.5,
+          },
+          positioned: { left: badgeX + 38, top: badgeY + 6 },
         });
       }
 

@@ -23,7 +23,7 @@ project = {
     { path: 'scenes/01_dark.scene.js', layer: 'content', start: 0 },
     { path: 'scenes/02_alive.scene.js', layer: 'content', start: 210 },
     { path: 'scenes/03_hardware.scene.js', layer: 'content', start: 390 },
-    { path: 'scenes/04_core.scene.js', layer: 'content', start: 600 },
+    { path: 'scenes/04_core.scene.js', layer: 'content', start: 615 },
     { path: 'scenes/05_everywhere.scene.js', layer: 'content', start: 780 },
     { path: 'scenes/06_power.scene.js', layer: 'content', start: 1020 },
     { path: 'scenes/07_work.scene.js', layer: 'content', start: 1230 },

@@ -12,7 +12,7 @@
 
 scene = {
   id: '03_hardware',
-  duration: 210,
+  duration: 225,
   from: 390,
   timeline: {
     label: 'Hardware',
@@ -244,7 +244,33 @@ scene = {
       }
     }
 
-    // ---- 150–210: Apple-grade architectural spec callout below the chip ----
+    // ---- 176–225: "MEET" revealed above the chip as Fa is drawn ----------
+    var meetIn = tw(176, 26, 0, 1, 'easeOutExpo');
+    if (meetIn > 0.003) {
+      kids.push({
+        type: 'text',
+        text: 'MEET',
+        width: 1920,
+        opacity: meetIn,
+        offsetY: 15 * (1 - meetIn),
+        style: {
+          fontSize: 72,
+          fontFamily: 'Impact',
+          color: '#FFFFFF',
+          letterSpacing: 6,
+          textAlign: 'center',
+          gradient: {
+            begin: 'topCenter',
+            end: 'bottomCenter',
+            colors: ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+            stops: [0.0, 0.45, 1.0],
+          },
+        },
+        positioned: { left: 0, top: 65 },
+      });
+    }
+
+    // ---- 150–225: Apple-grade architectural spec callout below the chip ----
     var typeIn = tw(150, 42, 0, 1, 'easeOutExpo');
     if (typeIn > 0.003) {
       kids.push({
@@ -259,7 +285,6 @@ scene = {
           fontFamily: 'Impact',
           letterSpacing: 4,
           textAlign: 'center',
-          textShadows: [{ color: '#44000000', blur: 16 }],
         },
         positioned: { left: 0, top: 690 },
       });
@@ -282,7 +307,6 @@ scene = {
             colors: ['#FFFFFF', '#D0A8FF', '#8F6BFF'],
             stops: [0.0, 0.5, 1.0],
           },
-          textShadows: [{ color: '#668F6BFF', blur: 48 }],
         },
         positioned: { left: 0, top: 745 },
       });

@@ -202,58 +202,64 @@ scene = {
     });
 
     // Mini Fa inside badge on left
+    var chipX = blockX + 10;
+    var chipY = blockY + 9;
     kids.push({
       type: 'rect',
       width: 104,
       height: 28,
       radius: 14,
       fill: '#0D172A',
-      border: { color: '#48C7E8', width: 1.2 },
+      border: { color: '#00F0FF', width: 1.2 },
       opacity: clamp01(insideIn),
       offsetY: 14 * (1 - insideIn),
-      positioned: { left: blockX + 10, top: blockY + 9 },
+      positioned: { left: chipX, top: chipY },
     });
 
+    // F in brand blue
     kids.push({
-      type: 'row',
-      mainAxisAlignment: 'center',
-      crossAxisAlignment: 'center',
+      type: 'text',
+      text: 'F',
       opacity: clamp01(insideIn),
       offsetY: 14 * (1 - insideIn),
-      children: [
-        {
-          type: 'text',
-          text: 'F',
-          style: {
-            fontSize: 14,
-            fontFamily: 'Impact',
-            fontWeight: '900',
-            color: '#5B61F6',
-          },
-        },
-        {
-          type: 'text',
-          text: 'a',
-          style: {
-            fontSize: 14,
-            fontFamily: 'Impact',
-            fontWeight: '900',
-            color: '#2EBD9E',
-          },
-        },
-        {
-          type: 'text',
-          text: ' inside',
-          style: {
-            fontSize: 11,
-            fontFamily: 'monospace',
-            fontWeight: '800',
-            color: '#FFFFFF',
-            letterSpacing: 0.5,
-          },
-        },
-      ],
-      positioned: { left: blockX + 10, top: blockY + 13, width: 104 },
+      style: {
+        fontSize: 14,
+        fontFamily: 'Impact',
+        fontWeight: '900',
+        color: '#5B61F6',
+      },
+      positioned: { left: chipX + 13, top: chipY + 5 },
+    });
+
+    // a in brand teal
+    kids.push({
+      type: 'text',
+      text: 'a',
+      opacity: clamp01(insideIn),
+      offsetY: 14 * (1 - insideIn),
+      style: {
+        fontSize: 14,
+        fontFamily: 'Impact',
+        fontWeight: '900',
+        color: '#2EBD9E',
+      },
+      positioned: { left: chipX + 23, top: chipY + 5 },
+    });
+
+    // inside in bold monospace
+    kids.push({
+      type: 'text',
+      text: 'inside',
+      opacity: clamp01(insideIn),
+      offsetY: 14 * (1 - insideIn),
+      style: {
+        fontSize: 11,
+        fontFamily: 'monospace',
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.5,
+      },
+      positioned: { left: chipX + 39, top: chipY + 7 },
     });
 
     // Platforms label

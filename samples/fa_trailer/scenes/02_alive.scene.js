@@ -524,6 +524,72 @@ scene = {
           ],
         ],
       },
+
+      // === BLOCK 11: BOTTOM-LEFT BLOCK (Autonomous Orchestrator) ===
+      {
+        id: 'bottom_left',
+        x: 140, y: 780, z: 460,
+        lines: [
+          [
+            ['final ', '#E056FD'],
+            ['job = await fa.', '#FFFFFF'],
+            ['dispatch', '#5B61F6'],
+            ['({', '#FFFFFF'],
+          ],
+          [
+            ['    goal: ', '#8A99B2'],
+            ['"Build 120 FPS pipeline, verify zero regressions"', '#48C7E8'],
+            [',', '#FFFFFF'],
+          ],
+          [
+            ['    workers: [', '#FFFFFF'],
+            ['Coder', '#5B61F6'],
+            [', ', '#FFFFFF'],
+            ['Reviewer', '#E056FD'],
+            [', ', '#FFFFFF'],
+            ['Tester', '#2EBD9E'],
+            ['],', '#FFFFFF'],
+          ],
+          [
+            ['    cube: ', '#8A99B2'],
+            ['CubePresets.', '#5B61F6'],
+            ['l2Full', '#48C7E8'],
+            [',', '#FFFFFF'],
+          ],
+          [
+            ['});', '#FFFFFF'],
+          ],
+          [
+            ['// hermetic AST validation · parallel dispatch', '#2EBD9E'],
+          ],
+        ],
+      },
+
+      // === BLOCK 12: BOTTOM-RIGHT BLOCK (Persistent Git Memory) ===
+      {
+        id: 'bottom_right',
+        x: 1160, y: 790, z: 520,
+        lines: [
+          [
+            ['final ', '#E056FD'],
+            ['memory = await ', '#FFFFFF'],
+            ['GitMemory.', '#5B61F6'],
+            ['sync', '#48C7E8'],
+            ['("knowledge/durable");', '#FFFFFF'],
+          ],
+          [
+            ['memory.', '#FFFFFF'],
+            ['supersede', '#5B61F6'],
+            ['(staleFact, withFact: ', '#FFFFFF'],
+            ['"Fa runs natively"', '#48C7E8'],
+            [');', '#FFFFFF'],
+          ],
+          [
+            ['expect(memory.verified, isTrue); ', '#2EBD9E'],
+            ['// zero hallucinations', '#2EBD9E'],
+          ],
+        ],
+      },
     ];
 
     // Wink timing on Hero Block: frames 98–118
@@ -655,24 +721,25 @@ scene = {
         });
 
         if (winkT > 0.5) {
-          // Specular star / spark on right winking eye
-          var sparkX = px + 158;
-          var sparkY = py + 115;
+          // Specular star / spark on right winking eye '-' in `( > _ - )`
+          // Exactly aligned over the winking eye '-' glyph on Line 4
+          var sparkX = px + 176;
+          var sparkY = py + 124;
           kids.push({
             type: 'circle',
-            size: 34,
+            size: 26,
             fill: '#FFFFFF',
             opacity: 0.95 * winkT,
-            blur: 5,
-            positioned: { left: sparkX - 17, top: sparkY - 17 },
+            blur: 4,
+            positioned: { left: sparkX - 13, top: sparkY - 13 },
           });
           kids.push({
             type: 'circle',
-            size: 60,
-            fill: '#00F0FF',
-            opacity: 0.75 * winkT,
-            blur: 16,
-            positioned: { left: sparkX - 30, top: sparkY - 30 },
+            size: 48,
+            fill: '#48C7E8',
+            opacity: 0.70 * winkT,
+            blur: 14,
+            positioned: { left: sparkX - 24, top: sparkY - 24 },
           });
         }
       }
@@ -681,12 +748,12 @@ scene = {
     // ------------------------------------------------------------------------
     // 6. Floating Optical Bokeh Spheres (Floating in Front of Camera)
     // ------------------------------------------------------------------------
+    // Placed strictly along peripheral edges to avoid obscuring center code
     var bokehDots = [
-      { x: 300, y: 220, size: 28, col: '#FF2A85', op: 0.35 },
-      { x: 880, y: 440, size: 44, col: '#00F0FF', op: 0.30 },
-      { x: 1400, y: 280, size: 36, col: '#A855F7', op: 0.28 },
-      { x: 1600, y: 720, size: 50, col: '#00F0FF', op: 0.25 },
-      { x: 420, y: 800, size: 32, col: '#FF2A85', op: 0.32 },
+      { x: 260, y: 220, size: 28, col: '#E056FD', op: 0.28 },
+      { x: 1460, y: 260, size: 36, col: '#5B61F6', op: 0.24 },
+      { x: 1680, y: 720, size: 46, col: '#48C7E8', op: 0.22 },
+      { x: 380, y: 880, size: 32, col: '#E056FD', op: 0.26 },
     ];
 
     for (var bi = 0; bi < bokehDots.length; bi++) {

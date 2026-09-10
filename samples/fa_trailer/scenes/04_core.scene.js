@@ -15,8 +15,8 @@
 
 scene = {
   id: '04_core',
-  duration: 180,
-  from: 600,
+  duration: 165,
+  from: 615,
   timeline: {
     label: 'Core',
     color: '#8F6BFF',
@@ -69,9 +69,9 @@ scene = {
       },
     ];
 
-    var BEAT_LEN = 45;
-    var IN = 7;
-    var OUT = 5;
+    var BEAT_LEN = 41.25;
+    var IN = 6;
+    var OUT = 4;
 
     var bi = Math.min(BEATS.length - 1, Math.floor(frame / BEAT_LEN));
     var beat = BEATS[bi];
@@ -119,9 +119,6 @@ scene = {
           letterSpacing: 0,
           textAlign: 'center',
           gradient: gradient,
-          textShadows: isAccent
-            ? [{ color: '#888F6BFF', blur: 64 }]
-            : [{ color: '#338F6BFF', blur: 32 }, { color: '#44000000', blur: 16 }],
         },
         positioned: { left: 0, top: top },
       };
