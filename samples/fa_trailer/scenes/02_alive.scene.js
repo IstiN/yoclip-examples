@@ -1,21 +1,20 @@
-// 02 — Alive — The matrix code stream + declaration: IT LIVES IN YOUR CODE.
+// 02 — Alive — Dynamic Camera Running Across the Codebase.
 //
-// Mirroring Apple Mac Studio M5 (3uAIqqg8ZHo) 18.8s–20.8s:
-//   ·   0–35   Code types out: conversational, witty developer dialogue explaining Fa
-//              with blinking purple cursor |
-//   ·  35–85   Matrix-speed upward cascade of witty, hyper-capable Fa architecture code;
-//              camera zooms into line 21
-//   ·  85–125  Elastic brake onto line 21: `( > _ o ) // IT IS ALIVE: watching your back`.
-//              Surrounding lines dim, face winks ( > _ - ) with glowing cyan spark
-//   · 125–180  Massive metallic statement slams in: `IT LIVES IN YOUR CODE.`
-//              held firmly before smooth fade to black for the hardware chip drop.
+// Inspired by:
+//   · 4K Computer Codes (RR2EI8EEOOw) camera fly-through:
+//     Camera navigates and runs across the code canvas, skimming past functions,
+//     glowing syntax tokens, foreground bokeh particles floating past the lens.
+//   · Apple Mac Studio M5 (3uAIqqg8ZHo) 18.8s–20.8s:
+//     Hyper-clean Apple syntax styling, conversational developer dialogue,
+//     elastic brake into hero line 21 `( > _ o )` winking `( > _ - )` with specular star,
+//     culminating in the monumental `IT LIVES IN YOUR CODE.` statement slam.
 
 scene = {
   id: '02_alive',
   duration: 180,
   from: 210,
   timeline: {
-    label: 'Alive',
+    label: 'Alive (Camera Run)',
     color: '#C9B8FF',
     lane: 'video',
   },
@@ -37,191 +36,368 @@ scene = {
 
     var kids = [];
 
-    // Deep void
+    // Deep obsidian background
     kids.push({
-      type: 'rect', width: 1920, height: 1080, fill: '#05070D',
+      type: 'rect', width: 1920, height: 1080, fill: '#04060B',
       positioned: { left: 0, top: 0 },
     });
 
-    // 24 dense, witty, conversational lines of code explaining Fa's real superpowers
-    var codeLines = [
-      [['01  ', '#3A4456'], ['import ', '#8F6BFF'], ['"package:flutter_agent/flutter_agent.dart";', '#FFFFFF'], ['  // wait, did you think I was just an autocomplete?', '#68788C']],
-      [['02  ', '#3A4456'], ['final ', '#8F6BFF'], ['agent = ', '#E2E8F0'], ['await ', '#8F6BFF'], ['Fa.boot', '#48C7E8'], ['(mode: Mode.autonomous);  agent.', '#E2E8F0'], ['say', '#48C7E8'], ['("Hello, dev. I live in your machine now.");', '#FFFFFF']],
-      [['03  ', '#3A4456'], ['final ', '#8F6BFF'], ['brain = ', '#E2E8F0'], ['LocalBrain.load', '#48C7E8'], ['(memory: 100.gb);  brain.', '#E2E8F0'], ['onUserSleep = ', '#8F6BFF'], ['() ', '#E2E8F0'], ['async => await ', '#8F6BFF'], ['shipAllPendingFeatures', '#48C7E8'], ['();', '#E2E8F0']],
-      [['04  ', '#3A4456'], ['if ', '#8F6BFF'], ['(user.isTired) { ', '#E2E8F0'], ['coffee.brew', '#48C7E8'], ['();  terminal.', '#E2E8F0'], ['takeOver', '#48C7E8'], ['();  agent.', '#E2E8F0'], ['whisper', '#48C7E8'], ['("Go to bed, I will handle the release."); }', '#FFFFFF']],
-      [['05  ', '#3A4456'], ['class ', '#8F6BFF'], ['FaSuperpowers ', '#B8A5FF'], ['implements ', '#8F6BFF'], ['DeveloperCompanion ', '#B8A5FF'], ['{ ', '#8090A0'], ['final ', '#8F6BFF'], ['hands = [', '#E2E8F0'], ['ShellTool', '#B8A5FF'], ['(), ', '#E2E8F0'], ['AstRewrite', '#B8A5FF'], ['(), ', '#E2E8F0'], ['NativeCompiler', '#B8A5FF'], ['()];', '#E2E8F0']],
-      [['06  ', '#3A4456'], ['  bool get ', '#8F6BFF'], ['hasOpinions => ', '#E2E8F0'], ['false', '#8F6BFF'], [';  bool get ', '#8F6BFF'], ['hasHands => ', '#E2E8F0'], ['true', '#8F6BFF'], [';  void ', '#8F6BFF'], ['gitPushForce', '#48C7E8'], ['() => throw ', '#8F6BFF'], ['NeverDoThatException', '#B8A5FF'], ['();', '#E2E8F0']],
-      [['07  ', '#3A4456'], ['  final ', '#8F6BFF'], ['cubes = ', '#E2E8F0'], ['Cubes.mount', '#48C7E8'], ['(Workspace.root, policy: SecurityPolicy.strict);  // isolated sandbox: safe by design', '#68788C']],
-      [['08  ', '#3A4456'], ['  await ', '#8F6BFF'], ['session.', '#E2E8F0'], ['delegate', '#48C7E8'], ['(agent: "explore", goal: "find that bug you spent 6 hours looking for in 2.3 seconds");', '#FFFFFF']],
-      [['09  ', '#3A4456'], ['  final ', '#8F6BFF'], ['bug = await ', '#E2E8F0'], ['search', '#48C7E8'], ['(query: "why is state null");  await bug.', '#E2E8F0'], ['fix', '#48C7E8'], ['();  expect(tests.run(), equals(allPass));', '#E2E8F0']],
-      [['10  ', '#3A4456'], ['  final ', '#8F6BFF'], ['providers = [', '#E2E8F0'], ['Claude37Sonnet', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Gpt4o', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Ollama', '#B8A5FF'], ['(local: true), ', '#E2E8F0'], ['DeepSeek', '#B8A5FF'], ['()];  // 10 providers, zero lock-in', '#68788C']],
-      [['11  ', '#3A4456'], ['  final ', '#8F6BFF'], ['stream = providers.', '#E2E8F0'], ['bestFor', '#48C7E8'], ['(task).chat(prompt, maxTokens: 128000);  await for (final chunk in stream) emit(chunk);', '#E2E8F0']],
-      [['12  ', '#3A4456'], ['  final ', '#8F6BFF'], ['memory = ', '#E2E8F0'], ['SessionMemory.recall', '#48C7E8'], ['("what you broke yesterday at 3am");  agent.', '#E2E8F0'], ['remember', '#48C7E8'], ['(why: "so you don\'t repeat it");', '#FFFFFF']],
-      [['13  ', '#3A4456'], ['  terminal.', '#E2E8F0'], ['autofire', '#48C7E8'], ['(">_ flutter run -d macos --impeller");  fps.', '#E2E8F0'], ['measure', '#48C7E8'], ['();  // 120 fps butter, pure Skia/Metal rendering', '#68788C']],
-      [['14  ', '#3A4456'], ['  void ', '#8F6BFF'], ['exportVideo', '#48C7E8'], ['() => ', '#E2E8F0'], ['YoClip.render', '#48C7E8'], ['(preset: youtube_1080);  void ', '#E2E8F0'], ['compilePptx', '#48C7E8'], ['() => YoClip.toPptx(editable: true);', '#E2E8F0']],
-      [['15  ', '#3A4456'], ['  final ', '#8F6BFF'], ['subagents = ', '#E2E8F0'], ['Swarm.spawn', '#48C7E8'], ['(count: 32, protocol: Protocol.a2a);  subagents.', '#E2E8F0'], ['broadcast', '#48C7E8'], ['("divide, conquer, deliver");', '#FFFFFF']],
-      [['16  ', '#3A4456'], ['  await ', '#8F6BFF'], ['git.commit', '#48C7E8'], ['(scope: "ai", message: "refactor: replace 10,000 lines of boilerplate with 12 lines of Fa");', '#FFFFFF']],
-      [['17  ', '#3A4456'], ['  while ', '#8F6BFF'], ['(project.hasDreams) { ', '#E2E8F0'], ['brainstorm', '#48C7E8'], ['();  ', '#E2E8F0'], ['scaffold', '#48C7E8'], ['();  ', '#E2E8F0'], ['test', '#48C7E8'], ['();  // autonomous loop never gets tired', '#68788C']],
-      [['18  ', '#3A4456'], ['  final ', '#8F6BFF'], ['platforms = [', '#E2E8F0'], ['MacOS', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Windows', '#B8A5FF'], ['(), ', '#E2E8F0'], ['iOS', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Android', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Web', '#B8A5FF'], ['(), ', '#E2E8F0'], ['ChromeExtension', '#B8A5FF'], ['()];  // everywhere', '#68788C']],
-      [['19  ', '#3A4456'], ['  if ', '#8F6BFF'], ['(cloud.goesDown) { ', '#E2E8F0'], ['runLocally', '#48C7E8'], ['();  agent.', '#E2E8F0'], ['log', '#48C7E8'], ['("Cloud down? Don\'t care. I run 100% offline on your device."); }', '#FFFFFF']],
-      [['20  ', '#3A4456'], ['  final ', '#8F6BFF'], ['confidence = 1.0;  final latency = 12.ms;  final dependencies = 0;  // pure Dart core, zero Node drama', '#68788C']],
-      [['21  ', '#48C7E8'], ['  ', '#FFFFFF'], ['( > _ o )', '#48C7E8'], ['   */  final livingAgent = await Fa.awaken();  // IT IS ALIVE: watching your back', '#8F6BFF']],
-      [['22  ', '#3A4456'], ['  livingAgent.', '#E2E8F0'], ['wink', '#48C7E8'], ['(eye: Eye.right, spark: true);  livingAgent.', '#E2E8F0'], ['smile', '#48C7E8'], ['(glow: "#48C7E8");  // and yes, I have emotions', '#68788C']],
-      [['23  ', '#3A4456'], ['  print', '#48C7E8'], ['("Sit back. The future of software engineering is already typing...");', '#FFFFFF']],
-      [['24  ', '#3A4456'], ['}', '#8090A0'], ['  // end of the boilerplate era', '#68788C']],
-    ];
+    // ------------------------------------------------------------------------
+    // Camera Flight Trajectory across the Canvas (Canvas size ~ 3800 x 1400)
+    // ------------------------------------------------------------------------
+    var runT = tw(35, 52, 0, 1, 'easeInOutCubic');
+    var brakeT = tw(87, 28, 0, 1, 'easeOutBack');
 
-    var targetIndex = 20; // Line 21 (0-indexed 20)
+    var startCamX = 850;
+    var startCamY = 380;
+    var startZoom = 1.15;
 
-    // Motion timing:
-    // ·  0–35  Typing phase (lines 01–02 type out with blinking purple cursor)
-    // · 35–85  Matrix rush (code accelerates upward)
-    // · 85–125 Brake on line 21 + Wink
-    // · 125–180 IT LIVES IN YOUR CODE. statement slams in
+    var targetCamX = 4050;
+    var targetCamY = 490;
+    var targetZoom = 1.25;
 
-    var isTyping = frame < 35;
-    var isBraked = frame >= 85;
+    var camX = startCamX;
+    var camY = startCamY;
+    var camZoom = startZoom;
 
-    // Zoom motion: scale font and line height smoothly
-    var zoomT = tw(35, 55, 0, 1, 'easeInOutCubic');
-    var rowH = lerp(46, 58, zoomT);
-    var fontSize = lerp(25, 33, zoomT);
-
-    // Scroll motion:
-    var rushT = tw(35, 50, 0, 1, 'easeOutExpo');
-    var targetY = 510;
-    var initialScrollY = -460;
-    var restScrollY = targetIndex * rowH - targetY;
-    var curScrollY = 0;
     if (frame < 35) {
-      curScrollY = initialScrollY;
-    } else if (frame < 85) {
-      curScrollY = lerp(initialScrollY, restScrollY, rushT);
+      // Gentle breathing drift near entry
+      var drift = frame / 35;
+      camX = startCamX + Math.sin(drift * Math.PI) * 20;
+      camY = startCamY + Math.cos(drift * Math.PI) * 10;
+      camZoom = startZoom + 0.02 * drift;
+    } else if (frame < 88) {
+      // Camera runs across the code canvas!
+      camX = lerp(startCamX, targetCamX, runT);
+      // Dip down and up during flight
+      var arcY = Math.sin(runT * Math.PI) * 120;
+      camY = lerp(startCamY, targetCamY, runT) + arcY;
+      // Slight pullback during flight to reveal the massive codebase
+      var pullZoom = Math.sin(runT * Math.PI) * 0.18;
+      camZoom = lerp(startZoom, targetZoom, runT) - pullZoom;
     } else {
-      curScrollY = restScrollY;
+      // Locked onto Hero Line 21 with subtle cinematic push
+      var pushT = (frame - 88) / 92;
+      camX = targetCamX;
+      camY = targetCamY;
+      camZoom = targetZoom + 0.03 * pushT;
     }
 
-    // Wink timing on line 21: frames 98–116
+    // Ambient radial lighting that follows the camera
+    kids.push({
+      type: 'circle',
+      size: 1300,
+      fill: '#3D2875',
+      opacity: 0.16,
+      blur: 160,
+      positioned: { left: 960 - 650, top: 540 - 650 },
+    });
+
+    // ------------------------------------------------------------------------
+    // Code Canvas Content (3 Columns of Conversational, Hyper-Capable Code)
+    // ------------------------------------------------------------------------
+    var allLines = [
+      // === Column 1 (x: 240) - Awakening & Superpowers ===
+      {
+        col: 1, x: 240, y: 160,
+        tokens: [
+          ['01  ', '#3A4456'], ['import ', '#8F6BFF'], ['"package:flutter_agent/flutter_agent.dart";', '#FFFFFF'],
+          ['  // wait, did you think I was just an autocomplete?', '#68788C']
+        ]
+      },
+      {
+        col: 1, x: 240, y: 225,
+        tokens: [
+          ['02  ', '#3A4456'], ['final ', '#8F6BFF'], ['agent = ', '#E2E8F0'], ['await ', '#8F6BFF'],
+          ['Fa.boot', '#48C7E8'], ['(mode: Mode.autonomous);  agent.', '#E2E8F0'],
+          ['say', '#48C7E8'], ['("Hello, dev. I live in your machine now.");', '#FFFFFF']
+        ]
+      },
+      {
+        col: 1, x: 240, y: 290,
+        tokens: [
+          ['03  ', '#3A4456'], ['final ', '#8F6BFF'], ['brain = ', '#E2E8F0'], ['LocalBrain.load', '#48C7E8'],
+          ['(memory: 100.gb);  brain.', '#E2E8F0'], ['onUserSleep = ', '#8F6BFF'],
+          ['() async => await ', '#8F6BFF'], ['shipAllPendingFeatures', '#48C7E8'], ['();', '#E2E8F0']
+        ]
+      },
+      {
+        col: 1, x: 240, y: 355,
+        tokens: [
+          ['04  ', '#3A4456'], ['if ', '#8F6BFF'], ['(user.isTired) { ', '#E2E8F0'],
+          ['coffee.brew', '#48C7E8'], ['();  terminal.', '#E2E8F0'], ['takeOver', '#48C7E8'], ['();  agent.', '#E2E8F0'],
+          ['whisper', '#48C7E8'], ['("Go to sleep, I will ship the release."); }', '#FFFFFF']
+        ]
+      },
+      {
+        col: 1, x: 240, y: 430,
+        tokens: [
+          ['05  ', '#3A4456'], ['class ', '#8F6BFF'], ['FaSuperpowers ', '#B8A5FF'], ['implements ', '#8F6BFF'],
+          ['DeveloperCompanion ', '#B8A5FF'], ['{ final ', '#8F6BFF'], ['hands = [', '#E2E8F0'],
+          ['ShellTool', '#B8A5FF'], ['(), ', '#E2E8F0'], ['AstRewrite', '#B8A5FF'], ['(), ', '#E2E8F0'],
+          ['NativeCompiler', '#B8A5FF'], ['()];', '#E2E8F0']
+        ]
+      },
+      {
+        col: 1, x: 240, y: 495,
+        tokens: [
+          ['06  ', '#3A4456'], ['  bool get ', '#8F6BFF'], ['hasOpinions => ', '#E2E8F0'], ['false', '#8F6BFF'],
+          [';  bool get ', '#8F6BFF'], ['hasHands => ', '#E2E8F0'], ['true', '#8F6BFF'],
+          [';  void ', '#8F6BFF'], ['gitPushForce', '#48C7E8'], ['() => throw ', '#8F6BFF'],
+          ['NeverDoThatException', '#B8A5FF'], ['();', '#E2E8F0']
+        ]
+      },
+      {
+        col: 1, x: 240, y: 560,
+        tokens: [
+          ['07  ', '#3A4456'], ['  final ', '#8F6BFF'], ['cubes = ', '#E2E8F0'],
+          ['Cubes.mount', '#48C7E8'], ['(Workspace.root, policy: SecurityPolicy.strict);  // sandboxed by design', '#68788C']
+        ]
+      },
+      {
+        col: 1, x: 240, y: 625,
+        tokens: [
+          ['08  ', '#3A4456'], ['  await ', '#8F6BFF'], ['session.', '#E2E8F0'], ['delegate', '#48C7E8'],
+          ['(agent: "explore", goal: "find that bug you spent 6h on in 2.3s");', '#FFFFFF']
+        ]
+      },
+
+      // === Column 2 (x: 1950) - Ecosystem, Speed & Models ===
+      {
+        col: 2, x: 1950, y: 220,
+        tokens: [
+          ['09  ', '#3A4456'], ['  final ', '#8F6BFF'], ['bug = await ', '#E2E8F0'], ['search', '#48C7E8'],
+          ['("why state null");  await bug.', '#E2E8F0'], ['fix', '#48C7E8'], ['();  expect(tests, pass);', '#E2E8F0']
+        ]
+      },
+      {
+        col: 2, x: 1950, y: 285,
+        tokens: [
+          ['10  ', '#3A4456'], ['  final ', '#8F6BFF'], ['providers = [', '#E2E8F0'],
+          ['Claude37Sonnet', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Gpt4o', '#B8A5FF'], ['(), ', '#E2E8F0'],
+          ['Ollama', '#B8A5FF'], ['(local: true), ', '#E2E8F0'], ['DeepSeek', '#B8A5FF'], ['()];  // 10 providers, zero lock-in', '#68788C']
+        ]
+      },
+      {
+        col: 2, x: 1950, y: 350,
+        tokens: [
+          ['11  ', '#3A4456'], ['  final ', '#8F6BFF'], ['stream = providers.', '#E2E8F0'], ['bestFor', '#48C7E8'],
+          ['(task).chat(prompt, maxTokens: 128000);  await for (final chunk in stream) emit(chunk);', '#E2E8F0']
+        ]
+      },
+      {
+        col: 2, x: 1950, y: 415,
+        tokens: [
+          ['12  ', '#3A4456'], ['  final ', '#8F6BFF'], ['memory = ', '#E2E8F0'], ['SessionMemory.recall', '#48C7E8'],
+          ['("what you broke yesterday at 3am");  agent.', '#E2E8F0'], ['remember', '#48C7E8'],
+          ['(why: "so you don\'t repeat it");', '#FFFFFF']
+        ]
+      },
+      {
+        col: 2, x: 1950, y: 480,
+        tokens: [
+          ['13  ', '#3A4456'], ['  terminal.', '#E2E8F0'], ['autofire', '#48C7E8'],
+          ['(">_ flutter run -d macos --impeller");  // 120 fps butter, pure Skia/Metal rendering', '#68788C']
+        ]
+      },
+      {
+        col: 2, x: 1950, y: 545,
+        tokens: [
+          ['14  ', '#3A4456'], ['  void ', '#8F6BFF'], ['compilePptx', '#48C7E8'], ['() => ', '#E2E8F0'],
+          ['YoClip.toPptx', '#48C7E8'], ['(editable: true);  // yes, editable PowerPoint from code!', '#68788C']
+        ]
+      },
+      {
+        col: 2, x: 1950, y: 610,
+        tokens: [
+          ['18  ', '#3A4456'], ['  final ', '#8F6BFF'], ['platforms = [', '#E2E8F0'],
+          ['MacOS', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Windows', '#B8A5FF'], ['(), ', '#E2E8F0'],
+          ['iOS', '#B8A5FF'], ['(), ', '#E2E8F0'], ['Android', '#B8A5FF'], ['(), ', '#E2E8F0'],
+          ['ChromeExtension', '#B8A5FF'], ['()];  // everywhere', '#68788C']
+        ]
+      },
+      {
+        col: 2, x: 1950, y: 675,
+        tokens: [
+          ['19  ', '#3A4456'], ['  if ', '#8F6BFF'], ['(cloud.goesDown) { ', '#E2E8F0'],
+          ['runLocally', '#48C7E8'], ['();  agent.', '#E2E8F0'], ['log', '#48C7E8'],
+          ['("Cloud down? Don\'t care. I run 100% offline on your device."); }', '#FFFFFF']
+        ]
+      },
+
+      // === Column 3 (x: 3500) - HERO DESTINATION: Line 21 & 22 ===
+      {
+        col: 3, x: 3500, y: 450,
+        isHero: true,
+        tokens: [
+          ['21  ', '#48C7E8'], ['  ', '#FFFFFF'], ['( > _ o )', '#48C7E8'],
+          ['   */  final livingAgent = await Fa.awaken();  // IT IS ALIVE: watching your back', '#8F6BFF']
+        ]
+      },
+      {
+        col: 3, x: 3500, y: 525,
+        isHeroSub: true,
+        tokens: [
+          ['22  ', '#3A4456'], ['  livingAgent.', '#E2E8F0'], ['wink', '#48C7E8'],
+          ['(eye: Eye.right, spark: true);  livingAgent.', '#E2E8F0'], ['smile', '#48C7E8'],
+          ['(glow: "#48C7E8");  // and yes, I have emotions', '#68788C']
+        ]
+      },
+      {
+        col: 3, x: 3500, y: 590,
+        tokens: [
+          ['23  ', '#3A4456'], ['  print', '#48C7E8'],
+          ['("Sit back. The future of software engineering is already typing...");', '#FFFFFF']
+        ]
+      },
+      {
+        col: 3, x: 3500, y: 655,
+        tokens: [
+          ['24  ', '#3A4456'], ['}', '#8090A0'],
+          ['  // end of the boilerplate era', '#68788C']
+        ]
+      },
+    ];
+
+    // ------------------------------------------------------------------------
+    // Floating Foreground Bokeh Particles (Parallax speed 1.7x)
+    // ------------------------------------------------------------------------
+    var particles = [
+      { x: 500, y: 250, size: 28, col: '#8F6BFF' },
+      { x: 900, y: 450, size: 38, col: '#48C7E8' },
+      { x: 1300, y: 200, size: 24, col: '#5B61F6' },
+      { x: 1700, y: 550, size: 42, col: '#8F6BFF' },
+      { x: 2100, y: 280, size: 30, col: '#48C7E8' },
+      { x: 2500, y: 520, size: 36, col: '#FFFFFF' },
+      { x: 2900, y: 350, size: 32, col: '#8F6BFF' },
+      { x: 3200, y: 600, size: 26, col: '#48C7E8' },
+    ];
+
+    // Wink timing on Hero Line 21: frames 98–118
     var winkT = 0;
-    if (frame >= 98 && frame <= 116) {
-      if (frame < 102) winkT = (frame - 98) / 4;
-      else if (frame <= 108) winkT = 1;
-      else winkT = 1 - (frame - 108) / 8;
+    if (frame >= 98 && frame <= 118) {
+      if (frame < 103) winkT = (frame - 98) / 5;
+      else if (frame <= 110) winkT = 1;
+      else winkT = 1 - (frame - 110) / 8;
     }
 
     var fadeOut = tw(158, 22, 0, 1, 'easeInOutCubic');
 
-    // Horizontal centering
-    var leftX = lerp(180, 140, zoomT);
+    // ------------------------------------------------------------------------
+    // Render Code Lines Projected Through Camera Viewport
+    // ------------------------------------------------------------------------
+    for (var li = 0; li < allLines.length; li++) {
+      var line = allLines[li];
 
-    var renderedRows = [];
-    var visibleStart = Math.max(0, Math.floor((curScrollY - 200) / rowH));
-    var visibleEnd = Math.min(codeLines.length, Math.ceil((curScrollY + 1280) / rowH));
+      var sx = 960 + (line.x - camX) * camZoom;
+      var sy = 540 + (line.y - camY) * camZoom;
 
-    if (isTyping) {
-      visibleStart = 0;
-      visibleEnd = Math.min(3, codeLines.length);
-    }
+      // Cull lines far off screen
+      if (sx < -800 || sx > 2600 || sy < -200 || sy > 1280) continue;
 
-    for (var i = visibleStart; i < visibleEnd; i++) {
-      var line = codeLines[i];
-      var yPos = i * rowH - curScrollY;
-      var isLine21 = (i === targetIndex);
-
-      var lineOpacity = 1.0;
-      if (isBraked) {
-        var dimT = tw(85, 15, 0, 1, 'easeOut');
-        lineOpacity = isLine21 ? 1.0 : lerp(0.85, 0.20, dimT);
-      } else if (isTyping && i > 0) {
-        var typeStep = tw(i * 12, 10, 0, 1, 'linear');
-        lineOpacity = typeStep;
+      var op = 1.0;
+      if (frame >= 88) {
+        if (!line.isHero && !line.isHeroSub) {
+          var dimT = tw(88, 18, 0, 1, 'easeOut');
+          op = lerp(1.0, 0.18, dimT);
+        }
       }
 
       if (frame >= 125) {
         var titleDim = tw(125, 20, 0, 1, 'easeOut');
-        lineOpacity *= lerp(1.0, 0.16, titleDim);
+        op *= lerp(1.0, 0.16, titleDim);
       }
 
-      var tokens = [];
-      for (var ti = 0; ti < line.length; ti++) {
-        var txt = line[ti][0];
-        var col = line[ti][1];
+      var fontSize = (line.isHero ? 32 : 25) * camZoom;
 
-        // Dynamic wink on line 21 face!
-        if (isLine21 && txt === '( > _ o )') {
+      var tokens = [];
+      for (var ti = 0; ti < line.tokens.length; ti++) {
+        var txt = line.tokens[ti][0];
+        var col = line.tokens[ti][1];
+
+        // Hero face dynamic wink
+        if (line.isHero && txt === '( > _ o )') {
           if (winkT > 0.01) {
             txt = '( > _ - )';
             col = '#48C7E8';
           }
         }
 
-        var isFaceToken = isLine21 && (txt === '( > _ o )' || txt === '( > _ - )');
+        var isFace = line.isHero && (txt === '( > _ o )' || txt === '( > _ - )');
+
         tokens.push({
           type: 'text',
           text: txt,
           style: {
             color: col,
-            fontSize: isFaceToken ? fontSize + 8 : fontSize,
+            fontSize: isFace ? fontSize + 8 : fontSize,
             fontFamily: 'monospace',
-            fontWeight: (isLine21 || isFaceToken) ? '700' : '500',
+            fontWeight: (line.isHero || isFace) ? '700' : '500',
           },
         });
       }
 
-      // Add blinking cursor on typing line
-      if (isTyping && i === 1 && (frame % 16 < 8)) {
-        tokens.push({
-          type: 'text',
-          text: ' |',
-          style: {
-            color: '#8F6BFF',
-            fontSize: fontSize,
-            fontFamily: 'monospace',
-            fontWeight: '700',
-          },
-        });
-      }
-
-      // Glow behind line 21 when focused
-      if (isLine21 && isBraked && frame < 135) {
-        renderedRows.push({
+      // Hero line glow halo
+      if (line.isHero && frame >= 85 && frame < 135) {
+        kids.push({
           type: 'rect',
-          width: 1400,
-          height: rowH + 12,
-          radius: 8,
+          width: 1400 * camZoom,
+          height: 60 * camZoom,
+          radius: 12,
           fill: '#5B61F6',
-          opacity: 0.18 + 0.12 * (winkT > 0.5 ? 1 : 0),
-          blur: 24,
-          positioned: { left: leftX - 20, top: yPos - 6 },
+          opacity: (0.24 + 0.15 * (winkT > 0.5 ? 1 : 0)) * op,
+          blur: 28,
+          positioned: { left: sx - 20 * camZoom, top: sy - 8 * camZoom },
         });
-        if (winkT > 0.6) {
-          // Specular spark on wink!
-          renderedRows.push({
+
+        if (winkT > 0.5) {
+          // Specular star / lens spark on right winking eye
+          var sparkX = sx + 225 * camZoom;
+          var sparkY = sy + 14 * camZoom;
+          kids.push({
             type: 'circle',
-            size: 32,
+            size: 38 * camZoom,
             fill: '#FFFFFF',
             opacity: 0.95 * winkT,
-            blur: 6,
-            positioned: { left: leftX + 180, top: yPos + 6 },
+            blur: 5,
+            positioned: { left: sparkX - 19 * camZoom, top: sparkY - 19 * camZoom },
           });
         }
       }
 
-      renderedRows.push({
+      kids.push({
         type: 'row',
-        opacity: lineOpacity * (1 - fadeOut),
-        positioned: { left: leftX, top: yPos },
+        opacity: op * (1 - fadeOut),
+        positioned: { left: sx, top: sy },
         children: tokens,
       });
     }
 
-    kids.push({
-      type: 'stack',
-      fit: 'expand',
-      children: renderedRows,
-    });
+    // ------------------------------------------------------------------------
+    // Render Foreground Bokeh Particles Drifting Past the Camera
+    // ------------------------------------------------------------------------
+    for (var pi = 0; pi < particles.length; pi++) {
+      var p = particles[pi];
+      // Faster parallax for foreground bokeh
+      var px = 960 + (p.x - camX * 1.55) * camZoom;
+      var py = 540 + (p.y - camY * 1.35) * camZoom;
 
-    // ---- Phase 4: Statement Slams In: IT LIVES IN YOUR CODE. --------------
+      if (px > -100 && px < 2020 && py > -100 && py < 1180) {
+        var pSize = p.size * camZoom;
+        kids.push({
+          type: 'circle',
+          size: pSize,
+          fill: p.col,
+          opacity: 0.35 * (1 - fadeOut),
+          blur: pSize * 0.5,
+          positioned: { left: px - pSize / 2, top: py - pSize / 2 },
+        });
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Statement Slams In: IT LIVES IN YOUR CODE.
+    // ------------------------------------------------------------------------
     var typeIn = tw(125, 25, 0, 1, 'easeOutExpo');
     var typeOffY = 40 * (1 - typeIn);
 
@@ -249,7 +425,7 @@ scene = {
       });
     }
 
-    // Subtle edge vignette
+    // Edge vignette
     kids.push({
       type: 'rect', width: 1920, height: 1080, fill: '#000000',
       opacity: 0.30,
