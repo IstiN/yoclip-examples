@@ -54,9 +54,17 @@ var studioSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' +
   '<polygon points="10,8 16,12 10,16" fill="#8F6BFF"/>' +
   '</svg>';
 
+var iosSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">' +
+  '<rect x="60" y="16" width="136" height="224" rx="28" fill="#181E2E" stroke="#FFFFFF" stroke-width="10"/>' +
+  '<rect x="104" y="26" width="48" height="8" rx="4" fill="#FFFFFF"/>' +
+  '<path fill="#FFFFFF" transform="translate(48, 48) scale(0.62)" d="M213.803 167.03c.442 47.58 41.74 63.413 42.197 63.615c-.35 1.116-6.599 22.563-21.757 44.716c-13.104 19.153-26.705 38.235-48.13 38.63c-21.05.388-27.82-12.483-51.888-12.483c-24.061 0-31.582 12.088-51.51 12.871c-20.68.783-36.428-20.71-49.64-39.793c-27-39.033-47.633-110.3-19.928-158.406c13.763-23.89 38.36-39.017 65.056-39.405c20.307-.387 39.475 13.662 51.889 13.662c12.406 0 35.699-16.895 60.186-14.414c10.25.427 39.026 4.14 57.503 31.186c-1.49.923-34.335 20.044-33.978 59.822M174.24 50.199c10.98-13.29 18.369-31.79 16.353-50.199c-15.826.636-34.962 10.546-46.314 23.828c-10.173 11.763-19.082 30.589-16.678 48.633c17.64 1.365 35.66-8.964 46.64-22.262"/>' +
+  '<line x1="108" y1="222" x2="148" y2="222" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>' +
+  '</svg>';
+
 var icons = {
   apple: appleSvg,
   windows: windowsSvg,
+  ios: iosSvg,
   android: androidSvg,
   chrome: chromeSvg,
   puzzle: puzzleSvg,
