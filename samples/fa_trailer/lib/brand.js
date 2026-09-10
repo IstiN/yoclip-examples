@@ -508,92 +508,20 @@ function fAccentBar(progress, opacity) {
   return kids;
 }
 
-/// Canonical, reusable Fa brand mark.
-/// Dynamically computed directly from the canonical BRAND geometry:
-/// - F top bar & stem: muscular brand blue `#5B61F6` with round caps and elbow
-/// - F accent bar: brand teal `#2EBD9E` capsule
-/// - a bowl: brand teal `#2EBD9E` circular ring (radius 84, stroke 60, clean round hole)
-/// - a stem: brand teal `#2EBD9E` vertical capsule flush with bowl tangent
-///
-/// Guaranteed 100% vector fidelity and clean round donut hole at any scale k.
+/// Canonical, reusable chubby Fa brand mark.
+/// Dynamically uses the exact same `completeFaMark` drawing pipeline as 03_hardware:
+/// identical paths, identical stroke join/caps, identical polyline rings, identical accents.
 function faBrandMark(cx, cy, k, opacity) {
-  var op = opacity == null ? 1 : opacity;
-  var kids = [];
-  var ax = BRAND.anchor[0];
-  var ay = BRAND.anchor[1];
+  var prevK = mapper.k;
+  var prevAx = mapper.ax;
+  var prevAy = mapper.ay;
+  var prevSx = mapper.sx;
+  var prevSy = mapper.sy;
 
-  function toScr(x, y) {
-    return {
-      x: cx + (x - ax) * k,
-      y: cy + (y - ay) * k,
-    };
-  }
+  setMapper(k, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
+  var kids = completeFaMark(1, 1, 1, 1, opacity);
 
-  // 1. F stem: from x: 258, y: 366 to 724, w: 70
-  var fTop = toScr(258, 366);
-  kids.push({
-    type: 'rect',
-    width: 70 * k,
-    height: (724 - 366) * k,
-    radius: 35 * k,
-    fill: '#5B61F6',
-    opacity: op,
-    positioned: { left: fTop.x, top: fTop.y },
-  });
-
-  // 2. F top bar: from x: 258 to 556, y: 366, h: 70
-  kids.push({
-    type: 'rect',
-    width: (556 - 258) * k,
-    height: 70 * k,
-    radius: 35 * k,
-    fill: '#5B61F6',
-    opacity: op,
-    positioned: { left: fTop.x, top: fTop.y },
-  });
-
-  // 3. F accent bar: from x: 258, y: 554, w: 224, h: 56
-  var accPos = toScr(258, 554);
-  kids.push({
-    type: 'rect',
-    width: 224 * k,
-    height: 56 * k,
-    radius: 28 * k,
-    fill: '#2EBD9E',
-    opacity: op,
-    positioned: { left: accPos.x, top: accPos.y - 28 * k },
-  });
-
-  // 4. a bowl: circular ring at (640, 640), r: 84, strokeWidth: 60
-  var bowlCenter = toScr(640, 640);
-  var bowlSize = (84 * 2 + 60) * k;
-  kids.push({
-    type: 'circle',
-    size: bowlSize,
-    stroke: '#2EBD9E',
-    strokeWidth: 60 * k,
-    opacity: op,
-    positioned: {
-      left: bowlCenter.x - bowlSize / 2,
-      top: bowlCenter.y - bowlSize / 2,
-    },
-  });
-
-  // 5. a stem: vertical capsule at x: 724, from y: 556 to 724, strokeWidth: 60
-  var stemTop = toScr(724 - 30, 556 - 30);
-  kids.push({
-    type: 'rect',
-    width: 60 * k,
-    height: (168 + 60) * k,
-    radius: 30 * k,
-    fill: '#2EBD9E',
-    opacity: op,
-    positioned: {
-      left: stemTop.x,
-      top: stemTop.y,
-    },
-  });
-
+  setMapper(prevK, prevAx, prevAy, prevSx, prevSy);
   return kids;
 }
 
@@ -643,82 +571,111 @@ function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, o
 /// Reusable Fa Hardware Chip component:
 /// Used identically in 03_hardware and 05_everywhere (and 08_lockup).
 /// cx, cy: center coordinates
-/// w, h: chip dimensions
-/// logoK: scale of the canonical Fa mark inside the chip
-/// opts: { opacity, glow, pins, radius, fProgress, accentProgress, bowlProgress, stemProgress }
-function faHardwareChip(cx, cy, w, h, logoK, opts) {
-  var kids = [];
-  var op = opts && opts.opacity != null ? opts.opacity : 1.0;
-  if (op <= 0.001) return kids;
-
-  var x = cx - w / 2;
-  var y = cy - h / 2;
-  var radius = (opts && opts.radius) || 46;
-
-  // 1. Ambient radial glow behind chip
-  if (!opts || opts.glow !== false) {
-    var glowMax = Math.max(w, h) * 1.35;
-    var glowMin = Math.min(w, h) * 1.1;
+/// sizeOrW: chip size (square squircle when size) or width
+/// opOrH: opacity (when size) or height
+/// optsOrK: options or logoK
+function faHardwareChip(cx, cy, sizeOrW, opOrH, optsOrK, extraOpts) {
+  var size, op, opts;
+  if (typeof opOrH === 'number' && typeof optsOrK === 'number') {
+    // Custom width & height call (cx, cy, w, h, logoK, opts)
+    var w = sizeOrW;
+    var h = opOrH;
+    var logoK = optsOrK;
+    opts = extraOpts || {};
+    op = opts.opacity != null ? opts.opacity : 1.0;
+    if (op <= 0.001) return [];
+    var kids = [];
+    var x = cx - w / 2;
+    var y = cy - h / 2;
+    var r = opts.radius || Math.round(Math.min(w, h) * 0.22);
+    // tile bloom
     kids.push({
-      type: 'circle',
-      size: glowMax,
-      fill: '#5B61F6',
-      opacity: clamp01(0.18 * op),
-      blur: 70,
-      positioned: { left: cx - glowMax / 2, top: cy - glowMax / 2 },
+      type: 'rect',
+      width: w + 40,
+      height: h + 40,
+      radius: r + 20,
+      fill: '#8F6BFF',
+      opacity: 0.18 * op,
+      blur: 48,
+      positioned: { left: x - 20, top: y - 20 },
     });
+    // body
     kids.push({
-      type: 'circle',
-      size: glowMin,
-      fill: '#2EBD9E',
-      opacity: clamp01(0.22 * op),
-      blur: 40,
-      positioned: { left: cx - glowMin / 2, top: cy - glowMin / 2 },
+      type: 'rect',
+      width: w,
+      height: h,
+      radius: r,
+      fill: '#0A0F1D',
+      border: { color: '#3B4F76', width: 2.0 },
+      opacity: op,
+      positioned: { left: x, top: y },
     });
+    // inner bezel
+    kids.push({
+      type: 'rect',
+      width: w - 8,
+      height: h - 8,
+      radius: r - 4,
+      fill: '#0D1424',
+      border: { color: '#1E2B45', width: 1.0 },
+      opacity: op,
+      positioned: { left: x + 4, top: y + 4 },
+    });
+    // logo
+    var markKids = faBrandMark(cx, cy, logoK, op);
+    for (var mi = 0; mi < markKids.length; mi++) kids.push(markKids[mi]);
+    return kids;
   }
 
-  // 2. Obsidian squircle hardware tile
+  // Canonical square hardware tile: (cx, cy, size, op, opts)
+  size = sizeOrW;
+  op = opOrH == null ? 1 : opOrH;
+  opts = optsOrK || {};
+  if (op <= 0.001) return [];
+
+  var k = size / 992;
+  var kids = [];
+
+  // 1. Soft ambient shadow/bloom behind the chip (identical to 03_hardware)
   kids.push({
     type: 'rect',
-    width: w,
-    height: h,
-    radius: radius,
+    width: size + 40,
+    height: size + 40,
+    radius: (224 + 20) * k,
+    fill: '#8F6BFF',
+    opacity: 0.18 * op,
+    blur: 48,
+    positioned: { left: cx - (size + 40) / 2, top: cy - (size + 40) / 2 },
+  });
+
+  // 2. Obsidian glass body with hardware border (identical to 03_hardware)
+  kids.push({
+    type: 'rect',
+    width: size,
+    height: size,
+    radius: 224 * k,
     fill: '#0A0F1D',
     border: { color: '#3B4F76', width: 2.0 },
-    opacity: clamp01(op),
-    positioned: { left: x, top: y },
+    opacity: op,
+    positioned: { left: cx - size / 2, top: cy - size / 2 },
   });
 
-  // 3. Hardware inner bezel rim
+  // 3. Hardware inner bezel rim (identical to 03_hardware)
   kids.push({
     type: 'rect',
-    width: w - 8,
-    height: h - 8,
-    radius: radius - 4,
+    width: size - 8,
+    height: size - 8,
+    radius: (224 * k) - 4,
     fill: '#0D1424',
     border: { color: '#1E2B45', width: 1.0 },
-    opacity: clamp01(op),
-    positioned: { left: x + 4, top: y + 4 },
+    opacity: op,
+    positioned: { left: cx - (size - 8) / 2, top: cy - (size - 8) / 2 },
   });
 
-  // 5. Canonical Fa Mark in the center
-  var fP = opts && opts.fProgress != null ? opts.fProgress : 1.0;
-  var accentP = opts && opts.accentProgress != null ? opts.accentProgress : 1.0;
-  var bowlP = opts && opts.bowlProgress != null ? opts.bowlProgress : 1.0;
-  var stemP = opts && opts.stemProgress != null ? opts.stemProgress : 1.0;
-
-  var isComplete = fP >= 0.999 && accentP >= 0.999 && bowlP >= 0.999 && stemP >= 0.999;
-  if (isComplete) {
-    var markKids = faBrandMark(cx, cy, logoK, op);
-    for (var mi = 0; mi < markKids.length; mi++) {
-      kids.push(markKids[mi]);
-    }
-  } else {
-    setMapper(logoK, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
-    var markKids = completeFaMark(fP, accentP, bowlP, stemP, op);
-    for (var mi = 0; mi < markKids.length; mi++) {
-      kids.push(markKids[mi]);
-    }
+  // 4. Canonical Fa mark centered inside (exact same pipeline as 03_hardware)
+  var markKids = faBrandMark(cx, cy, k, op);
+  for (var mi = 0; mi < markKids.length; mi++) {
+    kids.push(markKids[mi]);
   }
 
   return kids;

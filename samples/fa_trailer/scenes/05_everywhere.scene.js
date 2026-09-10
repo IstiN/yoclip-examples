@@ -273,7 +273,7 @@ scene = {
     });
 
     // 4 feeder drops from bus rail into top hardware pins of Fa Core
-    var coreTopPinsX = [900, 940, 980, 1020];
+    var coreTopPinsX = [920, 946, 974, 1000];
     for (var cti = 0; cti < coreTopPinsX.length; cti++) {
       var pinX = coreTopPinsX[cti];
       kids.push({
@@ -299,19 +299,15 @@ scene = {
     }
 
     // ------------------------------------------------------------------------
-    // 3. CENTER: Fa Core Hardware Engine (Reusable Fa Hardware Chip)
+    // 3. CENTER: Fa Core Hardware Engine (Canonical Square Fa Hardware Chip)
     // ------------------------------------------------------------------------
     var coreIn = tw(20, 25, 0, 1, 'easeOutCubic');
-    var coreW = 320;
-    var coreH = 220;
-    var coreX = 960 - coreW / 2;
-    var coreY = 325;
-    var faK = 0.28;
+    var coreSize = 224;
+    var coreTopY = 325;
+    var coreBottomY = coreTopY + coreSize;
+    var coreCenterY = coreTopY + coreSize / 2;
 
-    var coreChipKids = faHardwareChip(960, coreY + 98, coreW, coreH, faK, {
-      opacity: clamp01(coreIn),
-      radius: 46,
-    });
+    var coreChipKids = faHardwareChip(960, coreCenterY, coreSize, clamp01(coreIn));
     for (var cki = 0; cki < coreChipKids.length; cki++) {
       kids.push(coreChipKids[cki]);
     }
@@ -319,16 +315,16 @@ scene = {
     kids.push({
       type: 'text',
       text: 'FA CORE · AUTONOMOUS HARNESS',
-      width: coreW,
+      width: 320,
       opacity: clamp01(coreIn * 0.9),
       style: {
-        fontSize: 13,
+        fontSize: 12,
         fontFamily: 'Impact',
         color: '#FFFFFF',
         letterSpacing: 1.5,
         textAlign: 'center',
       },
-      positioned: { left: coreX, top: coreY + 182 },
+      positioned: { left: 960 - 160, top: coreBottomY + 12 },
     });
 
     // ------------------------------------------------------------------------
@@ -352,18 +348,18 @@ scene = {
     var startCardsX = (1920 - (7 * stepX + cardW)) / 2; // 231
     var baseY = 690;
 
-    // Conduits branching from bottom of Fa Core (x: 960, y: coreY + coreH = 545)
+    // Conduits branching from bottom of Fa Core (x: 960, y: coreBottomY)
     var conduitHubY = 600;
 
     // Central trunk from Fa Core down to distribution hub
     kids.push({
       type: 'rect',
       width: 4,
-      height: conduitHubY - (coreY + coreH),
+      height: conduitHubY - coreBottomY,
       radius: 2,
       fill: '#2E3C5F',
       opacity: clamp01(coreIn),
-      positioned: { left: 958, top: coreY + coreH },
+      positioned: { left: 958, top: coreBottomY },
     });
 
     // Horizontal distribution manifold
@@ -378,12 +374,11 @@ scene = {
     });
 
     // Helper: calculate point strictly along the 3-segment circuit bus conduit
-    // Segment 1: down from Fa Core (960, coreY + coreH) to hub (960, conduitHubY)
+    // Segment 1: down from Fa Core (960, coreBottomY) to hub (960, conduitHubY)
     // Segment 2: horizontal along hub manifold (960, conduitHubY) to (targetX, conduitHubY)
     // Segment 3: down feeder line (targetX, conduitHubY) to target card (targetX, baseY)
     function circuitTrackPoint(t, targetX) {
       var ct = clamp01(t);
-      var coreBottomY = coreY + coreH;
       if (ct < 0.22) {
         var s1 = ct / 0.22;
         return { x: 960, y: lerp(coreBottomY, conduitHubY, s1) };
