@@ -87,16 +87,44 @@ scene = {
         blur: 48,
         positioned: { left: tl.x - 20, top: tl.y - 20 },
       });
-      // The chip body: deep obsidian glass
+
+      // Hardware chip pins (top and bottom, identical to Fa Core)
+      var pinCols = 8;
+      var pinSpacing = (T.w * k - 70) / (pinCols - 1);
+      for (var pi = 0; pi < pinCols; pi++) {
+        var pinX = tl.x + 35 + pi * pinSpacing;
+        kids.push({
+          type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
+          opacity: clamp01(0.55 * tileA),
+          positioned: { left: pinX - 7, top: tl.y - 5 },
+        });
+        kids.push({
+          type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
+          opacity: clamp01(0.55 * tileA),
+          positioned: { left: pinX - 7, top: tl.y + T.h * k },
+        });
+      }
+
+      // The chip body: deep obsidian glass with hardware border
       kids.push({
         type: 'rect',
         width: T.w * k, height: T.h * k,
         radius: T.rx * k,
-        fill: '#0C1322',
-        stroke: '#2E3C5F',
-        strokeWidth: Math.max(2, 6 * k),
+        fill: '#0A0F1D',
+        border: { color: '#3B4F76', width: 2.0 },
         opacity: tileA,
         positioned: { left: tl.x, top: tl.y },
+      });
+
+      // Hardware inner bezel rim
+      kids.push({
+        type: 'rect',
+        width: T.w * k - 8, height: T.h * k - 8,
+        radius: (T.rx - 4) * k,
+        fill: '#0D1424',
+        border: { color: '#1E2B45', width: 1.0 },
+        opacity: tileA,
+        positioned: { left: tl.x + 4, top: tl.y + 4 },
       });
 
       // Specular sweep across the chip surface

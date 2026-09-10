@@ -537,6 +537,101 @@ function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, o
   return kids;
 }
 
+/// Reusable Fa Hardware Chip component:
+/// Used identically in 03_hardware and 05_everywhere (and 08_lockup).
+/// cx, cy: center coordinates
+/// w, h: chip dimensions
+/// logoK: scale of the canonical Fa mark inside the chip
+/// opts: { opacity, glow, pins, radius, fProgress, accentProgress, bowlProgress, stemProgress }
+function faHardwareChip(cx, cy, w, h, logoK, opts) {
+  var kids = [];
+  var op = opts && opts.opacity != null ? opts.opacity : 1.0;
+  if (op <= 0.001) return kids;
+
+  var x = cx - w / 2;
+  var y = cy - h / 2;
+  var radius = (opts && opts.radius) || 46;
+
+  // 1. Ambient radial glow behind chip
+  if (!opts || opts.glow !== false) {
+    var glowMax = Math.max(w, h) * 1.35;
+    var glowMin = Math.min(w, h) * 1.1;
+    kids.push({
+      type: 'circle',
+      size: glowMax,
+      fill: '#5B61F6',
+      opacity: clamp01(0.18 * op),
+      blur: 70,
+      positioned: { left: cx - glowMax / 2, top: cy - glowMax / 2 },
+    });
+    kids.push({
+      type: 'circle',
+      size: glowMin,
+      fill: '#2EBD9E',
+      opacity: clamp01(0.22 * op),
+      blur: 40,
+      positioned: { left: cx - glowMin / 2, top: cy - glowMin / 2 },
+    });
+  }
+
+  // 2. Hardware chip pins (top and bottom)
+  if (!opts || opts.pins !== false) {
+    var pinCols = 8;
+    var pinSpacing = (w - 70) / (pinCols - 1);
+    for (var pi = 0; pi < pinCols; pi++) {
+      var pinX = x + 35 + pi * pinSpacing;
+      kids.push({
+        type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
+        opacity: clamp01(0.55 * op),
+        positioned: { left: pinX - 7, top: y - 5 },
+      });
+      kids.push({
+        type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
+        opacity: clamp01(0.55 * op),
+        positioned: { left: pinX - 7, top: y + h },
+      });
+    }
+  }
+
+  // 3. Obsidian squircle hardware tile
+  kids.push({
+    type: 'rect',
+    width: w,
+    height: h,
+    radius: radius,
+    fill: '#0A0F1D',
+    border: { color: '#3B4F76', width: 2.0 },
+    opacity: clamp01(op),
+    positioned: { left: x, top: y },
+  });
+
+  // 4. Hardware inner bezel rim
+  kids.push({
+    type: 'rect',
+    width: w - 8,
+    height: h - 8,
+    radius: radius - 4,
+    fill: '#0D1424',
+    border: { color: '#1E2B45', width: 1.0 },
+    opacity: clamp01(op),
+    positioned: { left: x + 4, top: y + 4 },
+  });
+
+  // 5. Canonical Fa Mark in the center
+  setMapper(logoK, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
+  var fP = opts && opts.fProgress != null ? opts.fProgress : 1.0;
+  var accentP = opts && opts.accentProgress != null ? opts.accentProgress : 1.0;
+  var bowlP = opts && opts.bowlProgress != null ? opts.bowlProgress : 1.0;
+  var stemP = opts && opts.stemProgress != null ? opts.stemProgress : 1.0;
+
+  var markKids = completeFaMark(fP, accentP, bowlP, stemP, op);
+  for (var mi = 0; mi < markKids.length; mi++) {
+    kids.push(markKids[mi]);
+  }
+
+  return kids;
+}
+
 /// A horizontal streak: thin rounded rect flying right from svg point
 /// (x, y), `len` svg-units long at peak.
 function streak(i, ySvg, xSvg, lenSvg, thick, color, frame, fps, at, dur, dir) {

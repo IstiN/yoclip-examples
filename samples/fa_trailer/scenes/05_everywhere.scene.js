@@ -299,81 +299,21 @@ scene = {
     }
 
     // ------------------------------------------------------------------------
-    // 3. CENTER: Fa Core Hardware Engine (Canonical Fa Logo & Smile Underscore)
+    // 3. CENTER: Fa Core Hardware Engine (Reusable Fa Hardware Chip)
     // ------------------------------------------------------------------------
     var coreIn = tw(20, 25, 0, 1, 'easeOutCubic');
     var coreW = 320;
     var coreH = 220;
     var coreX = 960 - coreW / 2;
     var coreY = 325;
-
-    // Ambient radial glow behind Fa Core
-    kids.push({
-      type: 'circle',
-      size: 440,
-      fill: '#5B61F6',
-      opacity: clamp01(0.20 * coreIn),
-      blur: 70,
-      positioned: { left: 960 - 220, top: coreY + coreH / 2 - 220 },
-    });
-    kids.push({
-      type: 'circle',
-      size: 260,
-      fill: '#2EBD9E',
-      opacity: clamp01(0.25 * coreIn),
-      blur: 40,
-      positioned: { left: 960 - 130, top: coreY + coreH / 2 - 130 },
-    });
-
-    // Obsidian squircle hardware tile
-    kids.push({
-      type: 'rect',
-      width: coreW,
-      height: coreH,
-      radius: 46,
-      fill: '#0A0F1D',
-      border: { color: '#3B4F76', width: 2.0 },
-      opacity: clamp01(coreIn),
-      positioned: { left: coreX, top: coreY },
-    });
-
-    // Hardware inner bezel rim
-    kids.push({
-      type: 'rect',
-      width: coreW - 8,
-      height: coreH - 8,
-      radius: 42,
-      fill: '#0D1424',
-      border: { color: '#1E2B45', width: 1.0 },
-      opacity: clamp01(coreIn),
-      positioned: { left: coreX + 4, top: coreY + 4 },
-    });
-
-    // Hardware corner chip pins
-    var pinCols = 8;
-    for (var pi = 0; pi < pinCols; pi++) {
-      var pinX = coreX + 35 + pi * 36;
-      // Top pins
-      kids.push({
-        type: 'rect', width: 14, height: 4, radius: 1, fill: '#48C7E8',
-        opacity: clamp01(0.5 * coreIn),
-        positioned: { left: pinX, top: coreY - 4 },
-      });
-      // Bottom pins
-      kids.push({
-        type: 'rect', width: 14, height: 4, radius: 1, fill: '#48C7E8',
-        opacity: clamp01(0.5 * coreIn),
-        positioned: { left: pinX, top: coreY + coreH },
-      });
-    }
-
-    // Canonical Fa Mark inside Core (bold, thick, donut bowl)
     var faK = 0.28;
-    setMapper(faK, BRAND.anchor[0], BRAND.anchor[1], 960, coreY + 104);
 
-    var faCoreMark = completeFaMark(1, 1, 1, 1, clamp01(coreIn));
-    for (var fci = 0; fci < faCoreMark.length; fci++) {
-      kids.push(faCoreMark[fci]);
+    var coreChipKids = faHardwareChip(960, coreY + 98, coreW, coreH, faK, {
+      opacity: clamp01(coreIn),
+      radius: 46,
+    });
+    for (var cki = 0; cki < coreChipKids.length; cki++) {
+      kids.push(coreChipKids[cki]);
     }
 
     kids.push({
@@ -406,11 +346,11 @@ scene = {
     ];
 
     var cardW = 142;
-    var cardH = 158;
-    var cardRadius = 32;
+    var cardH = 126;
+    var cardRadius = 26;
     var stepX = 188;
     var startCardsX = (1920 - (7 * stepX + cardW)) / 2; // 231
-    var baseY = 675;
+    var baseY = 690;
 
     // Conduits branching from bottom of Fa Core (x: 960, y: coreY + coreH = 545)
     var conduitHubY = 600;
@@ -551,27 +491,27 @@ scene = {
         positioned: { left: targetX, top: currentCardY },
       });
 
-      // App Icon inside card (Fixed SVGs)
+      // App Icon inside card (Fixed SVGs, centered with balanced top margin)
       var iconSvgData = icons[app.icon] || icons.apple;
       kids.push({
         type: 'svg',
         svg: iconSvgData,
-        width: 58,
-        height: 58,
+        width: 52,
+        height: 52,
         opacity: clamp01(cardAlpha * (hasInjected ? 1.0 : 0.65)),
         positioned: {
-          left: targetX + (cardW - 58) / 2,
-          top: currentCardY + 18,
+          left: targetX + (cardW - 52) / 2,
+          top: currentCardY + 16,
         },
       });
 
-      // EMBEDDED BADGE: "Fa inside" chip (Generous padding, crisp pixel layout!)
+      // EMBEDDED BADGE: "Fa inside" chip (tight, balanced bottom margin, NO dead space!)
       if (hasInjected) {
         var badgeT = clamp01(Math.min(1.0, (frame - landFrame) / 5));
-        var badgeW = 98;
+        var badgeW = 96;
         var badgeH = 26;
         var badgeX = targetX + (cardW - badgeW) / 2;
-        var badgeY = currentCardY + 85;
+        var badgeY = currentCardY + 80;
 
         // Badge chip background
         kids.push({
@@ -596,7 +536,7 @@ scene = {
             fontWeight: '900',
             color: '#5B61F6',
           },
-          positioned: { left: badgeX + 12, top: badgeY + 4 },
+          positioned: { left: badgeX + 11, top: badgeY + 4 },
         });
 
         // a in brand teal
@@ -610,7 +550,7 @@ scene = {
             fontWeight: '900',
             color: '#2EBD9E',
           },
-          positioned: { left: badgeX + 22, top: badgeY + 4 },
+          positioned: { left: badgeX + 21, top: badgeY + 4 },
         });
 
         // inside in bold monospace with comfortable spacing
@@ -625,7 +565,7 @@ scene = {
             color: '#FFFFFF',
             letterSpacing: 0.5,
           },
-          positioned: { left: badgeX + 38, top: badgeY + 6 },
+          positioned: { left: badgeX + 37, top: badgeY + 6 },
         });
       }
 
@@ -642,27 +582,74 @@ scene = {
           letterSpacing: 1,
           textAlign: 'center',
         },
-        positioned: { left: targetX, top: baseY + cardH + 14 },
+        positioned: { left: targetX, top: baseY + cardH + 12 },
       });
 
-      var statusTxt = hasInjected ? 'FA EMBEDDED' : 'STANDALONE';
-      var statusCol = hasInjected ? '#48C7E8' : '#455268';
-      kids.push({
-        type: 'text',
-        text: statusTxt,
-        width: cardW,
-        opacity: clamp01(cardAlpha * (hasInjected ? 1.0 : 0.6)),
-        style: {
-          fontSize: 10,
-          fontFamily: 'monospace',
-          fontWeight: '700',
-          color: statusCol,
-          letterSpacing: 1,
-          textAlign: 'center',
-          shadows: hasInjected ? [{ color: '#48C7E8', blur: 8, offset: { x: 0, y: 0 } }] : [],
-        },
-        positioned: { left: targetX, top: baseY + cardH + 36 },
-      });
+      if (hasInjected) {
+        // Static Fa branded logo + EMBEDDED (no dirty cyan blur glow!)
+        var faStatusW = 82;
+        var faStartX = targetCenterX - faStatusW / 2;
+        var statusY = baseY + cardH + 34;
+
+        // F in brand blue
+        kids.push({
+          type: 'text',
+          text: 'F',
+          opacity: cardAlpha,
+          style: {
+            fontSize: 12,
+            fontFamily: 'Impact',
+            fontWeight: '900',
+            color: '#5B61F6',
+          },
+          positioned: { left: faStartX, top: statusY },
+        });
+
+        // a in brand teal
+        kids.push({
+          type: 'text',
+          text: 'a',
+          opacity: cardAlpha,
+          style: {
+            fontSize: 12,
+            fontFamily: 'Impact',
+            fontWeight: '900',
+            color: '#2EBD9E',
+          },
+          positioned: { left: faStartX + 9, top: statusY },
+        });
+
+        // EMBEDDED in clean muted silver
+        kids.push({
+          type: 'text',
+          text: 'EMBEDDED',
+          opacity: cardAlpha,
+          style: {
+            fontSize: 10,
+            fontFamily: 'monospace',
+            fontWeight: '700',
+            color: '#A0AFC4',
+            letterSpacing: 1,
+          },
+          positioned: { left: faStartX + 20, top: statusY + 1 },
+        });
+      } else {
+        kids.push({
+          type: 'text',
+          text: 'STANDALONE',
+          width: cardW,
+          opacity: clamp01(cardAlpha * 0.6),
+          style: {
+            fontSize: 10,
+            fontFamily: 'monospace',
+            fontWeight: '700',
+            color: '#455268',
+            letterSpacing: 1,
+            textAlign: 'center',
+          },
+          positioned: { left: targetX, top: baseY + cardH + 35 },
+        });
+      }
     }
 
     // ------------------------------------------------------------------------
