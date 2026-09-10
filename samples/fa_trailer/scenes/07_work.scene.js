@@ -77,7 +77,6 @@ scene = {
         textAlign: 'center',
         gradient: silverGrad,
         letterSpacing: 2,
-        shadows: [{ color: '#8F6BFF', blur: 36, offset: { x: 0, y: 6 } }],
       },
       positioned: { left: 0, top: 35 },
     });

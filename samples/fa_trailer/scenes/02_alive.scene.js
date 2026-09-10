@@ -568,10 +568,6 @@ scene = {
           letterSpacing: 2,
           textAlign: 'center',
           gradient: silverGrad,
-          shadows: [
-            { color: '#00F0FF', blur: 40, offset: { x: 0, y: 8 } },
-            { color: '#000000', blur: 60, offset: { x: 0, y: 20 } },
-          ],
         },
         positioned: { left: 0, top: 460 },
       });

@@ -94,7 +94,6 @@ scene = {
           textAlign: 'center',
           gradient: silverGrad,
           letterSpacing: 2,
-          shadows: [{ color: '#8F6BFF', blur: 30, offset: { x: 0, y: 6 } }],
         },
         positioned: { left: 0, top: 75 },
       });
@@ -112,7 +111,6 @@ scene = {
           textAlign: 'center',
           gradient: gunmetalGrad,
           letterSpacing: 2,
-          shadows: [{ color: '#000000', blur: 20, offset: { x: 0, y: 6 } }],
         },
         positioned: { left: 0, top: 178 },
       });
@@ -133,10 +131,6 @@ scene = {
           textAlign: 'center',
           gradient: silverGrad,
           letterSpacing: 3,
-          shadows: [
-            { color: '#00F0FF', blur: 40, offset: { x: 0, y: 8 } },
-            { color: '#8F6BFF', blur: 80, offset: { x: 0, y: 16 } },
-          ],
         },
         positioned: { left: 0, top: 55 },
       });
@@ -153,7 +147,6 @@ scene = {
           color: '#00F0FF',
           textAlign: 'center',
           letterSpacing: 2,
-          shadows: [{ color: '#00F0FF', blur: 24, offset: { x: 0, y: 4 } }],
         },
         positioned: { left: 0, top: 188 },
       });
