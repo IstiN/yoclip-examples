@@ -181,7 +181,7 @@ scene = {
     });
 
     kids.push({
-      type: 'text', text: 'fa1.dev — macOS · iOS · Web · Chrome', width: 1920,
+      type: 'text', text: 'fa1.dev — macOS · Windows · iOS · Web · Chrome', width: 1920,
       opacity: avIn,
       offsetY: 14 * (1 - avIn),
       style: {

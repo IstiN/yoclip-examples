@@ -3,9 +3,10 @@
 // Mirroring Apple Mac Studio M5 (3uAIqqg8ZHo) 21.0s–22.5s:
 //   ·   0–45   The headline slams in Apple-style full-bleed Impact:
 //              `EVERYWHERE.` / `ONE AGENT. ANY PLATFORM.`
-//   ·  35–100  The architecture node graph materializes: floating frosted-glass
-//              cards for CLI, Studio, Cubes, Multi-Provider, Platforms
-//   ·  60–240  Glowing violet and cyan curved Bezier splines link the blocks,
+//   ·  35–100  The architecture node graph materializes with platforms and apps:
+//              macOS, Windows, iOS & Android, Chrome & Extension,
+//              PowerPoint, Word, Outlook, Studio
+//   ·  60–240  Glowing curved Bezier splines link all apps & platforms to FA CORE,
 //              with bright energy pulses streaming across the wires.
 
 scene = {
@@ -53,11 +54,11 @@ scene = {
     var breathe = 0.5 + 0.5 * Math.sin((frame / 60) * Math.PI * 2);
     kids.push({
       type: 'circle',
-      size: 900,
+      size: 960,
       fill: '#5B61F6',
       opacity: 0.12 + 0.05 * breathe,
-      blur: 110,
-      positioned: { left: 960 - 450, top: 560 - 450 },
+      blur: 120,
+      positioned: { left: 960 - 480, top: 560 - 480 },
     });
 
     // ---- Headline: EVERYWHERE. / ONE AGENT. ANY PLATFORM. -------------------
@@ -66,7 +67,7 @@ scene = {
 
     // Dim the headline slightly when nodes fully activate
     var nodeFocusT = tw(55, 30, 0, 1, 'easeInOutCubic');
-    var headDim = lerp(1.0, 0.40, nodeFocusT);
+    var headDim = lerp(1.0, 0.35, nodeFocusT);
 
     kids.push({
       type: 'text',
@@ -75,7 +76,7 @@ scene = {
       opacity: headIn1 * headDim,
       offsetY: 25 * (1 - headIn1),
       style: {
-        fontSize: 140,
+        fontSize: 130,
         fontFamily: 'Impact',
         color: '#FFFFFF',
         textAlign: 'center',
@@ -83,7 +84,7 @@ scene = {
         letterSpacing: 2,
         shadows: [{ color: '#8F6BFF', blur: 36, offset: { x: 0, y: 6 } }],
       },
-      positioned: { left: 0, top: 35 },
+      positioned: { left: 0, top: 30 },
     });
 
     kids.push({
@@ -93,7 +94,7 @@ scene = {
       opacity: headIn2 * headDim,
       offsetY: 25 * (1 - headIn2),
       style: {
-        fontSize: 70,
+        fontSize: 64,
         fontFamily: 'Impact',
         color: '#FFFFFF',
         textAlign: 'center',
@@ -101,70 +102,137 @@ scene = {
         letterSpacing: 2,
         shadows: [{ color: '#000000', blur: 24, offset: { x: 0, y: 8 } }],
       },
-      positioned: { left: 0, top: 175 },
+      positioned: { left: 0, top: 165 },
     });
 
-    // ---- Architecture Nodes (Floating Frosted-Glass Cards) ------------------
-    var nodes = [
+    // ---- Architecture Nodes: Platforms, Browsers, Office Suites ------------
+    var centerNode = {
+      id: 'core',
+      title: 'FA ENGINE',
+      badge: 'PURE DART',
+      badgeCol: '#8F6BFF',
+      sub: '100% native · zero cloud lock-in',
+      stat: 'Impeller GPU · 120 FPS Runtime',
+      x: 770, y: 440, w: 380, h: 200,
+      at: 28,
+    };
+
+    var satelliteNodes = [
+      // Left Zone: Operating Systems
       {
-        id: 'core',
-        title: 'FA CORE',
-        badge: 'PURE DART',
-        badgeCol: '#8F6BFF',
-        sub: '100% native · streaming-first',
-        stat: '10 Providers · 120 FPS Impeller',
-        x: 770, y: 460, w: 380, h: 180,
-        isCenter: true,
-        at: 30,
+        id: 'macos',
+        title: 'macOS',
+        iconLetter: '',
+        iconBg: '#3A4456',
+        sub: 'Native Menu Bar & CLI',
+        stat: 'Apple Silicon Metal',
+        x: 120, y: 310, w: 270, h: 120,
+        wireCol: '#FFFFFF',
+        at: 36,
       },
       {
-        id: 'studio',
-        title: 'STUDIO PLAYER',
-        badge: 'TIMELINE',
-        badgeCol: '#48C7E8',
-        sub: 'multi-track · scrubbing',
-        stat: 'Audio Mixdown · Hot Reload',
-        x: 180, y: 340, w: 340, h: 160,
-        at: 42,
+        id: 'windows',
+        title: 'Windows',
+        iconLetter: '⊞',
+        iconBg: '#0078D7',
+        sub: 'WinUI & System Tray',
+        stat: 'DirectX / Desktop Host',
+        x: 120, y: 460, w: 270, h: 120,
+        wireCol: '#00A4EF',
+        at: 44,
       },
       {
-        id: 'cubes',
-        title: 'CUBES SANDBOX',
-        badge: 'SECURITY',
-        badgeCol: '#2EBD9E',
-        sub: 'declarative container',
-        stat: 'Isolated Filesystem & Tools',
-        x: 180, y: 680, w: 340, h: 160,
+        id: 'mobile',
+        title: 'iOS & Android',
+        iconLetter: '📱',
+        iconBg: '#3DDC84',
+        sub: 'Touch UI & Background Sync',
+        stat: 'ARM64 Mobile Native',
+        x: 120, y: 610, w: 270, h: 120,
+        wireCol: '#3DDC84',
         at: 52,
       },
       {
-        id: 'provider',
-        title: 'MULTI-PROVIDER',
-        badge: '10 MODELS',
-        badgeCol: '#8F6BFF',
-        sub: 'unified tool-calling',
-        stat: 'Claude 3.7 · GPT-4o · Ollama',
-        x: 1400, y: 340, w: 340, h: 160,
-        at: 46,
+        id: 'cli',
+        title: 'CLI & Linux',
+        iconLetter: '>',
+        iconBg: '#2EBD9E',
+        sub: 'Headless Server Daemon',
+        stat: 'Autonomous Terminal Swarm',
+        x: 120, y: 760, w: 270, h: 120,
+        wireCol: '#2EBD9E',
+        at: 60,
+      },
+
+      // Top Zone: Browsers & Web
+      {
+        id: 'chrome',
+        title: 'Chrome Extension',
+        iconLetter: '🧩',
+        iconBg: '#FBBC05',
+        sub: 'Side Panel & Web Page DOM',
+        stat: 'Manifest V3 Native',
+        x: 460, y: 260, w: 270, h: 115,
+        wireCol: '#FBBC05',
+        at: 40,
       },
       {
-        id: 'platform',
-        title: 'CROSS-PLATFORM',
-        badge: 'ALL OS',
-        badgeCol: '#48C7E8',
-        sub: 'universal Flutter deployment',
-        stat: 'macOS · iOS · Web · Linux · Win',
-        x: 1400, y: 680, w: 340, h: 160,
+        id: 'web',
+        title: 'Web Canvas',
+        iconLetter: '🌐',
+        iconBg: '#48C7E8',
+        sub: 'WasmGC + Impeller Skia',
+        stat: 'Universal Browser Engine',
+        x: 1190, y: 260, w: 270, h: 115,
+        wireCol: '#48C7E8',
+        at: 48,
+      },
+
+      // Right Zone: Office Suites & Studio
+      {
+        id: 'powerpoint',
+        title: 'PowerPoint',
+        iconLetter: 'P',
+        iconBg: '#D24726',
+        sub: 'Editable Text & PPTX Export',
+        stat: 'Automated Slide Decks',
+        x: 1530, y: 310, w: 270, h: 120,
+        wireCol: '#D24726',
+        at: 42,
+      },
+      {
+        id: 'word',
+        title: 'Word',
+        iconLetter: 'W',
+        iconBg: '#2B579A',
+        sub: 'DOCX Specs & Technical Docs',
+        stat: 'Structured Markdown Sync',
+        x: 1530, y: 460, w: 270, h: 120,
+        wireCol: '#2B579A',
+        at: 50,
+      },
+      {
+        id: 'outlook',
+        title: 'Outlook',
+        iconLetter: 'O',
+        iconBg: '#0078D4',
+        sub: 'Actionable Email & Calendar',
+        stat: 'Task Triaging & Invites',
+        x: 1530, y: 610, w: 270, h: 120,
+        wireCol: '#0078D4',
         at: 58,
       },
-    ];
-
-    // Bezier connections between nodes
-    var connections = [
-      { from: 'studio', to: 'core', p1: { x: 520, y: 420 }, p2: { x: 770, y: 510 }, col: '#8F6BFF' },
-      { from: 'cubes', to: 'core', p1: { x: 520, y: 760 }, p2: { x: 770, y: 590 }, col: '#2EBD9E' },
-      { from: 'core', to: 'provider', p1: { x: 1150, y: 510 }, p2: { x: 1400, y: 420 }, col: '#8F6BFF' },
-      { from: 'core', to: 'platform', p1: { x: 1150, y: 590 }, p2: { x: 1400, y: 760 }, col: '#48C7E8' },
+      {
+        id: 'studio',
+        title: 'YoClip Studio',
+        iconLetter: '🎬',
+        iconBg: '#8F6BFF',
+        sub: 'Multi-Track Video Timeline',
+        stat: 'Code-First Media Engine',
+        x: 1530, y: 760, w: 270, h: 120,
+        wireCol: '#8F6BFF',
+        at: 64,
+      },
     ];
 
     function bezierPt(p0, p1, p2, p3, t) {
@@ -180,13 +248,28 @@ scene = {
     }
 
     // ---- Render Connecting Splines & Glowing Energy Pulses ------------------
-    for (var ci = 0; ci < connections.length; ci++) {
-      var c = connections[ci];
-      var wireIn = tw(48 + ci * 6, 24, 0, 1, 'easeOut');
+    for (var ci = 0; ci < satelliteNodes.length; ci++) {
+      var sn = satelliteNodes[ci];
+      var wireIn = tw(sn.at + 8, 22, 0, 1, 'easeOut');
       if (wireIn <= 0.01) continue;
 
-      var startPt = c.p1;
-      var endPt = c.p2;
+      var snCenterX = sn.x + (sn.x < 770 ? sn.w : 0);
+      var snCenterY = sn.y + sn.h / 2;
+
+      // Connect to closest edge of center node
+      var cnCenterX = 770 + (sn.x < 770 ? 0 : centerNode.w);
+      var cnCenterY = 440 + (sn.y < 440 ? 40 : (sn.y > 640 ? 160 : 100));
+
+      if (sn.y < 350) {
+        // Top nodes connect to top edge
+        snCenterX = sn.x + sn.w / 2;
+        snCenterY = sn.y + sn.h;
+        cnCenterX = 770 + (sn.x < 960 ? 80 : 300);
+        cnCenterY = 440;
+      }
+
+      var startPt = { x: snCenterX, y: snCenterY };
+      var endPt = { x: cnCenterX, y: cnCenterY };
       var midX = (startPt.x + endPt.x) / 2;
       var cp1 = { x: midX, y: startPt.y };
       var cp2 = { x: midX, y: endPt.y };
@@ -200,10 +283,10 @@ scene = {
       kids.push({
         type: 'path',
         path: pathStr,
-        color: c.col,
-        strokeWidth: 8,
-        opacity: 0.35 * wireIn,
-        blur: 6,
+        color: sn.wireCol,
+        strokeWidth: 6,
+        opacity: 0.32 * wireIn,
+        blur: 5,
       });
 
       // Core crisp wire
@@ -211,55 +294,155 @@ scene = {
         type: 'path',
         path: pathStr,
         color: '#FFFFFF',
-        strokeWidth: 2.5,
-        opacity: 0.85 * wireIn,
+        strokeWidth: 1.8,
+        opacity: 0.80 * wireIn,
       });
 
       // Energy pulse traveling along wire
       if (wireIn > 0.8) {
-        var pulseCycle = ((frame + ci * 18) % 45) / 45;
+        var pulseCycle = ((frame + ci * 14) % 40) / 40;
         var pt = bezierPt(startPt, cp1, cp2, endPt, pulseCycle);
 
-        // Pulse glow
         kids.push({
           type: 'circle',
-          size: 24,
-          fill: c.col,
+          size: 20,
+          fill: sn.wireCol,
           opacity: 0.85,
-          blur: 6,
-          positioned: { left: pt.x - 12, top: pt.y - 12 },
+          blur: 5,
+          positioned: { left: pt.x - 10, top: pt.y - 10 },
         });
-        // Pulse hot core
         kids.push({
           type: 'circle',
-          size: 8,
+          size: 6,
           fill: '#FFFFFF',
           opacity: 0.95,
-          positioned: { left: pt.x - 4, top: pt.y - 4 },
+          positioned: { left: pt.x - 3, top: pt.y - 3 },
         });
       }
     }
 
-    // ---- Render Node Cards -------------------------------------------------
-    for (var i = 0; i < nodes.length; i++) {
-      var n = nodes[i];
-      var pop = tw(n.at, 22, 0, 1, 'backOut');
-      var op = tw(n.at, 14, 0, 1, 'easeOut');
-      if (op <= 0.01) continue;
+    // ---- Render Center Hero Node (FA ENGINE) -------------------------------
+    var cPop = tw(centerNode.at, 22, 0, 1, 'backOut');
+    var cOp = tw(centerNode.at, 14, 0, 1, 'easeOut');
+    if (cOp > 0.01) {
+      // Glow behind
+      kids.push({
+        type: 'rect',
+        width: centerNode.w,
+        height: centerNode.h,
+        radius: 20,
+        fill: '#5B61F6',
+        opacity: 0.35 * cOp,
+        blur: 32,
+        positioned: { left: centerNode.x, top: centerNode.y },
+      });
+      // Card body
+      kids.push({
+        type: 'rect',
+        width: centerNode.w,
+        height: centerNode.h,
+        radius: 18,
+        fill: '#10162A',
+        stroke: '#8F6BFF',
+        strokeWidth: 2.5,
+        opacity: cOp,
+        positioned: { left: centerNode.x, top: centerNode.y },
+      });
+      // Title
+      kids.push({
+        type: 'text',
+        text: centerNode.title,
+        opacity: cOp,
+        style: {
+          fontSize: 26,
+          color: '#FFFFFF',
+          fontFamily: 'Impact',
+          fontWeight: '700',
+          letterSpacing: 1,
+        },
+        positioned: { left: centerNode.x + 24, top: centerNode.y + 22 },
+      });
+      // Badge
+      kids.push({
+        type: 'text',
+        text: '[' + centerNode.badge + ']',
+        opacity: cOp,
+        style: {
+          fontSize: 13,
+          color: '#8F6BFF',
+          fontFamily: 'monospace',
+          fontWeight: '700',
+        },
+        positioned: { left: centerNode.x + centerNode.w - 120, top: centerNode.y + 26 },
+      });
+      // Subtitle
+      kids.push({
+        type: 'text',
+        text: centerNode.sub,
+        opacity: cOp,
+        style: {
+          fontSize: 15,
+          color: '#A0B0C8',
+          fontFamily: 'Roboto',
+          fontWeight: '500',
+        },
+        positioned: { left: centerNode.x + 24, top: centerNode.y + 76 },
+      });
+      // Divider
+      kids.push({
+        type: 'rect',
+        width: centerNode.w - 48,
+        height: 1,
+        fill: '#24324F',
+        opacity: cOp,
+        positioned: { left: centerNode.x + 24, top: centerNode.y + 118 },
+      });
+      // Stat
+      kids.push({
+        type: 'text',
+        text: centerNode.stat,
+        opacity: cOp,
+        style: {
+          fontSize: 15,
+          color: '#48C7E8',
+          fontFamily: 'monospace',
+          fontWeight: '600',
+        },
+        positioned: { left: centerNode.x + 24, top: centerNode.y + 142 },
+      });
+      // Sockets
+      kids.push({
+        type: 'circle',
+        size: 12,
+        fill: '#8F6BFF',
+        opacity: cOp,
+        positioned: { left: centerNode.x - 6, top: centerNode.y + centerNode.h / 2 - 6 },
+      });
+      kids.push({
+        type: 'circle',
+        size: 12,
+        fill: '#48C7E8',
+        opacity: cOp,
+        positioned: { left: centerNode.x + centerNode.w - 6, top: centerNode.y + centerNode.h / 2 - 6 },
+      });
+    }
 
-      var isCenter = n.isCenter;
-      var cardBorder = isCenter ? '#8F6BFF' : '#2D3850';
-      var cardFill = isCenter ? '#10162A' : '#0B101E';
+    // ---- Render Satellite Cards (with Real App Icons & Logos) --------------
+    for (var i = 0; i < satelliteNodes.length; i++) {
+      var n = satelliteNodes[i];
+      var pop = tw(n.at, 20, 0, 1, 'backOut');
+      var op = tw(n.at, 12, 0, 1, 'easeOut');
+      if (op <= 0.01) continue;
 
       // Card ambient glow behind
       kids.push({
         type: 'rect',
         width: n.w,
         height: n.h,
-        radius: 18,
-        fill: isCenter ? '#5B61F6' : '#2D3850',
-        opacity: (isCenter ? 0.32 : 0.12) * op,
-        blur: isCenter ? 32 : 16,
+        radius: 14,
+        fill: n.wireCol,
+        opacity: 0.12 * op,
+        blur: 16,
         positioned: { left: n.x, top: n.y },
       });
 
@@ -268,41 +451,51 @@ scene = {
         type: 'rect',
         width: n.w,
         height: n.h,
-        radius: 16,
-        fill: cardFill,
-        stroke: cardBorder,
-        strokeWidth: isCenter ? 2.5 : 1.5,
+        radius: 14,
+        fill: '#0C1220',
+        stroke: '#24324F',
+        strokeWidth: 1.5,
         opacity: op,
         positioned: { left: n.x, top: n.y },
       });
 
-      // Top title
+      // App Icon Badge (Color Square with Letter or Icon)
+      kids.push({
+        type: 'rect',
+        width: 34,
+        height: 34,
+        radius: 8,
+        fill: n.iconBg,
+        opacity: op,
+        positioned: { left: n.x + 16, top: n.y + 14 },
+      });
+      kids.push({
+        type: 'text',
+        text: n.iconLetter,
+        opacity: op,
+        style: {
+          fontSize: 18,
+          color: '#FFFFFF',
+          fontFamily: 'Roboto',
+          fontWeight: '700',
+          textAlign: 'center',
+        },
+        positioned: { left: n.x + 16, top: n.y + 20, width: 34 },
+      });
+
+      // App / Platform Title
       kids.push({
         type: 'text',
         text: n.title,
         opacity: op,
         style: {
-          fontSize: isCenter ? 24 : 19,
+          fontSize: 17,
           color: '#FFFFFF',
           fontFamily: 'Impact',
           fontWeight: '700',
-          letterSpacing: 1,
+          letterSpacing: 0.5,
         },
-        positioned: { left: n.x + 22, top: n.y + 18 },
-      });
-
-      // Badge
-      kids.push({
-        type: 'text',
-        text: '[' + n.badge + ']',
-        opacity: op,
-        style: {
-          fontSize: 12,
-          color: n.badgeCol,
-          fontFamily: 'monospace',
-          fontWeight: '700',
-        },
-        positioned: { left: n.x + n.w - 110, top: n.y + 22 },
+        positioned: { left: n.x + 60, top: n.y + 20 },
       });
 
       // Subtitle
@@ -311,22 +504,12 @@ scene = {
         text: n.sub,
         opacity: op,
         style: {
-          fontSize: isCenter ? 15 : 13,
+          fontSize: 12,
           color: '#8A99B0',
           fontFamily: 'Roboto',
           fontWeight: '500',
         },
-        positioned: { left: n.x + 22, top: n.y + (isCenter ? 64 : 54) },
-      });
-
-      // Divider line
-      kids.push({
-        type: 'rect',
-        width: n.w - 44,
-        height: 1,
-        fill: '#1D273D',
-        opacity: op,
-        positioned: { left: n.x + 22, top: n.y + (isCenter ? 104 : 88) },
+        positioned: { left: n.x + 16, top: n.y + 58 },
       });
 
       // Bottom stat line
@@ -335,28 +518,22 @@ scene = {
         text: n.stat,
         opacity: op,
         style: {
-          fontSize: isCenter ? 15 : 13,
-          color: isCenter ? '#48C7E8' : '#6A7C98',
+          fontSize: 11,
+          color: n.wireCol,
           fontFamily: 'monospace',
           fontWeight: '600',
         },
-        positioned: { left: n.x + 22, top: n.y + (isCenter ? 124 : 106) },
+        positioned: { left: n.x + 16, top: n.y + 84 },
       });
 
-      // Ports (socket dots on left & right edges)
+      // Socket dot
+      var portOnLeft = (n.x > 770);
       kids.push({
         type: 'circle',
-        size: 10,
-        fill: '#8F6BFF',
+        size: 9,
+        fill: n.wireCol,
         opacity: op,
-        positioned: { left: n.x - 5, top: n.y + n.h / 2 - 5 },
-      });
-      kids.push({
-        type: 'circle',
-        size: 10,
-        fill: '#48C7E8',
-        opacity: op,
-        positioned: { left: n.x + n.w - 5, top: n.y + n.h / 2 - 5 },
+        positioned: { left: portOnLeft ? n.x - 4 : n.x + n.w - 5, top: n.y + n.h / 2 - 4 },
       });
     }
 
