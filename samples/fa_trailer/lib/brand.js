@@ -609,26 +609,7 @@ function faHardwareChip(cx, cy, w, h, logoK, opts) {
     });
   }
 
-  // 2. Hardware chip pins (top and bottom)
-  if (!opts || opts.pins !== false) {
-    var pinCols = 8;
-    var pinSpacing = (w - 70) / (pinCols - 1);
-    for (var pi = 0; pi < pinCols; pi++) {
-      var pinX = x + 35 + pi * pinSpacing;
-      kids.push({
-        type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
-        opacity: clamp01(0.55 * op),
-        positioned: { left: pinX - 7, top: y - 5 },
-      });
-      kids.push({
-        type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
-        opacity: clamp01(0.55 * op),
-        positioned: { left: pinX - 7, top: y + h },
-      });
-    }
-  }
-
-  // 3. Obsidian squircle hardware tile
+  // 2. Obsidian squircle hardware tile
   kids.push({
     type: 'rect',
     width: w,
@@ -640,7 +621,7 @@ function faHardwareChip(cx, cy, w, h, logoK, opts) {
     positioned: { left: x, top: y },
   });
 
-  // 4. Hardware inner bezel rim
+  // 3. Hardware inner bezel rim
   kids.push({
     type: 'rect',
     width: w - 8,

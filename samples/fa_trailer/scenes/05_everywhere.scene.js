@@ -377,6 +377,25 @@ scene = {
       positioned: { left: startCardsX + cardW / 2, top: conduitHubY },
     });
 
+    // Helper: calculate point strictly along the 3-segment circuit bus conduit
+    // Segment 1: down from Fa Core (960, coreY + coreH) to hub (960, conduitHubY)
+    // Segment 2: horizontal along hub manifold (960, conduitHubY) to (targetX, conduitHubY)
+    // Segment 3: down feeder line (targetX, conduitHubY) to target card (targetX, baseY)
+    function circuitTrackPoint(t, targetX) {
+      var ct = clamp01(t);
+      var coreBottomY = coreY + coreH;
+      if (ct < 0.22) {
+        var s1 = ct / 0.22;
+        return { x: 960, y: lerp(coreBottomY, conduitHubY, s1) };
+      } else if (ct < 0.78) {
+        var s2 = (ct - 0.22) / 0.56;
+        return { x: lerp(960, targetX, s2), y: conduitHubY };
+      } else {
+        var s3 = (ct - 0.78) / 0.22;
+        return { x: targetX, y: lerp(conduitHubY, baseY, s3) };
+      }
+    }
+
     // ------------------------------------------------------------------------
     // 5. Injection Projectiles & Card Activation Loop
     // ------------------------------------------------------------------------
@@ -401,11 +420,10 @@ scene = {
         positioned: { left: targetCenterX - 1, top: conduitHubY },
       });
 
-      // Fly projectile from Fa Core down through manifold into target card
+      // Fly projectile from Fa Core along circuit bus conduit into target card
       if (isInFlight) {
         var flightEase = tw(launchFrame, 8, 0, 1, 'easeInOutQuad');
-        var projX = lerp(960, targetCenterX, flightEase);
-        var projY = lerp(coreY + coreH, baseY, flightEase);
+        var projPt = circuitTrackPoint(flightEase, targetCenterX);
 
         kids.push({
           type: 'circle',
@@ -413,7 +431,7 @@ scene = {
           fill: '#48C7E8',
           opacity: 0.85,
           blur: 16,
-          positioned: { left: projX - 21, top: projY - 21 },
+          positioned: { left: projPt.x - 21, top: projPt.y - 21 },
         });
         kids.push({
           type: 'circle',
@@ -421,7 +439,7 @@ scene = {
           fill: '#FFFFFF',
           opacity: 0.98,
           blur: 4,
-          positioned: { left: projX - 8, top: projY - 8 },
+          positioned: { left: projPt.x - 8, top: projPt.y - 8 },
         });
       }
 
@@ -603,21 +621,20 @@ scene = {
     }
 
     // ------------------------------------------------------------------------
-    // 6. Connecting Synaptic Pulses (Frame 150–240)
+    // 6. Connecting Synaptic Pulses (Frame 150–240) - Running strictly along circuits!
     // ------------------------------------------------------------------------
     if (frame >= 150) {
       var syncPulseT = ((frame - 150) % 24) / 24;
       for (var pi2 = 0; pi2 < apps.length; pi2++) {
         var pTargetCenterX = startCardsX + pi2 * stepX + cardW / 2;
-        var pX = lerp(960, pTargetCenterX, syncPulseT);
-        var pY = lerp(coreY + coreH, baseY, syncPulseT);
+        var pPt = circuitTrackPoint(syncPulseT, pTargetCenterX);
         kids.push({
           type: 'circle',
           size: 8,
           fill: '#48C7E8',
           opacity: 0.75,
           blur: 3,
-          positioned: { left: pX - 4, top: pY - 4 },
+          positioned: { left: pPt.x - 4, top: pPt.y - 4 },
         });
       }
     }

@@ -60,76 +60,188 @@ scene = {
     // ---- Beat 1 — CUBES. ----------------------------------------------------
     // Out-of-the-box cube variations grid (8 presets from Fa security ladder)
     var cubePresets = [
-      { id: 'L1-CORE', tier: 'L1', title: 'STRICT WORKSPACE', spec: 'fs: [.] · net: none · core tools', col: '#2EBD9E' },
-      { id: 'L1-FULL', tier: 'L1', title: 'ISOLATED SHELL', spec: 'fs: [.] · net: none · full CLI', col: '#2EBD9E' },
-      { id: 'L2-CORE', tier: 'L2', title: 'HOST AUDITED', spec: 'fs: ro / · ws: rw · dev net', col: '#48C7E8' },
-      { id: 'L2-FULL', tier: 'L2', title: 'STANDARD SANDBOX', spec: 'fs: ro / · ws: rw · npm/pub', col: '#5B61F6' },
-      { id: 'L3-CORE', tier: 'L3', title: 'FULL DISK AUDITED', spec: 'fs: rw / · safe tool policy', col: '#8F6BFF' },
-      { id: 'L3-FULL', tier: 'L3', title: 'UNRESTRICTED HOST', spec: 'fs: rw / · open net · root', col: '#A368FF' },
-      { id: 'EPHEMERAL', tier: 'TMP', title: 'RAM SCRATCH DISK', spec: 'type: tmpfs · zero traces', col: '#E056FD' },
-      { id: 'CONTAINER', tier: 'OCI', title: 'DOCKER PIPELINE', spec: 'runtime: oci · hermetic CI', col: '#00F0FF' },
+      {
+        id: 'L1-CORE', tier: 'L1 SANDBOX', col: '#2EBD9E',
+        role: 'STRICT WORKSPACE ISOLATION',
+        fs: 'fs: [.] (workspace only)',
+        fsNote: 'No host reading · /Users blocked',
+        net: 'net: none (air-gapped offline)',
+        netNote: '0 outbound sockets permitted',
+        tools: 'Core read, write & edit tools',
+        policyNote: 'Arbitrary shell execution blocked',
+        summary: 'Safe for untrusted PR reviews & unknown repos',
+      },
+      {
+        id: 'L1-FULL', tier: 'L1 SANDBOX', col: '#2EBD9E',
+        role: 'ISOLATED CLI WORKSPACE',
+        fs: 'fs: [.] (workspace only)',
+        fsNote: 'Scripts locked inside project dir',
+        net: 'net: none (air-gapped offline)',
+        netNote: '0 external connections allowed',
+        tools: 'Full bash, local scripts & build',
+        policyNote: 'Shell execution strictly sandboxed',
+        summary: 'Fast local refactoring & offline test suites',
+      },
+      {
+        id: 'L2-CORE', tier: 'L2 AUDITED', col: '#48C7E8',
+        role: 'AUDITED DEVELOPER RUNTIME',
+        fs: 'fs: ro / · rw [.] (project)',
+        fsNote: 'Host root read-only · project rw',
+        net: 'net: dev domain allowlist',
+        netNote: 'git, pub, npm registry whitelisted',
+        tools: 'Compilers, linters & LSP servers',
+        policyNote: 'Protected system files unmodifiable',
+        summary: 'Standard daily workflow with package downloads & LSP',
+      },
+      {
+        id: 'L2-FULL', tier: 'L2 AUDITED', col: '#5B61F6',
+        role: 'STANDARD AGENT ENVIRONMENT',
+        fs: 'fs: ro / · rw [.] (project)',
+        fsNote: 'Read-only root · safe project edits',
+        net: 'net: dev net & package managers',
+        netNote: 'Full dependency fetching enabled',
+        tools: 'Full bash, build toolchains & test',
+        policyNote: 'Destructive commands gated by policy',
+        summary: 'Comprehensive compilation & full build pipelines',
+      },
+      {
+        id: 'L3-CORE', tier: 'L3 POWER', col: '#8F6BFF',
+        role: 'SYSTEM-WIDE AUDITED ACCESS',
+        fs: 'fs: rw / (full disk audited)',
+        fsNote: 'Read-write across host directories',
+        net: 'net: full open network',
+        netNote: 'HTTP/HTTPS, SSH & custom ports',
+        tools: 'OS diagnostics, CLI & multi-repo',
+        policyNote: 'Destructive actions prompt confirmation',
+        summary: 'Cross-repo orchestration & multi-project refactoring',
+      },
+      {
+        id: 'L3-FULL', tier: 'L3 POWER', col: '#A368FF',
+        role: 'UNRESTRICTED AUTONOMOUS ROOT',
+        fs: 'fs: rw / (unrestricted root)',
+        fsNote: 'Complete host machine access',
+        net: 'net: open internet & daemon ports',
+        netNote: 'Unrestricted socket & network binding',
+        tools: 'Unrestricted headless tool suite',
+        policyNote: 'Zero approval prompts · Dark factory',
+        summary: 'Autonomous background agents & dark factory CI',
+      },
+      {
+        id: 'EPHEMERAL', tier: 'TMP RAM', col: '#E056FD',
+        role: 'RAM SCRATCHPAD DISK',
+        fs: 'fs: tmpfs (pure RAM mount)',
+        fsNote: 'In-memory workspace · 0 disk writes',
+        net: 'net: isolated dev access',
+        netNote: 'Package fetching into RAM cache',
+        tools: 'Volatile sandboxed build & run',
+        policyNote: 'Auto-wiped on process termination',
+        summary: 'Zero-trace security testing & disposable tasks',
+      },
+      {
+        id: 'CONTAINER', tier: 'OCI DOCKER', col: '#00F0FF',
+        role: 'HERMETIC DOCKER PIPELINE',
+        fs: 'fs: disposable OCI rootfs',
+        fsNote: 'Isolated container volume mount',
+        net: 'net: virtual bridge network',
+        netNote: 'Sandboxed virtual container bridge',
+        tools: 'Docker / Podman container daemon',
+        policyNote: 'Reproducible hermetic environment',
+        summary: 'Production container builds, cloud CI & air-tight runs',
+      },
     ];
 
     var gridIn = tw(0, 24, 0, 1, 'easeOutCubic');
     var b1kids = [];
 
-    // Background architectural template grid (4 columns x 2 rows)
-    var cW = 360;
-    var cH = 96;
-    var cGapX = 24;
-    var cGapY = 530; // separates top row from bottom row
-    var cStartX = (1920 - (4 * cW + 3 * cGapX)) / 2; // 204
+    // Header: CUBES. + Subtitle
+    b1kids.push({
+      type: 'text',
+      text: 'CUBES.',
+      width: 1920,
+      opacity: clamp01(gridIn),
+      style: {
+        fontSize: 72,
+        fontFamily: 'Impact',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        gradient: silverGrad,
+        letterSpacing: 6,
+      },
+      positioned: { left: 0, top: 26 },
+    });
+
+    b1kids.push({
+      type: 'text',
+      text: 'DECLARATIVE YAML SANDBOX · 8 VERIFIED APPROVAL TIERS',
+      width: 1920,
+      opacity: clamp01(gridIn * 0.9),
+      style: {
+        fontSize: 17,
+        fontFamily: 'Impact',
+        color: '#A368FF',
+        letterSpacing: 2,
+        textAlign: 'center',
+      },
+      positioned: { left: 0, top: 104 },
+    });
+
+    // 4 Columns x 2 Rows Grid of 390x390 Cube Squares
+    var cW = 390;
+    var cH = 390;
+    var cGapX = 26;
+    var cGapY = 32;
+    var cStartX = (1920 - (4 * cW + 3 * cGapX)) / 2; // 141
 
     for (var ci = 0; ci < cubePresets.length; ci++) {
       var cp = cubePresets[ci];
       var colIdx = ci % 4;
       var rowIdx = Math.floor(ci / 4);
       var cX = cStartX + colIdx * (cW + cGapX);
-      var cY = rowIdx === 0 ? 65 : 720; // Row 0 at 65 (ends 161), Row 1 at 720 (ends 816)
+      var cY = rowIdx === 0 ? 150 : 572;
 
-      var cardDrift = (1 - gridIn) * (rowIdx === 0 ? -25 : 25);
+      var cardDrift = (1 - gridIn) * (rowIdx === 0 ? -30 : 30);
 
-      // Card container
+      // Cube Square Container
       b1kids.push({
         type: 'rect',
         width: cW,
         height: cH,
-        radius: 16,
-        fill: '#080D1A',
-        border: { color: '#1B263C', width: 1.5 },
-        opacity: clamp01(gridIn * 0.92),
+        radius: 20,
+        fill: '#080E1B',
+        border: { color: cp.col, width: 1.5 },
+        opacity: clamp01(gridIn * 0.95),
         offsetY: cardDrift,
         positioned: { left: cX, top: cY },
       });
 
-      // Accent color strip on left
+      // Accent color strip on left edge
       b1kids.push({
         type: 'rect',
         width: 4,
-        height: cH - 28,
+        height: cH - 32,
         radius: 2,
         fill: cp.col,
-        opacity: clamp01(gridIn * 0.9),
+        opacity: clamp01(gridIn),
         offsetY: cardDrift,
-        positioned: { left: cX + 12, top: cY + 14 },
+        positioned: { left: cX + 12, top: cY + 16 },
       });
 
       // Tier badge pill
       b1kids.push({
         type: 'rect',
-        width: 42,
-        height: 20,
-        radius: 6,
-        fill: '#121D32',
+        width: 86,
+        height: 22,
+        radius: 11,
+        fill: '#121F38',
         border: { color: cp.col, width: 1.0 },
-        opacity: clamp01(gridIn * 0.95),
+        opacity: clamp01(gridIn),
         offsetY: cardDrift,
-        positioned: { left: cX + 26, top: cY + 12 },
+        positioned: { left: cX + 24, top: cY + 18 },
       });
       b1kids.push({
         type: 'text',
         text: cp.tier,
-        width: 42,
+        width: 86,
         opacity: clamp01(gridIn),
         offsetY: cardDrift,
         style: {
@@ -137,112 +249,218 @@ scene = {
           fontFamily: 'Impact',
           color: cp.col,
           textAlign: 'center',
-          letterSpacing: 0.5,
+          letterSpacing: 0.8,
         },
-        positioned: { left: cX + 26, top: cY + 16 },
+        positioned: { left: cX + 24, top: cY + 22 },
       });
 
       // Preset ID
       b1kids.push({
         type: 'text',
         text: cp.id,
-        width: cW - 85,
+        width: cW - 130,
         opacity: clamp01(gridIn),
         offsetY: cardDrift,
         style: {
-          fontSize: 15,
+          fontSize: 22,
           fontFamily: 'Impact',
           color: '#FFFFFF',
           letterSpacing: 1.5,
         },
-        positioned: { left: cX + 76, top: cY + 12 },
+        positioned: { left: cX + 118, top: cY + 16 },
       });
 
-      // Title
+      // Role subtitle
       b1kids.push({
         type: 'text',
-        text: cp.title,
-        width: cW - 40,
-        opacity: clamp01(gridIn * 0.85),
+        text: cp.role,
+        width: cW - 48,
+        opacity: clamp01(gridIn * 0.9),
         offsetY: cardDrift,
         style: {
           fontSize: 12,
           fontFamily: 'Impact',
-          color: '#8A99B2',
+          color: cp.col,
           letterSpacing: 1,
         },
-        positioned: { left: cX + 26, top: cY + 38 },
+        positioned: { left: cX + 24, top: cY + 48 },
       });
 
-      // Spec / Policy
+      // Divider line
+      b1kids.push({
+        type: 'rect',
+        width: cW - 48,
+        height: 1,
+        fill: '#1E2D4A',
+        opacity: clamp01(gridIn * 0.8),
+        offsetY: cardDrift,
+        positioned: { left: cX + 24, top: cY + 72 },
+      });
+
+      // Policy Line 1: FILESYSTEM
       b1kids.push({
         type: 'text',
-        text: cp.spec,
-        width: cW - 40,
+        text: 'FILESYSTEM POLICY',
         opacity: clamp01(gridIn * 0.7),
         offsetY: cardDrift,
         style: {
-          fontSize: 10,
+          fontSize: 9,
           fontFamily: 'monospace',
-          fontWeight: '600',
-          color: '#48C7E8',
+          fontWeight: '800',
+          color: '#6A7D9A',
+          letterSpacing: 0.8,
         },
-        positioned: { left: cX + 26, top: cY + 62 },
+        positioned: { left: cX + 24, top: cY + 84 },
       });
-    }
+      b1kids.push({
+        type: 'text',
+        text: cp.fs,
+        opacity: clamp01(gridIn),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 11,
+          fontFamily: 'monospace',
+          fontWeight: '700',
+          color: '#FFFFFF',
+        },
+        positioned: { left: cX + 24, top: cY + 98 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: cp.fsNote,
+        opacity: clamp01(gridIn * 0.75),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 9,
+          fontFamily: 'monospace',
+          color: '#8899B0',
+        },
+        positioned: { left: cX + 24, top: cY + 114 },
+      });
 
-    // Rotating wireframe isometric cubes in center
-    var spin = tw(0, 70, 0, 1, 'linear');
-    var squares = [
-      { base: 45, size: 540, o: 0.22 },
-      { base: -45, size: 540, o: 0.16 },
-      { base: 0, size: 540, o: 0.12 },
-    ];
-    for (var si = 0; si < squares.length; si++) {
-      var q = squares[si];
+      // Policy Line 2: NETWORK
+      b1kids.push({
+        type: 'text',
+        text: 'NETWORK ACCESS',
+        opacity: clamp01(gridIn * 0.7),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 9,
+          fontFamily: 'monospace',
+          fontWeight: '800',
+          color: '#6A7D9A',
+          letterSpacing: 0.8,
+        },
+        positioned: { left: cX + 24, top: cY + 138 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: cp.net,
+        opacity: clamp01(gridIn),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 11,
+          fontFamily: 'monospace',
+          fontWeight: '700',
+          color: '#FFFFFF',
+        },
+        positioned: { left: cX + 24, top: cY + 152 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: cp.netNote,
+        opacity: clamp01(gridIn * 0.75),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 9,
+          fontFamily: 'monospace',
+          color: '#8899B0',
+        },
+        positioned: { left: cX + 24, top: cY + 168 },
+      });
+
+      // Policy Line 3: SHELL & TOOLS
+      b1kids.push({
+        type: 'text',
+        text: 'EXECUTION & TOOLS',
+        opacity: clamp01(gridIn * 0.7),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 9,
+          fontFamily: 'monospace',
+          fontWeight: '800',
+          color: '#6A7D9A',
+          letterSpacing: 0.8,
+        },
+        positioned: { left: cX + 24, top: cY + 192 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: cp.tools,
+        opacity: clamp01(gridIn),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 11,
+          fontFamily: 'monospace',
+          fontWeight: '700',
+          color: '#FFFFFF',
+        },
+        positioned: { left: cX + 24, top: cY + 206 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: cp.policyNote,
+        opacity: clamp01(gridIn * 0.75),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 9,
+          fontFamily: 'monospace',
+          color: '#8899B0',
+        },
+        positioned: { left: cX + 24, top: cY + 222 },
+      });
+
+      // Policy Box 4: PRIMARY USE CASE
       b1kids.push({
         type: 'rect',
-        width: q.size,
-        height: q.size,
-        radius: 20,
-        border: { color: '#8F6BFF', width: 2 },
-        opacity: q.o,
-        rotation: q.base + 16 * spin,
-        positioned: { left: 960 - q.size / 2, top: 430 - q.size / 2 },
+        width: cW - 48,
+        height: 112,
+        radius: 12,
+        fill: '#050912',
+        border: { color: '#1B2942', width: 1.0 },
+        opacity: clamp01(gridIn * 0.9),
+        offsetY: cardDrift,
+        positioned: { left: cX + 24, top: cY + 252 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: 'PRIMARY USE CASE',
+        opacity: clamp01(gridIn),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 9,
+          fontFamily: 'monospace',
+          fontWeight: '800',
+          color: cp.col,
+          letterSpacing: 1,
+        },
+        positioned: { left: cX + 36, top: cY + 264 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: cp.summary,
+        width: cW - 72,
+        opacity: clamp01(gridIn * 0.95),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 12,
+          fontFamily: 'monospace',
+          fontWeight: '700',
+          color: '#E0E8F5',
+        },
+        positioned: { left: cX + 36, top: cY + 286 },
       });
     }
-
-    var sandboxIn = tw(14, 20, 0, 1, 'easeOut');
-    b1kids.push({
-      type: 'text',
-      text: 'CUBES.',
-      width: 1920,
-      style: {
-        fontSize: 300,
-        fontFamily: 'Impact',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        gradient: silverGrad,
-        letterSpacing: 4,
-      },
-      positioned: { left: 0, top: 190 },
-    });
-
-    b1kids.push({
-      type: 'text',
-      text: 'DECLARATIVE YAML SANDBOX. APPROVAL TIERS.',
-      width: 1920,
-      opacity: clamp01(sandboxIn),
-      offsetY: 15 * (1 - sandboxIn),
-      style: {
-        fontSize: 34,
-        fontFamily: 'Impact',
-        color: '#A368FF',
-        letterSpacing: 2,
-        textAlign: 'center',
-      },
-      positioned: { left: 0, top: 600 },
-    });
 
     // ---- Beat 2 — MEMORY / BUILT IN. ---------------------------------------
     var swarmZoom = lerp(1.05, 1.15, tw(70, 70, 0, 1, 'linear'));

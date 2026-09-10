@@ -100,7 +100,6 @@ scene = {
         textAlign: 'center',
         gradient: purpleGrad,
         letterSpacing: 2,
-        shadows: [{ color: '#000000', blur: 24, offset: { x: 0, y: 8 } }],
       },
       positioned: { left: 0, top: 175 },
     });
