@@ -640,10 +640,18 @@ function faHardwareChip(cx, cy, w, h, logoK, opts) {
   var bowlP = opts && opts.bowlProgress != null ? opts.bowlProgress : 1.0;
   var stemP = opts && opts.stemProgress != null ? opts.stemProgress : 1.0;
 
-  setMapper(logoK, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
-  var markKids = completeFaMark(fP, accentP, bowlP, stemP, op);
-  for (var mi = 0; mi < markKids.length; mi++) {
-    kids.push(markKids[mi]);
+  var isComplete = fP >= 0.999 && accentP >= 0.999 && bowlP >= 0.999 && stemP >= 0.999;
+  if (isComplete) {
+    var markKids = faBrandMark(cx, cy, logoK, op);
+    for (var mi = 0; mi < markKids.length; mi++) {
+      kids.push(markKids[mi]);
+    }
+  } else {
+    setMapper(logoK, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
+    var markKids = completeFaMark(fP, accentP, bowlP, stemP, op);
+    for (var mi = 0; mi < markKids.length; mi++) {
+      kids.push(markKids[mi]);
+    }
   }
 
   return kids;
