@@ -509,7 +509,7 @@ function fAccentBar(progress, opacity) {
 }
 
 /// Canonical vector SVG markup for the Fa brand mark (bold, muscular F + donut hole a).
-/// Uses viewBox="235 345 540 435" (aspect ratio ~1.241:1).
+/// Uses viewBox="235 345 540 435" (aspect ratio ~1.241:1), centered at (505, 562.5).
 function faLogoSvgData(op) {
   var o = op == null ? 1 : op;
   var opAttr = o < 0.999 ? ' opacity="' + o.toFixed(3) + '"' : '';
@@ -534,6 +534,14 @@ function faLogoSvgNode(cx, cy, h, op) {
   };
 }
 
+/// Canonical, reusable Fa brand mark.
+/// Used across all scenes (03_hardware, 05_everywhere, 08_lockup, badges, chips).
+/// Guarantees the circular donut hole in the `a` at any scale k.
+function faBrandMark(cx, cy, k, opacity) {
+  var h = Math.round(435 * k);
+  return [faLogoSvgNode(cx, cy, h, opacity)];
+}
+
 /// The complete, canonical Fa wordmark:
 /// 1. F stem + top bar (brand blue, bold strokeWidth 70)
 /// 2. F middle teal accent bar (height 56)
@@ -542,6 +550,15 @@ function faLogoSvgNode(cx, cy, h, op) {
 function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, opacity) {
   var kids = [];
   var op = opacity == null ? 1 : opacity;
+
+  // When fully formed, transition seamlessly into the canonical vector mark.
+  // Because h = 435 * k and viewBox center matches (505, 562.5), scale and position are 1:1.
+  if (fProgress >= 0.999 && accentProgress >= 0.999 && bowlProgress >= 0.999 && stemProgress >= 0.999) {
+    var center = brandToScreen(505, 562.5);
+    var markKids = faBrandMark(center.x, center.y, mapper.k, op);
+    for (var mi = 0; mi < markKids.length; mi++) kids.push(markKids[mi]);
+    return kids;
+  }
 
   if (fProgress > 0.001) {
     kids.push(fPathNode(fProgress, '#5B61F6', op));
