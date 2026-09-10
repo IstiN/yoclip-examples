@@ -18,7 +18,7 @@
 // Requires js_widget_runtime 0.4.115+ (jsr.ease, jsr.motion, path progress).
 
 project = {
-  lib: 'lib/brand.js',
+  lib: ['lib/brand.js', 'lib/icons.js'],
   scenes: [
     { path: 'scenes/01_dark.scene.js', layer: 'content', start: 0 },
     { path: 'scenes/02_alive.scene.js', layer: 'content', start: 210 },

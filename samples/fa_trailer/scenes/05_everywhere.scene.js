@@ -1,4 +1,4 @@
-// 05 — Everywhere — connecting blocks / node graph.
+// 05 — Everywhere — connecting blocks / node graph with official vector SVG logos.
 //
 // Mirroring Apple Mac Studio M5 (3uAIqqg8ZHo) 21.0s–22.5s:
 //   ·   0–45   The headline slams in Apple-style full-bleed Impact:
@@ -122,8 +122,7 @@ scene = {
       {
         id: 'macos',
         title: 'macOS',
-        iconLetter: '',
-        iconBg: '#3A4456',
+        iconId: 'apple',
         sub: 'Native Menu Bar & CLI',
         stat: 'Apple Silicon Metal',
         x: 120, y: 310, w: 270, h: 120,
@@ -133,8 +132,7 @@ scene = {
       {
         id: 'windows',
         title: 'Windows',
-        iconLetter: '⊞',
-        iconBg: '#0078D7',
+        iconId: 'windows',
         sub: 'WinUI & System Tray',
         stat: 'DirectX / Desktop Host',
         x: 120, y: 460, w: 270, h: 120,
@@ -144,8 +142,7 @@ scene = {
       {
         id: 'mobile',
         title: 'iOS & Android',
-        iconLetter: '📱',
-        iconBg: '#3DDC84',
+        iconId: 'android',
         sub: 'Touch UI & Background Sync',
         stat: 'ARM64 Mobile Native',
         x: 120, y: 610, w: 270, h: 120,
@@ -155,8 +152,7 @@ scene = {
       {
         id: 'cli',
         title: 'CLI & Linux',
-        iconLetter: '>',
-        iconBg: '#2EBD9E',
+        iconId: 'terminal',
         sub: 'Headless Server Daemon',
         stat: 'Autonomous Terminal Swarm',
         x: 120, y: 760, w: 270, h: 120,
@@ -168,8 +164,7 @@ scene = {
       {
         id: 'chrome',
         title: 'Chrome Extension',
-        iconLetter: '🧩',
-        iconBg: '#FBBC05',
+        iconId: 'puzzle',
         sub: 'Side Panel & Web Page DOM',
         stat: 'Manifest V3 Native',
         x: 460, y: 260, w: 270, h: 115,
@@ -179,8 +174,7 @@ scene = {
       {
         id: 'web',
         title: 'Web Canvas',
-        iconLetter: '🌐',
-        iconBg: '#48C7E8',
+        iconId: 'chrome',
         sub: 'WasmGC + Impeller Skia',
         stat: 'Universal Browser Engine',
         x: 1190, y: 260, w: 270, h: 115,
@@ -192,8 +186,7 @@ scene = {
       {
         id: 'powerpoint',
         title: 'PowerPoint',
-        iconLetter: 'P',
-        iconBg: '#D24726',
+        iconId: 'powerpoint',
         sub: 'Editable Text & PPTX Export',
         stat: 'Automated Slide Decks',
         x: 1530, y: 310, w: 270, h: 120,
@@ -203,8 +196,7 @@ scene = {
       {
         id: 'word',
         title: 'Word',
-        iconLetter: 'W',
-        iconBg: '#2B579A',
+        iconId: 'word',
         sub: 'DOCX Specs & Technical Docs',
         stat: 'Structured Markdown Sync',
         x: 1530, y: 460, w: 270, h: 120,
@@ -214,8 +206,7 @@ scene = {
       {
         id: 'outlook',
         title: 'Outlook',
-        iconLetter: 'O',
-        iconBg: '#0078D4',
+        iconId: 'outlook',
         sub: 'Actionable Email & Calendar',
         stat: 'Task Triaging & Invites',
         x: 1530, y: 610, w: 270, h: 120,
@@ -225,8 +216,7 @@ scene = {
       {
         id: 'studio',
         title: 'YoClip Studio',
-        iconLetter: '🎬',
-        iconBg: '#8F6BFF',
+        iconId: 'studio',
         sub: 'Multi-Track Video Timeline',
         stat: 'Code-First Media Engine',
         x: 1530, y: 760, w: 270, h: 120,
@@ -427,7 +417,7 @@ scene = {
       });
     }
 
-    // ---- Render Satellite Cards (with Real App Icons & Logos) --------------
+    // ---- Render Satellite Cards (with Real Vector SVG Logos) ---------------
     for (var i = 0; i < satelliteNodes.length; i++) {
       var n = satelliteNodes[i];
       var pop = tw(n.at, 20, 0, 1, 'backOut');
@@ -459,29 +449,30 @@ scene = {
         positioned: { left: n.x, top: n.y },
       });
 
-      // App Icon Badge (Color Square with Letter or Icon)
+      // Background tile behind icon
       kids.push({
         type: 'rect',
-        width: 34,
-        height: 34,
-        radius: 8,
-        fill: n.iconBg,
+        width: 38,
+        height: 38,
+        radius: 9,
+        fill: '#151D2F',
+        stroke: '#293754',
+        strokeWidth: 1,
         opacity: op,
-        positioned: { left: n.x + 16, top: n.y + 14 },
+        positioned: { left: n.x + 14, top: n.y + 12 },
       });
-      kids.push({
-        type: 'text',
-        text: n.iconLetter,
-        opacity: op,
-        style: {
-          fontSize: 18,
-          color: '#FFFFFF',
-          fontFamily: 'Roboto',
-          fontWeight: '700',
-          textAlign: 'center',
-        },
-        positioned: { left: n.x + 16, top: n.y + 20, width: 34 },
-      });
+
+      // Official Vector SVG Icon
+      if (typeof icons !== 'undefined' && icons[n.iconId]) {
+        kids.push({
+          type: 'svg',
+          data: icons[n.iconId],
+          width: 24,
+          height: 24,
+          opacity: op,
+          positioned: { left: n.x + 21, top: n.y + 19 },
+        });
+      }
 
       // App / Platform Title
       kids.push({
@@ -495,7 +486,7 @@ scene = {
           fontWeight: '700',
           letterSpacing: 0.5,
         },
-        positioned: { left: n.x + 60, top: n.y + 20 },
+        positioned: { left: n.x + 62, top: n.y + 20 },
       });
 
       // Subtitle
