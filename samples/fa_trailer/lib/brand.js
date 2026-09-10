@@ -508,39 +508,106 @@ function fAccentBar(progress, opacity) {
   return kids;
 }
 
-/// Canonical vector SVG markup for the Fa brand mark:
-/// Muscular, chubby F + thick donut bowl with a clear round center hole.
-/// Uses viewBox="235 345 540 435" (aspect ratio ~1.241:1), centered at (505, 562.5).
-function faLogoSvgData(op) {
-  var o = op == null ? 1 : op;
-  var opAttr = o < 0.999 ? ' opacity="' + o.toFixed(3) + '"' : '';
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="235 345 540 435"' + opAttr + '>' +
-    '<path d="M 296 700 L 296 408 L 556 408" stroke="#5B61F6" stroke-width="84" stroke-linecap="round" stroke-linejoin="round" fill="none" />' +
-    '<rect x="254" y="524" width="232" height="64" rx="32" fill="#2EBD9E" />' +
-    '<circle cx="640" cy="640" r="64" stroke="#2EBD9E" stroke-width="76" fill="none" />' +
-    '<path d="M 704 576 L 704 704" stroke="#2EBD9E" stroke-width="76" stroke-linecap="round" fill="none" />' +
-    '</svg>';
+/// Canonical, reusable Fa brand mark.
+/// Dynamically computed directly from the canonical BRAND geometry:
+/// - F top bar & stem: muscular brand blue `#5B61F6` with round caps and elbow
+/// - F accent bar: brand teal `#2EBD9E` capsule
+/// - a bowl: brand teal `#2EBD9E` circular ring (radius 84, stroke 60, clean round hole)
+/// - a stem: brand teal `#2EBD9E` vertical capsule flush with bowl tangent
+///
+/// Guaranteed 100% vector fidelity and clean round donut hole at any scale k.
+function faBrandMark(cx, cy, k, opacity) {
+  var op = opacity == null ? 1 : opacity;
+  var kids = [];
+  var ax = BRAND.anchor[0];
+  var ay = BRAND.anchor[1];
+
+  function toScr(x, y) {
+    return {
+      x: cx + (x - ax) * k,
+      y: cy + (y - ay) * k,
+    };
+  }
+
+  // 1. F stem: from x: 258, y: 366 to 724, w: 70
+  var fTop = toScr(258, 366);
+  kids.push({
+    type: 'rect',
+    width: 70 * k,
+    height: (724 - 366) * k,
+    radius: 35 * k,
+    fill: '#5B61F6',
+    opacity: op,
+    positioned: { left: fTop.x, top: fTop.y },
+  });
+
+  // 2. F top bar: from x: 258 to 556, y: 366, h: 70
+  kids.push({
+    type: 'rect',
+    width: (556 - 258) * k,
+    height: 70 * k,
+    radius: 35 * k,
+    fill: '#5B61F6',
+    opacity: op,
+    positioned: { left: fTop.x, top: fTop.y },
+  });
+
+  // 3. F accent bar: from x: 258, y: 554, w: 224, h: 56
+  var accPos = toScr(258, 554);
+  kids.push({
+    type: 'rect',
+    width: 224 * k,
+    height: 56 * k,
+    radius: 28 * k,
+    fill: '#2EBD9E',
+    opacity: op,
+    positioned: { left: accPos.x, top: accPos.y - 28 * k },
+  });
+
+  // 4. a bowl: circular ring at (640, 640), r: 84, strokeWidth: 60
+  var bowlCenter = toScr(640, 640);
+  var bowlSize = (84 * 2 + 60) * k;
+  kids.push({
+    type: 'circle',
+    size: bowlSize,
+    stroke: '#2EBD9E',
+    strokeWidth: 60 * k,
+    opacity: op,
+    positioned: {
+      left: bowlCenter.x - bowlSize / 2,
+      top: bowlCenter.y - bowlSize / 2,
+    },
+  });
+
+  // 5. a stem: vertical capsule at x: 724, from y: 556 to 724, strokeWidth: 60
+  var stemTop = toScr(724 - 30, 556 - 30);
+  kids.push({
+    type: 'rect',
+    width: 60 * k,
+    height: (168 + 60) * k,
+    radius: 30 * k,
+    fill: '#2EBD9E',
+    opacity: op,
+    positioned: {
+      left: stemTop.x,
+      top: stemTop.y,
+    },
+  });
+
+  return kids;
 }
 
-/// Static vector Fa brand mark widget, centered at (cx, cy) with given height.
+/// Helper for embedding the canonical Fa mark inside small chips, badges and buttons.
 function faLogoSvgNode(cx, cy, h, op) {
-  var w = Math.round(h * (540 / 435));
+  var k = h / 435;
+  var w = Math.round(540 * k);
   return {
-    type: 'svg',
-    svg: faLogoSvgData(op),
+    type: 'stack',
     width: w,
     height: h,
-    opacity: op == null ? 1 : op,
+    children: faBrandMark(Math.round(w / 2), Math.round(h / 2), k, op),
     positioned: { left: Math.round(cx - w / 2), top: Math.round(cy - h / 2) },
   };
-}
-
-/// Canonical, reusable chubby Fa brand mark.
-/// Used across all scenes (03_hardware, 05_everywhere, 08_lockup, badges, chips).
-/// Guarantees the bold chubby proportions and circular donut hole in the `a` at any scale k.
-function faBrandMark(cx, cy, k, opacity) {
-  var h = Math.round(435 * k);
-  return [faLogoSvgNode(cx, cy, h, opacity)];
 }
 
 /// The complete, canonical Fa wordmark:
