@@ -508,6 +508,32 @@ function fAccentBar(progress, opacity) {
   return kids;
 }
 
+/// Canonical vector SVG markup for the Fa brand mark (bold, muscular F + donut hole a).
+/// Uses viewBox="235 345 540 435" (aspect ratio ~1.241:1).
+function faLogoSvgData(op) {
+  var o = op == null ? 1 : op;
+  var opAttr = o < 0.999 ? ' opacity="' + o.toFixed(3) + '"' : '';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="235 345 540 435"' + opAttr + '>' +
+    '<path d="M 293 724 L 293 401 L 556 401" stroke="#5B61F6" stroke-width="70" stroke-linecap="round" stroke-linejoin="round" fill="none" />' +
+    '<rect x="258" y="528" width="224" height="56" rx="28" fill="#2EBD9E" />' +
+    '<circle cx="640" cy="640" r="84" stroke="#2EBD9E" stroke-width="60" fill="none" />' +
+    '<path d="M 724 556 L 724 724" stroke="#2EBD9E" stroke-width="60" stroke-linecap="round" fill="none" />' +
+    '</svg>';
+}
+
+/// Static vector Fa brand mark widget, centered at (cx, cy) with given height.
+function faLogoSvgNode(cx, cy, h, op) {
+  var w = Math.round(h * (540 / 435));
+  return {
+    type: 'svg',
+    svg: faLogoSvgData(op),
+    width: w,
+    height: h,
+    opacity: op == null ? 1 : op,
+    positioned: { left: Math.round(cx - w / 2), top: Math.round(cy - h / 2) },
+  };
+}
+
 /// The complete, canonical Fa wordmark:
 /// 1. F stem + top bar (brand blue, bold strokeWidth 70)
 /// 2. F middle teal accent bar (height 56)
@@ -516,6 +542,15 @@ function fAccentBar(progress, opacity) {
 function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, opacity) {
   var kids = [];
   var op = opacity == null ? 1 : opacity;
+
+  // When fully formed, render pure vector SVG for mathematically flawless donut hole
+  if (fProgress >= 0.999 && accentProgress >= 0.999 && bowlProgress >= 0.999 && stemProgress >= 0.999) {
+    var center = brandToScreen(506, 562.5);
+    var markH = Math.round(393 * mapper.k);
+    kids.push(faLogoSvgNode(center.x, center.y, markH, op));
+    return kids;
+  }
+
   if (fProgress > 0.001) {
     kids.push(fPathNode(fProgress, '#5B61F6', op));
   }
@@ -618,15 +653,20 @@ function faHardwareChip(cx, cy, w, h, logoK, opts) {
   });
 
   // 5. Canonical Fa Mark in the center
-  setMapper(logoK, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
   var fP = opts && opts.fProgress != null ? opts.fProgress : 1.0;
   var accentP = opts && opts.accentProgress != null ? opts.accentProgress : 1.0;
   var bowlP = opts && opts.bowlProgress != null ? opts.bowlProgress : 1.0;
   var stemP = opts && opts.stemProgress != null ? opts.stemProgress : 1.0;
 
-  var markKids = completeFaMark(fP, accentP, bowlP, stemP, op);
-  for (var mi = 0; mi < markKids.length; mi++) {
-    kids.push(markKids[mi]);
+  if (fP >= 0.999 && accentP >= 0.999 && bowlP >= 0.999 && stemP >= 0.999) {
+    var markH = Math.round(393 * logoK);
+    kids.push(faLogoSvgNode(cx, cy, markH, op));
+  } else {
+    setMapper(logoK, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
+    var markKids = completeFaMark(fP, accentP, bowlP, stemP, op);
+    for (var mi = 0; mi < markKids.length; mi++) {
+      kids.push(markKids[mi]);
+    }
   }
 
   return kids;

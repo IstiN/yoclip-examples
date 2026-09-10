@@ -88,23 +88,6 @@ scene = {
         positioned: { left: tl.x - 20, top: tl.y - 20 },
       });
 
-      // Hardware chip pins (top and bottom, identical to Fa Core)
-      var pinCols = 8;
-      var pinSpacing = (T.w * k - 70) / (pinCols - 1);
-      for (var pi = 0; pi < pinCols; pi++) {
-        var pinX = tl.x + 35 + pi * pinSpacing;
-        kids.push({
-          type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
-          opacity: clamp01(0.55 * tileA),
-          positioned: { left: pinX - 7, top: tl.y - 5 },
-        });
-        kids.push({
-          type: 'rect', width: 14, height: 5, radius: 1, fill: '#48C7E8',
-          opacity: clamp01(0.55 * tileA),
-          positioned: { left: pinX - 7, top: tl.y + T.h * k },
-        });
-      }
-
       // The chip body: deep obsidian glass with hardware border
       kids.push({
         type: 'rect',

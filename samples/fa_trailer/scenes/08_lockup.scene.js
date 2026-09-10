@@ -216,35 +216,8 @@ scene = {
       positioned: { left: chipX, top: chipY },
     });
 
-    // F in brand blue
-    kids.push({
-      type: 'text',
-      text: 'F',
-      opacity: clamp01(insideIn),
-      offsetY: 14 * (1 - insideIn),
-      style: {
-        fontSize: 14,
-        fontFamily: 'Impact',
-        fontWeight: '900',
-        color: '#5B61F6',
-      },
-      positioned: { left: chipX + 13, top: chipY + 5 },
-    });
-
-    // a in brand teal
-    kids.push({
-      type: 'text',
-      text: 'a',
-      opacity: clamp01(insideIn),
-      offsetY: 14 * (1 - insideIn),
-      style: {
-        fontSize: 14,
-        fontFamily: 'Impact',
-        fontWeight: '900',
-        color: '#2EBD9E',
-      },
-      positioned: { left: chipX + 23, top: chipY + 5 },
-    });
+    // Real vector Fa brand logo (drawn, NOT text!)
+    kids.push(faLogoSvgNode(chipX + 22, chipY + 14, 16, insideIn));
 
     // inside in bold monospace
     kids.push({

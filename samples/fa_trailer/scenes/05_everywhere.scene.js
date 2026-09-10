@@ -525,33 +525,8 @@ scene = {
           positioned: { left: badgeX, top: badgeY },
         });
 
-        // F in brand blue
-        kids.push({
-          type: 'text',
-          text: 'F',
-          opacity: badgeT,
-          style: {
-            fontSize: 14,
-            fontFamily: 'Impact',
-            fontWeight: '900',
-            color: '#5B61F6',
-          },
-          positioned: { left: badgeX + 11, top: badgeY + 4 },
-        });
-
-        // a in brand teal
-        kids.push({
-          type: 'text',
-          text: 'a',
-          opacity: badgeT,
-          style: {
-            fontSize: 14,
-            fontFamily: 'Impact',
-            fontWeight: '900',
-            color: '#2EBD9E',
-          },
-          positioned: { left: badgeX + 21, top: badgeY + 4 },
-        });
+        // Real vector Fa brand logo (drawn, NOT text!)
+        kids.push(faLogoSvgNode(badgeX + 22, badgeY + 13, 15, badgeT));
 
         // inside in bold monospace with comfortable spacing
         kids.push({
@@ -586,38 +561,13 @@ scene = {
       });
 
       if (hasInjected) {
-        // Static Fa branded logo + EMBEDDED (no dirty cyan blur glow!)
+        // Static Fa branded logo + EMBEDDED (drawn vector logo, NOT text!)
         var faStatusW = 82;
         var faStartX = targetCenterX - faStatusW / 2;
         var statusY = baseY + cardH + 34;
 
-        // F in brand blue
-        kids.push({
-          type: 'text',
-          text: 'F',
-          opacity: cardAlpha,
-          style: {
-            fontSize: 12,
-            fontFamily: 'Impact',
-            fontWeight: '900',
-            color: '#5B61F6',
-          },
-          positioned: { left: faStartX, top: statusY },
-        });
-
-        // a in brand teal
-        kids.push({
-          type: 'text',
-          text: 'a',
-          opacity: cardAlpha,
-          style: {
-            fontSize: 12,
-            fontFamily: 'Impact',
-            fontWeight: '900',
-            color: '#2EBD9E',
-          },
-          positioned: { left: faStartX + 9, top: statusY },
-        });
+        // Real vector Fa brand logo (drawn, NOT text!)
+        kids.push(faLogoSvgNode(faStartX + 7, statusY + 7, 12, cardAlpha));
 
         // EMBEDDED in clean muted silver
         kids.push({
@@ -631,7 +581,7 @@ scene = {
             color: '#A0AFC4',
             letterSpacing: 1,
           },
-          positioned: { left: faStartX + 20, top: statusY + 1 },
+          positioned: { left: faStartX + 18, top: statusY + 1 },
         });
       } else {
         kids.push({
