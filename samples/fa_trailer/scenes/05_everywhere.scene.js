@@ -32,6 +32,12 @@ scene = {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
+    function clamp01(v) {
+      if (v <= 0) return 0;
+      if (v >= 1) return 1;
+      return v;
+    }
+
     var silverGrad = {
       type: 'linear',
       begin: 'topCenter',
@@ -186,6 +192,7 @@ scene = {
     // 3. Fa Core Emitter (Left Dock)
     // ------------------------------------------------------------------------
     var coreIn = tw(30, 25, 0, 1, 'easeOutBack');
+    var coreAlpha = clamp01(tw(30, 20, 0, 1, 'easeOut'));
     var coreX = 120;
     var coreW = 160;
     var coreH = 160;
@@ -196,7 +203,7 @@ scene = {
       type: 'circle',
       size: 280,
       fill: '#8F6BFF',
-      opacity: 0.24 * coreIn,
+      opacity: clamp01(0.24 * coreAlpha),
       blur: 50,
       positioned: { left: coreX + coreW / 2 - 140, top: coreY + coreH / 2 - 140 },
     });
@@ -208,7 +215,7 @@ scene = {
       height: coreH,
       radius: 38,
       fill: '#101428',
-      opacity: coreIn,
+      opacity: coreAlpha,
       border: { color: '#8F6BFF', width: 2.5 },
       positioned: { left: coreX, top: coreY },
     });
@@ -224,7 +231,7 @@ scene = {
       type: 'text',
       text: '> _ ' + coreEyeRight,
       width: coreW,
-      opacity: coreIn,
+      opacity: coreAlpha,
       style: {
         fontSize: 36,
         fontFamily: 'monospace',
@@ -240,7 +247,7 @@ scene = {
       type: 'text',
       text: 'FA CORE',
       width: coreW,
-      opacity: coreIn * 0.95,
+      opacity: clamp01(coreAlpha * 0.95),
       style: {
         fontSize: 15,
         fontFamily: 'Impact',
@@ -255,7 +262,7 @@ scene = {
       type: 'text',
       text: 'SOURCE',
       width: coreW,
-      opacity: coreIn * 0.65,
+      opacity: clamp01(coreAlpha * 0.65),
       style: {
         fontSize: 11,
         fontFamily: 'monospace',
@@ -298,9 +305,8 @@ scene = {
       var launchFrame = app.at;
       var landFrame = app.at + 8;
 
-      // Card entrance animation (neutral state)
-      var cardEnterT = tw(30 + i * 3, 18, 0, 1, 'easeOutBack');
-      var cardAlpha = cardEnterT;
+      // Card entrance animation (smooth fade without overshoot)
+      var cardAlpha = clamp01(tw(30 + i * 3, 16, 0, 1, 'easeOut'));
 
       var hasInjected = frame >= landFrame;
       var isInFlight = frame >= launchFrame && frame < landFrame;
@@ -359,7 +365,7 @@ scene = {
       // Render shockwave burst ring upon injection
       if (shockwaveT > 0 && shockwaveT < 1) {
         var waveSize = 130 + shockwaveT * 150;
-        var waveOp = (1 - shockwaveT) * 0.85;
+        var waveOp = clamp01((1 - shockwaveT) * 0.85);
         kids.push({
           type: 'circle',
           size: waveSize,
@@ -380,7 +386,7 @@ scene = {
 
       // Injected glow behind card
       if (hasInjected) {
-        var pulseGlow = 0.24 + 0.08 * Math.sin(((frame + i * 8) / 25) * Math.PI * 2);
+        var pulseGlow = clamp01(0.24 + 0.08 * Math.sin(((frame + i * 8) / 25) * Math.PI * 2));
         kids.push({
           type: 'circle',
           size: 220,
@@ -413,7 +419,7 @@ scene = {
         svg: iconSvgData,
         width: 64,
         height: 64,
-        opacity: cardAlpha * (hasInjected ? 1.0 : 0.65),
+        opacity: clamp01(cardAlpha * (hasInjected ? 1.0 : 0.65)),
         positioned: {
           left: targetX + (cardW - 64) / 2,
           top: currentCardY + 26,
@@ -422,14 +428,14 @@ scene = {
 
       // EMBEDDED BADGE: "Fa inside" chip inside the card (lights up once injected!)
       if (hasInjected) {
-        var badgeT = Math.min(1.0, (frame - landFrame) / 5);
+        var badgeT = clamp01(Math.min(1.0, (frame - landFrame) / 5));
         kids.push({
           type: 'rect',
           width: 58,
           height: 22,
           radius: 11,
           fill: '#00F0FF',
-          opacity: 0.95 * badgeT,
+          opacity: clamp01(0.95 * badgeT),
           positioned: {
             left: targetX + (cardW - 58) / 2,
             top: currentCardY + cardH - 30,
@@ -476,7 +482,7 @@ scene = {
         type: 'text',
         text: statusTxt,
         width: cardW,
-        opacity: cardAlpha * (hasInjected ? 1.0 : 0.6),
+        opacity: clamp01(cardAlpha * (hasInjected ? 1.0 : 0.6)),
         style: {
           fontSize: 11,
           fontFamily: 'monospace',

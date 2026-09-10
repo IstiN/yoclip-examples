@@ -143,6 +143,18 @@ void main() {
     }
   });
 
+  testWidgets('05_everywhere renders every frame without widget exceptions', (tester) async {
+    await ensureLoaded();
+    await ensureTestFont();
+    final scene = _scenes['05_everywhere']!;
+    for (var f = 0; f < scene.duration; f += 2) {
+      final graph = scene.render(f);
+      expect(graph, isA<Map<String, dynamic>>());
+      await pumpGraph(tester, graph, '05_everywhere-sweep-$f');
+      expect(tester.takeException(), isNull, reason: 'Failed on frame $f');
+    }
+  });
+
   test('the project anchors all eight shots with the 1560-frame film', () async {
     await ensureLoaded();
     expect(_scenes.keys, containsAll([
