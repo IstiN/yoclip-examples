@@ -367,43 +367,20 @@ scene = {
       });
     }
 
-    // Canonical Fa Mark inside Core (using brand mapper)
-    var faK = 0.22;
-    setMapper(faK, BRAND.anchor[0], BRAND.anchor[1], 960, coreY + 95);
+    // Canonical Fa Mark inside Core (bold, thick, donut bowl)
+    var faK = 0.28;
+    setMapper(faK, BRAND.anchor[0], BRAND.anchor[1], 960, coreY + 104);
 
     var faCoreMark = completeFaMark(1, 1, 1, 1, clamp01(coreIn));
     for (var fci = 0; fci < faCoreMark.length; fci++) {
       kids.push(faCoreMark[fci]);
     }
 
-    // Living smile underscore & prompt inside Fa Core
-    var winkCore = 0;
-    if (frame >= 58 && frame <= 74) {
-      winkCore = frame < 64 ? (frame - 58) / 6 : (1 - (frame - 66) / 8);
-    }
-    var coreEyeRight = winkCore > 0.5 ? '-' : 'o';
-
-    kids.push({
-      type: 'text',
-      text: '> _ ' + coreEyeRight,
-      width: coreW,
-      opacity: clamp01(coreIn * 0.95),
-      style: {
-        fontSize: 22,
-        fontFamily: 'monospace',
-        fontWeight: '800',
-        color: '#48C7E8',
-        textAlign: 'center',
-        shadows: [{ color: '#48C7E8', blur: 10, offset: { x: 0, y: 0 } }],
-      },
-      positioned: { left: coreX, top: coreY + 148 },
-    });
-
     kids.push({
       type: 'text',
       text: 'FA CORE · AUTONOMOUS HARNESS',
       width: coreW,
-      opacity: clamp01(coreIn * 0.85),
+      opacity: clamp01(coreIn * 0.9),
       style: {
         fontSize: 13,
         fontFamily: 'Impact',
@@ -411,7 +388,7 @@ scene = {
         letterSpacing: 1.5,
         textAlign: 'center',
       },
-      positioned: { left: coreX, top: coreY + 180 },
+      positioned: { left: coreX, top: coreY + 182 },
     });
 
     // ------------------------------------------------------------------------

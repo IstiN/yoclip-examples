@@ -160,13 +160,13 @@ scene = {
       }
     }
 
-    // ---- 96–190: the face materializes inside the chip ---------------------
+    // ---- 96–178: the face materializes inside the chip ---------------------
     var N = 24;
     var chevFace = chevPoints(319, 420, 100, 108, N);
     var chevP = tw(96, 30, 0, 1, 'easeInOutCubic');
-    var foldT = tw(178, 26, 0, 1, 'easeInOutCubic');
+    var foldT = tw(160, 20, 0, 1, 'easeInOutCubic');
     var FSTEM_TOP = { x: 266, y: 372 };
-    var FSTEM_BOT = { x: 266, y: 716 };
+    var FSTEM_BOT = { x: 266, y: 724 };
     var fStemPts = [];
     for (var fsi = 0; fsi <= N; fsi++) {
       var ft = fsi / N;
@@ -174,28 +174,29 @@ scene = {
     }
     var chevLive = morphPts(chevFace, fStemPts, foldT);
     var chevCol = lerpColor(C.violetBright, C.blue, foldT);
-    var chevFade = 1 - tw(190, 14, 0, 1, 'easeIn');
+    var chevFade = 1 - tw(172, 12, 0, 1, 'easeIn');
     if (chevP > 0.001 && chevFade > 0.003) {
       kids.push(polylineNode(chevLive, 38 * 2.2, chevP, chevCol, 0.16 * chevFade));
       kids.push(polylineNode(chevLive, 38, chevP, chevCol, chevFade));
     }
 
-    // Eye ring -> note ring
+    // Eye ring -> note ring (fades cleanly before wordmark writes)
     var EYE = { x: 705, y: 420, r: 118 };
     var eyeRingP = tw(106, 30, 0, 1, 'easeInOutCubic');
-    var eyeFade = 1 - tw(168, 16, 0, 1, 'easeInOutCubic');
+    var eyeFade = 1 - tw(156, 16, 0, 1, 'easeInOutCubic');
     if (eyeRingP > 0.001 && eyeFade > 0.003) {
       var eyePts = ringPoints(EYE.x, EYE.y, EYE.r, N);
       kids.push(polylineNode(eyePts, 38 * 2.2, eyeRingP, C.violetBright, 0.16 * eyeFade));
       kids.push(polylineNode(eyePts, 38, eyeRingP, C.violetBright, eyeFade));
     }
 
-    // Underscore mouth bar morphing into the a's bowl
+    // Underscore mouth bar morphing into the a's bowl (fades cleanly at 178)
     var mouthP = tw(120, 22, 0, 1, 'easeOut');
-    var flyT = tw(150, 26, 0, 1, 'easeInOutCubic');
-    var bendAt = tw(156, 30, 0, 1, 'easeInOutCubic');
-    var bowlT = tw(184, 22, 0, 1, 'easeInOutCubic');
-    if (mouthP > 0.001) {
+    var flyT = tw(146, 22, 0, 1, 'easeInOutCubic');
+    var bendAt = tw(152, 24, 0, 1, 'easeInOutCubic');
+    var bowlT = tw(168, 16, 0, 1, 'easeInOutCubic');
+    var mouthFade = 1 - tw(174, 10, 0, 1, 'easeInOutCubic');
+    if (mouthP > 0.001 && mouthFade > 0.003) {
       var mCol = lerpColor(C.violetBright, '#2EBD9E', bowlT);
       var mSw = 38;
       var mPts;
@@ -210,38 +211,17 @@ scene = {
         var byy = lerp(BRAND.under.y + BRAND.under.h / 2, EYE.y, flyT);
         mPts = bendPoints(bx0, byy, bx1, EYE.x, EYE.y, EYE.r, bendAt, N);
       }
-      kids.push(polylineNode(mPts, mSw * 2.2, mouthP, mCol, 0.16));
-      kids.push(polylineNode(mPts, mSw, mouthP, mCol, 1));
+      kids.push(polylineNode(mPts, mSw, mouthP, mCol, mouthFade));
     }
 
-    // F stroke
-    var fP = tw(181, 26, 0, 1, 'easeInOutCubic');
-    if (fP > 0.001) {
-      kids.push(fPathNode(fP, C.blue, 1));
-    }
-
-    // F middle teal accent bar
-    var accentP = tw(188, 22, 0, 1, 'easeOut');
-    if (accentP > 0.001) {
-      var accentKids = fAccentBar(accentP, 1);
-      for (var ak = 0; ak < accentKids.length; ak++) kids.push(accentKids[ak]);
-    }
-
-    // a stem
-    var stemP = tw(188, 20, 0, 1, 'easeInOutCubic');
-    if (stemP > 0.001) {
-      var segs = 8;
-      var aStem = BRAND.a.stem;
-      var segH = aStem.h / segs;
-      for (var si = 0; si < segs; si++) {
-        var segSp = jsr.motion.clamp(stemP * segs - si, 0, 1);
-        if (segSp <= 0) continue;
-        var sy0 = aStem.y + aStem.h - (si + 1) * segH;
-        kids.push(trace(
-          'M' + aStem.x + ',' + (sy0 + segH) + ' L' + aStem.x + ',' + sy0,
-          38, aStem.x, sy0, 0, segH, segSp,
-          lerpColor('#2EBD9E', '#48C7E8', si / (segs - 1))));
-      }
+    // ---- 176–225: The canonical, bold Fa wordmark writes itself ------------
+    var fP = tw(176, 26, 0, 1, 'easeInOutCubic');
+    var accentP = tw(184, 20, 0, 1, 'easeOut');
+    var bowlP = tw(178, 24, 0, 1, 'easeInOutCubic');
+    var stemP = tw(186, 20, 0, 1, 'easeInOutCubic');
+    var faMarkKids = completeFaMark(fP, accentP, bowlP, stemP, 1);
+    for (var fmi = 0; fmi < faMarkKids.length; fmi++) {
+      kids.push(faMarkKids[fmi]);
     }
 
     // ---- 176–225: "MEET" revealed above the chip as Fa is drawn ----------

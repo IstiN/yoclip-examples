@@ -68,17 +68,15 @@ var BRAND = {
   chevron: { sw: 48, a1: [280, 434, 478, 541], a2: [478, 541, 280, 648] },
   // Teal underscore — a gradient capsule (square strips + semicircular
   // caps); it glides up-left to become the F's accent bar.
-  under: { x: 512, y: 712, w: 248, h: 38 },
-  // F — stem + top bar as ONE round-capped stroke path, plus the teal
-  // accent bar. The wordmark is laid out so its center matches the tile
-  // center (svg 512): the film anchors the tile center for its entire run,
-  // so the icon and the finished wordmark share one composition.
+  under: { x: 512, y: 712, w: 248, h: 48 },
+  // F — bold, thick, muscular letterform with smooth rounded elbow and
+  // caps. Both F and a share the baseline at 724 and x-height at 556.
   f: {
-    stemX: 266, topX2: 550, top: 372, bottom: 716, w: 48,
-    accent: { x: 266, y: 545, w: 212, h: 38 },
+    stemX: 258, topX2: 556, top: 366, bottom: 724, w: 70,
+    accent: { x: 258, y: 554, w: 224, h: 56 },
   },
-  // a — bowl (drawn arc) + stem, teal.
-  a: { bowl: { cx: 638, cy: 640, r: 82 }, stem: { x: 739, y: 558, h: 164 } },
+  // a — thick bagel/donut bowl ("бублик" with inner hole) + flush vertical stem.
+  a: { bowl: { cx: 640, cy: 640, r: 84 }, stem: { x: 724, y: 556, h: 168 } },
   // The anchor: the tile center, pinned at screen center for the whole film.
   anchor: [512, 512],
 };
@@ -511,10 +509,10 @@ function fAccentBar(progress, opacity) {
 }
 
 /// The complete, canonical Fa wordmark:
-/// 1. F stem + top bar (blue)
-/// 2. F middle teal accent bar
-/// 3. a circular bowl (teal)
-/// 4. a vertical stem (cyan)
+/// 1. F stem + top bar (brand blue, bold strokeWidth 70)
+/// 2. F middle teal accent bar (height 56)
+/// 3. a circular donut bowl (brand teal, strokeWidth 60, radius 84 with clean center hole)
+/// 4. a vertical stem (brand teal/cyan, strokeWidth 60, flush with bowl tangent)
 function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, opacity) {
   var kids = [];
   var op = opacity == null ? 1 : opacity;
@@ -527,22 +525,14 @@ function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, o
   }
   if (bowlProgress > 0.001) {
     kids.push(polylineNode(
-      ringPoints(BRAND.a.bowl.cx, BRAND.a.bowl.cy, BRAND.a.bowl.r, 24),
-      38, bowlProgress, '#2EBD9E', op));
+      ringPoints(BRAND.a.bowl.cx, BRAND.a.bowl.cy, BRAND.a.bowl.r, 28),
+      60, bowlProgress, '#2EBD9E', op));
   }
   if (stemProgress > 0.001) {
-    var segs = 8;
     var aStem = BRAND.a.stem;
-    var segH = aStem.h / segs;
-    for (var si = 0; si < segs; si++) {
-      var sp = jsr.motion.clamp(stemProgress * segs - si, 0, 1);
-      if (sp <= 0) continue;
-      var sy0 = aStem.y + aStem.h - (si + 1) * segH;
-      kids.push(trace(
-        'M' + aStem.x + ',' + (sy0 + segH) + ' L' + aStem.x + ',' + sy0,
-        38, aStem.x, sy0, 0, segH, sp,
-        lerpColor('#2EBD9E', '#48C7E8', si / (segs - 1)), op));
-    }
+    var d = 'M' + aStem.x + ',' + (aStem.y + aStem.h) + ' L' + aStem.x + ',' + aStem.y;
+    kids.push(trace(
+      d, 60, aStem.x, aStem.y, 0, aStem.h, stemProgress, '#2EBD9E', op));
   }
   return kids;
 }
