@@ -543,14 +543,6 @@ function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, o
   var kids = [];
   var op = opacity == null ? 1 : opacity;
 
-  // When fully formed, render pure vector SVG for mathematically flawless donut hole
-  if (fProgress >= 0.999 && accentProgress >= 0.999 && bowlProgress >= 0.999 && stemProgress >= 0.999) {
-    var center = brandToScreen(506, 562.5);
-    var markH = Math.round(393 * mapper.k);
-    kids.push(faLogoSvgNode(center.x, center.y, markH, op));
-    return kids;
-  }
-
   if (fProgress > 0.001) {
     kids.push(fPathNode(fProgress, '#5B61F6', op));
   }
