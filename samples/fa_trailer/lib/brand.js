@@ -508,16 +508,17 @@ function fAccentBar(progress, opacity) {
   return kids;
 }
 
-/// Canonical vector SVG markup for the Fa brand mark (bold, muscular F + donut hole a).
+/// Canonical vector SVG markup for the Fa brand mark:
+/// Muscular, chubby F + thick donut bowl with a clear round center hole.
 /// Uses viewBox="235 345 540 435" (aspect ratio ~1.241:1), centered at (505, 562.5).
 function faLogoSvgData(op) {
   var o = op == null ? 1 : op;
   var opAttr = o < 0.999 ? ' opacity="' + o.toFixed(3) + '"' : '';
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="235 345 540 435"' + opAttr + '>' +
-    '<path d="M 293 724 L 293 401 L 556 401" stroke="#5B61F6" stroke-width="70" stroke-linecap="round" stroke-linejoin="round" fill="none" />' +
-    '<rect x="258" y="528" width="224" height="56" rx="28" fill="#2EBD9E" />' +
-    '<circle cx="640" cy="640" r="84" stroke="#2EBD9E" stroke-width="60" fill="none" />' +
-    '<path d="M 724 556 L 724 724" stroke="#2EBD9E" stroke-width="60" stroke-linecap="round" fill="none" />' +
+    '<path d="M 296 700 L 296 408 L 556 408" stroke="#5B61F6" stroke-width="84" stroke-linecap="round" stroke-linejoin="round" fill="none" />' +
+    '<rect x="254" y="524" width="232" height="64" rx="32" fill="#2EBD9E" />' +
+    '<circle cx="640" cy="640" r="64" stroke="#2EBD9E" stroke-width="76" fill="none" />' +
+    '<path d="M 704 576 L 704 704" stroke="#2EBD9E" stroke-width="76" stroke-linecap="round" fill="none" />' +
     '</svg>';
 }
 
@@ -534,9 +535,9 @@ function faLogoSvgNode(cx, cy, h, op) {
   };
 }
 
-/// Canonical, reusable Fa brand mark.
+/// Canonical, reusable chubby Fa brand mark.
 /// Used across all scenes (03_hardware, 05_everywhere, 08_lockup, badges, chips).
-/// Guarantees the circular donut hole in the `a` at any scale k.
+/// Guarantees the bold chubby proportions and circular donut hole in the `a` at any scale k.
 function faBrandMark(cx, cy, k, opacity) {
   var h = Math.round(435 * k);
   return [faLogoSvgNode(cx, cy, h, opacity)];
@@ -550,15 +551,6 @@ function faBrandMark(cx, cy, k, opacity) {
 function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, opacity) {
   var kids = [];
   var op = opacity == null ? 1 : opacity;
-
-  // When fully formed, transition seamlessly into the canonical vector mark.
-  // Because h = 435 * k and viewBox center matches (505, 562.5), scale and position are 1:1.
-  if (fProgress >= 0.999 && accentProgress >= 0.999 && bowlProgress >= 0.999 && stemProgress >= 0.999) {
-    var center = brandToScreen(505, 562.5);
-    var markKids = faBrandMark(center.x, center.y, mapper.k, op);
-    for (var mi = 0; mi < markKids.length; mi++) kids.push(markKids[mi]);
-    return kids;
-  }
 
   if (fProgress > 0.001) {
     kids.push(fPathNode(fProgress, '#5B61F6', op));
