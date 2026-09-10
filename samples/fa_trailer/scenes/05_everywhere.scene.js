@@ -1,18 +1,19 @@
 // 05 — Everywhere — Fa embeds directly INTO your tools and platforms.
 //
-// Reversing standard tool ingestion (Claude Code pulls tools in;
-// Fa does the exact opposite: Fa injects ITSELF INTO the apps you use).
+// Reversing standard tool ingestion (Claude Code pulls tools into a terminal;
+// Fa does the exact opposite: Fa injects ITSELF INTO the apps and platforms you use).
 //
-// Visual architecture:
-//   · 0–40    Headline: "NOT ANOTHER TOOL YOU CALL." / "IT EMBEDS INTO EVERYTHING."
-//   · 30–65   The Rail draws across, 8 standalone app squircles appear (macOS, Windows, iOS, Android, Chrome, PowerPoint, Word, Outlook)
-//   · 65–150  Fa Core fires high-speed glowing Fa capsules along the rail!
-//             Each capsule flies and DOCKS into an app card:
-//             - Impact shockwave ring
-//             - Card leaps up and ignites with internal energy
-//             - An embedded cyan "Fa inside" badge illuminates inside the card
-//             - Tag flips from STANDALONE to "FA EMBEDDED"
-//   · 150–240 Grand unification: All apps glow with synchronized Fa energy
+// Complete Architectural Layout:
+//   · 0–40    Headline: "NOT ANOTHER TOOL YOU CALL." / "IT EMBEDS DIRECTLY INTO EVERYTHING."
+//   · Top:    4 Foundation Modules (10+ Providers BYOK, A2A Fabric, Git Memory, GPU Engine)
+//   · Center: Fa Core Engine with canonical Fa wordmark & smile underscore
+//   · Bottom: 8 Platforms & Apps (macOS, Windows, iOS, Android, Chrome, PowerPoint, Word, Outlook)
+//   · 65–150  Fa Core fires high-speed glowing Fa capsules along laser conduits into each app!
+//             - Impact shockwave burst
+//             - Card activates with internal energy
+//             - Embedded metallic [ Fa inside ] badge illuminates
+//             - Status flips from STANDALONE to "FA EMBEDDED"
+//   · 150–240 Grand unification: All apps synchronized with Fa Core
 //             Headline transforms: "EVERYWHERE." / "ONE AGENT. EMBEDDED INSIDE YOUR APPS."
 
 scene = {
@@ -66,23 +67,29 @@ scene = {
     var breathe = 0.5 + 0.5 * Math.sin((frame / 60) * Math.PI * 2);
     kids.push({
       type: 'circle',
-      size: 1100,
-      fill: '#3D2275',
-      opacity: 0.16 + 0.04 * breathe,
+      size: 1200,
+      fill: '#0C1426',
+      opacity: 0.75,
       blur: 160,
-      positioned: { left: 960 - 550, top: 520 - 550 },
+      positioned: { left: 960 - 600, top: 480 - 600 },
+    });
+    kids.push({
+      type: 'circle',
+      size: 650,
+      fill: '#5B61F6',
+      opacity: 0.12 + 0.04 * breathe,
+      blur: 100,
+      positioned: { left: 960 - 325, top: 440 - 325 },
     });
 
     // ------------------------------------------------------------------------
     // 1. Top Headlines (Dynamic Two-Phase Narrative)
     // ------------------------------------------------------------------------
-    // Phase A (0–120): Premise ("NOT ANOTHER TOOL YOU CALL / IT EMBEDS DIRECTLY INTO EVERYTHING")
-    // Phase B (130–240): Conclusion ("EVERYWHERE. / ONE AGENT. EMBEDDED INSIDE YOUR APPS.")
     var phaseA_Fade = tw(115, 15, 0, 1, 'easeInOutCubic');
     var phaseA_Op = 1 - phaseA_Fade;
     var phaseB_Op = tw(130, 20, 0, 1, 'easeInOutCubic');
 
-    // Phase A Titles
+    // Phase A Titles (0–120)
     var headIn1 = tw(0, 28, 0, 1, 'easeOutExpo');
     var headIn2 = tw(8, 28, 0, 1, 'easeOutExpo');
 
@@ -91,139 +98,260 @@ scene = {
         type: 'text',
         text: 'NOT ANOTHER TOOL YOU CALL.',
         width: 1920,
-        opacity: headIn1 * phaseA_Op,
+        opacity: clamp01(headIn1 * phaseA_Op),
         offsetY: 20 * (1 - headIn1),
         style: {
-          fontSize: 88,
+          fontSize: 78,
           fontFamily: 'Impact',
           color: '#FFFFFF',
           textAlign: 'center',
           gradient: silverGrad,
           letterSpacing: 2,
         },
-        positioned: { left: 0, top: 75 },
+        positioned: { left: 0, top: 42 },
       });
 
       kids.push({
         type: 'text',
         text: 'IT EMBEDS DIRECTLY INTO EVERYTHING YOU USE.',
         width: 1920,
-        opacity: headIn2 * phaseA_Op,
+        opacity: clamp01(headIn2 * phaseA_Op),
         offsetY: 15 * (1 - headIn2),
         style: {
-          fontSize: 46,
+          fontSize: 38,
           fontFamily: 'Impact',
           color: '#FFFFFF',
           textAlign: 'center',
           gradient: gunmetalGrad,
           letterSpacing: 2,
         },
-        positioned: { left: 0, top: 178 },
+        positioned: { left: 0, top: 128 },
       });
     }
 
-    // Phase B Titles
+    // Phase B Titles (130–240)
     if (phaseB_Op > 0.01) {
       kids.push({
         type: 'text',
         text: 'EVERYWHERE.',
         width: 1920,
-        opacity: phaseB_Op,
-        offsetY: -15 * (1 - phaseB_Op),
+        opacity: clamp01(phaseB_Op),
+        offsetY: -12 * (1 - phaseB_Op),
         style: {
-          fontSize: 124,
+          fontSize: 92,
           fontFamily: 'Impact',
           color: '#FFFFFF',
           textAlign: 'center',
           gradient: silverGrad,
           letterSpacing: 3,
         },
-        positioned: { left: 0, top: 55 },
+        positioned: { left: 0, top: 38 },
       });
 
       kids.push({
         type: 'text',
         text: 'ONE AGENT. EMBEDDED INSIDE YOUR APPS.',
         width: 1920,
-        opacity: phaseB_Op,
-        offsetY: -10 * (1 - phaseB_Op),
+        opacity: clamp01(phaseB_Op),
+        offsetY: -8 * (1 - phaseB_Op),
         style: {
-          fontSize: 48,
+          fontSize: 40,
           fontFamily: 'Impact',
-          color: '#00F0FF',
+          color: '#48C7E8',
           textAlign: 'center',
           letterSpacing: 2,
         },
-        positioned: { left: 0, top: 188 },
+        positioned: { left: 0, top: 134 },
       });
     }
 
     // ------------------------------------------------------------------------
-    // 2. Horizontal Injection Rail / Conveyor Beam
+    // 2. Top Section: Foundation Modules Powering Fa Core
     // ------------------------------------------------------------------------
-    var railIn = tw(25, 30, 0, 1, 'easeOutExpo');
-    var railY = 540;
-    var railStartX = 140;
-    var railEndX = 1860;
+    var topModulesIn = tw(15, 25, 0, 1, 'easeOutCubic');
+    var topMods = [
+      { id: 'llm', title: '10+ PROVIDERS BYOK', sub: 'Claude · GPT · DeepSeek · Gemini', icon: '#5B61F6' },
+      { id: 'a2a', title: 'A2A AGENT FABRIC', sub: 'Cross-Machine Mailbox & Swarms', icon: '#E056FD' },
+      { id: 'mem', title: 'GIT-BACKED MEMORY', sub: 'Durable Knowledge Graph', icon: '#2EBD9E' },
+      { id: 'gpu', title: 'HEADLESS GPU ENGINE', sub: 'Impeller 120 FPS Video Pipeline', icon: '#48C7E8' },
+    ];
 
-    // Background track
-    kids.push({
-      type: 'rect',
-      width: (railEndX - railStartX) * railIn,
-      height: 4,
-      radius: 2,
-      fill: '#151D30',
-      positioned: { left: railStartX, top: railY - 2 },
-    });
+    var modW = 320;
+    var modH = 74;
+    var modSpacing = 42;
+    var startModX = (1920 - (4 * modW + 3 * modSpacing)) / 2; // 257
+    var modY = 196;
 
-    // Glowing energy spine
-    kids.push({
-      type: 'rect',
-      width: (railEndX - railStartX) * railIn,
-      height: 2,
-      radius: 1,
-      fill: '#48C7E8',
-      opacity: 0.35 + 0.15 * breathe,
-      blur: 4,
-      positioned: { left: railStartX, top: railY - 1 },
-    });
+    for (var mi = 0; mi < topMods.length; mi++) {
+      var mod = topMods[mi];
+      var mx = startModX + mi * (modW + modSpacing);
+
+      // Card container
+      kids.push({
+        type: 'rect',
+        width: modW,
+        height: modH,
+        radius: 18,
+        fill: '#0C1322',
+        border: { color: '#24324F', width: 1.5 },
+        opacity: clamp01(topModulesIn * 0.95),
+        positioned: { left: mx, top: modY },
+      });
+
+      // Left accent pill
+      kids.push({
+        type: 'rect',
+        width: 4,
+        height: modH - 24,
+        radius: 2,
+        fill: mod.icon,
+        opacity: clamp01(topModulesIn * 0.9),
+        positioned: { left: mx + 12, top: modY + 12 },
+      });
+
+      kids.push({
+        type: 'text',
+        text: mod.title,
+        width: modW - 36,
+        opacity: clamp01(topModulesIn),
+        style: {
+          fontSize: 15,
+          fontFamily: 'Impact',
+          color: '#FFFFFF',
+          letterSpacing: 1,
+        },
+        positioned: { left: mx + 26, top: modY + 14 },
+      });
+
+      kids.push({
+        type: 'text',
+        text: mod.sub,
+        width: modW - 36,
+        opacity: clamp01(topModulesIn * 0.75),
+        style: {
+          fontSize: 11,
+          fontFamily: 'monospace',
+          fontWeight: '600',
+          color: '#48C7E8',
+        },
+        positioned: { left: mx + 26, top: modY + 40 },
+      });
+
+      // Data conduits streaming from module down to Fa Core
+      var conduitStartX = mx + modW / 2;
+      var conduitStartY = modY + modH;
+      var coreTopY = 325;
+      var coreCenterX = 960;
+
+      var streamP = tw(25 + mi * 4, 25, 0, 1, 'easeOut');
+      if (streamP > 0.01) {
+        // Vertical bus line
+        kids.push({
+          type: 'rect',
+          width: 2,
+          height: (coreTopY - conduitStartY) * streamP,
+          fill: '#24324F',
+          opacity: 0.6,
+          positioned: { left: conduitStartX - 1, top: conduitStartY },
+        });
+
+        // Pulsing data packet
+        var packetT = ((frame * 0.06 + mi * 0.25) % 1.0);
+        var packetY = lerp(conduitStartY, coreTopY, packetT);
+        var packetX = lerp(conduitStartX, coreCenterX, packetT * 0.7);
+        kids.push({
+          type: 'circle',
+          size: 6,
+          fill: mod.icon,
+          opacity: clamp01(0.85 * topModulesIn),
+          blur: 2,
+          positioned: { left: packetX - 3, top: packetY - 3 },
+        });
+      }
+    }
 
     // ------------------------------------------------------------------------
-    // 3. Fa Core Emitter (Left Dock)
+    // 3. CENTER: Fa Core Hardware Engine (Canonical Fa Logo & Smile Underscore)
     // ------------------------------------------------------------------------
-    var coreIn = tw(30, 25, 0, 1, 'easeOutBack');
-    var coreAlpha = clamp01(tw(30, 20, 0, 1, 'easeOut'));
-    var coreX = 120;
-    var coreW = 160;
-    var coreH = 160;
-    var coreY = railY - coreH / 2;
+    var coreIn = tw(20, 25, 0, 1, 'easeOutCubic');
+    var coreW = 320;
+    var coreH = 220;
+    var coreX = 960 - coreW / 2;
+    var coreY = 325;
 
-    // Glow aura behind Fa Core
+    // Ambient radial glow behind Fa Core
     kids.push({
       type: 'circle',
-      size: 280,
-      fill: '#8F6BFF',
-      opacity: clamp01(0.24 * coreAlpha),
-      blur: 50,
-      positioned: { left: coreX + coreW / 2 - 140, top: coreY + coreH / 2 - 140 },
+      size: 440,
+      fill: '#5B61F6',
+      opacity: clamp01(0.20 * coreIn),
+      blur: 70,
+      positioned: { left: 960 - 220, top: coreY + coreH / 2 - 220 },
+    });
+    kids.push({
+      type: 'circle',
+      size: 260,
+      fill: '#2EBD9E',
+      opacity: clamp01(0.25 * coreIn),
+      blur: 40,
+      positioned: { left: 960 - 130, top: coreY + coreH / 2 - 130 },
     });
 
-    // Fa Core Squircle Card
+    // Obsidian squircle hardware tile
     kids.push({
       type: 'rect',
       width: coreW,
       height: coreH,
-      radius: 38,
-      fill: '#101428',
-      opacity: coreAlpha,
-      border: { color: '#8F6BFF', width: 2.5 },
+      radius: 46,
+      fill: '#0A0F1D',
+      border: { color: '#3B4F76', width: 2.0 },
+      opacity: clamp01(coreIn),
       positioned: { left: coreX, top: coreY },
     });
 
-    // Inner Fa Face / Chip
+    // Hardware inner bezel rim
+    kids.push({
+      type: 'rect',
+      width: coreW - 8,
+      height: coreH - 8,
+      radius: 42,
+      fill: '#0D1424',
+      border: { color: '#1E2B45', width: 1.0 },
+      opacity: clamp01(coreIn),
+      positioned: { left: coreX + 4, top: coreY + 4 },
+    });
+
+    // Hardware corner chip pins
+    var pinCols = 8;
+    for (var pi = 0; pi < pinCols; pi++) {
+      var pinX = coreX + 35 + pi * 36;
+      // Top pins
+      kids.push({
+        type: 'rect', width: 14, height: 4, radius: 1, fill: '#48C7E8',
+        opacity: clamp01(0.5 * coreIn),
+        positioned: { left: pinX, top: coreY - 4 },
+      });
+      // Bottom pins
+      kids.push({
+        type: 'rect', width: 14, height: 4, radius: 1, fill: '#48C7E8',
+        opacity: clamp01(0.5 * coreIn),
+        positioned: { left: pinX, top: coreY + coreH },
+      });
+    }
+
+    // Canonical Fa Mark inside Core (using brand mapper)
+    var faK = 0.22;
+    setMapper(faK, BRAND.anchor[0], BRAND.anchor[1], 960, coreY + 95);
+
+    var faCoreMark = completeFaMark(1, 1, 1, 1, clamp01(coreIn));
+    for (var fci = 0; fci < faCoreMark.length; fci++) {
+      kids.push(faCoreMark[fci]);
+    }
+
+    // Living smile underscore & prompt inside Fa Core
     var winkCore = 0;
-    if (frame >= 58 && frame <= 72) {
-      winkCore = frame < 63 ? (frame - 58) / 5 : (1 - (frame - 66) / 6);
+    if (frame >= 58 && frame <= 74) {
+      winkCore = frame < 64 ? (frame - 58) / 6 : (1 - (frame - 66) / 8);
     }
     var coreEyeRight = winkCore > 0.5 ? '-' : 'o';
 
@@ -231,122 +359,128 @@ scene = {
       type: 'text',
       text: '> _ ' + coreEyeRight,
       width: coreW,
-      opacity: coreAlpha,
+      opacity: clamp01(coreIn * 0.95),
       style: {
-        fontSize: 36,
+        fontSize: 22,
         fontFamily: 'monospace',
         fontWeight: '800',
-        color: '#00F0FF',
+        color: '#48C7E8',
         textAlign: 'center',
-        shadows: [{ color: '#00F0FF', blur: 14, offset: { x: 0, y: 0 } }],
+        shadows: [{ color: '#48C7E8', blur: 10, offset: { x: 0, y: 0 } }],
       },
-      positioned: { left: coreX, top: coreY + 48 },
+      positioned: { left: coreX, top: coreY + 148 },
     });
 
     kids.push({
       type: 'text',
-      text: 'FA CORE',
+      text: 'FA CORE · AUTONOMOUS HARNESS',
       width: coreW,
-      opacity: clamp01(coreAlpha * 0.95),
+      opacity: clamp01(coreIn * 0.85),
       style: {
-        fontSize: 15,
+        fontSize: 13,
         fontFamily: 'Impact',
         color: '#FFFFFF',
         letterSpacing: 1.5,
         textAlign: 'center',
       },
-      positioned: { left: coreX, top: coreY + 102 },
-    });
-
-    kids.push({
-      type: 'text',
-      text: 'SOURCE',
-      width: coreW,
-      opacity: clamp01(coreAlpha * 0.65),
-      style: {
-        fontSize: 11,
-        fontFamily: 'monospace',
-        fontWeight: '700',
-        color: '#8F6BFF',
-        letterSpacing: 1,
-        textAlign: 'center',
-      },
-      positioned: { left: coreX, top: coreY + 124 },
+      positioned: { left: coreX, top: coreY + 180 },
     });
 
     // ------------------------------------------------------------------------
-    // 4. Target Application Cards (Separated!)
+    // 4. Target Platforms & Applications (Bottom Row)
     // ------------------------------------------------------------------------
     var apps = [
-      { id: 'macos', name: 'macOS', icon: 'apple', col: '#FFFFFF', at: 65 },
-      { id: 'windows', name: 'Windows', icon: 'windows', col: '#00A4EF', at: 73 },
-      { id: 'ios', name: 'iOS', icon: 'ios', col: '#A0C4FF', at: 81 },
-      { id: 'android', name: 'Android', icon: 'android', col: '#3DDC84', at: 89 },
-      { id: 'chrome', name: 'Chrome', icon: 'chrome', col: '#FBBC05', at: 97 },
-      { id: 'powerpoint', name: 'PowerPoint', icon: 'powerpoint', col: '#D24726', at: 105 },
-      { id: 'word', name: 'Word', icon: 'word', col: '#2B579A', at: 113 },
-      { id: 'outlook', name: 'Outlook', icon: 'outlook', col: '#0078D4', at: 121 },
+      { id: 'macos', name: 'macOS', icon: 'apple', col: '#FFFFFF', at: 60 },
+      { id: 'windows', name: 'Windows', icon: 'windows', col: '#00A4EF', at: 68 },
+      { id: 'ios', name: 'iOS', icon: 'ios', col: '#A0C4FF', at: 76 },
+      { id: 'android', name: 'Android', icon: 'android', col: '#3DDC84', at: 84 },
+      { id: 'chrome', name: 'Chrome', icon: 'chrome', col: '#FBBC05', at: 92 },
+      { id: 'powerpoint', name: 'PowerPoint', icon: 'powerpoint', col: '#D24726', at: 100 },
+      { id: 'word', name: 'Word', icon: 'word', col: '#2B579A', at: 108 },
+      { id: 'outlook', name: 'Outlook', icon: 'outlook', col: '#0078D4', at: 116 },
     ];
 
-    // Card dimensions & spacing
-    var cardW = 145;
-    var cardH = 145;
-    var cardRadius = 34;
-    var startCardsX = 360;
-    var stepX = 188; // 360 + 7 * 188 = 1676, perfectly centered!
+    var cardW = 142;
+    var cardH = 158;
+    var cardRadius = 32;
+    var stepX = 188;
+    var startCardsX = (1920 - (7 * stepX + cardW)) / 2; // 231
+    var baseY = 675;
+
+    // Conduits branching from bottom of Fa Core (x: 960, y: coreY + coreH = 545)
+    var conduitHubY = 600;
+
+    // Central trunk from Fa Core down to distribution hub
+    kids.push({
+      type: 'rect',
+      width: 4,
+      height: conduitHubY - (coreY + coreH),
+      radius: 2,
+      fill: '#2E3C5F',
+      opacity: clamp01(coreIn),
+      positioned: { left: 958, top: coreY + coreH },
+    });
+
+    // Horizontal distribution manifold
+    kids.push({
+      type: 'rect',
+      width: 7 * stepX,
+      height: 2,
+      radius: 1,
+      fill: '#24324F',
+      opacity: clamp01(coreIn * 0.7),
+      positioned: { left: startCardsX + cardW / 2, top: conduitHubY },
+    });
 
     // ------------------------------------------------------------------------
     // 5. Injection Projectiles & Card Activation Loop
     // ------------------------------------------------------------------------
     for (var i = 0; i < apps.length; i++) {
       var app = apps[i];
+      var targetCenterX = startCardsX + i * stepX + cardW / 2;
       var targetX = startCardsX + i * stepX;
-      var targetCenterY = railY;
       var launchFrame = app.at;
       var landFrame = app.at + 8;
 
-      // Card entrance animation (smooth fade without overshoot)
       var cardAlpha = clamp01(tw(30 + i * 3, 16, 0, 1, 'easeOut'));
-
       var hasInjected = frame >= landFrame;
       var isInFlight = frame >= launchFrame && frame < landFrame;
 
-      // Fly projectile from Fa Core (coreX + coreW) to target card
+      // Vertical feeder rail into each card
+      kids.push({
+        type: 'rect',
+        width: 2,
+        height: baseY - conduitHubY,
+        fill: hasInjected ? '#48C7E8' : '#1C273C',
+        opacity: hasInjected ? 0.7 : 0.35,
+        positioned: { left: targetCenterX - 1, top: conduitHubY },
+      });
+
+      // Fly projectile from Fa Core down through manifold into target card
       if (isInFlight) {
         var flightEase = tw(launchFrame, 8, 0, 1, 'easeInOutQuad');
-        var projX = lerp(coreX + coreW, targetX + cardW / 2, flightEase);
-        var projY = railY - Math.sin(flightEase * Math.PI) * 20;
+        var projX = lerp(960, targetCenterX, flightEase);
+        var projY = lerp(coreY + coreH, baseY, flightEase);
 
         kids.push({
           type: 'circle',
-          size: 46,
-          fill: '#00F0FF',
+          size: 42,
+          fill: '#48C7E8',
           opacity: 0.85,
           blur: 16,
-          positioned: { left: projX - 23, top: projY - 23 },
+          positioned: { left: projX - 21, top: projY - 21 },
         });
         kids.push({
           type: 'circle',
-          size: 18,
+          size: 16,
           fill: '#FFFFFF',
           opacity: 0.98,
           blur: 4,
-          positioned: { left: projX - 9, top: projY - 9 },
-        });
-
-        kids.push({
-          type: 'rect',
-          width: 60,
-          height: 4,
-          radius: 2,
-          fill: '#00F0FF',
-          opacity: 0.70,
-          blur: 5,
-          positioned: { left: projX - 60, top: projY - 2 },
+          positioned: { left: projX - 8, top: projY - 8 },
         });
       }
 
-      // Post-landing card reaction (bounce & shockwave)
+      // Card post-impact reaction (bounce & shockwave)
       var bounceY = 0;
       var shockwaveT = 0;
       var flashWhite = 0;
@@ -354,48 +488,48 @@ scene = {
         var postFrames = frame - landFrame;
         if (postFrames < 14) {
           var bNorm = postFrames / 14;
-          bounceY = -Math.sin(bNorm * Math.PI) * 18;
+          bounceY = -Math.sin(bNorm * Math.PI) * 16;
           shockwaveT = bNorm;
           if (postFrames <= 3) flashWhite = 1 - postFrames / 3;
         }
       }
 
-      var currentCardY = railY - cardH / 2 + bounceY;
+      var currentCardY = baseY + bounceY;
 
-      // Render shockwave burst ring upon injection
+      // Shockwave burst upon injection
       if (shockwaveT > 0 && shockwaveT < 1) {
-        var waveSize = 130 + shockwaveT * 150;
+        var waveSize = 130 + shockwaveT * 140;
         var waveOp = clamp01((1 - shockwaveT) * 0.85);
         kids.push({
           type: 'circle',
           size: waveSize,
-          fill: '#00F0FF',
+          fill: '#48C7E8',
           opacity: waveOp,
           blur: 24,
           positioned: {
-            left: targetX + cardW / 2 - waveSize / 2,
-            top: railY - waveSize / 2,
+            left: targetCenterX - waveSize / 2,
+            top: baseY + cardH / 2 - waveSize / 2,
           },
         });
       }
 
-      // Card background & border styling
-      var cardBg = flashWhite > 0.05 ? '#2A3C60' : (hasInjected ? '#10172A' : '#0B0F1C');
-      var cardBorderCol = hasInjected ? '#00F0FF' : 'rgba(255, 255, 255, 0.12)';
+      // Card background & border
+      var cardBg = flashWhite > 0.05 ? '#243555' : (hasInjected ? '#0F1626' : '#0B0F1C');
+      var cardBorderCol = hasInjected ? '#48C7E8' : 'rgba(255, 255, 255, 0.12)';
       var cardBorderW = hasInjected ? 2.5 : 1.5;
 
       // Injected glow behind card
       if (hasInjected) {
-        var pulseGlow = clamp01(0.24 + 0.08 * Math.sin(((frame + i * 8) / 25) * Math.PI * 2));
+        var pulseGlow = clamp01(0.22 + 0.08 * Math.sin(((frame + i * 8) / 25) * Math.PI * 2));
         kids.push({
           type: 'circle',
-          size: 220,
+          size: 200,
           fill: app.col,
           opacity: pulseGlow,
           blur: 44,
           positioned: {
-            left: targetX + cardW / 2 - 110,
-            top: currentCardY + cardH / 2 - 110,
+            left: targetCenterX - 100,
+            top: currentCardY + cardH / 2 - 100,
           },
         });
       }
@@ -412,51 +546,80 @@ scene = {
         positioned: { left: targetX, top: currentCardY },
       });
 
-      // App Icon inside card (Official SVG)
+      // App Icon inside card (Fixed SVGs)
       var iconSvgData = icons[app.icon] || icons.apple;
       kids.push({
         type: 'svg',
         svg: iconSvgData,
-        width: 64,
-        height: 64,
+        width: 58,
+        height: 58,
         opacity: clamp01(cardAlpha * (hasInjected ? 1.0 : 0.65)),
         positioned: {
-          left: targetX + (cardW - 64) / 2,
-          top: currentCardY + 26,
+          left: targetX + (cardW - 58) / 2,
+          top: currentCardY + 18,
         },
       });
 
-      // EMBEDDED BADGE: "Fa inside" chip inside the card (lights up once injected!)
+      // EMBEDDED BADGE: "Fa inside" chip (The iconic Intel-inside style badge with real Fa mark!)
       if (hasInjected) {
         var badgeT = clamp01(Math.min(1.0, (frame - landFrame) / 5));
+        var badgeW = 92;
+        var badgeH = 24;
+        var badgeX = targetX + (cardW - badgeW) / 2;
+        var badgeY = currentCardY + 86;
+
+        // Badge chip background
         kids.push({
           type: 'rect',
-          width: 58,
-          height: 22,
-          radius: 11,
-          fill: '#00F0FF',
+          width: badgeW,
+          height: badgeH,
+          radius: 12,
+          fill: '#080E1C',
+          border: { color: '#48C7E8', width: 1.5 },
           opacity: clamp01(0.95 * badgeT),
-          positioned: {
-            left: targetX + (cardW - 58) / 2,
-            top: currentCardY + cardH - 30,
-          },
+          positioned: { left: badgeX, top: badgeY },
         });
+
+        // "Fa" in brand blue & teal, followed by "inside"
         kids.push({
-          type: 'text',
-          text: 'Fa inside',
-          width: 58,
+          type: 'row',
+          mainAxisAlignment: 'center',
+          crossAxisAlignment: 'center',
           opacity: badgeT,
-          style: {
-            fontSize: 10,
-            fontFamily: 'monospace',
-            fontWeight: '900',
-            color: '#05070D',
-            textAlign: 'center',
-          },
-          positioned: {
-            left: targetX + (cardW - 58) / 2,
-            top: currentCardY + cardH - 26,
-          },
+          children: [
+            {
+              type: 'text',
+              text: 'F',
+              style: {
+                fontSize: 13,
+                fontFamily: 'Impact',
+                fontWeight: '900',
+                color: '#5B61F6',
+              },
+            },
+            {
+              type: 'text',
+              text: 'a',
+              style: {
+                fontSize: 13,
+                fontFamily: 'Impact',
+                fontWeight: '900',
+                color: '#2EBD9E',
+              },
+            },
+            {
+              type: 'text',
+              text: ' inside',
+              style: {
+                fontSize: 10,
+                fontFamily: 'monospace',
+                fontWeight: '800',
+                color: '#FFFFFF',
+                letterSpacing: 0.5,
+              },
+            },
+          ],
+          positioned: { left: badgeX, top: badgeY + 4, width: badgeW },
         });
       }
 
@@ -467,49 +630,53 @@ scene = {
         width: cardW,
         opacity: cardAlpha,
         style: {
-          fontSize: 17,
+          fontSize: 16,
           fontFamily: 'Impact',
           color: hasInjected ? '#FFFFFF' : '#8A96A8',
           letterSpacing: 1,
           textAlign: 'center',
         },
-        positioned: { left: targetX, top: railY + cardH / 2 + 18 },
+        positioned: { left: targetX, top: baseY + cardH + 14 },
       });
 
       var statusTxt = hasInjected ? 'FA EMBEDDED' : 'STANDALONE';
-      var statusCol = hasInjected ? '#00F0FF' : '#455268';
+      var statusCol = hasInjected ? '#48C7E8' : '#455268';
       kids.push({
         type: 'text',
         text: statusTxt,
         width: cardW,
         opacity: clamp01(cardAlpha * (hasInjected ? 1.0 : 0.6)),
         style: {
-          fontSize: 11,
+          fontSize: 10,
           fontFamily: 'monospace',
           fontWeight: '700',
           color: statusCol,
           letterSpacing: 1,
           textAlign: 'center',
-          shadows: hasInjected ? [{ color: '#00F0FF', blur: 8, offset: { x: 0, y: 0 } }] : [],
+          shadows: hasInjected ? [{ color: '#48C7E8', blur: 8, offset: { x: 0, y: 0 } }] : [],
         },
-        positioned: { left: targetX, top: railY + cardH / 2 + 42 },
+        positioned: { left: targetX, top: baseY + cardH + 36 },
       });
     }
 
     // ------------------------------------------------------------------------
-    // 6. Connecting High-Speed Synaptic Pulses (Frame 150–240)
+    // 6. Connecting Synaptic Pulses (Frame 150–240)
     // ------------------------------------------------------------------------
     if (frame >= 150) {
-      var syncPulseT = ((frame - 150) % 30) / 30;
-      var pulseHeadX = lerp(coreX + coreW, railEndX, syncPulseT);
-      kids.push({
-        type: 'circle',
-        size: 30,
-        fill: '#00F0FF',
-        opacity: 0.75,
-        blur: 10,
-        positioned: { left: pulseHeadX - 15, top: railY - 15 },
-      });
+      var syncPulseT = ((frame - 150) % 24) / 24;
+      for (var pi2 = 0; pi2 < apps.length; pi2++) {
+        var pTargetCenterX = startCardsX + pi2 * stepX + cardW / 2;
+        var pX = lerp(960, pTargetCenterX, syncPulseT);
+        var pY = lerp(coreY + coreH, baseY, syncPulseT);
+        kids.push({
+          type: 'circle',
+          size: 8,
+          fill: '#48C7E8',
+          opacity: 0.75,
+          blur: 3,
+          positioned: { left: pX - 4, top: pY - 4 },
+        });
+      }
     }
 
     // Edge vignette
@@ -526,3 +693,4 @@ scene = {
     };
   },
 };
+

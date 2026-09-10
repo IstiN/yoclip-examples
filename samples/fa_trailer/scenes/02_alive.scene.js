@@ -50,111 +50,125 @@ scene = {
     // Deep volumetric indigo ambient light
     kids.push({
       type: 'circle',
-      size: 1400,
-      fill: '#0E1C38',
-      opacity: 0.45,
+      size: 1500,
+      fill: '#0C1322',
+      opacity: 0.65,
       blur: 160,
-      positioned: { left: 960 - 700, top: 540 - 700 },
+      positioned: { left: 960 - 750, top: 540 - 750 },
+    });
+    kids.push({
+      type: 'circle',
+      size: 800,
+      fill: '#5B61F6',
+      opacity: 0.12,
+      blur: 120,
+      positioned: { left: 960 - 400, top: 540 - 400 },
     });
 
     // ------------------------------------------------------------------------
     // 2. Camera & Focal Motion (Camera pans, Focal Plane shifts)
     // ------------------------------------------------------------------------
-    // Phase 1 (0–45):   Camera drifts near left blocks (z ~ 400 in focus)
-    // Phase 2 (45–90):  Camera sweeps right and centers on Hero Block (z = 500)
-    // Phase 3 (90–125): Locked onto Hero Block, focal plane locked at z = 500
+    // Phase 1 (0–35):   Camera drifts near left blocks (z ~ 320 in focus)
+    // Phase 2 (35–85):  Camera sweeps right and rack-focuses onto Hero Block (z = 500)
+    // Phase 3 (85–125): Locked onto Hero Block, focal plane locked at z = 500
     // Phase 4 (125–180): Statement slams in, subtle dolly push
 
-    var panT = tw(35, 55, 0, 1, 'easeInOutCubic');
+    var panT = tw(25, 60, 0, 1, 'easeInOutCubic');
     var camX = lerp(-140, 0, panT);
     var camY = lerp(-30, 0, panT);
     var camZoom = lerp(1.08, 1.0, panT);
 
     // Current camera focal plane (distance in Z that is 100% sharp)
-    var currentFocalZ = lerp(400, 500, panT);
+    // Dynamic rack focus: shifts from 320 to 500 as camera pans!
+    var currentFocalZ = lerp(320, 500, tw(20, 65, 0, 1, 'easeInOutCubic'));
 
     // ------------------------------------------------------------------------
-    // 3. Central Anamorphic Light Bloom (The Hot Flare in Reference)
+    // 3. Central Anamorphic Light Bloom (Harmonized with Scene 01)
     // ------------------------------------------------------------------------
     var flareX = 1020 + camX * 0.4;
     var flareY = 640 + camY * 0.4;
     var flarePulse = 0.85 + 0.15 * Math.sin((frame / 20) * Math.PI * 2);
 
-    // Wide horizontal magenta glow streak
+    // Wide horizontal neon orchid glow streak
     kids.push({
       type: 'rect',
       width: 700,
-      height: 40,
-      radius: 20,
-      fill: '#FF2A85',
-      opacity: 0.32 * flarePulse,
-      blur: 50,
-      positioned: { left: flareX - 350, top: flareY - 20 },
+      height: 36,
+      radius: 18,
+      fill: '#E056FD',
+      opacity: 0.28 * flarePulse,
+      blur: 46,
+      positioned: { left: flareX - 350, top: flareY - 18 },
     });
 
-    // Mid cyan glow streak
+    // Mid brand-blue & cyan glow streak
     kids.push({
       type: 'rect',
-      width: 440,
-      height: 24,
-      radius: 12,
-      fill: '#00F0FF',
-      opacity: 0.48 * flarePulse,
-      blur: 28,
-      positioned: { left: flareX - 220, top: flareY - 12 },
+      width: 460,
+      height: 22,
+      radius: 11,
+      fill: '#5B61F6',
+      opacity: 0.42 * flarePulse,
+      blur: 24,
+      positioned: { left: flareX - 230, top: flareY - 11 },
     });
 
-    // Hot specular white core
+    // Hot specular cyan core
     kids.push({
       type: 'rect',
-      width: 140,
-      height: 10,
-      radius: 5,
-      fill: '#FFFFFF',
-      opacity: 0.80 * flarePulse,
-      blur: 10,
-      positioned: { left: flareX - 70, top: flareY - 5 },
+      width: 160,
+      height: 8,
+      radius: 4,
+      fill: '#48C7E8',
+      opacity: 0.85 * flarePulse,
+      blur: 8,
+      positioned: { left: flareX - 80, top: flareY - 4 },
     });
 
     // ------------------------------------------------------------------------
-    // 4. Code Blocks (Structured Exactly like the Reference Image)
+    // 4. Code Blocks (Dense Code Galaxy Filling the Screen)
     // ------------------------------------------------------------------------
     var blocks = [
       // === BLOCK 1: CENTER-RIGHT HERO BLOCK (In Sharp Focus) ===
       {
         id: 'hero',
-        x: 1050, y: 440, z: 500,
+        x: 1040, y: 430, z: 500,
         isHero: true,
         lines: [
           [
-            ['#include ', '#FF2A85'],
-            ['"package:flutter_agent/flutter_agent.dart"', '#00F0FF'],
+            ['#include ', '#E056FD'],
+            ['"package:flutter_agent/flutter_agent.dart"', '#48C7E8'],
           ],
           [
-            ['using namespace ', '#FF2A85'],
+            ['using namespace ', '#E056FD'],
             ['fa;', '#FFFFFF'],
           ],
           [
-            ['int ', '#00F0FF'],
+            ['int ', '#5B61F6'],
             ['main', '#FFFFFF'],
-            ['() ', '#00F0FF'],
+            ['() ', '#5B61F6'],
             ['async {', '#FFFFFF'],
           ],
           [
-            ['    final ', '#FF2A85'],
+            ['    final ', '#E056FD'],
             ['livingAgent = ', '#FFFFFF'],
-            ['await ', '#FF2A85'],
-            ['Fa.boot();', '#00F0FF'],
+            ['await ', '#E056FD'],
+            ['Fa.boot();', '#48C7E8'],
           ],
+          // LIVING FACE TOKEN: Split into exact canonical brand colors from Scene 01!
           [
-            ['    ( > _ o )', '#00F0FF'],
-            ['  // IT IS ALIVE: watching your back', '#22EE99'],
+            ['    ( ', '#FFFFFF'],
+            ['>', '#5B61F6'],
+            [' _ ', '#2EBD9E'],
+            ['eyeRight', '#48C7E8'],
+            [' )', '#FFFFFF'],
+            ['  // IT IS ALIVE: watching your back', '#2EBD9E'],
           ],
           [
             ['    livingAgent.', '#FFFFFF'],
-            ['wink', '#00F0FF'],
+            ['wink', '#48C7E8'],
             ['(eye: Eye.right);  ', '#FFFFFF'],
-            ['// emotions built in', '#22EE99'],
+            ['// emotions built in', '#2EBD9E'],
           ],
           [
             ['}', '#FFFFFF'],
@@ -162,138 +176,254 @@ scene = {
         ],
       },
 
-      // === BLOCK 2: TOP-CENTER BLOCK (Func definition / medium blur) ===
+      // === BLOCK 2: TOP-RIGHT: 10+ PROVIDERS BYOK ===
+      {
+        id: 'providers_byok',
+        x: 1220, y: 65, z: 680,
+        lines: [
+          [
+            ['// 10+ LLM PROVIDERS · ZERO LOCK-IN · BYOK', '#2EBD9E'],
+          ],
+          [
+            ['const ', '#E056FD'],
+            ['providers = [', '#FFFFFF'],
+          ],
+          [
+            ['    Anthropic.', '#FFFFFF'],
+            ['claude_3_5_sonnet', '#5B61F6'],
+            ['({ cache: true }),', '#48C7E8'],
+          ],
+          [
+            ['    OpenAI.', '#FFFFFF'],
+            ['gpt_4o', '#5B61F6'],
+            ['({ jsonSchema: true }),', '#48C7E8'],
+          ],
+          [
+            ['    DeepSeek.', '#FFFFFF'],
+            ['r1_reasoning', '#5B61F6'],
+            ['({ localFallback: true }),', '#48C7E8'],
+          ],
+          [
+            ['    Google.', '#FFFFFF'],
+            ['gemini_2_0_flash', '#5B61F6'],
+            ['({ multimodal: true }),', '#48C7E8'],
+          ],
+          [
+            ['    Ollama.', '#FFFFFF'],
+            ['local', '#2EBD9E'],
+            ['("llama3.3:70b"), ', '#48C7E8'],
+            ['// 100% offline', '#2EBD9E'],
+          ],
+          [
+            ['    Groq.', '#FFFFFF'],
+            ['ultraFast', '#E056FD'],
+            ['("500 tok/s"), Mistral, Bedrock', '#FFFFFF'],
+          ],
+          [
+            ['];', '#FFFFFF'],
+          ],
+        ],
+      },
+
+      // === BLOCK 3: TOP-CENTER BLOCK (Cubes Sandbox & Security) ===
       {
         id: 'top_center',
-        x: 740, y: 70, z: 750,
+        x: 620, y: 60, z: 740,
         lines: [
           [
-            ['printf', '#FF2A85'],
-            ['("Inside autonomousLoop()\\n");', '#FFFFFF'],
+            ['class ', '#E056FD'],
+            ['CubesSecurity ', '#5B61F6'],
+            ['extends ', '#E056FD'],
+            ['SandboxPolicy {', '#FFFFFF'],
+          ],
+          [
+            ['    Tier get ', '#E056FD'],
+            ['approvalLevel => ', '#FFFFFF'],
+            ['Tier.threeProtected;', '#48C7E8'],
+          ],
+          [
+            ['    bool get ', '#E056FD'],
+            ['networkIsolated => ', '#FFFFFF'],
+            ['true;', '#2EBD9E'],
+          ],
+          [
+            ['    void ', '#5B61F6'],
+            ['verifyExecution', '#FFFFFF'],
+            ['(Token vault) => vault.', '#FFFFFF'],
+            ['assertSanitized', '#5B61F6'],
+            ['();', '#FFFFFF'],
           ],
           [
             ['}', '#FFFFFF'],
           ],
+        ],
+      },
+
+      // === BLOCK 4: TOP-LEFT BLOCK (Fa Autonomous Engine & AST) ===
+      {
+        id: 'top_left',
+        x: 80, y: 70, z: 820,
+        lines: [
           [
-            ['void ', '#00F0FF'],
-            ['func2', '#FFFFFF'],
-            ['() {', '#00F0FF'],
+            ['import ', '#E056FD'],
+            ['"package:analyzer/dart/ast/ast.dart";', '#48C7E8'],
           ],
           [
-            ['    class ', '#FF2A85'],
-            ['CubesSecurity ', '#00F0FF'],
-            ['{ int ', '#00F0FF'],
-            ['id; };', '#FFFFFF'],
+            ['final ', '#E056FD'],
+            ['astWorker = ', '#FFFFFF'],
+            ['AstRewriter.', '#5B61F6'],
+            ['atomic(path);', '#48C7E8'],
           ],
           [
-            ['    printf', '#FF2A85'],
-            ['("Cubes sandbox: 100% isolated\\n");', '#FFFFFF'],
+            ['await astWorker.', '#FFFFFF'],
+            ['refactorWorkspace', '#5B61F6'],
+            ['(diagnostics: true);', '#FFFFFF'],
           ],
           [
-            ['    return;', '#FF2A85'],
+            ['// surgical hashline patches, zero hallucinations', '#2EBD9E'],
           ],
         ],
       },
 
-      // === BLOCK 3: TOP-RIGHT BLOCK (Streaming & Operators) ===
+      // === BLOCK 5: MID-LEFT BLOCK (Witty Developer Companion) ===
       {
-        id: 'top_right',
-        x: 1220, y: 90, z: 980,
+        id: 'mid_left',
+        x: 100, y: 260, z: 420,
         lines: [
           [
-            ['using namespace ', '#FF2A85'],
-            ['std;', '#FFFFFF'],
-          ],
-          [
-            ['int ', '#00F0FF'],
-            ['main() {', '#FFFFFF'],
-          ],
-          [
-            ['    int ', '#00F0FF'],
-            ['a = 10, b = 120;', '#FFFFFF'],
-          ],
-          [
-            ['    // INCREMENT', '#22EE99'],
-          ],
-          [
-            ['    stream << ', '#00F0FF'],
-            ['"Value of models: 10 providers" ', '#FFFFFF'],
-            ['<< endl;', '#00F0FF'],
-          ],
-          [
-            ['    stream << ', '#00F0FF'],
-            ['"120 fps Impeller Metal butter" ', '#FFFFFF'],
-            ['<< endl;', '#00F0FF'],
-          ],
-        ],
-      },
-
-      // === BLOCK 4: FAR-LEFT BLOCK (Witty Developer Companion) ===
-      {
-        id: 'far_left',
-        x: 120, y: 190, z: 420,
-        lines: [
-          [
-            ['if ', '#FF2A85'],
+            ['if ', '#E056FD'],
             ['(user.isTired) {', '#FFFFFF'],
           ],
           [
             ['    coffee.', '#FFFFFF'],
-            ['brew', '#00F0FF'],
+            ['brew', '#48C7E8'],
             ['();  terminal.', '#FFFFFF'],
-            ['takeOver', '#00F0FF'],
+            ['takeOver', '#5B61F6'],
             ['();', '#FFFFFF'],
           ],
           [
             ['    agent.', '#FFFFFF'],
-            ['whisper', '#00F0FF'],
+            ['whisper', '#48C7E8'],
             ['("Go to sleep, I will ship.");', '#FFFFFF'],
           ],
           [
             ['}', '#FFFFFF'],
           ],
           [
-            ['// pure Dart core, zero Node.js drama', '#22EE99'],
+            ['// pure Dart core, zero Node.js drama', '#2EBD9E'],
           ],
           [
-            ['final ', '#FF2A85'],
+            ['final ', '#E056FD'],
             ['hands = [', '#FFFFFF'],
-            ['ShellTool', '#00F0FF'],
+            ['ShellTool', '#5B61F6'],
             ['(), ', '#FFFFFF'],
-            ['AstRewrite', '#00F0FF'],
+            ['AstRewrite', '#48C7E8'],
+            ['(), ', '#FFFFFF'],
+            ['LspSymbol', '#5B61F6'],
             ['()];', '#FFFFFF'],
           ],
         ],
       },
 
-      // === BLOCK 5: LOWER-LEFT BLOCK (Foreground defocussed) ===
+      // === BLOCK 5B: LEFT-CENTER BRIDGE (Git & Atomic Commits) ===
       {
-        id: 'lower_left',
-        x: 100, y: 640, z: 280,
+        id: 'left_bridge',
+        x: 110, y: 460, z: 360,
         lines: [
           [
-            ['class ', '#FF2A85'],
-            ['FaSuperpowers ', '#00F0FF'],
-            ['implements ', '#FF2A85'],
+            ['// Git-backed atomic memory & union merge', '#2EBD9E'],
+          ],
+          [
+            ['await ', '#E056FD'],
+            ['git.stage', '#5B61F6'],
+            ['(["lib/**", "memory/**"]);', '#48C7E8'],
+          ],
+          [
+            ['await ', '#E056FD'],
+            ['git.commit', '#5B61F6'],
+            ['("feat: autonomous video pipeline");', '#FFFFFF'],
+          ],
+        ],
+      },
+
+      // === BLOCK 5C: MID-CENTER A2A PROTOCOL ===
+      {
+        id: 'mid_center',
+        x: 600, y: 310, z: 580,
+        lines: [
+          [
+            ['// A2A Protocol: Cross-Machine Agent Fabric', '#2EBD9E'],
+          ],
+          [
+            ['final ', '#E056FD'],
+            ['fabric = ', '#FFFFFF'],
+            ['A2AGateway.', '#5B61F6'],
+            ['mesh(cluster: "apple-silicon");', '#48C7E8'],
+          ],
+          [
+            ['await fabric.', '#FFFFFF'],
+            ['broadcast', '#5B61F6'],
+            ['(SubagentTask("render_gpu"));', '#FFFFFF'],
+          ],
+          [
+            ['peer.onReply((res) => print("Delivered in 4ms"));', '#2EBD9E'],
+          ],
+        ],
+      },
+
+      // === BLOCK 5D: MID-RIGHT CONTEXT PRUNING ===
+      {
+        id: 'mid_right',
+        x: 1420, y: 310, z: 560,
+        lines: [
+          [
+            ['// Intelligent Context Pruning & Checkpoints', '#2EBD9E'],
+          ],
+          [
+            ['final ', '#E056FD'],
+            ['ctx = ', '#FFFFFF'],
+            ['AgentContext.', '#5B61F6'],
+            ['checkpoint("research");', '#48C7E8'],
+          ],
+          [
+            ['await ctx.', '#FFFFFF'],
+            ['rewind', '#5B61F6'],
+            ['(keepReport: true);', '#FFFFFF'],
+          ],
+          [
+            ['expect(tokens.active, lessThan(6000));', '#48C7E8'],
+          ],
+        ],
+      },
+
+      // === BLOCK 6: LOWER-LEFT FOREGROUND BLOCK (Near camera: z = 280) ===
+      {
+        id: 'lower_left',
+        x: 90, y: 640, z: 280,
+        lines: [
+          [
+            ['class ', '#E056FD'],
+            ['FaSuperpowers ', '#5B61F6'],
+            ['implements ', '#E056FD'],
             ['Companion {', '#FFFFFF'],
           ],
           [
-            ['    bool get ', '#FF2A85'],
+            ['    bool get ', '#E056FD'],
             ['hasHands => ', '#FFFFFF'],
-            ['true;', '#00F0FF'],
+            ['true;', '#2EBD9E'],
           ],
           [
-            ['    void ', '#FF2A85'],
-            ['gitPushForce', '#00F0FF'],
+            ['    void ', '#5B61F6'],
+            ['gitPushForce', '#FFFFFF'],
             ['() => ', '#FFFFFF'],
-            ['throw ', '#FF2A85'],
-            ['NeverDoThat();', '#00F0FF'],
+            ['throw ', '#E056FD'],
+            ['NeverDoThat();', '#E056FD'],
           ],
           [
-            ['    final ', '#FF2A85'],
+            ['    final ', '#E056FD'],
             ['memory = ', '#FFFFFF'],
-            ['LocalBrain.', '#00F0FF'],
-            ['load(100.gb);', '#FFFFFF'],
+            ['GitBackedBrain.', '#5B61F6'],
+            ['load(path: "./memory");', '#48C7E8'],
           ],
           [
             ['}', '#FFFFFF'],
@@ -301,71 +431,96 @@ scene = {
         ],
       },
 
-      // === BLOCK 6: CENTER-BOTTOM BLOCK (Sitting in the cyan/magenta flare) ===
+      // === BLOCK 7: CENTER-BOTTOM BLOCK (Sitting in the flare) ===
       {
         id: 'center_bottom',
-        x: 620, y: 660, z: 580,
+        x: 620, y: 650, z: 580,
         lines: [
           [
-            ['#include ', '#FF2A85'],
-            ['<yoclip/timeline.h>', '#00F0FF'],
+            ['#include ', '#E056FD'],
+            ['<yoclip/timeline.h>', '#48C7E8'],
           ],
           [
-            ['void ', '#00F0FF'],
+            ['void ', '#5B61F6'],
             ['compilePptx', '#FFFFFF'],
-            ['() => ', '#00F0FF'],
-            ['YoClip.toPptx(editable: true);', '#FFFFFF'],
+            ['() => ', '#5B61F6'],
+            ['YoClip.toPptx(editable: true);', '#48C7E8'],
           ],
           [
-            ['final ', '#FF2A85'],
+            ['final ', '#E056FD'],
             ['platforms = [', '#FFFFFF'],
-            ['MacOS, Windows, iOS, Android', '#00F0FF'],
+            ['MacOS, Windows, iOS, Android', '#48C7E8'],
             ['];', '#FFFFFF'],
           ],
           [
-            ['// 100% offline fallback when cloud goes down', '#22EE99'],
+            ['// 100% offline fallback when cloud goes down', '#2EBD9E'],
           ],
           [
-            ['return ', '#FF2A85'],
-            ['Fa.runLocally();', '#00F0FF'],
+            ['return ', '#E056FD'],
+            ['Fa.runLocally(gpu: "Metal/Impeller");', '#48C7E8'],
           ],
         ],
       },
 
-      // === BLOCK 7: DEEP BACKGROUND BLOCK 1 (Heavy blur / hazy code) ===
+      // === BLOCK 8: BOTTOM-RIGHT BLOCK (Impeller GPU 120fps engine) ===
       {
-        id: 'bg_left',
-        x: 480, y: 380, z: 1250,
+        id: 'bottom_right',
+        x: 1360, y: 640, z: 460,
         lines: [
           [
-            ['Swarm.spawn', '#00F0FF'],
+            ['// Impeller GPU headless renderer', '#2EBD9E'],
+          ],
+          [
+            ['final ', '#E056FD'],
+            ['engine = ', '#FFFFFF'],
+            ['HeadlessRenderer.', '#5B61F6'],
+            ['gpu(metal: true);', '#48C7E8'],
+          ],
+          [
+            ['await engine.', '#FFFFFF'],
+            ['renderVideo', '#5B61F6'],
+            ['(fps: 120, codec: "h264");', '#FFFFFF'],
+          ],
+          [
+            ['expect(fps.avg, greaterThan(119.8));', '#48C7E8'],
+          ],
+        ],
+      },
+
+      // === BLOCK 9: DEEP BACKGROUND BLOCK 1 (Swarm & A2A protocol) ===
+      {
+        id: 'bg_left',
+        x: 440, y: 390, z: 1200,
+        lines: [
+          [
+            ['Swarm.spawn', '#5B61F6'],
             ['(count: 32, protocol: a2a);', '#FFFFFF'],
           ],
           [
-            ['subagents.broadcast("divide, conquer, deliver");', '#4F6B9E'],
+            ['subagents.broadcast("divide, conquer, deliver");', '#3D4F72'],
           ],
           [
-            ['await session.delegate("explore", "find bug in 2s");', '#4F6B9E'],
+            ['await session.delegate("explore", "find bug in 2s");', '#3D4F72'],
           ],
           [
-            ['expect(allTests, equals(allPass));', '#4F6B9E'],
+            ['expect(allTests, equals(allPass));', '#3D4F72'],
           ],
         ],
       },
 
-      // === BLOCK 8: DEEP BACKGROUND BLOCK 2 (Far right haze) ===
+      // === BLOCK 10: DEEP BACKGROUND BLOCK 2 (Far right haze) ===
       {
         id: 'bg_right',
-        x: 1480, y: 490, z: 1450,
+        x: 1540, y: 390, z: 1350,
         lines: [
           [
-            ['terminal.autofire(">_ flutter run --impeller");', '#4F6B9E'],
+            ['terminal.autofire(">_ flutter run --impeller");', '#3D4F72'],
           ],
           [
-            ['fps.measure(); // 120 fps butter', '#22EE99'],
+            ['fps.measure(); // 120 fps butter', '#2EBD9E'],
           ],
           [
-            ['void commit() => git.commit("refactor with Fa");', '#4F6B9E'],
+            ['void commit() => git.commit("refactor with Fa");', '#3D4F72'],
           ],
         ],
       },
@@ -396,13 +551,13 @@ scene = {
 
       // Depth of field blur sigma:
       // When at focal plane: blur = 0 (crystal sharp!).
-      // When far away: blur up to 8–12px.
+      // Subtle optical depth: text stays readable while feeling deep and layered
       var blurSigma = 0;
-      if (distFromFocus > 30) {
-        blurSigma = (distFromFocus - 30) * 0.016;
+      if (distFromFocus > 40) {
+        blurSigma = Math.min(5.5, (distFromFocus - 40) * 0.011);
       }
       if (b.isHero && frame >= 85) {
-        blurSigma = 0; // Hero is always pinned razor sharp after camera docks
+        blurSigma = 0; // Hero is pinned razor sharp after camera docks
       }
 
       // Parallax position
@@ -435,24 +590,25 @@ scene = {
           var txt = lineTokens[ti][0];
           var col = lineTokens[ti][1];
 
-          // Dynamic wink on hero face!
-          if (b.isHero && txt === '    ( > _ o )') {
-            if (winkT > 0.01) {
-              txt = '    ( > _ - )';
-              col = '#00F0FF';
-            }
+          // Dynamic eye resolution on hero face
+          if (txt === 'eyeRight') {
+            txt = winkT > 0.01 ? '-' : 'o';
+            col = '#48C7E8';
           }
 
-          var isFaceToken = b.isHero && (txt === '    ( > _ o )' || txt === '    ( > _ - )');
+          var isFaceToken = b.isHero && (
+            txt === '    ( ' || txt === '>' || txt === ' _ ' ||
+            txt === 'o' || txt === '-' || txt === ' )'
+          );
 
           tokenWidgets.push({
             type: 'text',
             text: txt,
             style: {
               color: col,
-              fontSize: isFaceToken ? 29 : 22,
+              fontSize: isFaceToken ? 30 : 21,
               fontFamily: 'monospace',
-              fontWeight: (b.isHero || isFaceToken) ? '700' : '500',
+              fontWeight: (b.isHero || isFaceToken) ? '800' : '500',
               shadows: blurSigma > 0.5 ? [] : [
                 { color: col, blur: 6, offset: { x: 0, y: 0 } },
               ],

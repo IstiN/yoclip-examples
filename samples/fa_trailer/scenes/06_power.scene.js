@@ -26,6 +26,12 @@ scene = {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
+    function clamp01(v) {
+      if (v <= 0) return 0;
+      if (v >= 1) return 1;
+      return v;
+    }
+
     var b1 = 1 - tw(64, 6, 0, 1, 'easeIn');
     var b2 = tw(70, 6, 0, 1, 'easeOut') * (1 - tw(134, 6, 0, 1, 'easeIn'));
     var b3 = tw(140, 6, 0, 1, 'easeOut');
@@ -52,61 +58,191 @@ scene = {
     };
 
     // ---- Beat 1 — CUBES. ----------------------------------------------------
-    var spin = tw(0, 70, 0, 1, 'linear');
-    var squares = [
-      { base: 45, size: 520, o: 0.22 },
-      { base: -45, size: 520, o: 0.18 },
-      { base: 0, size: 520, o: 0.15 },
+    // Out-of-the-box cube variations grid (8 presets from Fa security ladder)
+    var cubePresets = [
+      { id: 'L1-CORE', tier: 'L1', title: 'STRICT WORKSPACE', spec: 'fs: [.] · net: none · core tools', col: '#2EBD9E' },
+      { id: 'L1-FULL', tier: 'L1', title: 'ISOLATED SHELL', spec: 'fs: [.] · net: none · full CLI', col: '#2EBD9E' },
+      { id: 'L2-CORE', tier: 'L2', title: 'HOST AUDITED', spec: 'fs: ro / · ws: rw · dev net', col: '#48C7E8' },
+      { id: 'L2-FULL', tier: 'L2', title: 'STANDARD SANDBOX', spec: 'fs: ro / · ws: rw · npm/pub', col: '#5B61F6' },
+      { id: 'L3-CORE', tier: 'L3', title: 'FULL DISK AUDITED', spec: 'fs: rw / · safe tool policy', col: '#8F6BFF' },
+      { id: 'L3-FULL', tier: 'L3', title: 'UNRESTRICTED HOST', spec: 'fs: rw / · open net · root', col: '#A368FF' },
+      { id: 'EPHEMERAL', tier: 'TMP', title: 'RAM SCRATCH DISK', spec: 'type: tmpfs · zero traces', col: '#E056FD' },
+      { id: 'CONTAINER', tier: 'OCI', title: 'DOCKER PIPELINE', spec: 'runtime: oci · hermetic CI', col: '#00F0FF' },
     ];
-    var cube = [];
-    for (var si = 0; si < squares.length; si++) {
-      var q = squares[si];
-      cube.push({
+
+    var gridIn = tw(0, 24, 0, 1, 'easeOutCubic');
+    var b1kids = [];
+
+    // Background architectural template grid (4 columns x 2 rows)
+    var cW = 360;
+    var cH = 96;
+    var cGapX = 24;
+    var cGapY = 530; // separates top row from bottom row
+    var cStartX = (1920 - (4 * cW + 3 * cGapX)) / 2; // 204
+
+    for (var ci = 0; ci < cubePresets.length; ci++) {
+      var cp = cubePresets[ci];
+      var colIdx = ci % 4;
+      var rowIdx = Math.floor(ci / 4);
+      var cX = cStartX + colIdx * (cW + cGapX);
+      var cY = rowIdx === 0 ? 65 : 720; // Row 0 at 65 (ends 161), Row 1 at 720 (ends 816)
+
+      var cardDrift = (1 - gridIn) * (rowIdx === 0 ? -25 : 25);
+
+      // Card container
+      b1kids.push({
         type: 'rect',
-        width: q.size,
-        height: q.size,
-        radius: 12,
-        stroke: '#8F6BFF',
-        strokeWidth: 2,
-        opacity: q.o,
-        rotation: q.base + 16 * spin,
-        positioned: { left: 960 - q.size / 2, top: 480 - q.size / 2 },
+        width: cW,
+        height: cH,
+        radius: 16,
+        fill: '#080D1A',
+        border: { color: '#1B263C', width: 1.5 },
+        opacity: clamp01(gridIn * 0.92),
+        offsetY: cardDrift,
+        positioned: { left: cX, top: cY },
+      });
+
+      // Accent color strip on left
+      b1kids.push({
+        type: 'rect',
+        width: 4,
+        height: cH - 28,
+        radius: 2,
+        fill: cp.col,
+        opacity: clamp01(gridIn * 0.9),
+        offsetY: cardDrift,
+        positioned: { left: cX + 12, top: cY + 14 },
+      });
+
+      // Tier badge pill
+      b1kids.push({
+        type: 'rect',
+        width: 42,
+        height: 20,
+        radius: 6,
+        fill: '#121D32',
+        border: { color: cp.col, width: 1.0 },
+        opacity: clamp01(gridIn * 0.95),
+        offsetY: cardDrift,
+        positioned: { left: cX + 26, top: cY + 12 },
+      });
+      b1kids.push({
+        type: 'text',
+        text: cp.tier,
+        width: 42,
+        opacity: clamp01(gridIn),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 10,
+          fontFamily: 'Impact',
+          color: cp.col,
+          textAlign: 'center',
+          letterSpacing: 0.5,
+        },
+        positioned: { left: cX + 26, top: cY + 16 },
+      });
+
+      // Preset ID
+      b1kids.push({
+        type: 'text',
+        text: cp.id,
+        width: cW - 85,
+        opacity: clamp01(gridIn),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 15,
+          fontFamily: 'Impact',
+          color: '#FFFFFF',
+          letterSpacing: 1.5,
+        },
+        positioned: { left: cX + 76, top: cY + 12 },
+      });
+
+      // Title
+      b1kids.push({
+        type: 'text',
+        text: cp.title,
+        width: cW - 40,
+        opacity: clamp01(gridIn * 0.85),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 12,
+          fontFamily: 'Impact',
+          color: '#8A99B2',
+          letterSpacing: 1,
+        },
+        positioned: { left: cX + 26, top: cY + 38 },
+      });
+
+      // Spec / Policy
+      b1kids.push({
+        type: 'text',
+        text: cp.spec,
+        width: cW - 40,
+        opacity: clamp01(gridIn * 0.7),
+        offsetY: cardDrift,
+        style: {
+          fontSize: 10,
+          fontFamily: 'monospace',
+          fontWeight: '600',
+          color: '#48C7E8',
+        },
+        positioned: { left: cX + 26, top: cY + 62 },
       });
     }
 
-    var sandboxIn = tw(18, 18, 0, 1, 'easeOut');
-    var b1kids = cube.concat([
-      {
-        type: 'text',
-        text: 'CUBES.',
-        width: 1920,
-        style: {
-          fontSize: 540,
-          fontFamily: 'Impact',
-          color: '#FFFFFF',
-          textAlign: 'center',
-          gradient: silverGrad,
-          textShadows: [{ color: '#448F6BFF', blur: 64 }],
-        },
-        positioned: { left: 0, top: 160 },
+    // Rotating wireframe isometric cubes in center
+    var spin = tw(0, 70, 0, 1, 'linear');
+    var squares = [
+      { base: 45, size: 540, o: 0.22 },
+      { base: -45, size: 540, o: 0.16 },
+      { base: 0, size: 540, o: 0.12 },
+    ];
+    for (var si = 0; si < squares.length; si++) {
+      var q = squares[si];
+      b1kids.push({
+        type: 'rect',
+        width: q.size,
+        height: q.size,
+        radius: 20,
+        border: { color: '#8F6BFF', width: 2 },
+        opacity: q.o,
+        rotation: q.base + 16 * spin,
+        positioned: { left: 960 - q.size / 2, top: 430 - q.size / 2 },
+      });
+    }
+
+    var sandboxIn = tw(14, 20, 0, 1, 'easeOut');
+    b1kids.push({
+      type: 'text',
+      text: 'CUBES.',
+      width: 1920,
+      style: {
+        fontSize: 300,
+        fontFamily: 'Impact',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        gradient: silverGrad,
+        letterSpacing: 4,
       },
-      {
-        type: 'text',
-        text: 'DECLARATIVE YAML SANDBOX. APPROVAL TIERS.',
-        width: 1920,
-        opacity: sandboxIn,
-        offsetY: 15 * (1 - sandboxIn),
-        style: {
-          fontSize: 40,
-          fontFamily: 'Impact',
-          color: '#C9B8FF',
-          letterSpacing: 2,
-          textAlign: 'center',
-          textShadows: [{ color: '#44000000', blur: 16 }],
-        },
-        positioned: { left: 0, top: 780 },
+      positioned: { left: 0, top: 190 },
+    });
+
+    b1kids.push({
+      type: 'text',
+      text: 'DECLARATIVE YAML SANDBOX. APPROVAL TIERS.',
+      width: 1920,
+      opacity: clamp01(sandboxIn),
+      offsetY: 15 * (1 - sandboxIn),
+      style: {
+        fontSize: 34,
+        fontFamily: 'Impact',
+        color: '#A368FF',
+        letterSpacing: 2,
+        textAlign: 'center',
       },
-    ]);
+      positioned: { left: 0, top: 600 },
+    });
 
     // ---- Beat 2 — MEMORY / BUILT IN. ---------------------------------------
     var swarmZoom = lerp(1.05, 1.15, tw(70, 70, 0, 1, 'linear'));
@@ -144,7 +280,6 @@ scene = {
           color: '#FFFFFF',
           textAlign: 'center',
           gradient: silverGrad,
-          textShadows: [{ color: '#448F6BFF', blur: 48 }],
         },
         positioned: { left: 0, top: 40 },
       },
@@ -158,7 +293,6 @@ scene = {
           color: '#FFFFFF',
           textAlign: 'center',
           gradient: gunmetalGrad,
-          textShadows: [{ color: '#22000000', blur: 24 }],
         },
         positioned: { left: 0, top: 540 },
       },
@@ -172,7 +306,6 @@ scene = {
           color: '#48C7E8',
           letterSpacing: 2,
           textAlign: 'center',
-          textShadows: [{ color: '#44000000', blur: 16 }],
         },
         positioned: { left: 0, top: 970 },
       },
@@ -190,7 +323,6 @@ scene = {
           color: '#FFFFFF',
           textAlign: 'center',
           gradient: purpleGrad,
-          textShadows: [{ color: '#888F6BFF', blur: 64 }],
         },
         positioned: { left: 0, top: 220 },
       },
@@ -204,7 +336,6 @@ scene = {
           color: '#5CE8CF',
           letterSpacing: 2,
           textAlign: 'center',
-          textShadows: [{ color: '#44000000', blur: 16 }],
         },
         positioned: { left: 0, top: 620 },
       },

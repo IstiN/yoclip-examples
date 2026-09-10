@@ -25,6 +25,12 @@ scene = {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
+    function clamp01(v) {
+      if (v <= 0) return 0;
+      if (v >= 1) return 1;
+      return v;
+    }
+
     var silverGrad = {
       type: 'linear',
       begin: 'topCenter',
@@ -272,44 +278,109 @@ scene = {
         });
       }
 
-      // ---- Lane 3: Audio Soundtrack with Waveforms -------------------------
+      // ---- Lane 3: Audio Soundtrack with Professional Dual-Channel Waveform -
+      var sndX = TL_X + 40;
+      var sndW = TL_W - 80;
+      var sndY = TL_TOP + 322;
+      var sndH = 72;
+
+      // Master Soundtrack Clip Container
       kids.push({
         type: 'rect',
-        width: TL_W - 80,
-        height: 64,
+        width: sndW,
+        height: sndH,
         radius: 8,
-        fill: '#241242',
-        stroke: '#8F6BFF',
-        strokeWidth: 1.5,
-        opacity: timeIn * (1 - fadeOut),
-        positioned: { left: TL_X + 40, top: TL_TOP + 326 },
+        fill: '#130B24',
+        border: { color: '#8F6BFF', width: 1.5 },
+        opacity: clamp01(timeIn * (1 - fadeOut)),
+        positioned: { left: sndX, top: sndY },
       });
+
+      // Track header label & acoustic metadata
       kids.push({
         type: 'text',
-        text: 'soundtrack.mp3 [44.1kHz · Stereo · AAC 128k]',
-        opacity: timeIn * (1 - fadeOut),
+        text: '♫ soundtrack.mp3 · 44.1 kHz Stereo · AAC Master [ -14 LUFS ]',
+        opacity: clamp01(timeIn * (1 - fadeOut)),
         style: {
           fontSize: 12,
           fontFamily: 'monospace',
-          color: '#E6C4FF',
           fontWeight: '700',
+          color: '#E6C4FF',
+          letterSpacing: 0.5,
         },
-        positioned: { left: TL_X + 54, top: TL_TOP + 334 },
+        positioned: { left: sndX + 16, top: sndY + 8 },
       });
 
-      // Waveform vertical bars across soundtrack
-      var WAVE_BARS = 75;
+      // Volume Automation Gain Curve (Thin Cyan Line + Keyframe Points)
+      var autoY = sndY + 44;
+      kids.push({
+        type: 'rect',
+        width: sndW - 32,
+        height: 1.5,
+        fill: '#48C7E8',
+        opacity: clamp01(0.55 * timeIn * (1 - fadeOut)),
+        positioned: { left: sndX + 16, top: autoY },
+      });
+      // Keyframe dots on gain line
+      var keyframesX = [sndX + 40, sndX + 220, sndX + 540, sndX + 880, sndX + 1240, sndX + sndW - 40];
+      for (var kfi = 0; kfi < keyframesX.length; kfi++) {
+        kids.push({
+          type: 'circle',
+          size: 6,
+          fill: '#00F0FF',
+          opacity: clamp01(0.9 * timeIn * (1 - fadeOut)),
+          positioned: { left: keyframesX[kfi] - 3, top: autoY - 2 },
+        });
+      }
+
+      // Zero-crossing center axis line
+      kids.push({
+        type: 'rect',
+        width: sndW - 32,
+        height: 1,
+        fill: '#2E1D4E',
+        opacity: clamp01(0.7 * timeIn * (1 - fadeOut)),
+        positioned: { left: sndX + 16, top: autoY },
+      });
+
+      // High-density mirrored dual waveform (140 dynamic acoustic bars)
+      var WAVE_BARS = 140;
+      var barSpacing = (sndW - 40) / WAVE_BARS;
       for (var wb = 0; wb < WAVE_BARS; wb++) {
-        var barX = TL_X + 54 + wb * 20;
-        var barH = 10 + 26 * Math.abs(Math.sin((wb * 0.28) + (frame * 0.05)));
+        var barX = sndX + 20 + wb * barSpacing;
+
+        // Realistic acoustic waveform profile with transients, beat drops, and chorus peaks
+        var normPos = wb / WAVE_BARS;
+        var sectionEnvelope = 0.4 + 0.6 * Math.sin(normPos * Math.PI); // buildup & climax
+        var beatTransient = (wb % 8 === 0 || wb % 8 === 3) ? 1.4 : 0.85; // rhythmic spikes
+        var harmonicDetail = Math.abs(Math.sin(wb * 0.45) * Math.cos(wb * 0.18 + 0.5));
+        var liveMovement = 0.08 * Math.sin((wb * 0.3) + (frame * 0.08));
+
+        var halfAmp = (6 + 18 * harmonicDetail * sectionEnvelope * beatTransient + liveMovement);
+        halfAmp = Math.min(24, Math.max(3, halfAmp));
+
+        // Color based on amplitude: quiet violet up to transient cyan/white
+        var barCol = halfAmp > 18 ? '#00F0FF' : (halfAmp > 12 ? '#A368FF' : '#6B38C2');
+
+        // Top half (positive wave)
         kids.push({
           type: 'rect',
-          width: 3.5,
-          height: barH,
-          radius: 1.5,
-          fill: '#A368FF',
-          opacity: 0.85 * timeIn * (1 - fadeOut),
-          positioned: { left: barX, top: TL_TOP + 376 - barH / 2 },
+          width: 2.2,
+          height: halfAmp,
+          radius: 1,
+          fill: barCol,
+          opacity: clamp01(0.85 * timeIn * (1 - fadeOut)),
+          positioned: { left: barX, top: autoY - halfAmp },
+        });
+        // Bottom half (negative wave)
+        kids.push({
+          type: 'rect',
+          width: 2.2,
+          height: halfAmp * 0.85,
+          radius: 1,
+          fill: barCol,
+          opacity: clamp01(0.75 * timeIn * (1 - fadeOut)),
+          positioned: { left: barX, top: autoY + 1 },
         });
       }
 

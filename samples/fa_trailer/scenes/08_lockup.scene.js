@@ -40,12 +40,18 @@ scene = {
         easing);
     }
 
-    // ---- The mapper: tile center pinned at (960, 390) ----------------------
-    // The materialize beat scales k (0.94 → 1.0 of 0.44) about
+    function clamp01(v) {
+      if (v <= 0) return 0;
+      if (v >= 1) return 1;
+      return v;
+    }
+
+    // ---- The mapper: tile center pinned at (960, 315) ----------------------
+    // The materialize beat scales k (0.94 → 1.0 of 0.38) about
     // the anchor, so tile and wordmark breathe as one surface.
     var tileT = tw(20, 40, 0, 1, 'easeOutExpo');      // 20–60
-    var k = 0.44 * lerp(0.94, 1.0, tileT);
-    setMapper(k, BRAND.anchor[0], BRAND.anchor[1], 960, 390);
+    var k = 0.38 * lerp(0.94, 1.0, tileT);
+    setMapper(k, BRAND.anchor[0], BRAND.anchor[1], 960, 315);
 
     var kids = [];
 
@@ -67,14 +73,14 @@ scene = {
         type: 'circle', size: haloS, fill: C.violet,
         opacity: 0.14 * ptIn * (1 - ptOut),
         blur: 26,
-        positioned: { left: 960 - haloS / 2, top: 390 - haloS / 2 },
+        positioned: { left: 960 - haloS / 2, top: 315 - haloS / 2 },
       });
       var coreS = Math.max(1, 14 * ptIn);
       kids.push({
         type: 'circle', size: coreS, fill: C.violet,
         opacity: ptA,
         blur: 8,
-        positioned: { left: 960 - coreS / 2, top: 390 - coreS / 2 },
+        positioned: { left: 960 - coreS / 2, top: 315 - coreS / 2 },
       });
     }
 
@@ -88,7 +94,7 @@ scene = {
         type: 'circle', size: washS, fill: C.violet,
         opacity: 0.14 * glowT,
         blur: 80,
-        positioned: { left: 960 - washS / 2, top: 390 - washS / 2 },
+        positioned: { left: 960 - washS / 2, top: 315 - washS / 2 },
       });
     }
 
@@ -119,8 +125,6 @@ scene = {
     }
 
     // ---- 120–160: the ground glow ------------------------------------------
-    // A thin teal bar breathing under the finished mark (the morph's settle
-    // wave), arriving with the availability line.
     var gIn = tw(114, 18, 0, 1, 'easeOut');
     if (gIn > 0.003) {
       var gb = brandToScreen(522, 742);
@@ -135,10 +139,11 @@ scene = {
     }
 
     // ---- 80–160: the lockup below the tile ---------------------------------
-    var FA_TOP = 615;
+    var FA_TOP = 470;
     var faIn = tw(80, 26, 0, 1, 'easeOutExpo');
     var tagIn = tw(92, 26, 0, 1, 'easeOutExpo');
-    var avIn = tw(120, 26, 0, 1, 'easeOutExpo');
+    var insideIn = tw(106, 26, 0, 1, 'easeOutExpo');
+    var avIn = tw(122, 26, 0, 1, 'easeOutExpo');
 
     var silverGrad = {
       begin: 'topCenter',
@@ -150,16 +155,15 @@ scene = {
     kids.push({
       type: 'text', text: 'FA', width: 1920,
       opacity: faIn,
-      offsetY: 26 * (1 - faIn),
+      offsetY: 22 * (1 - faIn),
       style: {
-        fontSize: 210,
+        fontSize: 155,
         color: '#FFFFFF',
         fontFamily: 'Impact',
         fontWeight: '700',
         letterSpacing: 8,
         textAlign: 'center',
         gradient: silverGrad,
-        textShadows: [{ color: '#448F6BFF', blur: 48 }],
       },
       positioned: { left: 0, top: FA_TOP },
     });
@@ -167,31 +171,121 @@ scene = {
     kids.push({
       type: 'text', text: 'ONE AGENT HARNESS. EVERY DEVICE.', width: 1920,
       opacity: tagIn,
-      offsetY: 18 * (1 - tagIn),
+      offsetY: 16 * (1 - tagIn),
       style: {
-        fontSize: 38,
+        fontSize: 34,
         color: '#C0C0C8',
         fontFamily: 'Impact',
         fontWeight: '700',
-        letterSpacing: 4,
+        letterSpacing: 3,
         textAlign: 'center',
-        textShadows: [{ color: '#33000000', blur: 16 }],
       },
-      positioned: { left: 0, top: FA_TOP + 230 },
+      positioned: { left: 0, top: FA_TOP + 210 },
+    });
+
+    // ---- "Inside your apps" Block ------------------------------------------
+    var blockW = 680;
+    var blockH = 46;
+    var blockX = (1920 - blockW) / 2;
+    var blockY = FA_TOP + 275;
+
+    kids.push({
+      type: 'rect',
+      width: blockW,
+      height: blockH,
+      radius: 23,
+      fill: '#080D1A',
+      border: { color: '#24324F', width: 1.5 },
+      opacity: clamp01(insideIn * 0.95),
+      offsetY: 14 * (1 - insideIn),
+      positioned: { left: blockX, top: blockY },
+    });
+
+    // Mini Fa inside badge on left
+    kids.push({
+      type: 'rect',
+      width: 104,
+      height: 28,
+      radius: 14,
+      fill: '#0D172A',
+      border: { color: '#48C7E8', width: 1.2 },
+      opacity: clamp01(insideIn),
+      offsetY: 14 * (1 - insideIn),
+      positioned: { left: blockX + 10, top: blockY + 9 },
     });
 
     kids.push({
-      type: 'text', text: 'fa1.dev — macOS · Windows · iOS · Web · Chrome', width: 1920,
-      opacity: avIn,
-      offsetY: 14 * (1 - avIn),
+      type: 'row',
+      mainAxisAlignment: 'center',
+      crossAxisAlignment: 'center',
+      opacity: clamp01(insideIn),
+      offsetY: 14 * (1 - insideIn),
+      children: [
+        {
+          type: 'text',
+          text: 'F',
+          style: {
+            fontSize: 14,
+            fontFamily: 'Impact',
+            fontWeight: '900',
+            color: '#5B61F6',
+          },
+        },
+        {
+          type: 'text',
+          text: 'a',
+          style: {
+            fontSize: 14,
+            fontFamily: 'Impact',
+            fontWeight: '900',
+            color: '#2EBD9E',
+          },
+        },
+        {
+          type: 'text',
+          text: ' inside',
+          style: {
+            fontSize: 11,
+            fontFamily: 'monospace',
+            fontWeight: '800',
+            color: '#FFFFFF',
+            letterSpacing: 0.5,
+          },
+        },
+      ],
+      positioned: { left: blockX + 10, top: blockY + 13, width: 104 },
+    });
+
+    // Platforms label
+    kids.push({
+      type: 'text',
+      text: 'INSIDE YOUR APPS · macOS · Windows · iOS · Android · Chrome · Office',
+      width: blockW - 130,
+      opacity: clamp01(insideIn * 0.9),
+      offsetY: 14 * (1 - insideIn),
       style: {
-        fontSize: 32,
-        color: C.tealLight,
+        fontSize: 12,
         fontFamily: 'monospace',
-        letterSpacing: 2,
+        fontWeight: '700',
+        color: '#48C7E8',
+        letterSpacing: 1,
+      },
+      positioned: { left: blockX + 128, top: blockY + 14 },
+    });
+
+    // fa1.dev URL
+    kids.push({
+      type: 'text', text: 'fa1.dev', width: 1920,
+      opacity: avIn,
+      offsetY: 12 * (1 - avIn),
+      style: {
+        fontSize: 34,
+        color: '#FFFFFF',
+        fontFamily: 'Impact',
+        letterSpacing: 4,
         textAlign: 'center',
       },
-      positioned: { left: 0, top: FA_TOP + 290 },
+      positioned: { left: 0, top: FA_TOP + 350 },
     });
 
     // ---- 160–180: the final bloom ------------------------------------------

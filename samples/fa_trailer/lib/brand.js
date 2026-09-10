@@ -28,6 +28,13 @@ function lerp(a, b, t) {
   return a + (b - a) * t;
 }
 
+/// Clamps value strictly to [0.0, 1.0].
+function clamp01(v) {
+  if (v <= 0) return 0;
+  if (v >= 1) return 1;
+  return v;
+}
+
 /// Linear '#rrggbb' interpolation.
 function lerpColor(a, b, t) {
   t = jsr.motion.clamp(t, 0, 1);
