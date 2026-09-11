@@ -54,6 +54,7 @@ audio:
       volume: 0.8
     - source: assets/audio/keyboard_typing.mp3
       start: 210
+      duration: 150
       volume: 0.95
       loop: false
 
