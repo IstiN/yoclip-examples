@@ -192,16 +192,18 @@ scene = {
       positioned: { left: boxX + 104, top: boxY + 22 },
     });
 
-    // Right status badge
+    // Right status badge (Kimi CLI K3 model intake)
+    var badgeW = 160;
+    var badgeX = boxX + boxW - badgeW - 24;
     kids.push({
       type: 'rect',
-      width: 230,
+      width: badgeW,
       height: 28,
       radius: 14,
       fill: C_BG_PILL,
       border: { color: C_TEAL, width: 1 },
       opacity: termOpacity * 0.9,
-      positioned: { left: boxX + boxW - 254, top: boxY + 14 },
+      positioned: { left: badgeX, top: boxY + 14 },
     });
     // Status live dot
     kids.push({
@@ -211,11 +213,11 @@ scene = {
       radius: 4,
       fill: C_TEAL,
       opacity: termOpacity,
-      positioned: { left: boxX + boxW - 238, top: boxY + 24 },
+      positioned: { left: badgeX + 16, top: boxY + 24 },
     });
     kids.push({
       type: 'text',
-      text: 'HARNESS ENGINE: LIVE',
+      text: 'KIMI CLI: K3',
       opacity: termOpacity,
       style: {
         fontSize: 11,
@@ -223,7 +225,7 @@ scene = {
         fontWeight: '700',
         color: C_TEAL,
       },
-      positioned: { left: boxX + boxW - 222, top: boxY + 21 },
+      positioned: { left: badgeX + 32, top: boxY + 21 },
     });
 
     // ---- Prompt Typing Body ------------------------------------------------
