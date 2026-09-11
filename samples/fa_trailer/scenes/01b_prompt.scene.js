@@ -292,63 +292,24 @@ scene = {
       if (frame >= item.startF) {
         var charProgress = clamp01((frame - item.startF) / (item.endF - item.startF));
         var numChars = Math.round(charProgress * item.text.length);
-        var head = item.text.substring(0, numChars);
-        var tail = item.text.substring(numChars);
+        var visibleText = item.text.substring(0, numChars);
 
         var isCurrentLine = (frame >= item.startF && (i === lines.length - 1 || frame < lines[i + 1].startF));
         var showCaret = isCurrentLine && caretBlink && frame < 135;
 
-        // Static prompt symbol '>' at absolute coordinate: CAN NEVER JITTER OR SHIFT
+        var lineContent = item.prefix + visibleText + (showCaret ? '█' : '');
+
         kids.push({
           type: 'text',
-          text: '>',
+          text: lineContent,
           opacity: termOpacity,
           style: {
             fontSize: item.fontSize,
             fontFamily: 'monospace',
-            fontWeight: '800',
+            fontWeight: item.fontWeight,
             color: item.color,
           },
           positioned: { left: contentX, top: yPos },
-        });
-
-        // The typed line uses constant full text with transparent trailing tail
-        // so the Row bounds and baseline NEVER resize or jitter on keystrokes or blinks.
-        kids.push({
-          type: 'row',
-          mainAxisSize: 'min',
-          crossAxisAlignment: 'center',
-          opacity: termOpacity,
-          positioned: { left: contentX + 28, top: yPos },
-          children: [
-            {
-              type: 'text',
-              text: head,
-              style: {
-                fontSize: item.fontSize,
-                fontFamily: 'monospace',
-                fontWeight: item.fontWeight,
-                color: item.color,
-              },
-            },
-            {
-              type: 'container',
-              width: 9,
-              height: item.fontSize * 1.15,
-              color: showCaret ? C_TEAL : '#00000000',
-              margin: { left: 2, right: 2 },
-            },
-            {
-              type: 'text',
-              text: tail,
-              style: {
-                fontSize: item.fontSize,
-                fontFamily: 'monospace',
-                fontWeight: item.fontWeight,
-                color: '#00000000',
-              },
-            },
-          ],
         });
       }
     }
