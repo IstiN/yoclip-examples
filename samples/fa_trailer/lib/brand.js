@@ -521,7 +521,11 @@ function faBrandMark(cx, cy, k, opacity) {
   var prevSx = mapper.sx;
   var prevSy = mapper.sy;
 
-  setMapper(k, BRAND.anchor[0], BRAND.anchor[1], cx, cy);
+  // The true bounding box of completeFaMark in SVG coordinates:
+  // F: stemX 188..586, top 294..802
+  // a: bowl & stem cx 644, cy 640, r 120, sw 124, rightmost 826, bottom 822
+  // Total span: X: [188, 826] (W: 638, center 507), Y: [294, 822] (H: 528, center 558)
+  setMapper(k, 507, 558, cx, cy);
   var kids = completeFaMark(1, 1, 1, 1, opacity);
 
   setMapper(prevK, prevAx, prevAy, prevSx, prevSy);
@@ -530,14 +534,17 @@ function faBrandMark(cx, cy, k, opacity) {
 
 /// Helper for embedding the canonical Fa mark inside small chips, badges and buttons.
 function faLogoSvgNode(cx, cy, h, op) {
-  var k = h / 435;
-  var w = Math.round(540 * k);
+  // Glyph height is 528, width is 638.
+  // We size the stack to 720x600 * k so that round stroke caps and bowls are never clipped!
+  var k = h / 528;
+  var boxW = Math.round(720 * k);
+  var boxH = Math.round(600 * k);
   return {
     type: 'stack',
-    width: w,
-    height: h,
-    children: faBrandMark(Math.round(w / 2), Math.round(h / 2), k, op),
-    positioned: { left: Math.round(cx - w / 2), top: Math.round(cy - h / 2) },
+    width: boxW,
+    height: boxH,
+    children: faBrandMark(Math.round(boxW / 2), Math.round(boxH / 2), k, op),
+    positioned: { left: Math.round(cx - boxW / 2), top: Math.round(cy - boxH / 2) },
   };
 }
 
