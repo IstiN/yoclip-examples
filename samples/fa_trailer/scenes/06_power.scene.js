@@ -83,7 +83,7 @@ scene = {
         summary: 'Fast local refactoring & offline test suites',
       },
       {
-        id: 'L2-CORE', tier: 'L2 AUDITED', col: '#48C7E8',
+        id: 'L2-CORE', tier: 'L2 AUDITED', col: '#5B61F6',
         role: 'AUDITED DEVELOPER RUNTIME',
         fs: 'fs: ro / · rw [.] (project)',
         fsNote: 'Host root read-only · project rw',
@@ -94,7 +94,7 @@ scene = {
         summary: 'Standard daily workflow with package downloads & LSP',
       },
       {
-        id: 'L2-FULL', tier: 'L2 AUDITED', col: '#5B61F6',
+        id: 'L2-FULL', tier: 'L2 AUDITED', col: '#8F6BFF',
         role: 'STANDARD AGENT ENVIRONMENT',
         fs: 'fs: ro / · rw [.] (project)',
         fsNote: 'Read-only root · safe project edits',
@@ -105,7 +105,7 @@ scene = {
         summary: 'Comprehensive compilation & full build pipelines',
       },
       {
-        id: 'L3-CORE', tier: 'L3 POWER', col: '#8F6BFF',
+        id: 'L3-CORE', tier: 'L3 POWER', col: '#A092ED',
         role: 'SYSTEM-WIDE AUDITED ACCESS',
         fs: 'fs: rw / (full disk audited)',
         fsNote: 'Read-write across host directories',
@@ -127,7 +127,7 @@ scene = {
         summary: 'Autonomous background agents & dark factory CI',
       },
       {
-        id: 'EPHEMERAL', tier: 'TMP RAM', col: '#E056FD',
+        id: 'EPHEMERAL', tier: 'TMP RAM', col: '#C084FC',
         role: 'RAM SCRATCHPAD DISK',
         fs: 'fs: tmpfs (pure RAM mount)',
         fsNote: 'In-memory workspace · 0 disk writes',
@@ -138,7 +138,7 @@ scene = {
         summary: 'Zero-trace security testing & disposable tasks',
       },
       {
-        id: 'CONTAINER', tier: 'OCI DOCKER', col: '#00F0FF',
+        id: 'CONTAINER', tier: 'OCI DOCKER', col: '#2EBD9E',
         role: 'HERMETIC DOCKER PIPELINE',
         fs: 'fs: disposable OCI rootfs',
         fsNote: 'Isolated container volume mount',
@@ -521,7 +521,7 @@ scene = {
         style: {
           fontSize: 34,
           fontFamily: 'Impact',
-          color: '#48C7E8',
+          color: '#2EBD9E',
           letterSpacing: 2,
           textAlign: 'center',
         },
@@ -551,7 +551,7 @@ scene = {
         style: {
           fontSize: 42,
           fontFamily: 'Impact',
-          color: '#5CE8CF',
+          color: '#2EBD9E',
           letterSpacing: 2,
           textAlign: 'center',
         },
@@ -563,7 +563,7 @@ scene = {
     var DOTS = [
       { a0: -2.75, curl: 0.85, reach: 450, size: 14, color: '#C9B8FF', at: 146 },
       { a0: -2.15, curl: -0.65, reach: 400, size: 12, color: '#8F6BFF', at: 149 },
-      { a0: -1.55, curl: 0.75, reach: 470, size: 16, color: '#48C7E8', at: 152 },
+      { a0: -1.55, curl: 0.75, reach: 470, size: 16, color: '#2EBD9E', at: 152 },
       { a0: -0.95, curl: -0.80, reach: 380, size: 10, color: '#C9B8FF', at: 155 },
       { a0: -0.35, curl: 0.90, reach: 430, size: 13, color: '#8F6BFF', at: 158 },
     ];

@@ -45,7 +45,7 @@ scene = {
         type: 'rect',
         width: flareW,
         height: 3,
-        fill: '#48C7E8',
+        fill: '#2EBD9E',
         opacity: 0.65 * flareAlpha,
         blur: 4,
         positioned: { left: 960 - flareW / 2, top: 539 },
@@ -104,8 +104,8 @@ scene = {
           type: 'rect',
           width: sheenW,
           height: tw_h,
-          fill: '#48C7E8',
-          opacity: 0.16 * Math.sin(sheenP * Math.PI),
+          fill: '#FFFFFF',
+          opacity: 0.14 * Math.sin(sheenP * Math.PI),
           rotation: -25,
           positioned: { left: sheenPt.x - sheenW / 2, top: tl.y },
         });
@@ -206,7 +206,7 @@ scene = {
       }
 
       if (winkT > 0.01) {
-        // Flat horizontal dash capsule
+        // Flat horizontal dash capsule in Fa Violet
         var dashW = lerp(eyeR * 2, 160, winkT);
         var dashH = lerp(40, 30, winkT);
         kids.push({
@@ -214,7 +214,7 @@ scene = {
           width: dashW * tileScale,
           height: dashH * tileScale,
           radius: (dashH / 2) * tileScale,
-          fill: '#48C7E8',
+          fill: '#8F6BFF',
           opacity: faceIn,
           positioned: {
             left: pR.x - (dashW * tileScale) / 2,
@@ -237,7 +237,7 @@ scene = {
         kids.push(polylineNode(eyeRPts, 40, faceIn, '#2EBD9E', faceIn));
       }
 
-      // ---- Smile `_`: the iconic terminal underscore smiling ---------------
+      // ---- Smile `_`: the iconic terminal underscore smiling in Fa Teal ----
       var mouthIn = tw(102, 22, 0, 1, 'easeOut');
       if (mouthIn > 0.001) {
         var mouthPulse = 1 + 0.06 * (winkT > 0.5 ? 1 : 0);
@@ -247,7 +247,7 @@ scene = {
         kids.push({
           type: 'circle',
           size: 200 * tileScale,
-          fill: '#48C7E8',
+          fill: '#2EBD9E',
           opacity: 0.20 * mouthIn * faceIn,
           blur: 24,
           positioned: { left: pMouth.x - (200 * tileScale) / 2, top: pMouth.y - (200 * tileScale) / 2 },
@@ -258,7 +258,7 @@ scene = {
           width: mouthW * tileScale,
           height: mouthH * tileScale,
           radius: (mouthH / 2) * tileScale,
-          fill: '#48C7E8',
+          fill: '#2EBD9E',
           opacity: mouthIn * faceIn,
           positioned: {
             left: pMouth.x - (mouthW * tileScale) / 2,

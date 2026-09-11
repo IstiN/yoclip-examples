@@ -110,17 +110,17 @@ scene = {
         positioned: { left: tl.x + 4, top: tl.y + 4 },
       });
 
-      // Specular sweep across the chip surface
+      // Specular sweep across the chip surface (metallic titanium shimmer)
       var swP = tw(88, 38, 0, 1, 'easeInOutCubic');
       if (swP > 0.001 && swP < 0.999) {
         var swW = 160 * k;
         var swX = lerp(T.x - swW, T.x + T.w + swW, swP);
         var swPt = brandToScreen(swX, T.y + T.h / 2);
-        var sweepA = 0.14 * Math.sin(swP * Math.PI);
+        var sweepA = 0.12 * Math.sin(swP * Math.PI);
         kids.push({
           type: 'rect',
           width: swW, height: T.h * k,
-          fill: '#48C7E8',
+          fill: '#FFFFFF',
           opacity: sweepA,
           rotation: -20,
           positioned: { left: swPt.x - swW / 2, top: tl.y },

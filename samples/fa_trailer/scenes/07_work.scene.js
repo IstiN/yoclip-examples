@@ -200,9 +200,9 @@ scene = {
       var sceneClips = [
         { name: '01_dark', dur: '7.0s', x: TL_X + 40, w: 230, col: '#1E2340', stroke: '#5B61F6' },
         { name: '02_alive', dur: '6.0s', x: TL_X + 280, w: 210, col: '#2A1F48', stroke: '#8F6BFF' },
-        { name: '03_hardware', dur: '6.0s', x: TL_X + 500, w: 220, col: '#162C42', stroke: '#48C7E8' },
+        { name: '03_hardware', dur: '6.0s', x: TL_X + 500, w: 220, col: '#142C38', stroke: '#2EBD9E' },
         { name: '04_core', dur: '7.0s', x: TL_X + 730, w: 240, col: '#1C2038', stroke: '#6B7AFF' },
-        { name: '05_everywhere', dur: '8.0s', x: TL_X + 980, w: 270, col: '#142C38', stroke: '#2EBD9E' },
+        { name: '05_everywhere', dur: '8.0s', x: TL_X + 980, w: 270, col: '#1E2340', stroke: '#8F6BFF' },
         { name: '06_power', dur: '7.0s', x: TL_X + 1260, w: 240, col: '#2B1A42', stroke: '#A368FF' },
       ];
 
@@ -310,14 +310,14 @@ scene = {
         positioned: { left: sndX + 16, top: sndY + 8 },
       });
 
-      // Volume Automation Gain Curve (Thin Cyan Line + Keyframe Points)
+      // Volume Automation Gain Curve (Thin Fa Teal Line + Keyframe Points)
       var autoY = sndY + 44;
       kids.push({
         type: 'rect',
         width: sndW - 32,
         height: 1.5,
-        fill: '#48C7E8',
-        opacity: clamp01(0.55 * timeIn * (1 - fadeOut)),
+        fill: '#2EBD9E',
+        opacity: clamp01(0.65 * timeIn * (1 - fadeOut)),
         positioned: { left: sndX + 16, top: autoY },
       });
       // Keyframe dots on gain line
@@ -326,8 +326,8 @@ scene = {
         kids.push({
           type: 'circle',
           size: 6,
-          fill: '#00F0FF',
-          opacity: clamp01(0.9 * timeIn * (1 - fadeOut)),
+          fill: '#2EBD9E',
+          opacity: clamp01(0.95 * timeIn * (1 - fadeOut)),
           positioned: { left: keyframesX[kfi] - 3, top: autoY - 2 },
         });
       }
@@ -358,8 +358,8 @@ scene = {
         var halfAmp = (6 + 18 * harmonicDetail * sectionEnvelope * beatTransient + liveMovement);
         halfAmp = Math.min(24, Math.max(3, halfAmp));
 
-        // Color based on amplitude: quiet violet up to transient cyan/white
-        var barCol = halfAmp > 18 ? '#00F0FF' : (halfAmp > 12 ? '#A368FF' : '#6B38C2');
+        // Color based on amplitude: quiet violet up to transient teal/violet
+        var barCol = halfAmp > 18 ? '#2EBD9E' : (halfAmp > 12 ? '#8F6BFF' : '#5B61F6');
 
         // Top half (positive wave)
         kids.push({
@@ -398,8 +398,8 @@ scene = {
           width: sclip.w,
           height: 52,
           radius: 6,
-          fill: '#102430',
-          stroke: '#48C7E8',
+          fill: '#102420',
+          stroke: '#2EBD9E',
           strokeWidth: 1.2,
           opacity: timeIn * (1 - fadeOut),
           positioned: { left: sclip.x, top: TL_TOP + 448 },
@@ -411,7 +411,7 @@ scene = {
           style: {
             fontSize: 11,
             fontFamily: 'monospace',
-            color: '#48C7E8',
+            color: '#2EBD9E',
             fontWeight: '600',
           },
           positioned: { left: sclip.x + 10, top: TL_TOP + 466 },

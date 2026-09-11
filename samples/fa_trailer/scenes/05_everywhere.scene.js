@@ -157,7 +157,7 @@ scene = {
         style: {
           fontSize: 40,
           fontFamily: 'Impact',
-          color: '#48C7E8',
+          color: '#2EBD9E',
           textAlign: 'center',
           letterSpacing: 2,
         },
@@ -166,14 +166,14 @@ scene = {
     }
 
     // ------------------------------------------------------------------------
-    // 2. Top Section: Foundation Modules Powering Fa Core
+    // 2. Top Section: Foundation Modules Powering Fa Core (Fa Branded Palette)
     // ------------------------------------------------------------------------
     var topModulesIn = tw(15, 25, 0, 1, 'easeOutCubic');
     var topMods = [
       { id: 'llm', title: '10+ PROVIDERS BYOK', sub: 'Claude · GPT · DeepSeek · Gemini', icon: '#5B61F6' },
-      { id: 'a2a', title: 'A2A AGENT FABRIC', sub: 'Cross-Machine Mailbox & Swarms', icon: '#E056FD' },
+      { id: 'a2a', title: 'A2A AGENT FABRIC', sub: 'Cross-Machine Mailbox & Swarms', icon: '#8F6BFF' },
       { id: 'mem', title: 'GIT-BACKED MEMORY', sub: 'Durable Knowledge Graph', icon: '#2EBD9E' },
-      { id: 'gpu', title: 'HEADLESS GPU ENGINE', sub: 'Impeller 120 FPS Video Pipeline', icon: '#48C7E8' },
+      { id: 'gpu', title: 'HEADLESS GPU ENGINE', sub: 'Impeller 120 FPS Video Pipeline', icon: '#2EBD9E' },
     ];
 
     var modW = 320;
@@ -227,12 +227,12 @@ scene = {
         type: 'text',
         text: mod.sub,
         width: modW - 36,
-        opacity: clamp01(topModulesIn * 0.75),
+        opacity: clamp01(topModulesIn * 0.85),
         style: {
           fontSize: 11,
           fontFamily: 'monospace',
           fontWeight: '600',
-          color: '#48C7E8',
+          color: '#7A8CB6',
         },
         positioned: { left: mx + 26, top: modY + 40 },
       });
@@ -285,13 +285,13 @@ scene = {
         positioned: { left: pinX - 1, top: busRailY },
       });
 
-      // Pulsing data packet flowing into core
+      // Pulsing data packet flowing into core (Fa Teal & Violet)
       var packetT = ((frame * 0.06 + cti * 0.25) % 1.0);
       var pPacketY = lerp(busRailY, coreTopY, packetT);
       kids.push({
         type: 'circle',
         size: 6,
-        fill: '#48C7E8',
+        fill: cti % 2 === 0 ? '#2EBD9E' : '#8F6BFF',
         opacity: clamp01(0.85 * topModulesIn),
         blur: 2,
         positioned: { left: pinX - 3, top: pPacketY - 3 },
@@ -410,8 +410,8 @@ scene = {
         type: 'rect',
         width: 2,
         height: baseY - conduitHubY,
-        fill: hasInjected ? '#48C7E8' : '#1C273C',
-        opacity: hasInjected ? 0.7 : 0.35,
+        fill: hasInjected ? '#2EBD9E' : '#24324F',
+        opacity: hasInjected ? 0.75 : 0.35,
         positioned: { left: targetCenterX - 1, top: conduitHubY },
       });
 
@@ -423,7 +423,7 @@ scene = {
         kids.push({
           type: 'circle',
           size: 42,
-          fill: '#48C7E8',
+          fill: '#2EBD9E',
           opacity: 0.85,
           blur: 16,
           positioned: { left: projPt.x - 21, top: projPt.y - 21 },
@@ -461,7 +461,7 @@ scene = {
         kids.push({
           type: 'circle',
           size: waveSize,
-          fill: '#48C7E8',
+          fill: '#2EBD9E',
           opacity: waveOp,
           blur: 24,
           positioned: {
@@ -472,8 +472,8 @@ scene = {
       }
 
       // Card background & border
-      var cardBg = flashWhite > 0.05 ? '#243555' : (hasInjected ? '#0F1626' : '#0B0F1C');
-      var cardBorderCol = hasInjected ? '#48C7E8' : 'rgba(255, 255, 255, 0.12)';
+      var cardBg = flashWhite > 0.05 ? '#1C273C' : (hasInjected ? '#0F1626' : '#0B0F1C');
+      var cardBorderCol = hasInjected ? '#2EBD9E' : 'rgba(255, 255, 255, 0.12)';
       var cardBorderW = hasInjected ? 2.5 : 1.5;
 
       // Injected glow behind card
@@ -526,14 +526,14 @@ scene = {
         var badgeX = targetX + (cardW - badgeW) / 2;
         var badgeY = currentCardY + 80;
 
-        // Badge chip background
+        // Badge chip background with Fa Teal border
         kids.push({
           type: 'rect',
           width: badgeW,
           height: badgeH,
           radius: 13,
           fill: '#080E1C',
-          border: { color: '#00F0FF', width: 1.5 },
+          border: { color: '#2EBD9E', width: 1.5 },
           opacity: clamp01(0.95 * badgeT),
           positioned: { left: badgeX, top: badgeY },
         });
@@ -626,7 +626,7 @@ scene = {
         kids.push({
           type: 'circle',
           size: 8,
-          fill: '#48C7E8',
+          fill: pi2 % 2 === 0 ? '#2EBD9E' : '#8F6BFF',
           opacity: 0.75,
           blur: 3,
           positioned: { left: pPt.x - 4, top: pPt.y - 4 },
