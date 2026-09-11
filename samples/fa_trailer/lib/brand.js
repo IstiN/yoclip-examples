@@ -72,13 +72,13 @@ var BRAND = {
   // F — bold, thick, muscular letterform with smooth rounded elbow and
   // caps. Both F and a share the baseline at 724 and x-height at 556.
   f: {
-    stemX: 207, topX2: 566, top: 313, bottom: 783, w: 118,
-    accent: { x: 207, y: 554, w: 254, h: 96 },
+    stemX: 188, topX2: 586, top: 294, bottom: 802, w: 156,
+    accent: { x: 188, y: 554, w: 268, h: 124 },
   },
   // a — thick bagel/donut bowl ("бублик" with inner hole) + flush vertical stem.
   a: {
-    bowl: { cx: 640, cy: 640, r: 104, sw: 96 },
-    stem: { x: 744, y: 536, h: 208, sw: 96 },
+    bowl: { cx: 644, cy: 640, r: 120, sw: 124 },
+    stem: { x: 764, y: 520, h: 240, sw: 124 },
   },
   // The anchor: the tile center, pinned at screen center for the whole film.
   anchor: [512, 512],
