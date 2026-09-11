@@ -481,8 +481,11 @@ function fPathNode(progress, color, opacity) {
   var d = 'M' + (f.stemX + hw) + ',' + (f.bottom - hw) +
     ' L' + (f.stemX + hw) + ',' + (f.top + hw) +
     ' L' + (f.topX2 - hw) + ',' + (f.top + hw);
-  return trace(d, f.w, f.stemX, f.top, f.topX2 - f.stemX,
-    f.bottom - f.top, progress, color, opacity);
+  // Pass the centerline bounds (excluding stroke) so trace computes scale == k:
+  // Centerline width = (f.topX2 - hw) - (f.stemX + hw) = f.topX2 - f.stemX - f.w
+  // Centerline height = (f.bottom - hw) - (f.top + hw) = f.bottom - f.top - f.w
+  return trace(d, f.w, f.stemX + hw, f.top + hw,
+    f.topX2 - f.stemX - f.w, f.bottom - f.top - f.w, progress, color, opacity);
 }
 
 /// The F's middle accent crossbar (capsule from x: 266, y: 545, w: 212, h: 44).
