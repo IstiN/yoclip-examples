@@ -542,7 +542,7 @@ scene = {
 
       kids.push({
         type: 'text',
-        text: pText + (showLine0Caret ? '█' : ''),
+        text: pText + (showLine0Caret ? '_' : ''),
         opacity: termOpacity,
         style: {
           fontSize: promptItem.fontSize,
@@ -656,7 +656,7 @@ scene = {
         }
 
         // Clean structured line: "01  Text..."
-        var fullLineText = sItem.tag + '  ' + sText + (showSpecCaret ? '█' : '');
+        var fullLineText = sItem.tag + '  ' + sText + (showSpecCaret ? '_' : '');
 
         kids.push({
           type: 'text',
