@@ -42,3 +42,10 @@ theme:
     tealSpark: '#5CE8CF'
     violet: '#8F6BFF'
     violetBright: '#C9B8FF'
+
+audio:
+  tracks:
+    - source: assets/audio/background_music.mp3
+      start: 0
+      volume: 0.8
+
