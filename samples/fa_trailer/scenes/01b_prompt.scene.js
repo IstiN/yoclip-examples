@@ -295,7 +295,10 @@ scene = {
         var visibleText = item.text.substring(0, numChars);
 
         var isCurrentLine = (frame >= item.startF && (i === lines.length - 1 || frame < lines[i + 1].startF));
-        var showCaret = isCurrentLine && caretBlink && frame < 135;
+        // While actively typing (from startF to endF), keep the caret solid so it never
+        // pops in late or blinks off mid-word. Only blink while waiting idle before enter.
+        var isTyping = (frame >= item.startF && frame <= item.endF + 2);
+        var showCaret = isCurrentLine && (isTyping || caretBlink) && frame < 135;
 
         var lineContent = item.prefix + visibleText + (showCaret ? '█' : '');
 
@@ -308,6 +311,7 @@ scene = {
             fontFamily: 'monospace',
             fontWeight: item.fontWeight,
             color: item.color,
+            letterSpacing: 0,
           },
           positioned: { left: contentX, top: yPos },
         });
