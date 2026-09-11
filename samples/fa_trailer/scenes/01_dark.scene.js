@@ -9,7 +9,7 @@
 
 scene = {
   id: '01_dark',
-  duration: 210,
+  duration: 218,
   from: 0,
   timeline: {
     label: 'Dark',
@@ -24,8 +24,8 @@ scene = {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
-    // Cinematic zoom push-in across the scene: lands at exactly 0.42 at frame 210
-    var tileScale = lerp(0.38, 0.42, tw(0, 210, 0, 1, 'easeInOutCubic'));
+    // Cinematic zoom push-in across the scene: lands at exactly 0.42 at frame 218
+    var tileScale = lerp(0.38, 0.42, tw(0, 218, 0, 1, 'easeInOutCubic'));
     setMapper(tileScale, 512, 512, 960, 540);
 
     var kids = [];

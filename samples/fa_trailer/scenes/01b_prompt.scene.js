@@ -8,7 +8,7 @@
 
 scene = {
   id: '01b_prompt',
-  duration: 150, // 5.0 seconds at 30 fps
+  duration: 144, // 3.0 musical bars (4.8s at 30 fps, 150 BPM)
   description: 'Cyber-tactical directive intake screen: creator inputs the ultimate agent prompt, architecture modules illuminate, and [ENTER] triggers the live system boot into 02_alive.',
 
   timeline: {
@@ -46,9 +46,9 @@ scene = {
     var C_BG_PILL = '#141A29';
     var C_BORDER = '#1E2638';
 
-    // Camera / Terminal Entrance & Exit
-    var enterT = tw(0, 16, 0, 1, 'easeOutCubic');
-    var exitT = tw(136, 14, 0, 1, 'easeInOutExpo');
+    // Camera / Terminal Entrance & Exit (synchronized with 3-bar musical phrase)
+    var enterT = tw(0, 14, 0, 1, 'easeOutCubic');
+    var exitT = tw(130, 14, 0, 1, 'easeInOutExpo');
 
     var termOpacity = clamp01(enterT * (1 - 0.15 * exitT));
 
@@ -522,8 +522,8 @@ scene = {
     // Main Prompt Directive (Line 0)
     var promptItem = {
       text: 'Build the ultimate coding harness.',
-      startF: 14,
-      endF: 34,
+      startF: 12,
+      endF: 28,
       color: C_WHITE,
       fontSize: 27,
       fontWeight: '800',
@@ -536,7 +536,7 @@ scene = {
       var pChars = Math.round(pProg * promptItem.text.length);
       var pText = promptItem.text.substring(0, pChars);
 
-      var isLine0Active = (frame >= promptItem.startF && frame < 36);
+      var isLine0Active = (frame >= promptItem.startF && frame < 30);
       var isLine0Typing = (frame >= promptItem.startF && frame <= promptItem.endF + 2);
       var showLine0Caret = isLine0Active && (isLine0Typing || caretBlink);
 
@@ -556,7 +556,7 @@ scene = {
     }
 
     // Thin glowing accent line under headline prompt
-    var sepProg = tw(32, 10, 0, 1, 'easeOut');
+    var sepProg = tw(26, 10, 0, 1, 'easeOut');
     if (sepProg > 0.01) {
       kids.push({
         type: 'rect',
@@ -569,7 +569,7 @@ scene = {
     }
 
     // Requirements Section Subtitle
-    var subProg = tw(34, 8, 0, 1, 'easeOut');
+    var subProg = tw(28, 8, 0, 1, 'easeOut');
     if (subProg > 0.01) {
       kids.push({
         type: 'text',
@@ -594,8 +594,8 @@ scene = {
         color: C_VIOLET_LIGHT,
         fontSize: 18.5,
         fontWeight: '700',
-        startF: 36,
-        endF: 56,
+        startF: 30,
+        endF: 46,
       },
       {
         tag: '02',
@@ -603,8 +603,8 @@ scene = {
         color: C_VIOLET_PALE,
         fontSize: 18.5,
         fontWeight: '700',
-        startF: 58,
-        endF: 76,
+        startF: 48,
+        endF: 64,
       },
       {
         tag: '03',
@@ -612,8 +612,8 @@ scene = {
         color: C_TITANIUM,
         fontSize: 18.5,
         fontWeight: '700',
-        startF: 78,
-        endF: 102,
+        startF: 66,
+        endF: 88,
       },
       {
         tag: '04',
@@ -621,8 +621,8 @@ scene = {
         color: C_TEAL,
         fontSize: 18.5,
         fontWeight: '700',
-        startF: 104,
-        endF: 124,
+        startF: 90,
+        endF: 108,
       },
     ];
 
@@ -700,28 +700,28 @@ scene = {
         title: 'DART & FLUTTER CORE',
         subtitle: '120 FPS NATIVE ENGINE',
         color: C_VIOLET,
-        showF: 86,
+        showF: 76,
       },
       {
         icon: '💾',
         title: 'GIT-BACKED MEMORY',
         subtitle: 'DURABLE ATOMIC STORE',
         color: C_TEAL,
-        showF: 100,
+        showF: 88,
       },
       {
         icon: '🧩',
         title: 'DYNAMIC JS PLUGINS',
         subtitle: 'QUICKJS FFI RUNTIME',
         color: C_VIOLET_LIGHT,
-        showF: 114,
+        showF: 98,
       },
       {
         icon: '🌐',
         title: 'ALL 6 PLATFORMS + WEB',
         subtitle: 'HERMETIC CODEBASE',
         color: C_TEAL,
-        showF: 124,
+        showF: 108,
       },
     ];
 
@@ -811,7 +811,7 @@ scene = {
     });
 
     // Left status readout
-    var isDispatched = frame >= 135;
+    var isDispatched = frame >= 124;
     kids.push({
       type: 'circle',
       size: 9,
@@ -822,12 +822,12 @@ scene = {
 
     kids.push({
       type: 'text',
-      text: isDispatched ? 'SYSTEM STATUS: DISPATCHED // INITIALIZING FA CORE AGENT ENGINE' : (frame >= 124 ? 'STATUS: ALL DIRECTIVES VERIFIED // READY FOR EXECUTION' : 'STATUS: INTAKE PARSING IN PROGRESS...'),
+      text: isDispatched ? 'SYSTEM STATUS: DISPATCHED // INITIALIZING FA CORE AGENT ENGINE' : (frame >= 112 ? 'STATUS: ALL DIRECTIVES VERIFIED // READY FOR EXECUTION' : 'STATUS: INTAKE PARSING IN PROGRESS...'),
       style: {
         fontSize: 11.5,
         fontWeight: 'bold',
         fontFamily: 'monospace',
-        color: isDispatched ? '#5CE8CF' : (frame >= 124 ? C_TEAL : C_DIM),
+        color: isDispatched ? '#5CE8CF' : (frame >= 112 ? C_TEAL : C_DIM),
         letterSpacing: 1.2,
       },
       opacity: termOpacity,
@@ -835,7 +835,7 @@ scene = {
     });
 
     // Dispatch Button with Enter Click Dip
-    var btnIn = tw(115, 14, 0, 1, 'easeOutExpo');
+    var btnIn = tw(108, 12, 0, 1, 'easeOutExpo');
     if (btnIn > 0.01) {
       var btnW = 220;
       var btnH = 46;
@@ -843,8 +843,8 @@ scene = {
       var btnY = bottomBarY + 14;
 
       var dipT = 0;
-      if (frame >= 135 && frame <= 145) {
-        dipT = Math.sin((frame - 135) / 10 * Math.PI);
+      if (frame >= 124 && frame <= 134) {
+        dipT = Math.sin((frame - 124) / 10 * Math.PI);
       }
       var curBtnScale = 1 - 0.08 * dipT;
       var btnGlowA = isDispatched ? 0.45 + 0.15 * Math.sin(frame * 0.5) : 0.20;
@@ -896,8 +896,8 @@ scene = {
       });
 
       // Shockwave ring on click
-      if (frame >= 135) {
-        var shockProgress = (frame - 135) / 15;
+      if (frame >= 124) {
+        var shockProgress = (frame - 124) / 20;
         var shockR = 25 + shockProgress * 240;
         var shockAlpha = (1 - shockProgress) * 0.7;
         kids.push({

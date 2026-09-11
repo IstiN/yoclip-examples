@@ -16,8 +16,8 @@
 
 scene = {
   id: '02_alive',
-  duration: 180,
-  from: 210,
+  duration: 192,
+  from: 362,
   timeline: {
     label: 'Alive (Cyber-Terminal)',
     color: '#8F6BFF',

@@ -12,8 +12,8 @@
 
 scene = {
   id: '03_hardware',
-  duration: 225,
-  from: 390,
+  duration: 192,
+  from: 554,
   timeline: {
     label: 'Hardware',
     color: '#8F6BFF',
@@ -261,8 +261,8 @@ scene = {
       });
     }
 
-    // ---- 150–225: Apple-grade architectural spec callout below the chip ----
-    var typeIn = tw(150, 42, 0, 1, 'easeOutExpo');
+    // ---- 140–192: Apple-grade architectural spec callout below the chip ----
+    var typeIn = tw(140, 36, 0, 1, 'easeOutExpo');
     if (typeIn > 0.003) {
       kids.push({
         type: 'text',

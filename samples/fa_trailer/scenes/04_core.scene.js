@@ -15,8 +15,8 @@
 
 scene = {
   id: '04_core',
-  duration: 165,
-  from: 615,
+  duration: 192,
+  from: 746,
   timeline: {
     label: 'Core',
     color: '#8F6BFF',
@@ -69,7 +69,7 @@ scene = {
       },
     ];
 
-    var BEAT_LEN = 41.25;
+    var BEAT_LEN = 48.0;
     var IN = 6;
     var OUT = 4;
 

@@ -200,8 +200,8 @@ void main() {
       '07_work',
       '08_lockup',
     ]));
-    expect(_scenes['01_dark']!.duration, 210);
-    expect(_scenes['01b_prompt']!.duration, 150);
-    expect(_scenes['08_lockup']!.from, 1530);
+    expect(_scenes['01_dark']!.duration, 218);
+    expect(_scenes['01b_prompt']!.duration, 144);
+    expect(_scenes['08_lockup']!.from, 1514);
   });
 }
