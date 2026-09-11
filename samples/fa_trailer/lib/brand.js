@@ -72,11 +72,14 @@ var BRAND = {
   // F — bold, thick, muscular letterform with smooth rounded elbow and
   // caps. Both F and a share the baseline at 724 and x-height at 556.
   f: {
-    stemX: 258, topX2: 556, top: 366, bottom: 724, w: 70,
-    accent: { x: 258, y: 554, w: 224, h: 56 },
+    stemX: 207, topX2: 566, top: 313, bottom: 783, w: 118,
+    accent: { x: 207, y: 554, w: 254, h: 96 },
   },
   // a — thick bagel/donut bowl ("бублик" with inner hole) + flush vertical stem.
-  a: { bowl: { cx: 640, cy: 640, r: 84 }, stem: { x: 724, y: 556, h: 168 } },
+  a: {
+    bowl: { cx: 640, cy: 640, r: 104, sw: 96 },
+    stem: { x: 744, y: 536, h: 208, sw: 96 },
+  },
   // The anchor: the tile center, pinned at screen center for the whole film.
   anchor: [512, 512],
 };
@@ -539,13 +542,14 @@ function faLogoSvgNode(cx, cy, h, op) {
 }
 
 /// The complete, canonical Fa wordmark:
-/// 1. F stem + top bar (brand blue, bold strokeWidth 70)
-/// 2. F middle teal accent bar (height 56)
-/// 3. a circular donut bowl (brand teal, strokeWidth 60, radius 84 with clean center hole)
-/// 4. a vertical stem (brand teal/cyan, strokeWidth 60, flush with bowl tangent)
+/// 1. F stem + top bar (brand blue, bold strokeWidth 118)
+/// 2. F middle teal accent bar (height 96)
+/// 3. a circular donut bowl (brand teal, bold strokeWidth 96, radius 104 with clean center hole)
+/// 4. a vertical stem (brand teal/cyan, bold strokeWidth 96, flush with bowl tangent)
 function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, opacity) {
   var kids = [];
   var op = opacity == null ? 1 : opacity;
+  var a = BRAND.a;
 
   if (fProgress > 0.001) {
     kids.push(fPathNode(fProgress, '#5B61F6', op));
@@ -556,14 +560,14 @@ function completeFaMark(fProgress, accentProgress, bowlProgress, stemProgress, o
   }
   if (bowlProgress > 0.001) {
     kids.push(polylineNode(
-      ringPoints(BRAND.a.bowl.cx, BRAND.a.bowl.cy, BRAND.a.bowl.r, 28),
-      60, bowlProgress, '#2EBD9E', op));
+      ringPoints(a.bowl.cx, a.bowl.cy, a.bowl.r, 28),
+      a.bowl.sw, bowlProgress, '#2EBD9E', op));
   }
   if (stemProgress > 0.001) {
-    var aStem = BRAND.a.stem;
+    var aStem = a.stem;
     var d = 'M' + aStem.x + ',' + (aStem.y + aStem.h) + ' L' + aStem.x + ',' + aStem.y;
     kids.push(trace(
-      d, 60, aStem.x, aStem.y, 0, aStem.h, stemProgress, '#2EBD9E', op));
+      d, aStem.sw, aStem.x, aStem.y, 0, aStem.h, stemProgress, '#2EBD9E', op));
   }
   return kids;
 }
