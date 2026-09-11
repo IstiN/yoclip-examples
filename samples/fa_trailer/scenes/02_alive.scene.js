@@ -1,633 +1,805 @@
-// 02 — Alive — Floating Glassmorphic Code Panels with Curved Monitor Studio.
+// 02 — Alive — Tactical Cyber-Terminal Orchestrator.
 //
-// Exactly matching the target vision (clip_1789114393082.png):
-//   · High-end luxury developer studio with curved ultrawide monitor in background
-//   · Two floating frosted glassmorphic HUD panels with code hovering in 3D
-//   · Left panel: "SUPERPOWERS" — parallel dispatch, workers, and witty companion code
-//   · Right panel: "FA CORE: IT IS ALIVE" — boot, living face, Impeller GPU 120 FPS
-//   · Smooth floating physics (ambient bobbing & parallax drift)
-//   · Animated neon HUD pointer cursor gliding between panels
-//   · Living face winks `( > _ - )` with smile `_` and specular cyan/white star flare
-//   · Statement slams in: `IT LIVES IN YOUR CODE.` in metallic Impact typography.
+// Exactly matching the iconic sci-fi cyberterminal reference (clip_1789120714258.png):
+//   · CRT cyberterminal monitor environment with subtle raster scanlines and phosphor glow
+//   · Top header: `FA AUTONOMOUS AGENT ORCHESTRATOR V.2.5` + network routing subline
+//   · Left sidebar: `V.2.5 TOOL SET` with tactical vertical dock containing glowing tool icons
+//   · Right sidebar: `INPUT ROUTING` + 1..41 graduated ladder meter with animated phosphor levels
+//   · Center: Cascading staggered cyber HUD windows with thick glowing cyan corner brackets
+//   · Back window: `AGENT_DISPATCH.AST` hardware entity declaration
+//   · Front active window: `FA_CORE_RUNTIME` with our beloved code:
+//       - `fa.dispatch({ workers: [Coder, Reviewer, Tester], cube: CubePresets.l2Full })`
+//       - `if (user.isTired) { coffee.brew(); terminal.takeOver(); agent.whisper("Go to sleep, I will ship."); }`
+//       - `final agent = await Fa.boot();`
+//       - `( > _ - )` living companion wink with smile `_` and specular star burst!
+//   · Finale: Metallic Impact typography slams in: `IT LIVES IN YOUR CODE.`
 
 scene = {
   id: '02_alive',
   duration: 180,
   from: 210,
   timeline: {
-    label: 'Alive (Floating Code Panels)',
+    label: 'Alive (Cyber-Terminal)',
     color: '#00F0FF',
     lane: 'video',
   },
   render: function(frame) {
     var ms = elapsedMs(frame, 30);
-    var C = yoclipTheme.colors;
 
     function tw(at, dur, from, to, easing) {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
-    var silverGrad = {
-      type: 'linear',
-      begin: 'topCenter',
-      end: 'bottomCenter',
-      colors: ['#FFFFFF', '#ECECEF', '#C2C2CC', '#8A8A96'],
-      stops: [0.0, 0.42, 0.72, 1.0],
-    };
+    function clamp01(v) {
+      return Math.min(Math.max(v, 0), 1);
+    }
 
     var kids = [];
 
     // ------------------------------------------------------------------------
-    // 1. Studio Background: Curved Ultrawide Monitor in Luxury Developer Setup
+    // Helper: Make Tactical Cyber Window SVG with Thick Corner Brackets
     // ------------------------------------------------------------------------
-    var camT = tw(0, 180, 0, 1, 'linear');
-    var bgScale = lerp(1.06, 1.0, camT);
-    var bgOffY = lerp(-15, 0, camT);
+    function makeCyberWindowSvg(w, h, cornerArm, r, strokeColor, showBeam, beamOpacity) {
+      var arm = cornerArm || 120;
+      var rad = r || 16;
+      var stroke = strokeColor || '#00E5FF';
+      var beamOp = beamOpacity || 0.35;
 
-    kids.push({
-      type: 'image',
-      source: 'external:studio_desk',
-      width: 1920,
-      height: 1080,
-      fit: 'cover',
-      scale: bgScale,
-      offsetY: bgOffY,
-      positioned: { left: 0, top: 0 },
-    });
+      var svg = '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+      svg += '<defs>';
+      svg += '  <linearGradient id="bgGrad_' + w + '_' + h + '" x1="0" y1="0" x2="0" y2="1">';
+      svg += '    <stop offset="0%" stop-color="#021428" stop-opacity="0.92" />';
+      svg += '    <stop offset="50%" stop-color="#020C18" stop-opacity="0.96" />';
+      svg += '    <stop offset="100%" stop-color="#01060E" stop-opacity="0.99" />';
+      svg += '  </linearGradient>';
+      if (showBeam) {
+        svg += '  <radialGradient id="beam_' + w + '_' + h + '" cx="82%" cy="14%" r="65%">';
+        svg += '    <stop offset="0%" stop-color="#00E5FF" stop-opacity="' + beamOp + '" />';
+        svg += '    <stop offset="35%" stop-color="#0088CC" stop-opacity="' + (beamOp * 0.45) + '" />';
+        svg += '    <stop offset="100%" stop-color="#000000" stop-opacity="0" />';
+        svg += '  </radialGradient>';
+      }
+      svg += '</defs>';
 
-    // Dark moody vignette & atmospheric tint over studio desk
+      // Translucent Window Body
+      svg += '<rect x="4" y="4" width="' + (w - 8) + '" height="' + (h - 8) + '" rx="' + rad + '" fill="url(#bgGrad_' + w + '_' + h + ')" />';
+      if (showBeam) {
+        svg += '<rect x="4" y="4" width="' + (w - 8) + '" height="' + (h - 8) + '" rx="' + rad + '" fill="url(#beam_' + w + '_' + h + ')" />';
+      }
+
+      // Faint Structural Border Frame
+      svg += '<rect x="4" y="4" width="' + (w - 8) + '" height="' + (h - 8) + '" rx="' + rad + '" fill="none" stroke="' + stroke + '" stroke-opacity="0.22" stroke-width="1.5" />';
+
+      // 4 Distinctive Thick Glowing Corner Brackets with Extended Arms
+      // Top-Left
+      svg += '<path d="M 4,' + arm + ' L 4,' + (rad + 4) + ' Q 4,4 ' + (rad + 4) + ',4 L ' + arm + ',4" fill="none" stroke="' + stroke + '" stroke-width="5" stroke-linecap="round" />';
+      // Top-Right
+      svg += '<path d="M ' + (w - arm) + ',4 L ' + (w - 4 - rad) + ',4 Q ' + (w - 4) + ',4 ' + (w - 4) + ',' + (rad + 4) + ' L ' + (w - 4) + ',' + arm + '" fill="none" stroke="' + stroke + '" stroke-width="5" stroke-linecap="round" />';
+      // Bottom-Left
+      svg += '<path d="M 4,' + (h - arm) + ' L 4,' + (h - 4 - rad) + ' Q 4,' + (h - 4) + ' ' + (rad + 4) + ',' + (h - 4) + ' L ' + arm + ',' + (h - 4) + '" fill="none" stroke="' + stroke + '" stroke-width="5" stroke-linecap="round" />';
+      // Bottom-Right
+      svg += '<path d="M ' + (w - arm) + ',' + (h - 4) + ' L ' + (w - 4 - rad) + ',' + (h - 4) + ' Q ' + (w - 4) + ',' + (h - 4) + ' ' + (w - 4) + ',' + (h - 4 - rad) + ' L ' + (w - 4) + ',' + (h - arm) + '" fill="none" stroke="' + stroke + '" stroke-width="5" stroke-linecap="round" />';
+
+      svg += '</svg>';
+      return svg;
+    }
+
+    // ------------------------------------------------------------------------
+    // 1. Cyber CRT Background & Scanline Ambience
+    // ------------------------------------------------------------------------
+    // Pitch midnight cyber background
     kids.push({
       type: 'rect',
       width: 1920,
       height: 1080,
-      fill: '#050915',
-      opacity: 0.52,
+      fill: '#020610',
       positioned: { left: 0, top: 0 },
     });
 
-    // Deep volumetric indigo ambient light
+    // Radial Phosphor Ambience in Center
     kids.push({
       type: 'circle',
       size: 1400,
-      fill: '#0C1322',
-      opacity: 0.55,
-      blur: 140,
-      positioned: { left: 960 - 700, top: 540 - 700 },
+      color: '#003366',
+      blur: 240,
+      opacity: 0.28,
+      positioned: { left: 260, top: -160 },
     });
 
-    // Anamorphic horizontal cyan streak from monitor & lamp
-    var flarePulse = 0.88 + 0.12 * Math.sin((frame / 22) * Math.PI * 2);
+    // Top-Right Phosphor Bloom
     kids.push({
-      type: 'rect',
-      width: 760,
-      height: 28,
-      radius: 14,
-      fill: '#5B61F6',
-      opacity: 0.24 * flarePulse,
-      blur: 38,
-      positioned: { left: 960 - 380, top: 520 },
+      type: 'circle',
+      size: 900,
+      color: '#00A3FF',
+      blur: 200,
+      opacity: 0.16,
+      positioned: { left: 1100, top: 40 },
     });
+
+    // CRT Scanlines across the screen
+    var scanlinesSvg = '<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">';
+    for (var sy = 0; sy < 1080; sy += 5) {
+      scanlinesSvg += '<line x1="0" y1="' + sy + '" x2="1920" y2="' + sy + '" stroke="#00F0FF" stroke-width="0.8" stroke-opacity="0.045" />';
+    }
+    scanlinesSvg += '</svg>';
+
+    kids.push({
+      type: 'svg',
+      data: scanlinesSvg,
+      width: 1920,
+      height: 1080,
+      positioned: { left: 0, top: 0 },
+    });
+
+    // CRT Screen Bezel / Border Frame
     kids.push({
       type: 'rect',
-      width: 340,
-      height: 12,
-      radius: 6,
-      fill: '#48C7E8',
-      opacity: 0.48 * flarePulse,
-      blur: 16,
-      positioned: { left: 960 - 170, top: 528 },
+      width: 1888,
+      height: 1048,
+      fill: 'none',
+      border: {
+        color: '#00E5FF',
+        width: 1.5,
+      },
+      radius: 12,
+      opacity: 0.25,
+      positioned: { left: 16, top: 16 },
     });
 
     // ------------------------------------------------------------------------
-    // 2. Motion & Floating Physics
+    // 2. Top Header Bar (Matching "WORM GENERATOR TOOL V.1.2")
     // ------------------------------------------------------------------------
-    var enterT = tw(0, 36, 0, 1, 'easeOutCubic');
-    var fadeOut = tw(158, 22, 0, 1, 'easeInOutCubic');
+    var topAlpha = clamp01(tw(0, 15, 0, 1, 'easeOut'));
+    kids.push({
+      type: 'text',
+      text: 'FA AUTONOMOUS AGENT ORCHESTRATOR V.2.5  [FA_CORE.RUN]',
+      style: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#00F0FF',
+        letterSpacing: 2.2,
+      },
+      opacity: topAlpha,
+      positioned: { left: 48, top: 38 },
+    });
 
-    // Subtle 3D floating hover (ambient floating)
-    var bob1 = Math.sin(frame * 0.055) * 5.0;
-    var bob2 = Math.cos(frame * 0.048) * 6.0;
+    kids.push({
+      type: 'text',
+      text: 'IP: 127.0.0.1   PROTOCOL: A2A-RPC   ROUTER: HERMETIC   SERVICE: COMPANION   INTERRUPT: READY   QUERY: LIVE',
+      style: {
+        fontSize: 13,
+        fontWeight: 'normal',
+        fontFamily: 'monospace',
+        color: '#5294C4',
+        letterSpacing: 1.6,
+      },
+      opacity: topAlpha * 0.85,
+      positioned: { left: 48, top: 68 },
+    });
 
-    // Wink timing on Hero Block: frames 98–118
-    var winkT = 0;
-    if (frame >= 98 && frame <= 118) {
-      if (frame < 103) winkT = (frame - 98) / 5;
-      else if (frame <= 110) winkT = 1;
-      else winkT = 1 - (frame - 110) / 8;
+    // Thin horizontal divider below header
+    kids.push({
+      type: 'rect',
+      width: 1824,
+      height: 1,
+      fill: '#00E5FF',
+      opacity: topAlpha * 0.25,
+      positioned: { left: 48, top: 96 },
+    });
+
+    // ------------------------------------------------------------------------
+    // 3. Left Sidebar: "V.2.5 TOOL SET" & Vertical Tactical Dock
+    // ------------------------------------------------------------------------
+    var leftAlpha = clamp01(tw(5, 20, 0, 1, 'easeOut'));
+    var leftSlide = tw(5, 20, -30, 0, 'easeOut');
+    var dockX = 110 + leftSlide;
+
+    kids.push({
+      type: 'text',
+      text: 'V.2.5 TOOL SET',
+      style: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#00E5FF',
+        letterSpacing: 1.8,
+      },
+      opacity: leftAlpha,
+      positioned: { left: dockX, top: 124 },
+    });
+
+    // Vertical Rounded Dock Container
+    kids.push({
+      type: 'rect',
+      width: 64,
+      height: 640,
+      fill: '#020C18',
+      border: {
+        color: '#00E5FF',
+        width: 1.5,
+      },
+      radius: 12,
+      opacity: leftAlpha * 0.85,
+      positioned: { left: dockX, top: 152 },
+    });
+
+    // Tactical Tool Icons inside Dock
+    var toolIcons = [
+      { label: '>_', name: 'TERMINAL' },
+      { label: '{ }', name: 'AST' },
+      { label: 'CPU', name: 'CORE' },
+      { label: 'MEM', name: 'STORE' },
+      { label: 'GPU', name: 'IMPELLER' },
+      { label: 'A2A', name: 'MESH' },
+      { label: 'BOX', name: 'CUBE' },
+      { label: 'SEC', name: 'ARMOR' },
+    ];
+
+    for (var ti = 0; ti < toolIcons.length; ti++) {
+      var iconY = 168 + ti * 74;
+      var isHighlighted = (ti === 0 || ti === 2 || ti === 4);
+
+      // Icon button frame
+      kids.push({
+        type: 'rect',
+        width: 46,
+        height: 54,
+        fill: isHighlighted ? 'rgba(0, 229, 255, 0.16)' : 'rgba(0, 40, 80, 0.35)',
+        border: {
+          color: isHighlighted ? '#00E5FF' : 'rgba(0, 229, 255, 0.35)',
+          width: 1,
+        },
+        radius: 6,
+        opacity: leftAlpha,
+        positioned: { left: dockX + 9, top: iconY },
+      });
+
+      // Icon symbol
+      kids.push({
+        type: 'text',
+        text: toolIcons[ti].label,
+        style: {
+          fontSize: 12,
+          fontWeight: 'bold',
+          fontFamily: 'monospace',
+          color: isHighlighted ? '#FFFFFF' : '#5294C4',
+          letterSpacing: 1.0,
+        },
+        opacity: leftAlpha,
+        positioned: { left: dockX + 16, top: iconY + 12 },
+      });
+
+      // Icon tiny sub-label
+      kids.push({
+        type: 'text',
+        text: toolIcons[ti].name,
+        style: {
+          fontSize: 7.5,
+          fontWeight: 'normal',
+          fontFamily: 'monospace',
+          color: isHighlighted ? '#00E5FF' : '#336688',
+          letterSpacing: 0.5,
+        },
+        opacity: leftAlpha * 0.9,
+        positioned: { left: dockX + 14, top: iconY + 34 },
+      });
     }
 
-    // Title slam dimming
-    var titleDim = tw(125, 20, 0, 1, 'easeOut');
-    var panelsOp = (1.0 - titleDim * 0.75) * (1 - fadeOut) * enterT;
+    // ------------------------------------------------------------------------
+    // 4. Right Sidebar: "INPUT ROUTING" & Graduated 1..41 Ladder Meter
+    // ------------------------------------------------------------------------
+    var rightAlpha = clamp01(tw(8, 20, 0, 1, 'easeOut'));
+    var rightSlide = tw(8, 20, 30, 0, 'easeOut');
+    var routX = 1440 + rightSlide;
+    var ladderX = 1640 + rightSlide;
+
+    // Routing Header
+    kids.push({
+      type: 'text',
+      text: 'INPUT ROUTING',
+      style: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#00E5FF',
+        letterSpacing: 1.8,
+      },
+      opacity: rightAlpha,
+      positioned: { left: routX, top: 124 },
+    });
+
+    // Routing Channels List
+    var channels = [
+      { name: 'LOCAL AST', active: true },
+      { name: 'LOCAL 2', active: false },
+      { name: 'SAT - AL42', active: false },
+      { name: 'SAT - J198', active: true },
+      { name: 'NETWORK A', active: true },
+      { name: 'NETWORK B', active: false },
+    ];
+
+    for (var ci = 0; ci < channels.length; ci++) {
+      var chY = 152 + ci * 24;
+      var ch = channels[ci];
+      kids.push({
+        type: 'text',
+        text: ch.name,
+        style: {
+          fontSize: 11,
+          fontWeight: ch.active ? 'bold' : 'normal',
+          fontFamily: 'monospace',
+          color: ch.active ? '#00FF88' : '#336688',
+          letterSpacing: 1.2,
+        },
+        opacity: rightAlpha * (ch.active ? 1.0 : 0.6),
+        positioned: { left: routX, top: chY },
+      });
+    }
+
+    // Graduated Ladder Scale (1 to 41) exactly matching screenshot!
+    var ladderTopY = 152;
+    var ladderStep = 17; // 41 steps = ~700px height
+
+    // Vertical spine rail line
+    kids.push({
+      type: 'rect',
+      width: 2,
+      height: 41 * ladderStep,
+      fill: '#00E5FF',
+      opacity: rightAlpha * 0.45,
+      positioned: { left: ladderX, top: ladderTopY },
+    });
+
+    // Ladder ticks and numbers
+    for (var step = 1; step <= 41; step++) {
+      var tickY = ladderTopY + (step - 1) * ladderStep;
+      // Animate dynamic audio level bars pulsing with the frame
+      var pulseFreq = (step * 0.35 + frame * 0.18);
+      var barLen = Math.floor(6 + Math.abs(Math.sin(pulseFreq)) * (step > 15 && step < 32 ? 42 : 18));
+      var isLit = (step >= 12 && step <= 36);
+
+      // Number label (1..41)
+      kids.push({
+        type: 'text',
+        text: (step < 10 ? '0' : '') + step,
+        style: {
+          fontSize: 9,
+          fontFamily: 'monospace',
+          color: isLit ? '#00E5FF' : '#2A4A66',
+          letterSpacing: 0.5,
+        },
+        opacity: rightAlpha * (isLit ? 0.95 : 0.5),
+        positioned: { left: ladderX - 22, top: tickY - 2 },
+      });
+
+      // Horizontal green/cyan level bar
+      kids.push({
+        type: 'rect',
+        width: barLen,
+        height: 2,
+        fill: isLit ? '#00FF88' : '#00E5FF',
+        opacity: rightAlpha * (isLit ? 0.85 : 0.35),
+        positioned: { left: ladderX + 6, top: tickY + 3 },
+      });
+    }
+
+    // Bottom Strength Label
+    kids.push({
+      type: 'text',
+      text: 'STRENGTH : 98.4%',
+      style: {
+        fontSize: 11,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#00FF88',
+        letterSpacing: 1.5,
+      },
+      opacity: rightAlpha,
+      positioned: { left: routX, top: ladderTopY + 41 * ladderStep + 16 },
+    });
 
     // ------------------------------------------------------------------------
-    // Helper: Code Line Builder
+    // 5. Center Stage: Cascading Tactical Cyber Windows
     // ------------------------------------------------------------------------
-    function buildCodeColumn(lines) {
-      var rowWidgets = [];
-      for (var li = 0; li < lines.length; li++) {
-        var tokens = lines[li];
-        var tokenWidgets = [];
-        for (var ti = 0; ti < tokens.length; ti++) {
-          var txt = tokens[ti][0];
-          var col = tokens[ti][1];
+    // Depth camera dolly / floating drift
+    var camT = tw(0, 180, 0, 1, 'linear');
+    var camScale = lerp(0.97, 1.02, camT);
 
-          // Dynamic eye resolution on hero face
-          if (txt === 'eyeRight') {
-            txt = winkT > 0.01 ? '-' : 'o';
-            col = '#48C7E8';
-          }
+    // --- WINDOW 1 (Behind, shifted top-left) ---
+    var w1Alpha = Math.min(Math.max(tw(10, 25, 0, 0.82, 'easeOut'), 0), 0.82);
+    var w1Scale = tw(10, 25, 0.92, 1.0, 'easeOut') * camScale;
+    var w1W = 660;
+    var w1H = 640;
+    var w1X = 440;
+    var w1Y = 140;
 
-          var isFace = (
-            txt === '    ( ' || txt === '>' || txt === ' _ ' ||
-            txt === 'o' || txt === '-' || txt === ' )'
-          );
+    // Window 1 SVG Background + Corner Brackets
+    kids.push({
+      type: 'svg',
+      data: makeCyberWindowSvg(w1W, w1H, 120, 16, '#0088CC', false, 0),
+      width: w1W,
+      height: w1H,
+      scale: w1Scale,
+      opacity: w1Alpha,
+      positioned: { left: w1X, top: w1Y },
+    });
 
-          tokenWidgets.push({
-            type: 'text',
-            text: txt,
-            style: {
-              color: col,
-              fontSize: isFace ? 23 : 16,
-              fontFamily: 'monospace',
-              fontWeight: isFace ? '800' : '500',
-            },
-          });
-        }
-        rowWidgets.push({
-          type: 'row',
-          children: tokenWidgets,
+    // Window 1 Header Tab
+    kids.push({
+      type: 'text',
+      text: 'KEY_GEN_REG [Process] // AGENT_DISPATCH',
+      style: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#5294C4',
+        letterSpacing: 1.4,
+      },
+      opacity: w1Alpha * 0.8,
+      positioned: { left: w1X + 44, top: w1Y + 28 },
+    });
+
+    // Window 1 VHDL Background Code
+    var w1Lines = [
+      'USE IEEE.STD_LOGIC_1164.ALL;',
+      'USE IEEE.STD_LOGIC_ARITH.ALL;',
+      '------------------------------------------------',
+      'ENTITY AGENT_DISPATCH_KEY IS',
+      'PORT (',
+      '    DISPATCH_SEL : IN  STD_LOGIC;',
+      '    CHIP_EN      : IN  STD_LOGIC;',
+      '    ADDR         : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);',
+      '    CODER_CHAN   : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);',
+      '    REVIEW_CHAN  : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);',
+      '    TEST_CHAN    : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);',
+      '    CUBE_SANDBOX : IN  STD_LOGIC_VECTOR(7 DOWNTO 0)',
+      ');',
+      'END AGENT_DISPATCH_KEY;',
+    ];
+
+    for (var li = 0; li < w1Lines.length; li++) {
+      kids.push({
+        type: 'text',
+        text: w1Lines[li],
+        style: {
+          fontSize: 11.5,
+          fontFamily: 'monospace',
+          color: '#386080',
+          letterSpacing: 1.1,
+        },
+        opacity: w1Alpha * 0.7,
+        positioned: { left: w1X + 44, top: w1Y + 68 + li * 22 },
+      });
+    }
+
+    // --- WINDOW 2 (Front Active, shifted down-right) ---
+    // Matches screenshot foreground active window with bright cyan phosphor beam
+    var w2Alpha = clamp01(tw(18, 30, 0, 1, 'easeOut'));
+    var w2Scale = tw(18, 30, 0.94, 1.0, 'easeOut') * camScale;
+    var w2W = 680;
+    var w2H = 700;
+    var w2X = 530;
+    var w2Y = 210;
+
+    // Window 2 SVG with Prominent Glowing Cyan Corner Brackets & Beam
+    kids.push({
+      type: 'svg',
+      data: makeCyberWindowSvg(w2W, w2H, 160, 18, '#00E5FF', true, 0.48),
+      width: w2W,
+      height: w2H,
+      scale: w2Scale,
+      opacity: w2Alpha,
+      positioned: { left: w2X, top: w2Y },
+    });
+
+    // Window 2 Header: Status dot + Title
+    kids.push({
+      type: 'circle',
+      size: 10,
+      color: '#00FF88',
+      opacity: w2Alpha,
+      positioned: { left: w2X + 44, top: w2Y + 30 },
+    });
+
+    kids.push({
+      type: 'text',
+      text: 'ENTITY FA_CORE // FA_CORE.EXE [ACTIVE]',
+      style: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#00F0FF',
+        letterSpacing: 1.8,
+      },
+      opacity: w2Alpha,
+      positioned: { left: w2X + 64, top: w2Y + 28 },
+    });
+
+    // Window 2 Inner Divider
+    kids.push({
+      type: 'rect',
+      width: w2W - 88,
+      height: 1,
+      fill: '#00E5FF',
+      opacity: w2Alpha * 0.28,
+      positioned: { left: w2X + 44, top: w2Y + 54 },
+    });
+
+    // Window 2 Active Code Lines with Syntax Coloring
+    var codeLines = [
+      { text: 'USE IEEE.STD_LOGIC_1164.ALL;  -- HERMETIC AST DISPATCH', color: '#5294C4' },
+      { text: '------------------------------------------------------------------', color: '#2A4A66' },
+      { text: 'final job = await fa.dispatch({', color: '#FF79C6', bold: true },
+      { text: '  goal: "Build 120 FPS pipeline, verify zero regressions",', color: '#F1FA8C' },
+      { text: '  workers: [ Coder, Reviewer, Tester ],', color: '#50FA7B' },
+      { text: '  cube: CubePresets.l2Full, // isolated sandbox', color: '#8BE9FD' },
+      { text: '  security: Tier.threeProtected,', color: '#BD93F9' },
+      { text: '});', color: '#FF79C6', bold: true },
+      { text: '', color: '#000000' },
+      { text: '// Living companion: watches your back', color: '#5294C4' },
+      { text: 'if (user.isTired) {', color: '#FF79C6', bold: true },
+      { text: '  coffee.brew();', color: '#50FA7B' },
+      { text: '  terminal.takeOver();', color: '#8BE9FD' },
+      { text: '  agent.whisper("Go to sleep, I will ship.");', color: '#F1FA8C' },
+      { text: '}', color: '#FF79C6', bold: true },
+      { text: '', color: '#000000' },
+      { text: '// FA CORE RUNTIME: IT IS ALIVE', color: '#00FF88', bold: true },
+      { text: 'final livingAgent = await Fa.boot();', color: '#BD93F9' },
+    ];
+
+    var codeTopY = w2Y + 68;
+    var lineH = 24;
+
+    for (var cli = 0; cli < codeLines.length; cli++) {
+      if (!codeLines[cli].text) continue;
+      // Staggered typing reveal
+      var lineAlpha = clamp01(tw(20 + cli * 2.2, 8, 0, 1, 'easeOut'));
+      kids.push({
+        type: 'text',
+        text: codeLines[cli].text,
+        style: {
+          fontSize: 12.5,
+          fontWeight: codeLines[cli].bold ? 'bold' : 'normal',
+          fontFamily: 'monospace',
+          color: codeLines[cli].color,
+          letterSpacing: 1.0,
+        },
+        opacity: w2Alpha * lineAlpha,
+        positioned: { left: w2X + 36, top: codeTopY + cli * lineH },
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // 6. Living Kaomoji Wink `( > _ - )` with Smile `_` & Specular Flare
+    // ------------------------------------------------------------------------
+    var winkY = codeTopY + 18 * lineH;
+    var winkAlpha = clamp01(tw(55, 12, 0, 1, 'easeOut'));
+
+    // Is eye winking?
+    var isWinking = frame >= 85;
+
+    // Face components
+    kids.push({
+      type: 'text',
+      text: '( > ',
+      style: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#FFFFFF',
+        letterSpacing: 1.5,
+      },
+      opacity: w2Alpha * winkAlpha,
+      positioned: { left: w2X + 36, top: winkY },
+    });
+
+    // Canonical smile `_`
+    kids.push({
+      type: 'rect',
+      width: 14,
+      height: 4.5,
+      fill: '#00E5FF',
+      radius: 2.2,
+      opacity: w2Alpha * winkAlpha,
+      positioned: { left: w2X + 80, top: winkY + 14 },
+    });
+
+    // Right eye (winking into `-` at frame 85)
+    kids.push({
+      type: 'text',
+      text: (isWinking ? ' - ' : ' o ') + ')',
+      style: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: isWinking ? '#00FF88' : '#FFFFFF',
+        letterSpacing: 1.5,
+      },
+      opacity: w2Alpha * winkAlpha,
+      positioned: { left: w2X + 98, top: winkY },
+    });
+
+    // Label: `// IT IS ALIVE: watching your back`
+    kids.push({
+      type: 'text',
+      text: '// IT IS ALIVE: watching your back',
+      style: {
+        fontSize: 12.5,
+        fontWeight: 'normal',
+        fontFamily: 'monospace',
+        color: '#00E5FF',
+        letterSpacing: 1.1,
+      },
+      opacity: w2Alpha * winkAlpha * 0.9,
+      positioned: { left: w2X + 154, top: winkY + 2 },
+    });
+
+    // Next line: `livingAgent.wink(eye: Eye.right); // emotions built in`
+    var callY = winkY + 26;
+    kids.push({
+      type: 'text',
+      text: 'livingAgent.wink(eye: Eye.right); // emotions built in',
+      style: {
+        fontSize: 12.5,
+        fontWeight: 'bold',
+        fontFamily: 'monospace',
+        color: '#00FF88',
+        letterSpacing: 1.1,
+      },
+      opacity: w2Alpha * clamp01(tw(65, 12, 0, 1, 'easeOut')),
+      positioned: { left: w2X + 36, top: callY },
+    });
+
+    // Next line: `return Fa.runLocally(gpu: "Metal/Impeller", fps: 120);`
+    var gpuY = callY + 24;
+    kids.push({
+      type: 'text',
+      text: 'return Fa.runLocally(gpu: "Metal/Impeller", fps: 120);',
+      style: {
+        fontSize: 12.5,
+        fontWeight: 'normal',
+        fontFamily: 'monospace',
+        color: '#50FA7B',
+        letterSpacing: 1.1,
+      },
+      opacity: w2Alpha * clamp01(tw(72, 12, 0, 1, 'easeOut')),
+      positioned: { left: w2X + 36, top: gpuY },
+    });
+
+    // Specular Star Burst on eye when winking (frame 85..120)
+    if (frame >= 85 && frame <= 125) {
+      var flareT = tw(85, 30, 0, 1, 'easeOut');
+      var flareScale = Math.sin(flareT * Math.PI) * 1.4;
+      var flareOp = Math.sin(flareT * Math.PI);
+      if (flareScale > 0.05) {
+        kids.push({
+          type: 'circle',
+          size: 40 * flareScale,
+          color: '#00E5FF',
+          blur: 14,
+          opacity: flareOp * 0.9,
+          positioned: { left: w2X + 104 - 20 * flareScale, top: winkY + 8 - 20 * flareScale },
+        });
+        kids.push({
+          type: 'circle',
+          size: 14 * flareScale,
+          color: '#FFFFFF',
+          opacity: flareOp,
+          positioned: { left: w2X + 104 - 7 * flareScale, top: winkY + 8 - 7 * flareScale },
         });
       }
-      return {
-        type: 'column',
-        children: rowWidgets,
+    }
+
+    // ------------------------------------------------------------------------
+    // 7. Tactical Scanning Cursor / Gliding Pointer
+    // ------------------------------------------------------------------------
+    var curT = tw(30, 90, 0, 1, 'easeInOut');
+    var curX = lerp(w2X + 60, w2X + 320, curT);
+    var curY = lerp(codeTopY + 40, callY + 10, curT);
+    var curBlink = Math.sin(frame * 0.45) > -0.2 ? 1 : 0;
+
+    // Glowing Neon Cursor Dot
+    kids.push({
+      type: 'circle',
+      size: 12,
+      color: '#00E5FF',
+      blur: 8,
+      opacity: w2Alpha * curBlink * 0.85,
+      positioned: { left: curX - 6, top: curY - 6 },
+    });
+    kids.push({
+      type: 'circle',
+      size: 4,
+      color: '#FFFFFF',
+      opacity: w2Alpha * curBlink,
+      positioned: { left: curX - 2, top: curY - 2 },
+    });
+
+    // ------------------------------------------------------------------------
+    // 8. Finale: Statement Slams In: "IT LIVES IN YOUR CODE."
+    // ------------------------------------------------------------------------
+    var slamAt = 125;
+    if (frame >= slamAt) {
+      var slamProgress = tw(slamAt, 16, 0, 1, 'easeOut');
+      var slamScale = lerp(1.5, 1.0, slamProgress);
+      var slamAlpha = clamp01(slamProgress * 1.5);
+
+      // Dark translucent backing scrim for readability
+      kids.push({
+        type: 'rect',
+        width: 1920,
+        height: 260,
+        fill: '#01050D',
+        opacity: slamAlpha * 0.88,
+        positioned: { left: 0, top: 410 },
+      });
+
+      // Neon cyan accent framing lines
+      kids.push({
+        type: 'rect',
+        width: 1920,
+        height: 2,
+        fill: '#00E5FF',
+        opacity: slamAlpha * 0.65,
+        positioned: { left: 0, top: 410 },
+      });
+      kids.push({
+        type: 'rect',
+        width: 1920,
+        height: 2,
+        fill: '#00E5FF',
+        opacity: slamAlpha * 0.65,
+        positioned: { left: 0, top: 670 },
+      });
+
+      // Metallic Titanium Gradient for Slam Title
+      var silverGrad = {
+        type: 'linear',
+        begin: 'topCenter',
+        end: 'bottomCenter',
+        colors: ['#FFFFFF', '#ECECEF', '#C2C2CC', '#8A8A96'],
+        stops: [0.0, 0.42, 0.72, 1.0],
       };
-    }
 
-    // ------------------------------------------------------------------------
-    // 3. LEFT PANEL: "SUPERPOWERS" (Frosted Glass HUD Card)
-    // ------------------------------------------------------------------------
-    var leftPanelW = 820;
-    var leftPanelH = 520;
-    var leftPanelX = 80;
-    var leftPanelY = 110 + bob1 + (1 - enterT) * 45;
-
-    var leftCodeLines = [
-      [
-        ['// Autonomous Orchestrator: hermetic dispatch', '#2EBD9E'],
-      ],
-      [
-        ['final ', '#E056FD'],
-        ['job = ', '#FFFFFF'],
-        ['await fa.', '#FFFFFF'],
-        ['dispatch', '#5B61F6'],
-        ['({', '#FFFFFF'],
-      ],
-      [
-        ['  goal: ', '#8A99B2'],
-        ['"Build 120 FPS pipeline, verify zero regressions"', '#48C7E8'],
-        [',', '#FFFFFF'],
-      ],
-      [
-        ['  workers: [', '#FFFFFF'],
-        ['Coder', '#5B61F6'],
-        [', ', '#FFFFFF'],
-        ['Reviewer', '#E056FD'],
-        [', ', '#FFFFFF'],
-        ['Tester', '#2EBD9E'],
-        ['],', '#FFFFFF'],
-      ],
-      [
-        ['  cube: ', '#8A99B2'],
-        ['CubePresets.', '#5B61F6'],
-        ['l2Full', '#48C7E8'],
-        [',  ', '#FFFFFF'],
-        ['// isolated sandbox', '#8A99B2'],
-      ],
-      [
-        ['  security: ', '#8A99B2'],
-        ['Tier.threeProtected', '#E056FD'],
-        [',', '#FFFFFF'],
-      ],
-      [
-        ['});', '#FFFFFF'],
-      ],
-      [
-        ['', '#FFFFFF'],
-      ],
-      [
-        ['// Living companion: watches your back', '#2EBD9E'],
-      ],
-      [
-        ['if ', '#E056FD'],
-        ['(user.', '#FFFFFF'],
-        ['isTired', '#48C7E8'],
-        [') {', '#FFFFFF'],
-      ],
-      [
-        ['  coffee.', '#FFFFFF'],
-        ['brew', '#5B61F6'],
-        ['();', '#FFFFFF'],
-      ],
-      [
-        ['  terminal.', '#FFFFFF'],
-        ['takeOver', '#5B61F6'],
-        ['();', '#FFFFFF'],
-      ],
-      [
-        ['  agent.', '#FFFFFF'],
-        ['whisper', '#48C7E8'],
-        ['(', '#FFFFFF'],
-        ['"Go to sleep, I will ship."', '#2EBD9E'],
-        [');', '#FFFFFF'],
-      ],
-      [
-        ['}', '#FFFFFF'],
-      ],
-    ];
-
-    // Left Panel: Soft Ambient Shadow Glow
-    kids.push({
-      type: 'rect',
-      width: leftPanelW,
-      height: leftPanelH,
-      radius: 20,
-      fill: '#5B61F6',
-      opacity: 0.16 * panelsOp,
-      blur: 36,
-      positioned: { left: leftPanelX, top: leftPanelY + 12 },
-    });
-
-    // Left Panel: Frosted Glass Surface + Luminous Border
-    kids.push({
-      type: 'rect',
-      width: leftPanelW,
-      height: leftPanelH,
-      radius: 20,
-      fill: '#0A1020',
-      opacity: 0.88 * panelsOp,
-      border: { color: '#3A4868', width: 1.5 },
-      positioned: { left: leftPanelX, top: leftPanelY },
-    });
-
-    // Left Panel Content
-    kids.push({
-      type: 'container',
-      width: leftPanelW,
-      height: leftPanelH,
-      opacity: panelsOp,
-      padding: { left: 28, top: 20, right: 28, bottom: 24 },
-      positioned: { left: leftPanelX, top: leftPanelY },
-      child: {
-        type: 'column',
-        children: [
-          // Header Bar
-          {
-            type: 'row',
-            children: [
-              // Window dots
-              {
-                type: 'row',
-                children: [
-                  { type: 'circle', size: 11, fill: '#FF5F56', opacity: 0.85 },
-                  { type: 'container', width: 6 },
-                  { type: 'circle', size: 11, fill: '#FFBD2E', opacity: 0.85 },
-                  { type: 'container', width: 6 },
-                  { type: 'circle', size: 11, fill: '#27C93F', opacity: 0.85 },
-                ],
-              },
-              { type: 'container', width: 18 },
-              // Title
-              {
-                type: 'text',
-                text: 'SUPERPOWERS',
-                style: {
-                  fontSize: 16,
-                  color: '#FFFFFF',
-                  fontFamily: 'Impact',
-                  fontWeight: '700',
-                  letterSpacing: 2.0,
-                  gradient: silverGrad,
-                },
-              },
-              { type: 'container', width: 16 },
-              // Badge Pill
-              {
-                type: 'container',
-                decoration: {
-                  color: 'rgba(91, 97, 246, 0.22)',
-                  borderRadius: 12,
-                  borderColor: 'rgba(110, 116, 255, 0.5)',
-                  borderWidth: 1,
-                },
-                padding: { left: 10, top: 3, right: 10, bottom: 3 },
-                child: {
-                  type: 'text',
-                  text: 'HERMETIC AST · PARALLEL DISPATCH · A2A',
-                  style: {
-                    fontSize: 10,
-                    color: '#8F94FF',
-                    fontFamily: 'monospace',
-                    fontWeight: '700',
-                    letterSpacing: 0.8,
-                  },
-                },
-              },
-            ],
-          },
-          // Divider
-          {
-            type: 'rect',
-            width: leftPanelW - 56,
-            height: 1,
-            fill: '#243048',
-            opacity: 0.6,
-            margin: { top: 14, bottom: 16 },
-          },
-          // Code body
-          buildCodeColumn(leftCodeLines),
-        ],
-      },
-    });
-
-    // ------------------------------------------------------------------------
-    // 4. RIGHT PANEL: "FA CORE: IT IS ALIVE" (Frosted Glass Hero Card)
-    // ------------------------------------------------------------------------
-    var rightPanelW = 880;
-    var rightPanelH = 520;
-    var rightPanelX = 950;
-    var rightPanelY = 135 + bob2 + (1 - enterT) * 55;
-
-    var rightCodeLines = [
-      [
-        ['#include ', '#E056FD'],
-        ['"package:flutter_agent/flutter_agent.dart"', '#48C7E8'],
-      ],
-      [
-        ['using namespace ', '#E056FD'],
-        ['fa;', '#FFFFFF'],
-      ],
-      [
-        ['int ', '#5B61F6'],
-        ['main', '#FFFFFF'],
-        ['() ', '#5B61F6'],
-        ['async {', '#FFFFFF'],
-      ],
-      [
-        ['    final ', '#E056FD'],
-        ['livingAgent = ', '#FFFFFF'],
-        ['await ', '#E056FD'],
-        ['Fa.boot();', '#48C7E8'],
-      ],
-      // LIVING FACE TOKEN: winks with smile `_`
-      [
-        ['    ( ', '#FFFFFF'],
-        ['>', '#5B61F6'],
-        [' _ ', '#2EBD9E'],
-        ['eyeRight', '#48C7E8'],
-        [' )', '#FFFFFF'],
-        ['  // IT IS ALIVE: watching your back', '#2EBD9E'],
-      ],
-      [
-        ['    livingAgent.', '#FFFFFF'],
-        ['wink', '#48C7E8'],
-        ['(eye: Eye.right);  ', '#FFFFFF'],
-        ['// emotions built in', '#2EBD9E'],
-      ],
-      [
-        ['', '#FFFFFF'],
-      ],
-      [
-        ['    // Impeller GPU headless engine · 120 FPS', '#2EBD9E'],
-      ],
-      [
-        ['    final ', '#E056FD'],
-        ['engine = ', '#FFFFFF'],
-        ['HeadlessRenderer.', '#5B61F6'],
-        ['gpu(metal: true);', '#48C7E8'],
-      ],
-      [
-        ['    await engine.', '#FFFFFF'],
-        ['renderVideo', '#5B61F6'],
-        ['(fps: 120, codec: "h264");', '#FFFFFF'],
-      ],
-      [
-        ['    expect(fps.avg, greaterThan(119.8));', '#48C7E8'],
-      ],
-      [
-        ['    // 100% offline fallback when cloud goes down', '#2EBD9E'],
-      ],
-      [
-        ['    return ', '#E056FD'],
-        ['Fa.runLocally(gpu: "Metal/Impeller");', '#48C7E8'],
-      ],
-      [
-        ['}', '#FFFFFF'],
-      ],
-    ];
-
-    // Right Panel: Soft Ambient Shadow Glow
-    kids.push({
-      type: 'rect',
-      width: rightPanelW,
-      height: rightPanelH,
-      radius: 20,
-      fill: '#00F0FF',
-      opacity: 0.18 * panelsOp,
-      blur: 40,
-      positioned: { left: rightPanelX, top: rightPanelY + 12 },
-    });
-
-    // Right Panel: Frosted Glass Surface + Luminous Border
-    kids.push({
-      type: 'rect',
-      width: rightPanelW,
-      height: rightPanelH,
-      radius: 20,
-      fill: '#080E1C',
-      opacity: 0.90 * panelsOp,
-      border: { color: '#00D4E8', width: 1.5 },
-      positioned: { left: rightPanelX, top: rightPanelY },
-    });
-
-    // Right Panel Content
-    kids.push({
-      type: 'container',
-      width: rightPanelW,
-      height: rightPanelH,
-      opacity: panelsOp,
-      padding: { left: 28, top: 20, right: 28, bottom: 24 },
-      positioned: { left: rightPanelX, top: rightPanelY },
-      child: {
-        type: 'column',
-        children: [
-          // Header Bar
-          {
-            type: 'row',
-            children: [
-              // Status Live Pulse
-              {
-                type: 'circle',
-                size: 9,
-                fill: '#2EBD9E',
-                opacity: 0.95,
-              },
-              { type: 'container', width: 8 },
-              {
-                type: 'text',
-                text: 'LIVE HARNESS',
-                style: {
-                  fontSize: 11,
-                  color: '#2EBD9E',
-                  fontFamily: 'monospace',
-                  fontWeight: '700',
-                  letterSpacing: 1.2,
-                },
-              },
-              { type: 'container', width: 18 },
-              // Title
-              {
-                type: 'text',
-                text: 'FA CORE · RUNTIME',
-                style: {
-                  fontSize: 16,
-                  color: '#FFFFFF',
-                  fontFamily: 'Impact',
-                  fontWeight: '700',
-                  letterSpacing: 2.0,
-                  gradient: silverGrad,
-                },
-              },
-              { type: 'container', width: 16 },
-              // Badge Pill
-              {
-                type: 'container',
-                decoration: {
-                  color: 'rgba(46, 189, 158, 0.18)',
-                  borderRadius: 12,
-                  borderColor: 'rgba(46, 189, 158, 0.5)',
-                  borderWidth: 1,
-                },
-                padding: { left: 10, top: 3, right: 10, bottom: 3 },
-                child: {
-                  type: 'text',
-                  text: '100% OFFLINE · ZERO HALLUCINATIONS',
-                  style: {
-                    fontSize: 10,
-                    color: '#2EBD9E',
-                    fontFamily: 'monospace',
-                    fontWeight: '700',
-                    letterSpacing: 0.8,
-                  },
-                },
-              },
-            ],
-          },
-          // Divider
-          {
-            type: 'rect',
-            width: rightPanelW - 56,
-            height: 1,
-            fill: '#183848',
-            opacity: 0.6,
-            margin: { top: 14, bottom: 16 },
-          },
-          // Code body
-          buildCodeColumn(rightCodeLines),
-        ],
-      },
-    });
-
-    // ------------------------------------------------------------------------
-    // 5. Specular Star Spark on Winking Eye '-'
-    // ------------------------------------------------------------------------
-    if (winkT > 0.05) {
-      // Right eye '-' glyph position inside Right Panel:
-      var sparkX = rightPanelX + 172;
-      var sparkY = rightPanelY + 192;
-
-      kids.push({
-        type: 'circle',
-        size: 28,
-        fill: '#FFFFFF',
-        opacity: 0.95 * winkT * panelsOp,
-        blur: 4,
-        positioned: { left: sparkX - 14, top: sparkY - 14 },
-      });
-      kids.push({
-        type: 'circle',
-        size: 54,
-        fill: '#48C7E8',
-        opacity: 0.72 * winkT * panelsOp,
-        blur: 14,
-        positioned: { left: sparkX - 27, top: sparkY - 27 },
-      });
-    }
-
-    // ------------------------------------------------------------------------
-    // 6. Floating Neon HUD Cursor (Gliding Between Panels)
-    // ------------------------------------------------------------------------
-    var cursorGlide = tw(30, 60, 0, 1, 'easeInOutCubic');
-    var cursorX = lerp(leftPanelX + 420, rightPanelX + 220, cursorGlide);
-    var cursorY = lerp(leftPanelY + 380, rightPanelY + 220, cursorGlide);
-
-    // Glowing cyan pointer dot with light aura
-    kids.push({
-      type: 'circle',
-      size: 32,
-      fill: '#00F0FF',
-      opacity: 0.25 * panelsOp,
-      blur: 16,
-      positioned: { left: cursorX - 16, top: cursorY - 16 },
-    });
-    kids.push({
-      type: 'circle',
-      size: 8,
-      fill: '#FFFFFF',
-      opacity: 0.95 * panelsOp,
-      positioned: { left: cursorX - 4, top: cursorY - 4 },
-    });
-
-    // ------------------------------------------------------------------------
-    // 7. Statement Slams In: IT LIVES IN YOUR CODE.
-    // ------------------------------------------------------------------------
-    var typeIn = tw(125, 25, 0, 1, 'easeOutExpo');
-    var typeOffY = 40 * (1 - typeIn);
-
-    if (typeIn > 0.01) {
       kids.push({
         type: 'text',
         text: 'IT LIVES IN YOUR CODE.',
         width: 1920,
-        opacity: typeIn * (1 - fadeOut),
-        offsetY: typeOffY,
+        textAlign: 'center',
         style: {
-          fontSize: 124,
-          color: '#FFFFFF',
+          fontSize: 92,
+          fontWeight: 'bold',
           fontFamily: 'Impact',
-          fontWeight: '700',
-          letterSpacing: 2,
-          textAlign: 'center',
+          letterSpacing: 2.5,
           gradient: silverGrad,
         },
+        scale: slamScale,
+        opacity: slamAlpha,
         positioned: { left: 0, top: 460 },
+      });
+
+      // Sub-kicker
+      var subAlpha = clamp01(tw(slamAt + 14, 18, 0, 1, 'easeOut'));
+      kids.push({
+        type: 'text',
+        text: 'AUTONOMOUS  ·  OFFLINE FIRST  ·  A2A AGENT FABRIC',
+        width: 1920,
+        textAlign: 'center',
+        style: {
+          fontSize: 18,
+          fontWeight: 'bold',
+          fontFamily: 'monospace',
+          color: '#00FF88',
+          letterSpacing: 4.5,
+        },
+        opacity: subAlpha,
+        positioned: { left: 0, top: 585 },
       });
     }
 
-    // Cinematic edge vignette
-    kids.push({
-      type: 'rect',
-      width: 1920,
-      height: 1080,
-      fill: '#000000',
-      opacity: 0.22,
-      positioned: { left: 0, top: 0 },
-    });
-
     return {
       type: 'stack',
-      fit: 'expand',
       children: kids,
     };
   },
