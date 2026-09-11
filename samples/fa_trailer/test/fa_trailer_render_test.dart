@@ -149,6 +149,7 @@ void main() {
   // flatten. Scene id -> the frames the director reviews.
   final probes = <String, List<int>>{
     '01_dark': [10, 60, 150, 200],
+    '01b_prompt': [20, 50, 90, 120, 140],
     '02_alive': [25, 60, 105, 140],
     '03_hardware': [40, 100, 170, 190, 195, 200, 202, 205, 207],
     '04_core': [20, 70, 110, 160],
@@ -186,10 +187,11 @@ void main() {
     }
   });
 
-  test('the project anchors all eight shots with the 1560-frame film', () async {
+  test('the project anchors all nine shots with the 1710-frame film', () async {
     await ensureLoaded();
     expect(_scenes.keys, containsAll([
       '01_dark',
+      '01b_prompt',
       '02_alive',
       '03_hardware',
       '04_core',
@@ -199,6 +201,7 @@ void main() {
       '08_lockup',
     ]));
     expect(_scenes['01_dark']!.duration, 210);
-    expect(_scenes['08_lockup']!.from, 1380);
+    expect(_scenes['01b_prompt']!.duration, 150);
+    expect(_scenes['08_lockup']!.from, 1530);
   });
 }

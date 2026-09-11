@@ -1,5 +1,5 @@
 config:
-  duration: 1560
+  duration: 1710
   fps: 30
   width: 1920
   height: 1080
@@ -26,6 +26,7 @@ external_assets:
 
 scenes:
   - scenes/01_dark.scene.js
+  - scenes/01b_prompt.scene.js
   - scenes/02_alive.scene.js
   - scenes/03_hardware.scene.js
   - scenes/04_core.scene.js
@@ -51,4 +52,7 @@ audio:
     - source: assets/audio/background_music.mp3
       start: 0
       volume: 0.8
+    - source: assets/audio/keyboard_typing.mp3
+      start: 210
+      volume: 0.95
 
