@@ -1,15 +1,13 @@
-// 02 — Alive — 3D Floating Code Galaxy with Depth of Field & Anamorphic Bloom.
+// 02 — Alive — Floating Glassmorphic Code Panels with Curved Monitor Studio.
 //
-// Exactly matching the reference image (clip_1789029739563.png / RR2EI8EEOOw):
-//   · Rich midnight-navy backdrop with atmospheric indigo volumetric fog
-//   · Multiple floating code blocks at varying Z-depths filling the screen
-//   · Authentic optical depth-of-field blur (near/far blocks heavily defocused)
-//   · Vibrant cyberpunk syntax palette: Hot Magenta (#FF2A85), Electric Cyan (#00F0FF),
-//     Mint Green (#22EE99), Crisp White (#FFFFFF), Lilac (#A855F7)
-//   · Horizontal anamorphic light bloom with white/cyan/magenta core flare
-//   · Camera glides across the code field, focal plane shifts onto hero block
-//   · Hero block locks in razor-sharp focus: `( > _ o ) // IT IS ALIVE`
-//   · Winks `( > _ - )` with smile `_` and specular star flare
+// Exactly matching the target vision (clip_1789114393082.png):
+//   · High-end luxury developer studio with curved ultrawide monitor in background
+//   · Two floating frosted glassmorphic HUD panels with code hovering in 3D
+//   · Left panel: "SUPERPOWERS" — parallel dispatch, workers, and witty companion code
+//   · Right panel: "FA CORE: IT IS ALIVE" — boot, living face, Impeller GPU 120 FPS
+//   · Smooth floating physics (ambient bobbing & parallax drift)
+//   · Animated neon HUD pointer cursor gliding between panels
+//   · Living face winks `( > _ - )` with smile `_` and specular cyan/white star flare
 //   · Statement slams in: `IT LIVES IN YOUR CODE.` in metallic Impact typography.
 
 scene = {
@@ -17,7 +15,7 @@ scene = {
   duration: 180,
   from: 210,
   timeline: {
-    label: 'Alive (Code Galaxy)',
+    label: 'Alive (Floating Code Panels)',
     color: '#00F0FF',
     lane: 'video',
   },
@@ -40,557 +38,75 @@ scene = {
     var kids = [];
 
     // ------------------------------------------------------------------------
-    // 1. Midnight Navy Background & Atmospheric Fog (Matches Reference)
+    // 1. Studio Background: Curved Ultrawide Monitor in Luxury Developer Setup
     // ------------------------------------------------------------------------
+    var camT = tw(0, 180, 0, 1, 'linear');
+    var bgScale = lerp(1.06, 1.0, camT);
+    var bgOffY = lerp(-15, 0, camT);
+
     kids.push({
-      type: 'rect', width: 1920, height: 1080, fill: '#050915',
+      type: 'image',
+      source: 'external:studio_desk',
+      width: 1920,
+      height: 1080,
+      fit: 'cover',
+      scale: bgScale,
+      offsetY: bgOffY,
+      positioned: { left: 0, top: 0 },
+    });
+
+    // Dark moody vignette & atmospheric tint over studio desk
+    kids.push({
+      type: 'rect',
+      width: 1920,
+      height: 1080,
+      fill: '#050915',
+      opacity: 0.52,
       positioned: { left: 0, top: 0 },
     });
 
     // Deep volumetric indigo ambient light
     kids.push({
       type: 'circle',
-      size: 1500,
+      size: 1400,
       fill: '#0C1322',
-      opacity: 0.65,
-      blur: 160,
-      positioned: { left: 960 - 750, top: 540 - 750 },
+      opacity: 0.55,
+      blur: 140,
+      positioned: { left: 960 - 700, top: 540 - 700 },
     });
+
+    // Anamorphic horizontal cyan streak from monitor & lamp
+    var flarePulse = 0.88 + 0.12 * Math.sin((frame / 22) * Math.PI * 2);
     kids.push({
-      type: 'circle',
-      size: 800,
+      type: 'rect',
+      width: 760,
+      height: 28,
+      radius: 14,
       fill: '#5B61F6',
-      opacity: 0.12,
-      blur: 120,
-      positioned: { left: 960 - 400, top: 540 - 400 },
+      opacity: 0.24 * flarePulse,
+      blur: 38,
+      positioned: { left: 960 - 380, top: 520 },
     });
-
-    // ------------------------------------------------------------------------
-    // 2. Camera & Focal Motion (Camera pans, Focal Plane shifts)
-    // ------------------------------------------------------------------------
-    // Phase 1 (0–35):   Camera drifts near left blocks (z ~ 320 in focus)
-    // Phase 2 (35–85):  Camera sweeps right and rack-focuses onto Hero Block (z = 500)
-    // Phase 3 (85–125): Locked onto Hero Block, focal plane locked at z = 500
-    // Phase 4 (125–180): Statement slams in, subtle dolly push
-
-    var panT = tw(25, 60, 0, 1, 'easeInOutCubic');
-    var camX = lerp(-140, 0, panT);
-    var camY = lerp(-30, 0, panT);
-    var camZoom = lerp(1.08, 1.0, panT);
-
-    // Current camera focal plane (distance in Z that is 100% sharp)
-    // Dynamic rack focus: shifts from 320 to 500 as camera pans!
-    var currentFocalZ = lerp(320, 500, tw(20, 65, 0, 1, 'easeInOutCubic'));
-
-    // ------------------------------------------------------------------------
-    // 3. Central Anamorphic Light Bloom (Harmonized with Scene 01)
-    // ------------------------------------------------------------------------
-    var flareX = 1020 + camX * 0.4;
-    var flareY = 640 + camY * 0.4;
-    var flarePulse = 0.85 + 0.15 * Math.sin((frame / 20) * Math.PI * 2);
-
-    // Wide horizontal neon orchid glow streak
     kids.push({
       type: 'rect',
-      width: 700,
-      height: 36,
-      radius: 18,
-      fill: '#E056FD',
-      opacity: 0.28 * flarePulse,
-      blur: 46,
-      positioned: { left: flareX - 350, top: flareY - 18 },
-    });
-
-    // Mid brand-blue & cyan glow streak
-    kids.push({
-      type: 'rect',
-      width: 460,
-      height: 22,
-      radius: 11,
-      fill: '#5B61F6',
-      opacity: 0.42 * flarePulse,
-      blur: 24,
-      positioned: { left: flareX - 230, top: flareY - 11 },
-    });
-
-    // Hot specular cyan core
-    kids.push({
-      type: 'rect',
-      width: 160,
-      height: 8,
-      radius: 4,
+      width: 340,
+      height: 12,
+      radius: 6,
       fill: '#48C7E8',
-      opacity: 0.85 * flarePulse,
-      blur: 8,
-      positioned: { left: flareX - 80, top: flareY - 4 },
+      opacity: 0.48 * flarePulse,
+      blur: 16,
+      positioned: { left: 960 - 170, top: 528 },
     });
 
     // ------------------------------------------------------------------------
-    // 4. Code Blocks (Dense Code Galaxy Filling the Screen)
+    // 2. Motion & Floating Physics
     // ------------------------------------------------------------------------
-    var blocks = [
-      // === BLOCK 1: CENTER-RIGHT HERO BLOCK (In Sharp Focus) ===
-      {
-        id: 'hero',
-        x: 1040, y: 430, z: 500,
-        isHero: true,
-        lines: [
-          [
-            ['#include ', '#E056FD'],
-            ['"package:flutter_agent/flutter_agent.dart"', '#48C7E8'],
-          ],
-          [
-            ['using namespace ', '#E056FD'],
-            ['fa;', '#FFFFFF'],
-          ],
-          [
-            ['int ', '#5B61F6'],
-            ['main', '#FFFFFF'],
-            ['() ', '#5B61F6'],
-            ['async {', '#FFFFFF'],
-          ],
-          [
-            ['    final ', '#E056FD'],
-            ['livingAgent = ', '#FFFFFF'],
-            ['await ', '#E056FD'],
-            ['Fa.boot();', '#48C7E8'],
-          ],
-          // LIVING FACE TOKEN: Split into exact canonical brand colors from Scene 01!
-          [
-            ['    ( ', '#FFFFFF'],
-            ['>', '#5B61F6'],
-            [' _ ', '#2EBD9E'],
-            ['eyeRight', '#48C7E8'],
-            [' )', '#FFFFFF'],
-            ['  // IT IS ALIVE: watching your back', '#2EBD9E'],
-          ],
-          [
-            ['    livingAgent.', '#FFFFFF'],
-            ['wink', '#48C7E8'],
-            ['(eye: Eye.right);  ', '#FFFFFF'],
-            ['// emotions built in', '#2EBD9E'],
-          ],
-          [
-            ['}', '#FFFFFF'],
-          ],
-        ],
-      },
+    var enterT = tw(0, 36, 0, 1, 'easeOutCubic');
+    var fadeOut = tw(158, 22, 0, 1, 'easeInOutCubic');
 
-      // === BLOCK 2: TOP-RIGHT: 10+ PROVIDERS BYOK ===
-      {
-        id: 'providers_byok',
-        x: 1220, y: 65, z: 680,
-        lines: [
-          [
-            ['// 10+ LLM PROVIDERS · ZERO LOCK-IN · BYOK', '#2EBD9E'],
-          ],
-          [
-            ['const ', '#E056FD'],
-            ['providers = [', '#FFFFFF'],
-          ],
-          [
-            ['    Anthropic.', '#FFFFFF'],
-            ['claude_3_5_sonnet', '#5B61F6'],
-            ['({ cache: true }),', '#48C7E8'],
-          ],
-          [
-            ['    OpenAI.', '#FFFFFF'],
-            ['gpt_4o', '#5B61F6'],
-            ['({ jsonSchema: true }),', '#48C7E8'],
-          ],
-          [
-            ['    DeepSeek.', '#FFFFFF'],
-            ['r1_reasoning', '#5B61F6'],
-            ['({ localFallback: true }),', '#48C7E8'],
-          ],
-          [
-            ['    Google.', '#FFFFFF'],
-            ['gemini_2_0_flash', '#5B61F6'],
-            ['({ multimodal: true }),', '#48C7E8'],
-          ],
-          [
-            ['    Ollama.', '#FFFFFF'],
-            ['local', '#2EBD9E'],
-            ['("llama3.3:70b"), ', '#48C7E8'],
-            ['// 100% offline', '#2EBD9E'],
-          ],
-          [
-            ['    Groq.', '#FFFFFF'],
-            ['ultraFast', '#E056FD'],
-            ['("500 tok/s"), Mistral, Bedrock', '#FFFFFF'],
-          ],
-          [
-            ['];', '#FFFFFF'],
-          ],
-        ],
-      },
-
-      // === BLOCK 3: TOP-CENTER BLOCK (Cubes Sandbox & Security) ===
-      {
-        id: 'top_center',
-        x: 620, y: 60, z: 740,
-        lines: [
-          [
-            ['class ', '#E056FD'],
-            ['CubesSecurity ', '#5B61F6'],
-            ['extends ', '#E056FD'],
-            ['SandboxPolicy {', '#FFFFFF'],
-          ],
-          [
-            ['    Tier get ', '#E056FD'],
-            ['approvalLevel => ', '#FFFFFF'],
-            ['Tier.threeProtected;', '#48C7E8'],
-          ],
-          [
-            ['    bool get ', '#E056FD'],
-            ['networkIsolated => ', '#FFFFFF'],
-            ['true;', '#2EBD9E'],
-          ],
-          [
-            ['    void ', '#5B61F6'],
-            ['verifyExecution', '#FFFFFF'],
-            ['(Token vault) => vault.', '#FFFFFF'],
-            ['assertSanitized', '#5B61F6'],
-            ['();', '#FFFFFF'],
-          ],
-          [
-            ['}', '#FFFFFF'],
-          ],
-        ],
-      },
-
-      // === BLOCK 4: TOP-LEFT BLOCK (Fa Autonomous Engine & AST) ===
-      {
-        id: 'top_left',
-        x: 80, y: 70, z: 820,
-        lines: [
-          [
-            ['import ', '#E056FD'],
-            ['"package:analyzer/dart/ast/ast.dart";', '#48C7E8'],
-          ],
-          [
-            ['final ', '#E056FD'],
-            ['astWorker = ', '#FFFFFF'],
-            ['AstRewriter.', '#5B61F6'],
-            ['atomic(path);', '#48C7E8'],
-          ],
-          [
-            ['await astWorker.', '#FFFFFF'],
-            ['refactorWorkspace', '#5B61F6'],
-            ['(diagnostics: true);', '#FFFFFF'],
-          ],
-          [
-            ['// surgical hashline patches, zero hallucinations', '#2EBD9E'],
-          ],
-        ],
-      },
-
-      // === BLOCK 5: MID-LEFT BLOCK (Witty Developer Companion) ===
-      {
-        id: 'mid_left',
-        x: 100, y: 260, z: 420,
-        lines: [
-          [
-            ['if ', '#E056FD'],
-            ['(user.isTired) {', '#FFFFFF'],
-          ],
-          [
-            ['    coffee.', '#FFFFFF'],
-            ['brew', '#48C7E8'],
-            ['();  terminal.', '#FFFFFF'],
-            ['takeOver', '#5B61F6'],
-            ['();', '#FFFFFF'],
-          ],
-          [
-            ['    agent.', '#FFFFFF'],
-            ['whisper', '#48C7E8'],
-            ['("Go to sleep, I will ship.");', '#FFFFFF'],
-          ],
-          [
-            ['}', '#FFFFFF'],
-          ],
-          [
-            ['// pure Dart core, zero Node.js drama', '#2EBD9E'],
-          ],
-          [
-            ['final ', '#E056FD'],
-            ['hands = [', '#FFFFFF'],
-            ['ShellTool', '#5B61F6'],
-            ['(), ', '#FFFFFF'],
-            ['AstRewrite', '#48C7E8'],
-            ['(), ', '#FFFFFF'],
-            ['LspSymbol', '#5B61F6'],
-            ['()];', '#FFFFFF'],
-          ],
-        ],
-      },
-
-      // === BLOCK 5B: LEFT-CENTER BRIDGE (Git & Atomic Commits) ===
-      {
-        id: 'left_bridge',
-        x: 110, y: 460, z: 360,
-        lines: [
-          [
-            ['// Git-backed atomic memory & union merge', '#2EBD9E'],
-          ],
-          [
-            ['await ', '#E056FD'],
-            ['git.stage', '#5B61F6'],
-            ['(["lib/**", "memory/**"]);', '#48C7E8'],
-          ],
-          [
-            ['await ', '#E056FD'],
-            ['git.commit', '#5B61F6'],
-            ['("feat: autonomous video pipeline");', '#FFFFFF'],
-          ],
-        ],
-      },
-
-      // === BLOCK 5C: MID-CENTER A2A PROTOCOL ===
-      {
-        id: 'mid_center',
-        x: 600, y: 310, z: 580,
-        lines: [
-          [
-            ['// A2A Protocol: Cross-Machine Agent Fabric', '#2EBD9E'],
-          ],
-          [
-            ['final ', '#E056FD'],
-            ['fabric = ', '#FFFFFF'],
-            ['A2AGateway.', '#5B61F6'],
-            ['mesh(cluster: "apple-silicon");', '#48C7E8'],
-          ],
-          [
-            ['await fabric.', '#FFFFFF'],
-            ['broadcast', '#5B61F6'],
-            ['(SubagentTask("render_gpu"));', '#FFFFFF'],
-          ],
-          [
-            ['peer.onReply((res) => print("Delivered in 4ms"));', '#2EBD9E'],
-          ],
-        ],
-      },
-
-      // === BLOCK 5D: MID-RIGHT CONTEXT PRUNING ===
-      {
-        id: 'mid_right',
-        x: 1420, y: 310, z: 560,
-        lines: [
-          [
-            ['// Intelligent Context Pruning & Checkpoints', '#2EBD9E'],
-          ],
-          [
-            ['final ', '#E056FD'],
-            ['ctx = ', '#FFFFFF'],
-            ['AgentContext.', '#5B61F6'],
-            ['checkpoint("research");', '#48C7E8'],
-          ],
-          [
-            ['await ctx.', '#FFFFFF'],
-            ['rewind', '#5B61F6'],
-            ['(keepReport: true);', '#FFFFFF'],
-          ],
-          [
-            ['expect(tokens.active, lessThan(6000));', '#48C7E8'],
-          ],
-        ],
-      },
-
-      // === BLOCK 6: LOWER-LEFT FOREGROUND BLOCK (Near camera: z = 280) ===
-      {
-        id: 'lower_left',
-        x: 90, y: 640, z: 280,
-        lines: [
-          [
-            ['class ', '#E056FD'],
-            ['FaSuperpowers ', '#5B61F6'],
-            ['implements ', '#E056FD'],
-            ['Companion {', '#FFFFFF'],
-          ],
-          [
-            ['    bool get ', '#E056FD'],
-            ['hasHands => ', '#FFFFFF'],
-            ['true;', '#2EBD9E'],
-          ],
-          [
-            ['    void ', '#5B61F6'],
-            ['gitPushForce', '#FFFFFF'],
-            ['() => ', '#FFFFFF'],
-            ['throw ', '#E056FD'],
-            ['NeverDoThat();', '#E056FD'],
-          ],
-          [
-            ['    final ', '#E056FD'],
-            ['memory = ', '#FFFFFF'],
-            ['GitBackedBrain.', '#5B61F6'],
-            ['load(path: "./memory");', '#48C7E8'],
-          ],
-          [
-            ['}', '#FFFFFF'],
-          ],
-        ],
-      },
-
-      // === BLOCK 7: CENTER-BOTTOM BLOCK (Sitting in the flare) ===
-      {
-        id: 'center_bottom',
-        x: 620, y: 650, z: 580,
-        lines: [
-          [
-            ['#include ', '#E056FD'],
-            ['<yoclip/timeline.h>', '#48C7E8'],
-          ],
-          [
-            ['void ', '#5B61F6'],
-            ['compilePptx', '#FFFFFF'],
-            ['() => ', '#5B61F6'],
-            ['YoClip.toPptx(editable: true);', '#48C7E8'],
-          ],
-          [
-            ['final ', '#E056FD'],
-            ['platforms = [', '#FFFFFF'],
-            ['MacOS, Windows, iOS, Android', '#48C7E8'],
-            ['];', '#FFFFFF'],
-          ],
-          [
-            ['// 100% offline fallback when cloud goes down', '#2EBD9E'],
-          ],
-          [
-            ['return ', '#E056FD'],
-            ['Fa.runLocally(gpu: "Metal/Impeller");', '#48C7E8'],
-          ],
-        ],
-      },
-
-      // === BLOCK 8: BOTTOM-RIGHT BLOCK (Impeller GPU 120fps engine) ===
-      {
-        id: 'bottom_right',
-        x: 1360, y: 640, z: 460,
-        lines: [
-          [
-            ['// Impeller GPU headless renderer', '#2EBD9E'],
-          ],
-          [
-            ['final ', '#E056FD'],
-            ['engine = ', '#FFFFFF'],
-            ['HeadlessRenderer.', '#5B61F6'],
-            ['gpu(metal: true);', '#48C7E8'],
-          ],
-          [
-            ['await engine.', '#FFFFFF'],
-            ['renderVideo', '#5B61F6'],
-            ['(fps: 120, codec: "h264");', '#FFFFFF'],
-          ],
-          [
-            ['expect(fps.avg, greaterThan(119.8));', '#48C7E8'],
-          ],
-        ],
-      },
-
-      // === BLOCK 9: DEEP BACKGROUND BLOCK 1 (Swarm & A2A protocol) ===
-      {
-        id: 'bg_left',
-        x: 440, y: 390, z: 1200,
-        lines: [
-          [
-            ['Swarm.spawn', '#5B61F6'],
-            ['(count: 32, protocol: a2a);', '#FFFFFF'],
-          ],
-          [
-            ['subagents.broadcast("divide, conquer, deliver");', '#3D4F72'],
-          ],
-          [
-            ['await session.delegate("explore", "find bug in 2s");', '#3D4F72'],
-          ],
-          [
-            ['expect(allTests, equals(allPass));', '#3D4F72'],
-          ],
-        ],
-      },
-
-      // === BLOCK 10: DEEP BACKGROUND BLOCK 2 (Far right haze) ===
-      {
-        id: 'bg_right',
-        x: 1540, y: 390, z: 1350,
-        lines: [
-          [
-            ['terminal.autofire(">_ flutter run --impeller");', '#3D4F72'],
-          ],
-          [
-            ['fps.measure(); // 120 fps butter', '#2EBD9E'],
-          ],
-          [
-            ['void commit() => git.commit("refactor with Fa");', '#3D4F72'],
-          ],
-        ],
-      },
-
-      // === BLOCK 11: BOTTOM-LEFT BLOCK (Autonomous Orchestrator) ===
-      {
-        id: 'bottom_left',
-        x: 140, y: 780, z: 460,
-        lines: [
-          [
-            ['final ', '#E056FD'],
-            ['job = await fa.', '#FFFFFF'],
-            ['dispatch', '#5B61F6'],
-            ['({', '#FFFFFF'],
-          ],
-          [
-            ['    goal: ', '#8A99B2'],
-            ['"Build 120 FPS pipeline, verify zero regressions"', '#48C7E8'],
-            [',', '#FFFFFF'],
-          ],
-          [
-            ['    workers: [', '#FFFFFF'],
-            ['Coder', '#5B61F6'],
-            [', ', '#FFFFFF'],
-            ['Reviewer', '#E056FD'],
-            [', ', '#FFFFFF'],
-            ['Tester', '#2EBD9E'],
-            ['],', '#FFFFFF'],
-          ],
-          [
-            ['    cube: ', '#8A99B2'],
-            ['CubePresets.', '#5B61F6'],
-            ['l2Full', '#48C7E8'],
-            [',', '#FFFFFF'],
-          ],
-          [
-            ['});', '#FFFFFF'],
-          ],
-          [
-            ['// hermetic AST validation · parallel dispatch', '#2EBD9E'],
-          ],
-        ],
-      },
-
-      // === BLOCK 12: BOTTOM-RIGHT BLOCK (Persistent Git Memory) ===
-      {
-        id: 'bottom_right',
-        x: 1160, y: 790, z: 520,
-        lines: [
-          [
-            ['final ', '#E056FD'],
-            ['memory = await ', '#FFFFFF'],
-            ['GitMemory.', '#5B61F6'],
-            ['sync', '#48C7E8'],
-            ['("knowledge/durable");', '#FFFFFF'],
-          ],
-          [
-            ['memory.', '#FFFFFF'],
-            ['supersede', '#5B61F6'],
-            ['(staleFact, withFact: ', '#FFFFFF'],
-            ['"Fa runs natively"', '#48C7E8'],
-            [');', '#FFFFFF'],
-          ],
-          [
-            ['expect(memory.verified, isTrue); ', '#2EBD9E'],
-            ['// zero hallucinations', '#2EBD9E'],
-          ],
-        ],
-      },
-    ];
+    // Subtle 3D floating hover (ambient floating)
+    var bob1 = Math.sin(frame * 0.055) * 5.0;
+    var bob2 = Math.cos(frame * 0.048) * 6.0;
 
     // Wink timing on Hero Block: frames 98–118
     var winkT = 0;
@@ -600,61 +116,21 @@ scene = {
       else winkT = 1 - (frame - 110) / 8;
     }
 
-    var fadeOut = tw(158, 22, 0, 1, 'easeInOutCubic');
+    // Title slam dimming
+    var titleDim = tw(125, 20, 0, 1, 'easeOut');
+    var panelsOp = (1.0 - titleDim * 0.75) * (1 - fadeOut) * enterT;
 
     // ------------------------------------------------------------------------
-    // 5. Render Code Blocks with Optical Depth of Field (Blur + Opacity)
+    // Helper: Code Line Builder
     // ------------------------------------------------------------------------
-    // Sort blocks descending by Z so deep blocks render behind
-    var sortedBlocks = blocks.slice();
-    sortedBlocks.sort(function(a, b) { return b.z - a.z; });
-
-    for (var bi = 0; bi < sortedBlocks.length; bi++) {
-      var b = sortedBlocks[bi];
-
-      // Calculate optical distance from current focal plane
-      var distFromFocus = Math.abs(b.z - currentFocalZ);
-
-      // Depth of field blur sigma:
-      // When at focal plane: blur = 0 (crystal sharp!).
-      // Subtle optical depth: text stays readable while feeling deep and layered
-      var blurSigma = 0;
-      if (distFromFocus > 40) {
-        blurSigma = Math.min(5.5, (distFromFocus - 40) * 0.011);
-      }
-      if (b.isHero && frame >= 85) {
-        blurSigma = 0; // Hero is pinned razor sharp after camera docks
-      }
-
-      // Parallax position
-      var px = 960 + (b.x - 960 + camX) * camZoom;
-      var py = 540 + (b.y - 540 + camY) * camZoom;
-
-      // Opacity based on distance and focus
-      var blockOp = 1.0;
-      if (b.z > 1000) {
-        blockOp = Math.max(0.25, 1.0 - (b.z - 1000) / 900);
-      }
-      if (!b.isHero && frame >= 90) {
-        // Subtle dim of background when hero locks in
-        var dockDim = tw(90, 20, 0, 1, 'easeOut');
-        blockOp *= lerp(1.0, 0.45, dockDim);
-      }
-
-      if (frame >= 125) {
-        // Everything dims slightly for title slam
-        var titleDim = tw(125, 20, 0, 1, 'easeOut');
-        blockOp *= lerp(1.0, 0.20, titleDim);
-      }
-
+    function buildCodeColumn(lines) {
       var rowWidgets = [];
-      for (var li = 0; li < b.lines.length; li++) {
-        var lineTokens = b.lines[li];
+      for (var li = 0; li < lines.length; li++) {
+        var tokens = lines[li];
         var tokenWidgets = [];
-
-        for (var ti = 0; ti < lineTokens.length; ti++) {
-          var txt = lineTokens[ti][0];
-          var col = lineTokens[ti][1];
+        for (var ti = 0; ti < tokens.length; ti++) {
+          var txt = tokens[ti][0];
+          var col = tokens[ti][1];
 
           // Dynamic eye resolution on hero face
           if (txt === 'eyeRight') {
@@ -662,7 +138,7 @@ scene = {
             col = '#48C7E8';
           }
 
-          var isFaceToken = b.isHero && (
+          var isFace = (
             txt === '    ( ' || txt === '>' || txt === ' _ ' ||
             txt === 'o' || txt === '-' || txt === ' )'
           );
@@ -672,103 +148,446 @@ scene = {
             text: txt,
             style: {
               color: col,
-              fontSize: isFaceToken ? 30 : 21,
+              fontSize: isFace ? 23 : 16,
               fontFamily: 'monospace',
-              fontWeight: (b.isHero || isFaceToken) ? '800' : '500',
-              shadows: blurSigma > 0.5 ? [] : [
-                { color: col, blur: 6, offset: { x: 0, y: 0 } },
-              ],
+              fontWeight: isFace ? '800' : '500',
             },
           });
         }
-
         rowWidgets.push({
           type: 'row',
           children: tokenWidgets,
         });
       }
-
-      var colWidget = {
+      return {
         type: 'column',
         children: rowWidgets,
       };
-
-      // Wrap in blurred container if out of focus!
-      var containerProps = {
-        type: 'container',
-        opacity: blockOp * (1 - fadeOut),
-        positioned: { left: px, top: py },
-        child: colWidget,
-      };
-
-      if (blurSigma > 0.6) {
-        containerProps.blur = Math.min(10, blurSigma);
-      }
-
-      kids.push(containerProps);
-
-      // Hero glow halo & Specular star spark on eye
-      if (b.isHero && frame >= 85 && frame < 135) {
-        kids.push({
-          type: 'rect',
-          width: 620,
-          height: 180,
-          radius: 16,
-          fill: '#00F0FF',
-          opacity: (0.12 + 0.08 * (winkT > 0.5 ? 1 : 0)) * blockOp,
-          blur: 32,
-          positioned: { left: px - 20, top: py + 70 },
-        });
-
-        if (winkT > 0.5) {
-          // Specular star / spark on right winking eye '-' in `( > _ - )`
-          // Exactly aligned over the winking eye '-' glyph on Line 4
-          var sparkX = px + 176;
-          var sparkY = py + 124;
-          kids.push({
-            type: 'circle',
-            size: 26,
-            fill: '#FFFFFF',
-            opacity: 0.95 * winkT,
-            blur: 4,
-            positioned: { left: sparkX - 13, top: sparkY - 13 },
-          });
-          kids.push({
-            type: 'circle',
-            size: 48,
-            fill: '#48C7E8',
-            opacity: 0.70 * winkT,
-            blur: 14,
-            positioned: { left: sparkX - 24, top: sparkY - 24 },
-          });
-        }
-      }
     }
 
     // ------------------------------------------------------------------------
-    // 6. Floating Optical Bokeh Spheres (Floating in Front of Camera)
+    // 3. LEFT PANEL: "SUPERPOWERS" (Frosted Glass HUD Card)
     // ------------------------------------------------------------------------
-    // Placed strictly along peripheral edges to avoid obscuring center code
-    var bokehDots = [
-      { x: 260, y: 220, size: 28, col: '#E056FD', op: 0.28 },
-      { x: 1460, y: 260, size: 36, col: '#5B61F6', op: 0.24 },
-      { x: 1680, y: 720, size: 46, col: '#48C7E8', op: 0.22 },
-      { x: 380, y: 880, size: 32, col: '#E056FD', op: 0.26 },
+    var leftPanelW = 820;
+    var leftPanelH = 520;
+    var leftPanelX = 80;
+    var leftPanelY = 110 + bob1 + (1 - enterT) * 45;
+
+    var leftCodeLines = [
+      [
+        ['// Autonomous Orchestrator: hermetic dispatch', '#2EBD9E'],
+      ],
+      [
+        ['final ', '#E056FD'],
+        ['job = ', '#FFFFFF'],
+        ['await fa.', '#FFFFFF'],
+        ['dispatch', '#5B61F6'],
+        ['({', '#FFFFFF'],
+      ],
+      [
+        ['  goal: ', '#8A99B2'],
+        ['"Build 120 FPS pipeline, verify zero regressions"', '#48C7E8'],
+        [',', '#FFFFFF'],
+      ],
+      [
+        ['  workers: [', '#FFFFFF'],
+        ['Coder', '#5B61F6'],
+        [', ', '#FFFFFF'],
+        ['Reviewer', '#E056FD'],
+        [', ', '#FFFFFF'],
+        ['Tester', '#2EBD9E'],
+        ['],', '#FFFFFF'],
+      ],
+      [
+        ['  cube: ', '#8A99B2'],
+        ['CubePresets.', '#5B61F6'],
+        ['l2Full', '#48C7E8'],
+        [',  ', '#FFFFFF'],
+        ['// isolated sandbox', '#8A99B2'],
+      ],
+      [
+        ['  security: ', '#8A99B2'],
+        ['Tier.threeProtected', '#E056FD'],
+        [',', '#FFFFFF'],
+      ],
+      [
+        ['});', '#FFFFFF'],
+      ],
+      [
+        ['', '#FFFFFF'],
+      ],
+      [
+        ['// Living companion: watches your back', '#2EBD9E'],
+      ],
+      [
+        ['if ', '#E056FD'],
+        ['(user.', '#FFFFFF'],
+        ['isTired', '#48C7E8'],
+        [') {', '#FFFFFF'],
+      ],
+      [
+        ['  coffee.', '#FFFFFF'],
+        ['brew', '#5B61F6'],
+        ['();', '#FFFFFF'],
+      ],
+      [
+        ['  terminal.', '#FFFFFF'],
+        ['takeOver', '#5B61F6'],
+        ['();', '#FFFFFF'],
+      ],
+      [
+        ['  agent.', '#FFFFFF'],
+        ['whisper', '#48C7E8'],
+        ['(', '#FFFFFF'],
+        ['"Go to sleep, I will ship."', '#2EBD9E'],
+        [');', '#FFFFFF'],
+      ],
+      [
+        ['}', '#FFFFFF'],
+      ],
     ];
 
-    for (var bi = 0; bi < bokehDots.length; bi++) {
-      var bk = bokehDots[bi];
-      var bkX = bk.x + camX * 1.4;
-      var bkY = bk.y + camY * 1.4;
+    // Left Panel: Soft Ambient Shadow Glow
+    kids.push({
+      type: 'rect',
+      width: leftPanelW,
+      height: leftPanelH,
+      radius: 20,
+      fill: '#5B61F6',
+      opacity: 0.16 * panelsOp,
+      blur: 36,
+      positioned: { left: leftPanelX, top: leftPanelY + 12 },
+    });
+
+    // Left Panel: Frosted Glass Surface + Luminous Border
+    kids.push({
+      type: 'rect',
+      width: leftPanelW,
+      height: leftPanelH,
+      radius: 20,
+      fill: '#0A1020',
+      opacity: 0.88 * panelsOp,
+      border: { color: '#3A4868', width: 1.5 },
+      positioned: { left: leftPanelX, top: leftPanelY },
+    });
+
+    // Left Panel Content
+    kids.push({
+      type: 'container',
+      width: leftPanelW,
+      height: leftPanelH,
+      opacity: panelsOp,
+      padding: { left: 28, top: 20, right: 28, bottom: 24 },
+      positioned: { left: leftPanelX, top: leftPanelY },
+      child: {
+        type: 'column',
+        children: [
+          // Header Bar
+          {
+            type: 'row',
+            children: [
+              // Window dots
+              {
+                type: 'row',
+                children: [
+                  { type: 'circle', size: 11, fill: '#FF5F56', opacity: 0.85 },
+                  { type: 'container', width: 6 },
+                  { type: 'circle', size: 11, fill: '#FFBD2E', opacity: 0.85 },
+                  { type: 'container', width: 6 },
+                  { type: 'circle', size: 11, fill: '#27C93F', opacity: 0.85 },
+                ],
+              },
+              { type: 'container', width: 18 },
+              // Title
+              {
+                type: 'text',
+                text: 'SUPERPOWERS',
+                style: {
+                  fontSize: 16,
+                  color: '#FFFFFF',
+                  fontFamily: 'Impact',
+                  fontWeight: '700',
+                  letterSpacing: 2.0,
+                  gradient: silverGrad,
+                },
+              },
+              { type: 'container', width: 16 },
+              // Badge Pill
+              {
+                type: 'container',
+                decoration: {
+                  color: 'rgba(91, 97, 246, 0.22)',
+                  borderRadius: 12,
+                  borderColor: 'rgba(110, 116, 255, 0.5)',
+                  borderWidth: 1,
+                },
+                padding: { left: 10, top: 3, right: 10, bottom: 3 },
+                child: {
+                  type: 'text',
+                  text: 'HERMETIC AST · PARALLEL DISPATCH · A2A',
+                  style: {
+                    fontSize: 10,
+                    color: '#8F94FF',
+                    fontFamily: 'monospace',
+                    fontWeight: '700',
+                    letterSpacing: 0.8,
+                  },
+                },
+              },
+            ],
+          },
+          // Divider
+          {
+            type: 'rect',
+            width: leftPanelW - 56,
+            height: 1,
+            fill: '#243048',
+            opacity: 0.6,
+            margin: { top: 14, bottom: 16 },
+          },
+          // Code body
+          buildCodeColumn(leftCodeLines),
+        ],
+      },
+    });
+
+    // ------------------------------------------------------------------------
+    // 4. RIGHT PANEL: "FA CORE: IT IS ALIVE" (Frosted Glass Hero Card)
+    // ------------------------------------------------------------------------
+    var rightPanelW = 880;
+    var rightPanelH = 520;
+    var rightPanelX = 950;
+    var rightPanelY = 135 + bob2 + (1 - enterT) * 55;
+
+    var rightCodeLines = [
+      [
+        ['#include ', '#E056FD'],
+        ['"package:flutter_agent/flutter_agent.dart"', '#48C7E8'],
+      ],
+      [
+        ['using namespace ', '#E056FD'],
+        ['fa;', '#FFFFFF'],
+      ],
+      [
+        ['int ', '#5B61F6'],
+        ['main', '#FFFFFF'],
+        ['() ', '#5B61F6'],
+        ['async {', '#FFFFFF'],
+      ],
+      [
+        ['    final ', '#E056FD'],
+        ['livingAgent = ', '#FFFFFF'],
+        ['await ', '#E056FD'],
+        ['Fa.boot();', '#48C7E8'],
+      ],
+      // LIVING FACE TOKEN: winks with smile `_`
+      [
+        ['    ( ', '#FFFFFF'],
+        ['>', '#5B61F6'],
+        [' _ ', '#2EBD9E'],
+        ['eyeRight', '#48C7E8'],
+        [' )', '#FFFFFF'],
+        ['  // IT IS ALIVE: watching your back', '#2EBD9E'],
+      ],
+      [
+        ['    livingAgent.', '#FFFFFF'],
+        ['wink', '#48C7E8'],
+        ['(eye: Eye.right);  ', '#FFFFFF'],
+        ['// emotions built in', '#2EBD9E'],
+      ],
+      [
+        ['', '#FFFFFF'],
+      ],
+      [
+        ['    // Impeller GPU headless engine · 120 FPS', '#2EBD9E'],
+      ],
+      [
+        ['    final ', '#E056FD'],
+        ['engine = ', '#FFFFFF'],
+        ['HeadlessRenderer.', '#5B61F6'],
+        ['gpu(metal: true);', '#48C7E8'],
+      ],
+      [
+        ['    await engine.', '#FFFFFF'],
+        ['renderVideo', '#5B61F6'],
+        ['(fps: 120, codec: "h264");', '#FFFFFF'],
+      ],
+      [
+        ['    expect(fps.avg, greaterThan(119.8));', '#48C7E8'],
+      ],
+      [
+        ['    // 100% offline fallback when cloud goes down', '#2EBD9E'],
+      ],
+      [
+        ['    return ', '#E056FD'],
+        ['Fa.runLocally(gpu: "Metal/Impeller");', '#48C7E8'],
+      ],
+      [
+        ['}', '#FFFFFF'],
+      ],
+    ];
+
+    // Right Panel: Soft Ambient Shadow Glow
+    kids.push({
+      type: 'rect',
+      width: rightPanelW,
+      height: rightPanelH,
+      radius: 20,
+      fill: '#00F0FF',
+      opacity: 0.18 * panelsOp,
+      blur: 40,
+      positioned: { left: rightPanelX, top: rightPanelY + 12 },
+    });
+
+    // Right Panel: Frosted Glass Surface + Luminous Border
+    kids.push({
+      type: 'rect',
+      width: rightPanelW,
+      height: rightPanelH,
+      radius: 20,
+      fill: '#080E1C',
+      opacity: 0.90 * panelsOp,
+      border: { color: '#00D4E8', width: 1.5 },
+      positioned: { left: rightPanelX, top: rightPanelY },
+    });
+
+    // Right Panel Content
+    kids.push({
+      type: 'container',
+      width: rightPanelW,
+      height: rightPanelH,
+      opacity: panelsOp,
+      padding: { left: 28, top: 20, right: 28, bottom: 24 },
+      positioned: { left: rightPanelX, top: rightPanelY },
+      child: {
+        type: 'column',
+        children: [
+          // Header Bar
+          {
+            type: 'row',
+            children: [
+              // Status Live Pulse
+              {
+                type: 'circle',
+                size: 9,
+                fill: '#2EBD9E',
+                opacity: 0.95,
+              },
+              { type: 'container', width: 8 },
+              {
+                type: 'text',
+                text: 'LIVE HARNESS',
+                style: {
+                  fontSize: 11,
+                  color: '#2EBD9E',
+                  fontFamily: 'monospace',
+                  fontWeight: '700',
+                  letterSpacing: 1.2,
+                },
+              },
+              { type: 'container', width: 18 },
+              // Title
+              {
+                type: 'text',
+                text: 'FA CORE · RUNTIME',
+                style: {
+                  fontSize: 16,
+                  color: '#FFFFFF',
+                  fontFamily: 'Impact',
+                  fontWeight: '700',
+                  letterSpacing: 2.0,
+                  gradient: silverGrad,
+                },
+              },
+              { type: 'container', width: 16 },
+              // Badge Pill
+              {
+                type: 'container',
+                decoration: {
+                  color: 'rgba(46, 189, 158, 0.18)',
+                  borderRadius: 12,
+                  borderColor: 'rgba(46, 189, 158, 0.5)',
+                  borderWidth: 1,
+                },
+                padding: { left: 10, top: 3, right: 10, bottom: 3 },
+                child: {
+                  type: 'text',
+                  text: '100% OFFLINE · ZERO HALLUCINATIONS',
+                  style: {
+                    fontSize: 10,
+                    color: '#2EBD9E',
+                    fontFamily: 'monospace',
+                    fontWeight: '700',
+                    letterSpacing: 0.8,
+                  },
+                },
+              },
+            ],
+          },
+          // Divider
+          {
+            type: 'rect',
+            width: rightPanelW - 56,
+            height: 1,
+            fill: '#183848',
+            opacity: 0.6,
+            margin: { top: 14, bottom: 16 },
+          },
+          // Code body
+          buildCodeColumn(rightCodeLines),
+        ],
+      },
+    });
+
+    // ------------------------------------------------------------------------
+    // 5. Specular Star Spark on Winking Eye '-'
+    // ------------------------------------------------------------------------
+    if (winkT > 0.05) {
+      // Right eye '-' glyph position inside Right Panel:
+      var sparkX = rightPanelX + 172;
+      var sparkY = rightPanelY + 192;
+
       kids.push({
         type: 'circle',
-        size: bk.size,
-        fill: bk.col,
-        opacity: bk.op * (1 - fadeOut),
-        blur: bk.size * 0.45,
-        positioned: { left: bkX - bk.size / 2, top: bkY - bk.size / 2 },
+        size: 28,
+        fill: '#FFFFFF',
+        opacity: 0.95 * winkT * panelsOp,
+        blur: 4,
+        positioned: { left: sparkX - 14, top: sparkY - 14 },
+      });
+      kids.push({
+        type: 'circle',
+        size: 54,
+        fill: '#48C7E8',
+        opacity: 0.72 * winkT * panelsOp,
+        blur: 14,
+        positioned: { left: sparkX - 27, top: sparkY - 27 },
       });
     }
+
+    // ------------------------------------------------------------------------
+    // 6. Floating Neon HUD Cursor (Gliding Between Panels)
+    // ------------------------------------------------------------------------
+    var cursorGlide = tw(30, 60, 0, 1, 'easeInOutCubic');
+    var cursorX = lerp(leftPanelX + 420, rightPanelX + 220, cursorGlide);
+    var cursorY = lerp(leftPanelY + 380, rightPanelY + 220, cursorGlide);
+
+    // Glowing cyan pointer dot with light aura
+    kids.push({
+      type: 'circle',
+      size: 32,
+      fill: '#00F0FF',
+      opacity: 0.25 * panelsOp,
+      blur: 16,
+      positioned: { left: cursorX - 16, top: cursorY - 16 },
+    });
+    kids.push({
+      type: 'circle',
+      size: 8,
+      fill: '#FFFFFF',
+      opacity: 0.95 * panelsOp,
+      positioned: { left: cursorX - 4, top: cursorY - 4 },
+    });
 
     // ------------------------------------------------------------------------
     // 7. Statement Slams In: IT LIVES IN YOUR CODE.
@@ -798,8 +617,11 @@ scene = {
 
     // Cinematic edge vignette
     kids.push({
-      type: 'rect', width: 1920, height: 1080, fill: '#000000',
-      opacity: 0.26,
+      type: 'rect',
+      width: 1920,
+      height: 1080,
+      fill: '#000000',
+      opacity: 0.22,
       positioned: { left: 0, top: 0 },
     });
 

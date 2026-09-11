@@ -43,7 +43,26 @@ void main() {
     _runtime?.dispose();
   });
 
-  final compiler = YoclipWidgetRenderer();
+  final projectDir = faTrailerProjectPath;
+  final studioDeskBytes = io.File('$projectDir/assets/bg/studio_desk.png').existsSync()
+      ? io.File('$projectDir/assets/bg/studio_desk.png').readAsBytesSync()
+      : null;
+
+  final compiler = YoclipWidgetRenderer(
+    externalAssetResolver: YoclipExternalAssetResolver(
+      files: {
+        'studio_desk': '$projectDir/assets/bg/studio_desk.png',
+        'ai_desk': '$projectDir/assets/ai/G1_desk.png',
+        'ai_swarm': '$projectDir/assets/ai/G3_swarm.png',
+        'ai_corridor': '$projectDir/assets/ai/G4_corridor.png',
+      },
+      imageBytes: {
+        if (studioDeskBytes != null) 'studio_desk': studioDeskBytes,
+      },
+      fileReader: (path) async =>
+          io.File(path).existsSync() ? io.File(path).readAsBytesSync() : null,
+    ),
+  );
 
   Future<void> ensureTestFont() async {
     Future<void> load(String family, String file) async {
@@ -84,13 +103,25 @@ void main() {
             child: SizedBox(
               width: 1920,
               height: 1080,
-              child: compiler.compile(graph, 0),
+              child: YoclipExternalAssets(
+                files: {
+                  'studio_desk': '$projectDir/assets/bg/studio_desk.png',
+                  'ai_desk': '$projectDir/assets/ai/G1_desk.png',
+                  'ai_swarm': '$projectDir/assets/ai/G3_swarm.png',
+                  'ai_corridor': '$projectDir/assets/ai/G4_corridor.png',
+                },
+                imageBytes: {
+                  if (studioDeskBytes != null) 'studio_desk': studioDeskBytes,
+                },
+                child: compiler.compile(graph, 0),
+              ),
             ),
           ),
         ),
       ),
     );
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
 
     final captureDir = io.Platform.environment['YOCLIP_CAPTURE_DIR'];
     if (captureDir == null || captureDir.isEmpty) return;

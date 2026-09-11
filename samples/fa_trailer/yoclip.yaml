@@ -11,6 +11,9 @@ project_js: project.js
 # AI-generated footage placeholders (Grok). These PNGs are the START frames;
 # when the real clips land they become `type: video` assets with the same keys.
 external_assets:
+  studio_desk:
+    type: image
+    path: assets/bg/studio_desk.png
   ai_desk:
     type: image
     path: assets/ai/G1_desk.png
