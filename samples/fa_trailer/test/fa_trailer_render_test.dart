@@ -202,6 +202,7 @@ void main() {
     ]));
     expect(_scenes['01_dark']!.duration, 218);
     expect(_scenes['01b_prompt']!.duration, 144);
-    expect(_scenes['08_lockup']!.from, 1514);
+    expect(_scenes['03_hardware']!.duration, 240);
+    expect(_scenes['08_lockup']!.from, 1562);
   });
 }

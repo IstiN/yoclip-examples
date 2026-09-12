@@ -11,7 +11,7 @@
 scene = {
   id: '07_work',
   duration: 144,
-  from: 1370,
+  from: 1418,
   timeline: {
     label: 'Studio Timeline',
     color: '#8F6BFF',

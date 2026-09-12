@@ -19,7 +19,7 @@
 scene = {
   id: '05_everywhere',
   duration: 240,
-  from: 938,
+  from: 986,
   timeline: {
     label: 'Everywhere (Embedded)',
     color: '#8F6BFF',

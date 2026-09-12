@@ -12,7 +12,7 @@
 scene = {
   id: '06_power',
   duration: 192,
-  from: 1178,
+  from: 1226,
   timeline: {
     label: 'Power',
     color: '#8F6BFF',

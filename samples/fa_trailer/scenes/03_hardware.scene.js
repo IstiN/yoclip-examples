@@ -12,7 +12,7 @@
 
 scene = {
   id: '03_hardware',
-  duration: 192,
+  duration: 240, // 5.0 musical bars (8.0s at 30 fps, 150 BPM)
   from: 554,
   timeline: {
     label: 'Hardware',
@@ -171,11 +171,11 @@ scene = {
       }
     }
 
-    // ---- 96–178: the face materializes inside the chip ---------------------
+    // ---- 86–136: the face materializes inside the chip --------------------
     var N = 24;
     var chevFace = chevPoints(319, 420, 100, 108, N);
-    var chevP = tw(96, 30, 0, 1, 'easeInOutCubic');
-    var foldT = tw(160, 20, 0, 1, 'easeInOutCubic');
+    var chevP = tw(86, 28, 0, 1, 'easeInOutCubic');
+    var foldT = tw(124, 18, 0, 1, 'easeInOutCubic');
     var FSTEM_TOP = { x: 266, y: 372 };
     var FSTEM_BOT = { x: 266, y: 724 };
     var fStemPts = [];
@@ -185,7 +185,7 @@ scene = {
     }
     var chevLive = morphPts(chevFace, fStemPts, foldT);
     var chevCol = lerpColor(C.violetBright, C.blue, foldT);
-    var chevFade = 1 - tw(172, 12, 0, 1, 'easeIn');
+    var chevFade = 1 - tw(134, 10, 0, 1, 'easeIn');
     if (chevP > 0.001 && chevFade > 0.003) {
       kids.push(polylineNode(chevLive, 38 * 2.2, chevP, chevCol, 0.16 * chevFade));
       kids.push(polylineNode(chevLive, 38, chevP, chevCol, chevFade));
@@ -193,20 +193,20 @@ scene = {
 
     // Eye ring -> note ring (fades cleanly before wordmark writes)
     var EYE = { x: 705, y: 420, r: 118 };
-    var eyeRingP = tw(106, 30, 0, 1, 'easeInOutCubic');
-    var eyeFade = 1 - tw(156, 16, 0, 1, 'easeInOutCubic');
+    var eyeRingP = tw(94, 26, 0, 1, 'easeInOutCubic');
+    var eyeFade = 1 - tw(126, 14, 0, 1, 'easeInOutCubic');
     if (eyeRingP > 0.001 && eyeFade > 0.003) {
       var eyePts = ringPoints(EYE.x, EYE.y, EYE.r, N);
       kids.push(polylineNode(eyePts, 38 * 2.2, eyeRingP, C.violetBright, 0.16 * eyeFade));
       kids.push(polylineNode(eyePts, 38, eyeRingP, C.violetBright, eyeFade));
     }
 
-    // Underscore mouth bar morphing into the a's bowl (fades cleanly at 178)
-    var mouthP = tw(120, 22, 0, 1, 'easeOut');
-    var flyT = tw(146, 22, 0, 1, 'easeInOutCubic');
-    var bendAt = tw(152, 24, 0, 1, 'easeInOutCubic');
-    var bowlT = tw(168, 16, 0, 1, 'easeInOutCubic');
-    var mouthFade = 1 - tw(174, 10, 0, 1, 'easeInOutCubic');
+    // Underscore mouth bar morphing into the a's bowl (fades cleanly at 136)
+    var mouthP = tw(102, 20, 0, 1, 'easeOut');
+    var flyT = tw(118, 18, 0, 1, 'easeInOutCubic');
+    var bendAt = tw(122, 20, 0, 1, 'easeInOutCubic');
+    var bowlT = tw(130, 14, 0, 1, 'easeInOutCubic');
+    var mouthFade = 1 - tw(136, 10, 0, 1, 'easeInOutCubic');
     if (mouthP > 0.001 && mouthFade > 0.003) {
       var mCol = lerpColor(C.violetBright, '#2EBD9E', bowlT);
       var mSw = 38;
@@ -225,18 +225,18 @@ scene = {
       kids.push(polylineNode(mPts, mSw, mouthP, mCol, mouthFade));
     }
 
-    // ---- 176–225: The canonical, bold Fa wordmark writes itself ------------
-    var fP = tw(176, 26, 0, 1, 'easeInOutCubic');
-    var accentP = tw(184, 20, 0, 1, 'easeOut');
-    var bowlP = tw(178, 24, 0, 1, 'easeInOutCubic');
-    var stemP = tw(186, 20, 0, 1, 'easeInOutCubic');
+    // ---- 134–180: The canonical, bold Fa wordmark writes itself unhurriedly ---
+    var fP = tw(134, 28, 0, 1, 'easeInOutCubic');
+    var accentP = tw(144, 22, 0, 1, 'easeOut');
+    var bowlP = tw(138, 26, 0, 1, 'easeInOutCubic');
+    var stemP = tw(148, 24, 0, 1, 'easeInOutCubic');
     var faMarkKids = completeFaMark(fP, accentP, bowlP, stemP, 1);
     for (var fmi = 0; fmi < faMarkKids.length; fmi++) {
       kids.push(faMarkKids[fmi]);
     }
 
-    // ---- 176–225: "MEET" revealed above the chip as Fa is drawn ----------
-    var meetIn = tw(176, 26, 0, 1, 'easeOutExpo');
+    // ---- 144–240: "MEET" revealed above the chip as Fa is drawn ----------
+    var meetIn = tw(144, 26, 0, 1, 'easeOutExpo');
     if (meetIn > 0.003) {
       kids.push({
         type: 'text',
@@ -261,8 +261,8 @@ scene = {
       });
     }
 
-    // ---- 140–192: Apple-grade architectural spec callout below the chip ----
-    var typeIn = tw(140, 36, 0, 1, 'easeOutExpo');
+    // ---- 150–240: Apple-grade architectural spec callout below the chip ----
+    var typeIn = tw(150, 32, 0, 1, 'easeOutExpo');
     if (typeIn > 0.003) {
       kids.push({
         type: 'text',

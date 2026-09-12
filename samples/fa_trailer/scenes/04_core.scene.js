@@ -16,7 +16,7 @@
 scene = {
   id: '04_core',
   duration: 192,
-  from: 746,
+  from: 794,
   timeline: {
     label: 'Core',
     color: '#8F6BFF',
