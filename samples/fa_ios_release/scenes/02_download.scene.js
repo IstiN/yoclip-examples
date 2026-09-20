@@ -30,6 +30,13 @@ scene = {
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
+    // Video slot: QR-scan clip (see assets/VIDEO_PROMPTS.md)
+    if (typeof VIDEO_SLOTS !== 'undefined' && VIDEO_SLOTS) {
+      kids.push(faVideoSlot('download_qr_scan_' + T.name + '_' + (isP ? 'v' : 'h'), T, F, {
+        chipY: isP ? F.H * 0.925 : F.H * 0.87,
+      }));
+    }
+
     // Section title
     var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');
     kids.push(faText('GET FA. ANYWHERE YOU ARE.', {
@@ -187,7 +194,7 @@ scene = {
     var plateW = qrSize + platePad * 2;
     var plateH = plateW + 96;
     var plateX = isP ? cx - plateW / 2 : F.W * 0.60;
-    var plateY = isP ? F.H * 0.60 : F.H * 0.24;
+    var plateY = isP ? F.H * 0.52 : F.H * 0.24;
 
     if (qrIn > 0.003) {
       kids.push(faRRect(plateW + 32, plateH + 32, 34, T.teal, {

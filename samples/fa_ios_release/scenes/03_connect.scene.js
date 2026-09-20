@@ -67,27 +67,35 @@ scene = {
     }));
 
     // ---- Provider chips ---------------------------------------------------
+    // ASTRA leads (OpenAI), then the rest light up on the beat grid.
     var providers = [
-      { name: 'KIMI K3', tag: 'DEFAULT' },
-      { name: 'GPT-5.2', tag: 'OPENAI' },
-      { name: 'CLAUDE', tag: 'ANTHROPIC' },
-      { name: 'GEMINI', tag: 'GOOGLE' },
+      { name: 'ASTRA', tag: 'OPENAI', icon: 'astra' },
+      { name: 'GPT-5.2', tag: 'OPENAI', icon: 'gpt' },
+      { name: 'KIMI K3', tag: 'MOONSHOT', icon: 'kimi' },
+      { name: 'CLAUDE', tag: 'ANTHROPIC', icon: 'claude' },
+      { name: 'GEMINI', tag: 'GOOGLE', icon: 'gemini' },
+      { name: 'GLM 5.3', tag: 'Z.AI', icon: 'glm' },
+      { name: 'AIIN.BY', tag: '300+ MODELS', icon: 'aiin' },
+      { name: 'OpenRouter', tag: '300+ MODELS', icon: 'openrouter' },
     ];
-    var chipW = isP ? F.W * 0.42 : Math.min(F.W * 0.19, 300);
-    var chipH = isP ? 150 : 160;
+    var cols = isP ? 2 : 4;
+    var rows = isP ? 4 : 2;
+    var chipW = isP ? F.W * 0.44 : Math.min(F.W * 0.19, 300);
+    var chipH = isP ? 138 : 150;
     var gap = isP ? F.W * 0.04 : F.W * 0.024;
-    var gridW = isP ? chipW * 2 + gap : chipW * 4 + gap * 3;
+    var vgap = isP ? 32 : 36;
+    var gridW = cols * chipW + (cols - 1) * gap;
     var x0 = cx - gridW / 2;
-    var y0 = isP ? F.H * 0.30 : F.H * 0.38;
+    var y0 = isP ? F.H * 0.26 : F.H * 0.32;
 
     for (var i = 0; i < providers.length; i++) {
-      var col = isP ? i % 2 : i;
-      var row = isP ? Math.floor(i / 2) : 0;
+      var col = i % cols;
+      var row = Math.floor(i / cols);
       var px = x0 + col * (chipW + gap);
-      var py = y0 + row * (chipH + gap);
-      var inAt = 12 + i * 16;
+      var py = y0 + row * (chipH + vgap);
+      var inAt = 8 + i * 9;
       var pIn = tw(inAt, 12, 0, 1, 'easeOutBack');
-      var lit = frame >= inAt + 14; // flips to "connected" state
+      var lit = frame >= inAt + 13; // flips to "connected" state
       var colr = lit ? T.teal : T.violet;
 
       if (pIn > 0.003) {
@@ -97,26 +105,34 @@ scene = {
           offsetY: 18 * (1 - pIn),
           positioned: { left: px, top: py },
         }));
+
+        // Provider mark (themed monochrome vector icon)
+        var iconS = 42;
+        kids.push(providerIconNode(providers[i].icon, colr, iconS, {
+          opacity: pIn,
+          positioned: { left: px + 22, top: py + 26 },
+        }));
+        var nameX = px + 22 + iconS + 16;
         kids.push(faText(providers[i].name, {
           opacity: pIn,
           style: {
-            fontSize: isP ? 30 : 28,
+            fontSize: isP ? 27 : 26,
             fontFamily: 'monospace',
             fontWeight: '800',
             color: lit ? T.teal : T.text,
             letterSpacing: 1,
           },
-          positioned: { left: px + 24, top: py + 30 },
+          positioned: { left: nameX, top: py + 30 },
         }));
         kids.push(faText(providers[i].tag, {
           opacity: pIn * 0.6,
           style: {
-            fontSize: isP ? 19 : 17,
+            fontSize: isP ? 18 : 16,
             fontFamily: 'monospace',
             color: T.dim,
-            letterSpacing: 2,
+            letterSpacing: 1.5,
           },
-          positioned: { left: px + 24, top: py + 74 },
+          positioned: { left: nameX, top: py + 74 },
         }));
 
         // Status corner: spinner -> check
@@ -206,7 +222,7 @@ scene = {
         textAlign: 'center',
         letterSpacing: 2,
       },
-      positioned: { left: 0, top: isP ? F.H * 0.84 : F.H * 0.80 },
+      positioned: { left: 0, top: isP ? F.H * 0.85 : F.H * 0.83 },
     }));
 
     return { type: 'stack', fit: 'expand', children: kids };

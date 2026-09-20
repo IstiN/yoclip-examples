@@ -28,6 +28,14 @@ scene = {
 
     var isP = F.portrait;
     var m = Math.min(F.W, F.H);
+
+    // Video slot: build_montage clip behind the app cards (low opacity)
+    if (typeof VIDEO_SLOTS !== 'undefined' && VIDEO_SLOTS) {
+      kids.push(faVideoSlot('build_montage_' + T.name + '_' + (isP ? 'v' : 'h'), T, F, {
+        chip: false,
+        opacity: 0.85,
+      }));
+    }
     var cx = F.cx;
 
     var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');

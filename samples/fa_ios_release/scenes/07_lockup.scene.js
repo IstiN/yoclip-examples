@@ -25,6 +25,13 @@ scene = {
     var kids = [];
     kids.push(faRRect(F.W, F.H, 0, T.bg));
 
+    // Video slot: outro man-at-monitors clip (see assets/VIDEO_PROMPTS.md)
+    if (typeof VIDEO_SLOTS !== 'undefined' && VIDEO_SLOTS) {
+      kids.push(faVideoSlot('outro_monitors_' + T.name + '_' + (isP ? 'v' : 'h'), T, F, {
+        chip: false,
+      }));
+    }
+
     var isP = F.portrait;
     var m = Math.min(F.W, F.H);
     var cx = F.cx;

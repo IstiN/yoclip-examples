@@ -8,6 +8,8 @@
 //   brand/fa/fa_theme.js   — dark/light palettes, format + node builders
 // Project-local lib:
 //   lib/qr.js              — fa1.dev QR matrix + vector QR renderer
+//   lib/provider_icons.js  — monochrome vector marks for AI providers
+//   lib/video_slots.js     — visible placeholders for AI-generated person clips
 
 project = {
   lib: [
@@ -15,6 +17,8 @@ project = {
     '../../brand/fa/fa_icons.js',
     '../../brand/fa/fa_theme.js',
     'lib/qr.js',
+    'lib/provider_icons.js',
+    'lib/video_slots.js',
   ],
   scenes: [
     { path: 'scenes/01_hook.scene.js', layer: 'content', start: 0 },

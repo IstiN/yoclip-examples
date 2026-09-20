@@ -29,6 +29,15 @@ scene = {
     var isP = F.portrait;
     var m = Math.min(F.W, F.H);
 
+    // Video slot: hook_typing clip (see assets/VIDEO_PROMPTS.md)
+    if (typeof VIDEO_SLOTS !== 'undefined' && VIDEO_SLOTS) {
+      var slotW = Math.min(F.W * 0.66, 920);
+      kids.push(faVideoSlot('hook_typing_' + T.name + '_' + (isP ? 'v' : 'h'), T, F, {
+        chipX: isP ? cx - slotW / 2 : F.W * 0.06,
+        chipY: isP ? F.H * 0.425 : F.H * 0.68,
+      }));
+    }
+
     // ---- Headline: metallic Impact ---------------------------------------
     // Portrait: centered stacked block. Landscape: left column (card sits
     // on the right) so the two never overlap.

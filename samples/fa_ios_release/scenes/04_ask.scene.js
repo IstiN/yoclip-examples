@@ -2,7 +2,8 @@
 // (192 frames, 4 bars)
 //
 // iMessage-style bubbles: user right (violet), Fa left (surface + teal).
-// Answer bullets stagger in: native draw engine, zero HTML, keychain, sandbox.
+// Answer bullets stagger in: Flutter draw engine, zero HTML, sqlite,
+// Flame3D games, keychain keys.
 
 scene = {
   id: '04_ask',
@@ -100,14 +101,16 @@ scene = {
 
     // ---- Fa answer bubble (left, surface + teal border) --------------------
     var bullets = [
-      { t: 'NATIVE DRAW ENGINE — UI RENDERS AT 120 FPS.', c: 'violet' },
-      { t: 'ZERO HTML WRAPPERS — REAL SWIFT RUNTIME.', c: 'teal' },
+      { t: 'NATIVE DRAW ENGINE — FLUTTER @ 120 FPS.', c: 'violet' },
+      { t: 'ZERO HTML WRAPPERS — PURE NATIVE VIEWS.', c: 'teal' },
+      { t: 'SQLITE DATABASE — ALL DATA ON-DEVICE.', c: 'teal' },
+      { t: 'FLAME3D — REAL 3D GAMES, NOT WEBGL.', c: 'violet' },
       { t: 'API KEYS LIVE IN YOUR KEYCHAIN. NEVER OURS.', c: 'teal' },
-      { t: 'FA SANDBOX COMPILES & RUNS — ON-DEVICE.', c: 'violet' },
     ];
     var aIn = tw(58, 14, 0, 1, 'easeOutCubic');
     var aY = isP ? F.H * 0.30 : F.H * 0.36;
-    var aH = 130 + bullets.length * (isP ? 66 : 62);
+    var bGap = isP ? 62 : 58;
+    var aH = 130 + bullets.length * bGap;
 
     if (aIn > 0.003) {
       kids.push(faRRect(chatW, aH + 60, 30, T.card, {
@@ -147,8 +150,8 @@ scene = {
       }));
 
       for (var bi = 0; bi < bullets.length; bi++) {
-        var bIn = tw(72 + bi * 16, 10, 0, 1, 'easeOut');
-        var by = aY + 120 + bi * (isP ? 66 : 62);
+        var bIn = tw(72 + bi * 14, 10, 0, 1, 'easeOut');
+        var by = aY + 120 + bi * bGap;
         if (bIn > 0.01 && by + 40 < aY + aH + 40) {
           var bc = bullets[bi].c === 'violet' ? T.violet : T.teal;
           kids.push(faRRect(12, 12, 6, bc, {
