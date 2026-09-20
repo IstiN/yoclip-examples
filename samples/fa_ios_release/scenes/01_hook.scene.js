@@ -85,14 +85,16 @@ scene = {
       positioned: { left: headLeft, top: headY + headSize * 1.15 },
     }));
 
-    // Thin teal rule under the headline
+    // Thin teal rule under the headline. Impact's line box is ~1.32em and
+    // its ink starts ~0.3em below the line top, so the rule must clear
+    // headSize*1.15 (line 2 top) + headSize*1.32 (line box) + air.
     var ruleP = tw(34, 12, 0, 1, 'easeOut');
     if (ruleP > 0.01) {
       var ruleW = m * 0.28 * ruleP;
       var ruleX = isP ? cx - m * 0.14 * ruleP : headLeft;
       kids.push(faRRect(ruleW, 3, 1.5, T.teal, {
         opacity: 0.9,
-        positioned: { left: ruleX, top: headY + headSize * 2.45 },
+        positioned: { left: ruleX, top: headY + headSize * 2.47 + 22 },
       }));
     }
 
