@@ -6,7 +6,7 @@
 scene = {
   id: '01_hook',
   duration: 170,
-  from: 0,
+  from: 432,
   timeline: {
     label: 'Hook',
     color: '#8F6BFF',

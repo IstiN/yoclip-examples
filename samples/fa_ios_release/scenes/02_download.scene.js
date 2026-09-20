@@ -7,7 +7,7 @@
 scene = {
   id: '02_download',
   duration: 192,
-  from: 170,
+  from: 602,
   timeline: {
     label: 'Download',
     color: '#2EBD9E',

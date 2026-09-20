@@ -1,4 +1,4 @@
-// broll_01 — hook_typing video slot (background layer, frames 0–170)
+// broll_01 — hook_typing video slot (background layer, frames 432–170)
 //
 // Sits on its own "B-roll" lane under 01_hook. Today it paints the scene
 // base + slot marks; when the Grok clip lands, replace the body with an
@@ -9,7 +9,7 @@
 scene = {
   id: 'broll_01_hook_typing',
   duration: 170,
-  from: 0,
+  from: 432,
   timeline: {
     label: 'B-roll · hook_typing',
     color: '#2EBD9E',

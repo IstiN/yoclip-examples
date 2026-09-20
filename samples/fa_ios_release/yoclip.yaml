@@ -2,20 +2,21 @@
 #
 # Every scene cut lands on a 150 BPM musical downbeat (bar = 48 frames,
 # downbeats at frame 26 + 48k):
-#   01_hook      0-170    (3 bars)  "Build an iOS app — on your iPhone?" hook
-#   02_download  170-362  (4 bars)  QR + fa1.dev + App Store card
-#   03_connect   362-506  (3 bars)  Connect your AI provider (BYOK)
-#   04_ask       506-698  (4 bars)  Chat: native engine, keychain, sandbox
-#   05_build     698-938  (5 bars)  Generation montage: 4 apps being built
-#   06_publish   938-1130 (4 bars)  Widget catalog + publish
-#   07_lockup    1130-1274(3 bars)  Fa mark + "First real mobile AI harness"
+#   00_intro     0-432    (9 bars)  Grok-generated intro video (own audio)
+#   01_hook      432-602  (3 bars)  "Build an iOS app — on your iPhone?" hook
+#   02_download  602-794  (4 bars)  QR + fa1.dev + App Store card
+#   03_connect   794-938  (3 bars)  Connect your AI provider (BYOK)
+#   04_ask       938-1130 (4 bars)  Chat: flutter engine, sqlite, flame3d
+#   05_build     1130-1370(5 bars)  Generation montage: 4 apps being built
+#   06_publish   1370-1562(4 bars)  Widget catalog + publish
+#   07_lockup    1562-1706(3 bars)  Fa mark + "First real mobile AI harness"
 #
 # Variants retarget theme (params.mode → faTheme()) and resolution
 # (width/height → yoclipFormat.orientation). Render with:
 #   yoclip render --project samples/samples/fa_ios_release --variant dark_vertical
 
 config:
-  duration: 1274
+  duration: 1706
   fps: 30
   width: 1920
   height: 1080
@@ -52,6 +53,7 @@ variants:
         background: '#F5F5F7'
 
 scenes:
+  - scenes/00_intro.scene.js
   - scenes/01_hook.scene.js
   - scenes/02_download.scene.js
   - scenes/03_connect.scene.js
@@ -70,8 +72,23 @@ theme:
     violet: '#8F6BFF'
     violetBright: '#C9B8FF'
 
+external_assets:
+  intro_video:
+    type: video
+    path: assets/video/intro_video.mp4
+
 audio:
   tracks:
+    # Intro video audio is auto-extracted from external:intro_video by the
+    # engine (video_intro_video track) — do NOT add it here manually.
     - source: assets/audio/background_music.mp3
       start: 0
       volume: 0.8
+      loop: false
+      envelope:
+        # 10% bed under the intro video, fade up into the first content cut
+        - frame: 0
+          volume: 0.1
+        - frame: 408
+          volume: 0.8
+          ramp: 24

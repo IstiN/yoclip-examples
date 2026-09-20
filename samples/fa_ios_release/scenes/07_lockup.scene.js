@@ -6,7 +6,7 @@
 scene = {
   id: '07_lockup',
   duration: 144,
-  from: 1130,
+  from: 1562,
   timeline: {
     label: 'Lockup',
     color: '#8F6BFF',

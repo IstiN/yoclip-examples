@@ -81,6 +81,7 @@ void main() {
     String captureName,
     int w,
     int h,
+    int frame,
   ) async {
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = Size(w.toDouble(), h.toDouble());
@@ -95,7 +96,18 @@ void main() {
             child: SizedBox(
               width: w.toDouble(),
               height: h.toDouble(),
-              child: compiler.compile(graph, 0),
+              // Frame + YoclipExternalAssets: AnimVideo reads the current
+              // frame from context and resolves `external:` ids to files.
+              child: YoclipExternalAssets(
+                files: {
+                  'intro_video':
+                      '$projectDir/assets/video/intro_video.mp4',
+                },
+                child: Frame(
+                  value: frame,
+                  child: compiler.compile(graph, frame),
+                ),
+              ),
             ),
           ),
         ),
@@ -103,6 +115,10 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pump(const Duration(milliseconds: 100));
+    // Deterministic video frames: wait until AnimVideo finished decoding
+    // the frame it needs instead of capturing a mid-load placeholder.
+    await tester.runAsync(() => AnimVideo.waitForPendingLoads());
+    await tester.pump();
 
     final captureDir = io.Platform.environment['YOCLIP_CAPTURE_DIR'];
     if (captureDir == null || captureDir.isEmpty) return;
@@ -134,7 +150,10 @@ void main() {
     'light_vertical': (1080, 1920),
   };
 
-  // scene id -> frames the director reviews
+  // scene id -> frames the director reviews.
+  // 00_intro is excluded: AnimVideo decodes via a live ffmpeg stream, which
+  // hangs under widget-test FakeAsync. Video playback is verified in Studio
+  // and CLI export instead.
   const probes = {
     '01_hook': [10, 90, 155],
     '02_download': [30, 120, 170],
@@ -145,10 +164,10 @@ void main() {
     '07_lockup': [50, 100, 135],
   };
 
-  test('all 4 variants load 11 scenes each', () {
+  test('all 4 variants load 12 scenes each', () {
     expect(loaded.keys, containsAll(sizes.keys));
     for (final entry in loaded.entries) {
-      expect(entry.value.length, 11, reason: 'variant ${entry.key}');
+      expect(entry.value.length, 12, reason: 'variant ${entry.key}');
     }
   });
 
@@ -196,6 +215,7 @@ void main() {
               '${variantId}_${sceneId}_$localFrame',
               w,
               h,
+              globalFrame,
             );
           },
         );
