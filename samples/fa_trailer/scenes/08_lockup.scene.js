@@ -18,7 +18,7 @@
 //   ·  160–180 the final bloom: a soft pulse at the a's bowl, everything
 //              brightens 8% and eases back down — hold on the lockup
 //
-// Every brand piece goes through lib/brand.js (setMapper, brandToScreen,
+// Every brand piece goes through the shared brand/fa kit (setMapper, brandToScreen,
 // fPathNode, ringPoints/polylineNode, trace, tealBar) so this icon IS the
 // film's icon, not a lookalike.
 
