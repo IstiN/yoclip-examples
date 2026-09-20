@@ -118,19 +118,20 @@ half of frame, slow push-in, photorealistic, no readable text
 
 ## Как вставить в yoclip (после генерации)
 
-0. Сцены 01/02/05/07 уже рисуют слоты-плейсхолдеры (`lib/video_slots.js`) —
-   угловые метки + название нужного клипа. Когда видео готово:
-   выставь `VIDEO_SLOTS = false` в `lib/video_slots.js`.
+Слоты — это **отдельные сцены на background-слое** (`scenes/broll_*.scene.js`),
+в таймлайне Studio они лежат на собственных B-roll лейнах. Контент-сцены
+01/02/05/07 фон не рисуют — через них видно то, что под ними.
+
 1. Положи файлы в `samples/fa_ios_release/assets/video/`:
    `hook_typing_dark_h.mp4`, `outro_monitors_dark_v.mp4` и т.д.
    (имена совпадают с подписями в слотах: `<shot>_<theme>_<v|h>.mp4`)
 2. Добавь в `yoclip.yaml` → `external_assets` (имя → путь).
-3. В сцене: `AnimVideo` node, `source: 'external:<имя>'`, `fit: cover`,
-   при необходимости `opacity` и затемнение (`AbsoluteFill` чёрный
-   поверх с opacity 0.45 для dark-тем, 0.15 для light). Для 05_build
-   клип идёт фоном за карточками (opacity ~0.35), для 07_lockup —
-   полный фон с негативным пространством под локап.
-4. Светлая тема dark-слой не примет — генерируй light-варианты отдельно.
+3. В соответствующей `broll_*.scene.js` замени тело на `AnimVideo` node:
+   `source: 'external:<имя>'`, `fit: cover`, при необходимости `opacity`
+   (05_build — ~0.35 за карточками, 01/02/07 — 0.5–0.65 + чёрный
+   затемняющий `AbsoluteFill` поверх клипа, под текстом).
+4. Убрать метки слота: `VIDEO_SLOTS = false` в `lib/video_slots.js`.
+5. Светлая тема dark-слой не примет — генерируй light-варианты отдельно.
 
 ## Negative prompt (добавляй везде)
 

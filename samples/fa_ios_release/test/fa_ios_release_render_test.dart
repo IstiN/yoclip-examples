@@ -145,12 +145,15 @@ void main() {
     '07_lockup': [50, 100, 135],
   };
 
-  test('all 4 variants load 7 scenes each', () {
+  test('all 4 variants load 11 scenes each', () {
     expect(loaded.keys, containsAll(sizes.keys));
     for (final entry in loaded.entries) {
-      expect(entry.value.length, 7, reason: 'variant ${entry.key}');
+      expect(entry.value.length, 11, reason: 'variant ${entry.key}');
     }
   });
+
+  // Same layering the engine uses: background first, then content, overlay.
+  const layerOrder = {'background': 0, 'content': 1, 'overlay': 2};
 
   for (final variantId in sizes.keys) {
     final (w, h) = sizes[variantId]!;
@@ -164,8 +167,29 @@ void main() {
             final scenes = loaded[variantId]!;
             final scene = scenes.firstWhere((s) => s.id == sceneId);
             expect(localFrame, lessThan(scene.duration));
-            final graph = scene.render(localFrame);
-            expect(graph, isNotNull);
+            final globalFrame = scene.from + localFrame;
+            final active = scenes
+                .where(
+                  (s) =>
+                      globalFrame >= s.from &&
+                      globalFrame < s.from + s.duration,
+                )
+                .toList()
+              ..sort(
+                (a, b) =>
+                    (layerOrder[a.layer] ?? 1) - (layerOrder[b.layer] ?? 1),
+              );
+            final layers = <Map<String, dynamic>>[];
+            for (final s in active) {
+              final g = s.render(globalFrame - s.from);
+              expect(g, isNotNull, reason: 'scene ${s.id}');
+              layers.add(Map<String, dynamic>.from(g!));
+            }
+            final graph = <String, dynamic>{
+              'type': 'stack',
+              'fit': 'expand',
+              'children': layers,
+            };
             await pumpGraph(
               tester,
               graph,

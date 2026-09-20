@@ -24,18 +24,12 @@ scene = {
     }
 
     var kids = [];
-    kids.push(faRRect(F.W, F.H, 0, T.bg));
+
+    // No full-frame background — broll_02_qr_scan paints it underneath.
 
     var isP = F.portrait;
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
-
-    // Video slot: QR-scan clip (see assets/VIDEO_PROMPTS.md)
-    if (typeof VIDEO_SLOTS !== 'undefined' && VIDEO_SLOTS) {
-      kids.push(faVideoSlot('download_qr_scan_' + T.name + '_' + (isP ? 'v' : 'h'), T, F, {
-        chipY: isP ? F.H * 0.925 : F.H * 0.87,
-      }));
-    }
 
     // Section title
     var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');

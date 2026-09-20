@@ -24,18 +24,12 @@ scene = {
     }
 
     var kids = [];
-    kids.push(faRRect(F.W, F.H, 0, T.bg));
+
+    // No full-frame background — broll_05_build_montage paints it
+    // underneath (slot plate now, dim coding-montage video later).
 
     var isP = F.portrait;
     var m = Math.min(F.W, F.H);
-
-    // Video slot: build_montage clip behind the app cards (low opacity)
-    if (typeof VIDEO_SLOTS !== 'undefined' && VIDEO_SLOTS) {
-      kids.push(faVideoSlot('build_montage_' + T.name + '_' + (isP ? 'v' : 'h'), T, F, {
-        chip: false,
-        opacity: 0.85,
-      }));
-    }
     var cx = F.cx;
 
     var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');
@@ -64,13 +58,13 @@ scene = {
 
     var apps = [
       { name: 'LISTKIT', kind: 'SHOPPING LIST', tint: 'teal',
-        log: ['swiftui list + coredata', 'widget: quick add'] },
+        log: ['flutter listview + sqlite', 'widget: quick add'] },
       { name: 'HYPE TYPE', kind: 'MARKETING CONTENT', tint: 'violet',
-        log: ['llm prompt pipeline', 'share sheet export'] },
+        log: ['llm prompt pipeline', 'share card export'] },
       { name: 'LINGO COACH', kind: 'LEARN ENGLISH', tint: 'teal',
-        log: ['tts + spaced repetition', 'on-device ml kit'] },
+        log: ['tts + spaced repetition', 'on-device llm'] },
       { name: 'VOXEL RUN', kind: '3D GAME', tint: 'violet',
-        log: ['metal renderer 60fps', 'haptic gamepad'] },
+        log: ['flame3d renderer 60fps', 'haptic gamepad'] },
     ];
 
     // Grid geometry

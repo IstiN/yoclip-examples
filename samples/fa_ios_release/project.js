@@ -21,6 +21,12 @@ project = {
     'lib/video_slots.js',
   ],
   scenes: [
+    // B-roll layer (rendered first): video-insert slots / future footage
+    { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 0 },
+    { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 170 },
+    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 698 },
+    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1130 },
+    // Content layer
     { path: 'scenes/01_hook.scene.js', layer: 'content', start: 0 },
     { path: 'scenes/02_download.scene.js', layer: 'content', start: 170 },
     { path: 'scenes/03_connect.scene.js', layer: 'content', start: 362 },
