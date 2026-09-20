@@ -36,8 +36,8 @@ scene = {
     // on the right) so the two never overlap.
     var h1In = tw(8, 14, 0, 1, 'easeOutExpo');
     var h2In = tw(22, 14, 0, 1, 'easeOutExpo');
-    var headSize = isP ? Math.round(m * 0.068) : Math.round(m * 0.052);
-    var headY = isP ? F.H * 0.24 : F.H * 0.24;
+    var headSize = isP ? Math.round(m * 0.082) : Math.round(m * 0.052);
+    var headY = isP ? F.H * 0.28 : F.H * 0.24;
     var headLeft = isP ? 0 : F.W * 0.06;
     var headW = isP ? F.W : F.W * 0.42;
 
@@ -99,9 +99,9 @@ scene = {
     // ---- Prompt card with typing ask ------------------------------------
     var cardIn = tw(40, 16, 0, 1, 'easeOutCubic');
     var cardW = isP ? F.W * 0.86 : F.W * 0.38;
-    var cardH = isP ? m * 0.30 : m * 0.40;
+    var cardH = isP ? m * 0.40 : m * 0.40;
     var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.55;
-    var cardY = isP ? F.H * 0.52 : F.H * 0.24;
+    var cardY = isP ? F.H * 0.49 : F.H * 0.24;
 
     if (cardIn > 0.003) {
       kids.push(faRRect(cardW + 36, cardH + 36, 28, T.violet, {
@@ -124,24 +124,25 @@ scene = {
       kids.push(faText('PROMPT // FA iOS AGENT', {
         opacity: cardIn * 0.9,
         style: {
-          fontSize: isP ? 20 : 22,
+          fontSize: isP ? 26 : 22,
           fontFamily: 'monospace',
           fontWeight: '700',
           color: T.teal,
           letterSpacing: 2,
         },
-        positioned: { left: cardX + 52, top: cardY + 20 },
+        positioned: { left: cardX + 52, top: cardY + 28 },
       }));
 
-      // Typed line
+      // Typed line — portrait wraps inside the card at a readable size
       var ask = 'Build me a real app — compiled natively, right on my iPhone.';
       var t0 = 52, t1 = 132;
       var prog = clamp01((frame - t0) / (t1 - t0));
       var chars = Math.round(prog * ask.length);
       var typing = frame >= t0 && frame <= t1 + 2;
       var showCaret = frame >= t0 && (typing || Math.floor(frame / 6) % 2 === 0) && frame < 158;
-      var fs = isP ? 25 : 27;
+      var fs = isP ? 46 : 30;
       kids.push(faText(ask.substring(0, chars) + (showCaret ? '_' : ''), {
+        width: isP ? cardW - 64 : undefined,
         opacity: cardIn,
         style: {
           fontSize: fs,
@@ -150,15 +151,15 @@ scene = {
           color: T.text,
           letterSpacing: 0,
         },
-        positioned: { left: cardX + 28, top: cardY + cardH * 0.42 },
+        positioned: { left: cardX + 28, top: cardY + cardH * (isP ? 0.34 : 0.40) },
       }));
     }
 
     // ---- Send button charges and fires ----------------------------------
     var btnIn = tw(136, 12, 0, 1, 'easeOutBack');
     if (btnIn > 0.003) {
-      var bw = isP ? 300 : 320;
-      var bh = 74;
+      var bw = isP ? 400 : 320;
+      var bh = isP ? 96 : 74;
       var bx = isP ? cx - bw / 2 : cardX + cardW - bw - 6;
       var by = isP ? cardY + cardH + 46 : cardY + cardH + 44;
       var pulse = frame >= 150 ? 1 + 0.05 * Math.sin((frame - 150) * 0.6) : 1;
@@ -177,13 +178,13 @@ scene = {
       kids.push(faText('SEND  ->', {
         opacity: btnIn,
         style: {
-          fontSize: 26,
+          fontSize: isP ? 32 : 26,
           fontFamily: 'monospace',
           fontWeight: '800',
           color: T.isLight ? '#FFFFFF' : '#05070D',
           letterSpacing: 2,
         },
-        positioned: { left: bx + (isP ? 78 : 84), top: by + 22 },
+        positioned: { left: bx + (isP ? 116 : 84), top: by + (isP ? 30 : 22) },
       }));
     }
 
