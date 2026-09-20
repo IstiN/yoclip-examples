@@ -118,10 +118,11 @@ scene = {
         positioned: { left: cardX, top: cardY },
       }));
 
-      // Header row: prompt glyph + label
-      kids.push(faRRect(12, 12, 6, T.teal, {
+      // Header row: prompt glyph + label. Dot centered on the text's cap
+      // center (Robo caps sit ~15px below a 26px text box top).
+      kids.push(faRRect(14, 14, 7, T.teal, {
         opacity: cardIn,
-        positioned: { left: cardX + 28, top: cardY + 26 },
+        positioned: { left: cardX + 28, top: cardY + 30 },
       }));
       kids.push(faText('PROMPT // FA iOS AGENT', {
         opacity: cardIn * 0.9,
