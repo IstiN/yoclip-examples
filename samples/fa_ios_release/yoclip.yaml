@@ -1,0 +1,77 @@
+# Fa iOS release — vertical & horizontal, dark & light, one codebase.
+#
+# Every scene cut lands on a 150 BPM musical downbeat (bar = 48 frames,
+# downbeats at frame 26 + 48k):
+#   01_hook      0-170    (3 bars)  "Build an iOS app — on your iPhone?" hook
+#   02_download  170-362  (4 bars)  QR + fa1.dev + App Store card
+#   03_connect   362-506  (3 bars)  Connect your AI provider (BYOK)
+#   04_ask       506-698  (4 bars)  Chat: native engine, keychain, sandbox
+#   05_build     698-938  (5 bars)  Generation montage: 4 apps being built
+#   06_publish   938-1130 (4 bars)  Widget catalog + publish
+#   07_lockup    1130-1274(3 bars)  Fa mark + "First real mobile AI harness"
+#
+# Variants retarget theme (params.mode → faTheme()) and resolution
+# (width/height → yoclipFormat.orientation). Render with:
+#   yoclip render --project samples/samples/fa_ios_release --variant dark_vertical
+
+config:
+  duration: 1274
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#070a12'
+
+project_js: project.js
+
+variants:
+  - id: dark_horizontal
+    label: Dark · Horizontal
+    params:
+      mode: dark
+  - id: dark_vertical
+    label: Dark · Vertical
+    width: 1080
+    height: 1920
+    params:
+      mode: dark
+  - id: light_horizontal
+    label: Light · Horizontal
+    params:
+      mode: light
+    theme:
+      colors:
+        background: '#F5F5F7'
+  - id: light_vertical
+    label: Light · Vertical
+    width: 1080
+    height: 1920
+    params:
+      mode: light
+    theme:
+      colors:
+        background: '#F5F5F7'
+
+scenes:
+  - scenes/01_hook.scene.js
+  - scenes/02_download.scene.js
+  - scenes/03_connect.scene.js
+  - scenes/04_ask.scene.js
+  - scenes/05_build.scene.js
+  - scenes/06_publish.scene.js
+  - scenes/07_lockup.scene.js
+
+theme:
+  colors:
+    background: '#070a12'
+    blue: '#5B61F6'
+    blueBright: '#6E74FF'
+    teal: '#2EBD9E'
+    tealBright: '#5CE8CF'
+    violet: '#8F6BFF'
+    violetBright: '#C9B8FF'
+
+audio:
+  tracks:
+    - source: assets/audio/background_music.mp3
+      start: 0
+      volume: 0.8

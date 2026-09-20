@@ -1,0 +1,190 @@
+// 01 — Hook — "Build a native iOS app — on your iPhone?" (170 frames, 3 bars)
+//
+// Metallic headline slams in, a prompt card types the user's ask with a
+// solid caret, the send button charges and fires into the next scene.
+
+scene = {
+  id: '01_hook',
+  duration: 170,
+  from: 0,
+  timeline: {
+    label: 'Hook',
+    color: '#8F6BFF',
+    lane: 'video',
+  },
+
+  render: function(frame) {
+    var ms = elapsedMs(frame, 30);
+    var T = faTheme();
+    var F = faFormat();
+
+    function tw(at, dur, from, to, easing) {
+      return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
+    }
+
+    var kids = [];
+    kids.push(faRRect(F.W, F.H, 0, T.bg));
+
+    var cx = F.cx;
+    var isP = F.portrait;
+    var m = Math.min(F.W, F.H);
+
+    // ---- Headline: metallic Impact ---------------------------------------
+    // Portrait: centered stacked block. Landscape: left column (card sits
+    // on the right) so the two never overlap.
+    var h1In = tw(8, 14, 0, 1, 'easeOutExpo');
+    var h2In = tw(22, 14, 0, 1, 'easeOutExpo');
+    var headSize = isP ? Math.round(m * 0.068) : Math.round(m * 0.052);
+    var headY = isP ? F.H * 0.24 : F.H * 0.24;
+    var headLeft = isP ? 0 : F.W * 0.06;
+    var headW = isP ? F.W : F.W * 0.42;
+
+    kids.push(faText('BUILD A NATIVE iOS APP.', {
+      width: headW,
+      opacity: clamp01(h1In * 1.2),
+      offsetY: 26 * (1 - h1In),
+      style: {
+        fontSize: headSize,
+        fontFamily: 'Impact',
+        fontWeight: '700',
+        color: T.text,
+        textAlign: isP ? 'center' : 'left',
+        letterSpacing: 2,
+        gradient: {
+          begin: 'topCenter',
+          end: 'bottomCenter',
+          colors: T.isLight
+            ? ['#3C4043', '#0B0F19', '#0B0F19']
+            : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+          stops: [0.0, 0.45, 1.0],
+        },
+      },
+      positioned: { left: headLeft, top: headY },
+    }));
+
+    kids.push(faText('ON YOUR iPHONE.', {
+      width: headW,
+      opacity: clamp01(h2In * 1.2),
+      offsetY: 26 * (1 - h2In),
+      style: {
+        fontSize: headSize,
+        fontFamily: 'Impact',
+        fontWeight: '700',
+        color: T.text,
+        textAlign: isP ? 'center' : 'left',
+        letterSpacing: 2,
+        gradient: {
+          begin: 'topCenter',
+          end: 'bottomCenter',
+          colors: [T.violetPale, T.violet, T.violetDeep],
+          stops: [0.0, 0.5, 1.0],
+        },
+      },
+      positioned: { left: headLeft, top: headY + headSize * 1.15 },
+    }));
+
+    // Thin teal rule under the headline
+    var ruleP = tw(34, 12, 0, 1, 'easeOut');
+    if (ruleP > 0.01) {
+      var ruleW = m * 0.28 * ruleP;
+      var ruleX = isP ? cx - m * 0.14 * ruleP : headLeft;
+      kids.push(faRRect(ruleW, 3, 1.5, T.teal, {
+        opacity: 0.9,
+        positioned: { left: ruleX, top: headY + headSize * 2.45 },
+      }));
+    }
+
+    // ---- Prompt card with typing ask ------------------------------------
+    var cardIn = tw(40, 16, 0, 1, 'easeOutCubic');
+    var cardW = isP ? F.W * 0.86 : F.W * 0.38;
+    var cardH = isP ? m * 0.30 : m * 0.40;
+    var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.55;
+    var cardY = isP ? F.H * 0.52 : F.H * 0.24;
+
+    if (cardIn > 0.003) {
+      kids.push(faRRect(cardW + 36, cardH + 36, 28, T.violet, {
+        opacity: 0.12 * cardIn,
+        blur: 40,
+        positioned: { left: cardX - 18, top: cardY - 18 },
+      }));
+      kids.push(faRRect(cardW, cardH, 22, T.card, {
+        opacity: cardIn,
+        border: { color: T.border, width: 1.5 },
+        offsetY: 20 * (1 - cardIn),
+        positioned: { left: cardX, top: cardY },
+      }));
+
+      // Header row: prompt glyph + label
+      kids.push(faRRect(12, 12, 6, T.teal, {
+        opacity: cardIn,
+        positioned: { left: cardX + 28, top: cardY + 26 },
+      }));
+      kids.push(faText('PROMPT // FA iOS AGENT', {
+        opacity: cardIn * 0.9,
+        style: {
+          fontSize: isP ? 20 : 22,
+          fontFamily: 'monospace',
+          fontWeight: '700',
+          color: T.teal,
+          letterSpacing: 2,
+        },
+        positioned: { left: cardX + 52, top: cardY + 20 },
+      }));
+
+      // Typed line
+      var ask = 'Build me a real app — compiled natively, right on my iPhone.';
+      var t0 = 52, t1 = 132;
+      var prog = clamp01((frame - t0) / (t1 - t0));
+      var chars = Math.round(prog * ask.length);
+      var typing = frame >= t0 && frame <= t1 + 2;
+      var showCaret = frame >= t0 && (typing || Math.floor(frame / 6) % 2 === 0) && frame < 158;
+      var fs = isP ? 25 : 27;
+      kids.push(faText(ask.substring(0, chars) + (showCaret ? '_' : ''), {
+        opacity: cardIn,
+        style: {
+          fontSize: fs,
+          fontFamily: 'monospace',
+          fontWeight: '600',
+          color: T.text,
+          letterSpacing: 0,
+        },
+        positioned: { left: cardX + 28, top: cardY + cardH * 0.42 },
+      }));
+    }
+
+    // ---- Send button charges and fires ----------------------------------
+    var btnIn = tw(136, 12, 0, 1, 'easeOutBack');
+    if (btnIn > 0.003) {
+      var bw = isP ? 300 : 320;
+      var bh = 74;
+      var bx = isP ? cx - bw / 2 : cardX + cardW - bw - 6;
+      var by = isP ? cardY + cardH + 46 : cardY + cardH + 44;
+      var pulse = frame >= 150 ? 1 + 0.05 * Math.sin((frame - 150) * 0.6) : 1;
+
+      kids.push(faRRect(bw, bh, bh / 2, T.teal, {
+        opacity: 0.35 * btnIn,
+        blur: 26,
+        scale: pulse,
+        positioned: { left: bx, top: by },
+      }));
+      kids.push(faRRect(bw, bh, bh / 2, T.teal, {
+        opacity: btnIn,
+        scale: pulse,
+        positioned: { left: bx, top: by },
+      }));
+      kids.push(faText('SEND  ->', {
+        opacity: btnIn,
+        style: {
+          fontSize: 26,
+          fontFamily: 'monospace',
+          fontWeight: '800',
+          color: T.isLight ? '#FFFFFF' : '#05070D',
+          letterSpacing: 2,
+        },
+        positioned: { left: bx + (isP ? 78 : 84), top: by + 22 },
+      }));
+    }
+
+    return { type: 'stack', fit: 'expand', children: kids };
+  },
+};

@@ -1,0 +1,28 @@
+// Fa iOS release — 7 shots, 42.5s @ 30fps, beat-locked to the shared
+// 150 BPM music (48-frame bars). One codebase renders 4 deliverables via
+// variants: dark/light × horizontal/vertical.
+//
+// Reuses the Fa Brand Kit (single source of truth — edit brand only there):
+//   brand/fa/fa_kit.js     — Fa mark geometry, trace/polyline primitives
+//   brand/fa/fa_icons.js   — official vector icons (ios, apple, chrome...)
+//   brand/fa/fa_theme.js   — dark/light palettes, format + node builders
+// Project-local lib:
+//   lib/qr.js              — fa1.dev QR matrix + vector QR renderer
+
+project = {
+  lib: [
+    '../../brand/fa/fa_kit.js',
+    '../../brand/fa/fa_icons.js',
+    '../../brand/fa/fa_theme.js',
+    'lib/qr.js',
+  ],
+  scenes: [
+    { path: 'scenes/01_hook.scene.js', layer: 'content', start: 0 },
+    { path: 'scenes/02_download.scene.js', layer: 'content', start: 170 },
+    { path: 'scenes/03_connect.scene.js', layer: 'content', start: 362 },
+    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 506 },
+    { path: 'scenes/05_build.scene.js', layer: 'content', start: 698 },
+    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 938 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1130 },
+  ],
+};
