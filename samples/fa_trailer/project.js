@@ -14,7 +14,7 @@
 // Total: 1754 frames @ 30fps (58.46s), perfectly locked to 150 BPM downbeats.
 
 project = {
-  lib: ['lib/brand.js', 'lib/icons.js'],
+  lib: ['../../brand/fa/fa_kit.js', '../../brand/fa/fa_icons.js'],
   scenes: [
     { path: 'scenes/01_dark.scene.js', layer: 'content', start: 0 },
     { path: 'scenes/01b_prompt.scene.js', layer: 'content', start: 218 },

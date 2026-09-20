@@ -5,7 +5,7 @@ config:
   height: 1080
   background: '#070a12'
 
-# Brand geometry and the trace()/gradient-strip helpers live in lib/brand.js.
+# Brand geometry and the trace()/gradient-strip helpers live in brand/fa/fa_kit.js (shared kit, ../../ relative to this project).
 project_js: project.js
 
 # AI-generated footage placeholders (Grok). These PNGs are the START frames;
