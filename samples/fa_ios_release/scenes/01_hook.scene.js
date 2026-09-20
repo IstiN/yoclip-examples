@@ -149,6 +149,7 @@ scene = {
           fontFamily: 'monospace',
           fontWeight: '600',
           color: T.text,
+          textAlign: 'left',
           letterSpacing: 0,
         },
         positioned: { left: cardX + 28, top: cardY + cardH * (isP ? 0.34 : 0.40) },
