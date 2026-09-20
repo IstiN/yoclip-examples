@@ -130,7 +130,7 @@ scene = {
           color: T.teal,
           letterSpacing: 2,
         },
-        positioned: { left: cardX + 52, top: cardY + 28 },
+        positioned: { left: cardX + 52, top: cardY + (isP ? 23 : 25) },
       }));
 
       // Typed line — portrait wraps inside the card at a readable size
@@ -177,15 +177,17 @@ scene = {
         positioned: { left: bx, top: by },
       }));
       kids.push(faText('SEND  ->', {
+        width: bw,
         opacity: btnIn,
         style: {
           fontSize: isP ? 32 : 26,
           fontFamily: 'monospace',
           fontWeight: '800',
           color: T.isLight ? '#FFFFFF' : '#05070D',
+          textAlign: 'center',
           letterSpacing: 2,
         },
-        positioned: { left: bx + (isP ? 116 : 84), top: by + (isP ? 30 : 22) },
+        positioned: { left: bx, top: by + (isP ? 30 : 22) },
       }));
     }
 

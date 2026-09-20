@@ -206,7 +206,7 @@ scene = {
           color: T.teal,
           letterSpacing: 3,
         },
-        positioned: { left: pillX + (isP ? 62 : 70), top: pillY + 24 },
+        positioned: { left: pillX + (isP ? 62 : 70), top: pillY + 29 },
       }));
     }
 

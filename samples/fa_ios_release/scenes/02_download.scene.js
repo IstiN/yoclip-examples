@@ -120,7 +120,7 @@ scene = {
           fontSize: 22, fontFamily: 'monospace', fontWeight: '800',
           color: '#FFFFFF', letterSpacing: 1,
         },
-        positioned: { left: tx + 34, top: pillY + 10 },
+        positioned: { left: tx + 34, top: pillY + 12 },
       }));
       kids.push(faRRect(330, 44, 22, T.teal, {
         opacity: 0.18 * cardIn,
@@ -133,7 +133,7 @@ scene = {
           fontSize: 19, fontFamily: 'monospace', fontWeight: '700',
           color: T.teal, letterSpacing: 1,
         },
-        positioned: { left: tx + 226, top: pillY + 11 },
+        positioned: { left: tx + 226, top: pillY + 13 },
       }));
 
       // GET button (App Store style)
@@ -150,7 +150,7 @@ scene = {
           fontSize: 26, fontFamily: 'Impact', fontWeight: '700',
           color: T.teal, letterSpacing: 2,
         },
-        positioned: { left: getX + (isP ? 42 : 40), top: iconY + 12 },
+        positioned: { left: getX + (isP ? 42 : 40), top: iconY + 15 },
       }));
 
       // Feature rows
