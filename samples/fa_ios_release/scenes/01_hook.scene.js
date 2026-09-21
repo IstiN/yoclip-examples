@@ -24,6 +24,20 @@ scene = {
 
     var kids = [];
 
+    // Frosted scrim over the intro video tail (360–451 the hook renders
+    // above the live footage; readable text needs the video knocked back).
+    // sigma blurs the footage behind, tint darkens it. Fades in with the
+    // headline. After 451 the same scrim softens the broll slot plate.
+    var scrimIn = clamp01(tw(0, 12, 0, 1, 'easeOutExpo'));
+    kids.push({
+      type: 'backdropBlur',
+      sigma: isP ? 26 : 20,
+      color: T.background,
+      tintOpacity: (T.isLight ? 0.45 : 0.62) * scrimIn,
+      width: F.W,
+      height: F.H,
+    });
+
     // No full-frame background here — the broll_01_hook_typing scene on
     // the layer below paints it (today the slot plate, tomorrow the video).
 
