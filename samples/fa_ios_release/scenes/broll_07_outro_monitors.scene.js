@@ -1,4 +1,4 @@
-// broll_07 — outro_monitors video slot (background layer, 1130–1274)
+// broll_07 — outro_monitors video slot (background layer, 1490–1634)
 //
 // Hero man-at-monitor-wall shot behind the 07_lockup end card (reference:
 // storyboard page 23 — keep subject right of center / lower half so the
@@ -7,7 +7,7 @@
 scene = {
   id: 'broll_07_outro_monitors',
   duration: 144,
-  from: 1562,
+  from: 1490,
   timeline: {
     label: 'B-roll · outro_monitors',
     color: '#8F6BFF',

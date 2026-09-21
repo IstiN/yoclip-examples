@@ -1,15 +1,17 @@
-// broll_01 — hook_typing video slot (background layer, frames 432–170)
+// broll_01 — hook_typing video slot (background layer, frames 451–530)
 //
-// Sits on its own "B-roll" lane under 01_hook. Today it paints the scene
-// base + slot marks; when the Grok clip lands, replace the body with an
-// AnimVideo node (source: 'external:hook_typing_<theme>_<v|h>') — the
-// content scene above has no full-frame background, so footage shows
-// through. See assets/VIDEO_PROMPTS.md.
+// Sits on its own "B-roll" lane under 01_hook. Starts at 451 — the intro
+// video (content layer, above) covers the background until its source
+// ends there, so the slot is visible only for the hook scene's tail.
+// When the Grok clip lands, replace the body with an AnimVideo node
+// (source: 'external:hook_typing_<theme>_<v|h>') — the content scene
+// above has no full-frame background, so footage shows through. See
+// assets/VIDEO_PROMPTS.md.
 
 scene = {
   id: 'broll_01_hook_typing',
-  duration: 170,
-  from: 432,
+  duration: 79,
+  from: 451,
   timeline: {
     label: 'B-roll · hook_typing',
     color: '#2EBD9E',

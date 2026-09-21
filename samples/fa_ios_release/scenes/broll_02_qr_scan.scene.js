@@ -1,4 +1,4 @@
-// broll_02 — download_qr_scan video slot (background layer, 170–362)
+// broll_02 — download_qr_scan video slot (background layer, 530–722)
 //
 // Hands-scanning-QR b-roll under 02_download. See assets/VIDEO_PROMPTS.md
 // and lib/video_slots.js.
@@ -6,7 +6,7 @@
 scene = {
   id: 'broll_02_qr_scan',
   duration: 192,
-  from: 602,
+  from: 530,
   timeline: {
     label: 'B-roll · qr_scan',
     color: '#2EBD9E',

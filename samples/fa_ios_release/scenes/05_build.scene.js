@@ -7,7 +7,7 @@
 scene = {
   id: '05_build',
   duration: 240,
-  from: 1130,
+  from: 1058,
   timeline: {
     label: 'Build',
     color: '#5B61F6',

@@ -187,11 +187,16 @@ void main() {
             final scene = scenes.firstWhere((s) => s.id == sceneId);
             expect(localFrame, lessThan(scene.duration));
             final globalFrame = scene.from + localFrame;
+            // 00_intro (AnimVideo) is skipped in compositing too: its
+            // ffmpeg streaming decode hangs under FakeAsync. Hooks probed
+            // at local <91 render without the intro layer underneath,
+            // which only affects the backdrop, not the layout under test.
             final active = scenes
                 .where(
                   (s) =>
                       globalFrame >= s.from &&
-                      globalFrame < s.from + s.duration,
+                      globalFrame < s.from + s.duration &&
+                      s.id != '00_intro',
                 )
                 .toList()
               ..sort(

@@ -1,22 +1,27 @@
 # Fa iOS release — vertical & horizontal, dark & light, one codebase.
 #
-# Every scene cut lands on a 150 BPM musical downbeat (bar = 48 frames,
-# downbeats at frame 26 + 48k):
-#   00_intro     0-432    (9 bars)  Grok-generated intro video (own audio)
-#   01_hook      432-602  (3 bars)  "Build an iOS app — on your iPhone?" hook
-#   02_download  602-794  (4 bars)  QR + fa1.dev + App Store card
-#   03_connect   794-938  (3 bars)  Connect your AI provider (BYOK)
-#   04_ask       938-1130 (4 bars)  Chat: flutter engine, sqlite, flame3d
-#   05_build     1130-1370(5 bars)  Generation montage: 4 apps being built
-#   06_publish   1370-1562(4 bars)  Widget catalog + publish
-#   07_lockup    1562-1706(3 bars)  Fa mark + "First real mobile AI harness"
+# Music grid: 150 BPM (bar = 48 frames, downbeats at frame 26 + 48k).
+#   00_intro     0-451    Grok intro video at native tempo (speed 0.8):
+#                        picture+sound run to the source end (~15s). From
+#                        360 (12s) the hook renders above it — the intro's
+#                        last audio plays on underneath (background bed).
+#   01_hook      360-530  "Build an iOS app — on your iPhone?" hook
+#   02_download  530-722  QR + fa1.dev + App Store card
+#   03_connect   722-866  Connect your AI provider (BYOK)
+#   04_ask       866-1058 Chat: flutter engine, sqlite, flame3d
+#   05_build     1058-1298 Generation montage: 4 apps being built
+#   06_publish   1298-1490 Widget catalog + publish
+#   07_lockup    1490-1634 Fa mark + "First real mobile AI harness"
+#
+# NOTE: the -72 shift (next scene at 12s per user request) puts later cuts
+# half a bar off the 150 BPM grid — revisit if the music feels off.
 #
 # Variants retarget theme (params.mode → faTheme()) and resolution
 # (width/height → yoclipFormat.orientation). Render with:
 #   yoclip render --project samples/samples/fa_ios_release --variant dark_vertical
 
 config:
-  duration: 1706
+  duration: 1634
   fps: 30
   width: 1920
   height: 1080
@@ -89,6 +94,6 @@ audio:
         # 10% bed under the intro video, fade up into the first content cut
         - frame: 0
           volume: 0.1
-        - frame: 408
+        - frame: 336
           volume: 0.8
           ramp: 24

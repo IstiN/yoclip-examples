@@ -22,18 +22,20 @@ project = {
   ],
   scenes: [
     { path: 'scenes/00_intro.scene.js', layer: 'content', start: 0 },
-    // B-roll layer (rendered first): video-insert slots / future footage
-    { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 432 },
-    { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 602 },
-    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1130 },
-    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1562 },
+    // B-roll layer (rendered first): video-insert slots / future footage.
+    // broll_01 starts at 451 — until then the intro video (content layer)
+    // still covers the background while its audio plays out.
+    { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 451 },
+    { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 530 },
+    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1058 },
+    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1490 },
     // Content layer
-    { path: 'scenes/01_hook.scene.js', layer: 'content', start: 432 },
-    { path: 'scenes/02_download.scene.js', layer: 'content', start: 602 },
-    { path: 'scenes/03_connect.scene.js', layer: 'content', start: 794 },
-    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 938 },
-    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1130 },
-    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1370 },
-    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1562 },
+    { path: 'scenes/01_hook.scene.js', layer: 'content', start: 360 },
+    { path: 'scenes/02_download.scene.js', layer: 'content', start: 530 },
+    { path: 'scenes/03_connect.scene.js', layer: 'content', start: 722 },
+    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 866 },
+    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1058 },
+    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1298 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1490 },
   ],
 };
