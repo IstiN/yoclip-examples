@@ -99,9 +99,10 @@ scene = {
     }
 
     // ---- Prompt card with typing ask ------------------------------------
-    // Story beat: he's SEARCHING, not writing to an agent yet. Google-style
-    // field: gray wordmark, white input pill with the typed query, and a
-    // teal SEND pill that pops in at the pill's right end once typing ends.
+    // Story beat: he's SEARCHING. The ask types inside a bordered input
+    // pill; a teal circular button with a white SVG magnifier pops in at
+    // the pill's bottom-right once typing ends, then presses itself
+    // (scale dip + ripple ring) — a simulated search click.
     var cardIn = tw(0, 16, 0, 1, 'easeOutCubic');
     var cardW = isP ? F.W * 0.86 : F.W * 0.38;
     var cardH = isP ? m * 0.40 : m * 0.40;
@@ -121,28 +122,17 @@ scene = {
         positioned: { left: cardX, top: cardY },
       }));
 
-      // Search wordmark — gray, quiet, unmistakably "typing into a browser".
-      kids.push(faText('Google', {
-        opacity: cardIn * 0.85,
-        style: {
-          fontSize: isP ? 34 : 24,
-          fontWeight: '600',
-          color: '#9AA0A6',
-          letterSpacing: 0.5,
-        },
-        positioned: { left: cardX + 28, top: cardY + 24 },
-      }));
-
-      // Input pill: the query types inside it; SEND docks to its right end.
+      // Input pill: the query types inside it; the search button docks to
+      // its bottom-right corner.
       var pad = isP ? 28 : 24;
       var pillX = cardX + pad;
-      var pillY = cardY + (isP ? 84 : 76);
+      var pillY = cardY + pad;
       var pillW = cardW - pad * 2;
-      var pillH = cardH - pad - (isP ? 84 : 76);
+      var pillH = cardH - pad * 2;
 
       kids.push(faRRect(pillW, pillH, 26, T.card, {
         opacity: cardIn,
-        border: { color: '#DADCE0', width: 1.5 },
+        border: { color: T.border, width: 1.5 },
         positioned: { left: pillX, top: pillY },
       }));
 
@@ -168,37 +158,89 @@ scene = {
         positioned: { left: pillX + pad, top: pillY + pad * 0.9 },
       }));
 
-      // SEND pill — pops in at the input pill's bottom-right when the ask
-      // is fully typed (mirrors the app's real composer button).
-      var sendIn = clamp01(tw(t1 + 6, 14, 0, 1, 'cubicBezier(0.22, 1, 0.36, 1)'));
-      var sendW = isP ? 184 : 148;
-      var sendH = isP ? 62 : 52;
-      if (sendIn > 0.003) {
-        kids.push(faRRect(sendW, sendH, sendH / 2, T.teal, {
-          opacity: sendIn,
-          offsetY: 12 * (1 - sendIn),
-          positioned: {
-            left: pillX + pillW - sendW - pad * 0.8,
-            top: pillY + pillH - sendH - pad * 0.8,
-          },
+      // Search button — teal circle + white SVG magnifier. Zooms in with a
+      // back-ease overshoot when the ask is fully typed, then presses: a
+      // quick scale dip and an expanding ripple ring simulate the click.
+      var btnD = isP ? 64 : 54;
+      var btnX = pillX + pillW - btnD - pad * 0.8;
+      var btnY = pillY + pillH - btnD - pad * 0.8;
+      // Zoom-in: linear ramp + half-sine overshoot bump (the tween easing
+      // strings have no back/outBack, so the overshoot is composed here).
+      var magPop = clamp01((frame - (t1 + 4)) / 18);
+      var magIn = magPop * (1 + 0.22 * Math.sin(magPop * Math.PI));
+      var magOpacity = clamp01(magPop * 2.2);
+      // Click press: smooth half-sine dip 1 -> 0.88 -> 1 over 12 frames.
+      var clickAt = t1 + 30;
+      var pressT = clamp01((frame - clickAt) / 12);
+      var press = 1 - 0.12 * Math.sin(pressT * Math.PI);
+      var btnScale = magIn * press;
+
+      if (magOpacity > 0.003) {
+        kids.push(faRRect(btnD, btnD, btnD / 2, T.teal, {
+          opacity: magOpacity,
+          scale: btnScale,
+          positioned: { left: btnX, top: btnY },
         }));
-        kids.push(faText('SEND ->', {
-          opacity: sendIn,
-          style: {
-            fontSize: isP ? 25 : 20,
-            fontFamily: 'monospace',
-            fontWeight: '700',
-            color: '#FFFFFF',
-            textAlign: 'center',
-            letterSpacing: 2,
-          },
-          width: sendW,
-          positioned: {
-            left: pillX + pillW - sendW - pad * 0.8,
-            top:
-                pillY + pillH - sendH - pad * 0.8 + (sendH - (isP ? 25 : 20)) / 2 - 2,
-          },
-        }));
+
+        // SVG magnifier: ring (two arcs) + 45° handle, round caps.
+        var bcx = btnX + btnD / 2;
+        var bcy = btnY + btnD / 2;
+        var r = isP ? 11.5 : 10;
+        var sw = isP ? 4.6 : 4;
+        var ox = bcx - 1.5;
+        var oy = bcy - 2;
+        var dg = r * 0.7071;
+        var hx1 = ox + dg;
+        var hy1 = oy + dg;
+        var hl = isP ? 9 : 8;
+        kids.push({
+          type: 'path',
+          path:
+              'M ' + (ox + r) + ' ' + oy +
+              ' A ' + r + ' ' + r + ' 0 1 1 ' + (ox - r) + ' ' + oy +
+              ' A ' + r + ' ' + r + ' 0 1 1 ' + (ox + r) + ' ' + oy,
+          color: '#FFFFFF',
+          strokeWidth: sw,
+          progress: 1,
+          width: r * 2 + sw * 2,
+          height: r * 2 + sw * 2,
+          opacity: magOpacity,
+          positioned: { left: ox - r - sw, top: oy - r - sw },
+        });
+        kids.push({
+          type: 'path',
+          path:
+              'M ' + hx1 + ' ' + hy1 +
+              ' L ' + (hx1 + hl * 0.7071) + ' ' + (hy1 + hl * 0.7071),
+          color: '#FFFFFF',
+          strokeWidth: sw,
+          progress: 1,
+          width: hl + sw * 2,
+          height: hl + sw * 2,
+          opacity: magOpacity,
+          positioned: { left: hx1 - sw, top: hy1 - sw },
+        });
+
+        // Ripple ring right after the press.
+        var rippleP = clamp01((frame - (clickAt + 4)) / 16);
+        if (rippleP > 0.001 && rippleP < 1) {
+          var rr = btnD / 2 + 30 * rippleP;
+          var rw = rr * 2;
+          kids.push({
+            type: 'path',
+            path:
+                'M ' + (bcx + rr) + ' ' + bcy +
+                ' A ' + rr + ' ' + rr + ' 0 1 1 ' + (bcx - rr) + ' ' + bcy +
+                ' A ' + rr + ' ' + rr + ' 0 1 1 ' + (bcx + rr) + ' ' + bcy,
+            color: T.teal,
+            strokeWidth: 5 * (1 - rippleP) + 1,
+            progress: 1,
+            width: rw + 12,
+            height: rw + 12,
+            opacity: 0.55 * (1 - rippleP),
+            positioned: { left: bcx - rr - 6, top: bcy - rr - 6 },
+          });
+        }
       }
     }
 
