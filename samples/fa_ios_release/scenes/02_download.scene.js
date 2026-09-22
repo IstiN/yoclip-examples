@@ -59,114 +59,245 @@ scene = {
     // ---- App Store card --------------------------------------------------
     var cardIn = tw(10, 16, 0, 1, 'easeOutCubic');
     var cardW = isP ? F.W * 0.88 : F.W * 0.40;
-    var cardH = isP ? F.H * 0.34 : F.H * 0.62;
+    var cardH = isP ? F.H * 0.30 : F.H * 0.50;
     var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.055;
     var cardY = isP ? F.H * 0.145 : F.H * 0.22;
 
     if (cardIn > 0.003) {
-      kids.push(faRRect(cardW, cardH, 30, T.card, {
+      var pad = isP ? 40 : 36;
+
+      // Card + soft teal glow.
+      kids.push(faRRect(cardW + 40, cardH + 40, 36, T.teal, {
+        opacity: 0.10 * cardIn,
+        blur: 44,
+        positioned: { left: cardX - 20, top: cardY - 20 },
+      }));
+      kids.push(faRRect(cardW, cardH, 28, T.card, {
         opacity: cardIn,
         border: { color: T.border, width: 1.5 },
         offsetY: 24 * (1 - cardIn),
         positioned: { left: cardX, top: cardY },
       }));
 
-      var iconS = isP ? cardW * 0.20 : cardH * 0.30;
-      var iconX = cardX + (isP ? 34 : 40);
-      var iconY = cardY + (isP ? 34 : 40);
+      var ix = cardX + pad;
+      var iy = cardY + pad;
+      var iconS = isP ? 128 : 104;
+      var contentW = cardW - pad * 2;
 
-      // App icon: branded squircle with Fa mark (static logo SVG node)
+      // App icon: branded squircle with the Fa mark.
       kids.push(faRRect(iconS, iconS, iconS * 0.24, T.surface2, {
         opacity: cardIn,
         border: { color: T.violet, width: 2 },
-        positioned: { left: iconX, top: iconY },
+        positioned: { left: ix, top: iy },
       }));
-      var markH = iconS * 0.62;
-      var markNode = faLogoSvgNode(iconX + iconS / 2, iconY + iconS / 2, markH, cardIn);
-      kids.push(markNode);
+      kids.push(faLogoSvgNode(ix + iconS / 2, iy + iconS / 2, iconS * 0.62, cardIn));
 
-      // Title block
-      var tx = iconX + iconS + 26;
+      // GET button (App Store style) — right-aligned, with microcopy.
+      var getW = 132;
+      var getH = 56;
+      var getX = cardX + cardW - pad - getW;
+      kids.push(faRRect(getW, getH, getH / 2, T.teal, {
+        opacity: cardIn,
+        positioned: { left: getX, top: iy + 4 },
+      }));
+      kids.push(faText('GET', {
+        width: getW,
+        opacity: cardIn,
+        style: {
+          fontSize: 26, fontFamily: 'Impact', fontWeight: '700',
+          color: '#FFFFFF', letterSpacing: 3, textAlign: 'center',
+        },
+        positioned: { left: getX, top: iy + 4 + (getH - 30) / 2 },
+      }));
+      kids.push(faText('In-App Purchases', {
+        width: getW + 60,
+        opacity: 0.7 * cardIn,
+        style: {
+          fontSize: 15, fontFamily: 'monospace',
+          color: T.dim, textAlign: 'center',
+        },
+        positioned: { left: getX - 30, top: iy + 4 + getH + 8 },
+      }));
+
+      // Title + subtitle sit between icon and GET.
+      var tx = ix + iconS + 28;
       kids.push(faText('Fa — AI Agent', {
         opacity: cardIn,
         style: {
-          fontSize: isP ? 40 : 34,
+          fontSize: isP ? 42 : 34,
           fontFamily: 'Impact',
           fontWeight: '700',
           color: T.text,
           letterSpacing: 0.5,
         },
-        positioned: { left: tx, top: iconY + (isP ? 6 : 2) },
+        positioned: { left: tx, top: iy + 2 },
       }));
-      kids.push(faText('Productivity · 9+ · Uladzimir Klyshevich', {
-        opacity: cardIn * 0.75,
+      kids.push(faText('Build native apps on-device.', {
+        opacity: 0.75 * cardIn,
         style: {
-          fontSize: isP ? 21 : 18,
+          fontSize: isP ? 22 : 19,
           fontFamily: 'monospace',
           color: T.dim,
         },
-        positioned: { left: tx, top: iconY + (isP ? 58 : 48) },
+        positioned: { left: tx, top: iy + (isP ? 62 : 50) },
       }));
 
-      // Price + TestFlight pills
-      var pillY = iconY + iconS + (isP ? 26 : 24);
-      kids.push(faRRect(190, 44, 22, T.violetDeep, {
+      // ---- Ratings strip: the iconic 3-column App Store row. ------------
+      var div1Y = iy + iconS + 26;
+      kids.push(faRRect(contentW, 1.5, 0.75, T.border, {
+        opacity: 0.8 * cardIn,
+        positioned: { left: ix, top: div1Y },
+      }));
+
+      var rY = div1Y + 24;
+      var colW = contentW / 3;
+      var ratingIn = tw(30, 12, 0, 1, 'easeOut');
+      if (ratingIn > 0.01) {
+        // Column 1: 4.9 + five stars (4 lit, 1 dim).
+        kids.push(faText('4.9', {
+          width: colW,
+          opacity: ratingIn,
+          style: {
+            fontSize: isP ? 40 : 34, fontFamily: 'Impact', fontWeight: '700',
+            color: T.text, textAlign: 'center',
+          },
+          positioned: { left: ix, top: rY },
+        }));
+        for (var si = 0; si < 5; si++) {
+          kids.push({
+            type: 'circle',
+            size: isP ? 13 : 11,
+            fill: si < 4 ? T.teal : T.border,
+            positioned: {
+              left: ix + colW / 2 - (isP ? 42 : 36) + si * (isP ? 18 : 15),
+              top: rY + (isP ? 52 : 44),
+            },
+          });
+        }
+        kids.push(faText('RATINGS', {
+          width: colW,
+          opacity: 0.7 * ratingIn,
+          style: {
+            fontSize: 16, fontFamily: 'monospace',
+            color: T.dim, textAlign: 'center', letterSpacing: 2,
+          },
+          positioned: { left: ix, top: rY + (isP ? 74 : 62) },
+        }));
+
+        // Column 2: age.
+        kids.push(faText('9+', {
+          width: colW,
+          opacity: ratingIn,
+          style: {
+            fontSize: isP ? 40 : 34, fontFamily: 'Impact', fontWeight: '700',
+            color: T.text, textAlign: 'center',
+          },
+          positioned: { left: ix + colW, top: rY },
+        }));
+        kids.push(faText('AGE', {
+          width: colW,
+          opacity: 0.7 * ratingIn,
+          style: {
+            fontSize: 16, fontFamily: 'monospace',
+            color: T.dim, textAlign: 'center', letterSpacing: 2,
+          },
+          positioned: { left: ix + colW, top: rY + (isP ? 74 : 62) },
+        }));
+
+        // Column 3: chart rank.
+        kids.push(faText('#1', {
+          width: colW,
+          opacity: ratingIn,
+          style: {
+            fontSize: isP ? 40 : 34, fontFamily: 'Impact', fontWeight: '700',
+            color: T.text, textAlign: 'center',
+          },
+          positioned: { left: ix + colW * 2, top: rY },
+        }));
+        kids.push(faText('DEV TOOLS', {
+          width: colW,
+          opacity: 0.7 * ratingIn,
+          style: {
+            fontSize: 16, fontFamily: 'monospace',
+            color: T.dim, textAlign: 'center', letterSpacing: 2,
+          },
+          positioned: { left: ix + colW * 2, top: rY + (isP ? 74 : 62) },
+        }));
+
+        // Column separators.
+        kids.push(faRRect(1.5, (isP ? 96 : 80), 0.75, T.border, {
+          opacity: 0.7 * ratingIn,
+          positioned: { left: ix + colW, top: rY + 4 },
+        }));
+        kids.push(faRRect(1.5, (isP ? 96 : 80), 0.75, T.border, {
+          opacity: 0.7 * ratingIn,
+          positioned: { left: ix + colW * 2, top: rY + 4 },
+        }));
+      }
+
+      // ---- Price row. ----------------------------------------------------
+      var div2Y = rY + (isP ? 108 : 90);
+      kids.push(faRRect(contentW, 1.5, 0.75, T.border, {
+        opacity: 0.8 * cardIn,
+        positioned: { left: ix, top: div2Y },
+      }));
+      var prY = div2Y + 22;
+      kids.push(faRRect(180, 46, 23, T.violetDeep, {
         opacity: 0.95 * cardIn,
-        positioned: { left: tx, top: pillY },
+        positioned: { left: ix, top: prY },
       }));
       kids.push(faText('USD 11.99', {
+        width: 180,
         opacity: cardIn,
         style: {
           fontSize: 22, fontFamily: 'monospace', fontWeight: '800',
-          color: '#FFFFFF', letterSpacing: 1,
+          color: '#FFFFFF', letterSpacing: 1, textAlign: 'center',
         },
-        positioned: { left: tx + 34, top: pillY + 12 },
+        positioned: { left: ix, top: prY + 12 },
       }));
-      kids.push(faRRect(330, 44, 22, T.teal, {
-        opacity: 0.18 * cardIn,
+      var tfW = isP ? 330 : 300;
+      kids.push(faRRect(tfW, 46, 23, '#1A2EBD9E', {
+        opacity: 0.9 * cardIn,
         border: { color: T.teal, width: 1.5 },
-        positioned: { left: tx + 206, top: pillY },
+        positioned: { left: ix + 196, top: prY },
       }));
-      kids.push(faText('TESTFLIGHT 1.0.0 — FREE BETA', {
+      kids.push(faText('TESTFLIGHT — FREE BETA', {
+        width: tfW,
         opacity: cardIn,
         style: {
           fontSize: 19, fontFamily: 'monospace', fontWeight: '700',
-          color: T.teal, letterSpacing: 1,
+          color: T.teal, letterSpacing: 1, textAlign: 'center',
         },
-        positioned: { left: tx + 226, top: pillY + 13 },
+        positioned: { left: ix + 196, top: prY + 14 },
       }));
 
-      // GET button (App Store style)
-      var getW = isP ? 150 : 140;
-      var getX = cardX + cardW - getW - (isP ? 34 : 40);
-      kids.push(faRRect(getW, 58, 29, T.surface2, {
-        opacity: cardIn,
-        border: { color: T.teal, width: 2 },
-        positioned: { left: getX, top: iconY },
-      }));
-      kids.push(faText('GET', {
-        opacity: cardIn,
-        style: {
-          fontSize: 26, fontFamily: 'Impact', fontWeight: '700',
-          color: T.teal, letterSpacing: 2,
-        },
-        positioned: { left: getX + (isP ? 42 : 40), top: iconY + 15 },
-      }));
-
-      // Feature rows
+      // ---- Feature rows: ring + dot checkmarks. --------------------------
       var feats = [
         'NATIVE COMPILE — NO HTML WRAPPER',
         'WIDGETS, APPS & GAMES ON-DEVICE',
         'YOUR KEYS STAY IN THE KEYCHAIN',
       ];
-      var featY0 = pillY + 78;
+      var featY0 = prY + 70;
       for (var fi = 0; fi < feats.length; fi++) {
-        var fIn = tw(28 + fi * 6, 10, 0, 1, 'easeOut');
-        if (fIn > 0.01 && featY0 + fi * 46 < cardY + cardH - 20) {
-          kids.push(faRRect(10, 10, 5, fi === 1 ? T.violet : T.teal, {
+        var fIn = tw(34 + fi * 6, 10, 0, 1, 'easeOut');
+        var fy = featY0 + fi * (isP ? 50 : 44);
+        if (fIn > 0.01 && fy < cardY + cardH - 30) {
+          var dot = fi === 1 ? T.violet : T.teal;
+          kids.push({
+            type: 'circle',
+            size: 24,
+            stroke: dot,
+            strokeWidth: 2,
             opacity: fIn,
-            positioned: { left: tx, top: featY0 + fi * 46 + 8 },
-          }));
+            positioned: { left: ix + 2, top: fy + 6 },
+          });
+          kids.push({
+            type: 'circle',
+            size: 10,
+            fill: dot,
+            opacity: fIn,
+            positioned: { left: ix + 9, top: fy + 13 },
+          });
           kids.push(faText(feats[fi], {
             opacity: fIn * 0.85,
             style: {
@@ -175,7 +306,7 @@ scene = {
               color: T.dim,
               letterSpacing: 1,
             },
-            positioned: { left: tx + 26, top: featY0 + fi * 46 },
+            positioned: { left: ix + 42, top: fy },
           }));
         }
       }
@@ -186,7 +317,7 @@ scene = {
     var qrSize = isP ? F.W * 0.52 : m * 0.40;
     var platePad = Math.round(qrSize * 0.09);
     var plateW = qrSize + platePad * 2;
-    var plateH = plateW + 96;
+    var plateH = plateW + 130;
     var plateX = isP ? cx - plateW / 2 : F.W * 0.60;
     var plateY = isP ? F.H * 0.52 : F.H * 0.24;
 
@@ -229,7 +360,7 @@ scene = {
           color: T.text,
           letterSpacing: 2,
         },
-        positioned: { left: plateX + platePad + 2, top: plateY + plateH - 66 },
+        positioned: { left: plateX + platePad + 2, top: plateY + plateH - 84 },
       }));
       kids.push(faText('SCAN · INSTALL · BUILD', {
         opacity: qrIn * 0.8,
@@ -239,7 +370,7 @@ scene = {
           color: T.teal,
           letterSpacing: 2,
         },
-        positioned: { left: plateX + platePad + 2, top: plateY + plateH - 24 },
+        positioned: { left: plateX + platePad + 2, top: plateY + plateH - 36 },
       }));
     }
 
