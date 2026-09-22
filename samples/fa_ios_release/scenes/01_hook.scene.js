@@ -100,37 +100,39 @@ scene = {
 
     // ---- Prompt card with typing ask ------------------------------------
     // Story beat: he's SEARCHING. The ask types inside a bordered input
-    // pill; a teal circular button with a white SVG magnifier pops in at
-    // the pill's bottom-right once typing ends, then presses itself
-    // (scale dip + ripple ring) — a simulated search click.
+    // pill. A "camera" (a full-frame transform wrapper — scale + pan)
+    // zooms into the typing area while he types, shifts focus to the teal
+    // magnifier button, the button presses (dip + ripple = simulated
+    // click), and the camera pulls back out.
     var cardIn = tw(0, 16, 0, 1, 'easeOutCubic');
     var cardW = isP ? F.W * 0.86 : F.W * 0.38;
     var cardH = isP ? m * 0.40 : m * 0.40;
     var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.55;
     var cardY = isP ? F.H * 0.49 : F.H * 0.24;
+    var pad = isP ? 28 : 24;
+    var pillX = cardX + pad;
+    var pillY = cardY + pad;
+    var pillW = cardW - pad * 2;
+    var pillH = cardH - pad * 2;
+    var btnD = isP ? 64 : 54;
+    var btnX = pillX + pillW - btnD - pad * 0.8;
+    var btnY = pillY + pillH - btnD - pad * 0.8;
+    var cardKids = [];
 
     if (cardIn > 0.003) {
-      kids.push(faRRect(cardW + 36, cardH + 36, 28, T.violet, {
+      cardKids.push(faRRect(cardW + 36, cardH + 36, 28, T.violet, {
         opacity: 0.12 * cardIn,
         blur: 40,
         positioned: { left: cardX - 18, top: cardY - 18 },
       }));
-      kids.push(faRRect(cardW, cardH, 22, T.card, {
+      cardKids.push(faRRect(cardW, cardH, 22, T.card, {
         opacity: cardIn,
         border: { color: T.border, width: 1.5 },
         offsetY: 20 * (1 - cardIn),
         positioned: { left: cardX, top: cardY },
       }));
 
-      // Input pill: the query types inside it; the search button docks to
-      // its bottom-right corner.
-      var pad = isP ? 28 : 24;
-      var pillX = cardX + pad;
-      var pillY = cardY + pad;
-      var pillW = cardW - pad * 2;
-      var pillH = cardH - pad * 2;
-
-      kids.push(faRRect(pillW, pillH, 26, T.card, {
+      cardKids.push(faRRect(pillW, pillH, 26, T.card, {
         opacity: cardIn,
         border: { color: T.border, width: 1.5 },
         positioned: { left: pillX, top: pillY },
@@ -144,7 +146,7 @@ scene = {
       var typing = frame >= t0 && frame <= t1 + 2;
       var showCaret = frame >= t0 && (typing || Math.floor(frame / 6) % 2 === 0) && frame < 106;
       var fs = isP ? 44 : 28;
-      kids.push(faText(ask.substring(0, chars) + (showCaret ? '_' : ''), {
+      cardKids.push(faText(ask.substring(0, chars) + (showCaret ? '_' : ''), {
         width: pillW - pad * 2,
         opacity: cardIn,
         style: {
@@ -158,25 +160,18 @@ scene = {
         positioned: { left: pillX + pad, top: pillY + pad * 0.9 },
       }));
 
-      // Search button — teal circle + white SVG magnifier. Zooms in with a
-      // back-ease overshoot when the ask is fully typed, then presses: a
-      // quick scale dip and an expanding ripple ring simulate the click.
-      var btnD = isP ? 64 : 54;
-      var btnX = pillX + pillW - btnD - pad * 0.8;
-      var btnY = pillY + pillH - btnD - pad * 0.8;
-      // Zoom-in: linear ramp + half-sine overshoot bump (the tween easing
-      // strings have no back/outBack, so the overshoot is composed here).
+      // Search button — teal circle + white SVG magnifier.
       var magPop = clamp01((frame - (t1 + 4)) / 18);
       var magIn = magPop * (1 + 0.22 * Math.sin(magPop * Math.PI));
       var magOpacity = clamp01(magPop * 2.2);
       // Click press: smooth half-sine dip 1 -> 0.88 -> 1 over 12 frames.
-      var clickAt = t1 + 30;
+      var clickAt = t1 + 32;
       var pressT = clamp01((frame - clickAt) / 12);
       var press = 1 - 0.12 * Math.sin(pressT * Math.PI);
       var btnScale = magIn * press;
 
       if (magOpacity > 0.003) {
-        kids.push(faRRect(btnD, btnD, btnD / 2, T.teal, {
+        cardKids.push(faRRect(btnD, btnD, btnD / 2, T.teal, {
           opacity: magOpacity,
           scale: btnScale,
           positioned: { left: btnX, top: btnY },
@@ -193,7 +188,7 @@ scene = {
         var hx1 = ox + dg;
         var hy1 = oy + dg;
         var hl = isP ? 9 : 8;
-        kids.push({
+        cardKids.push({
           type: 'path',
           path:
               'M ' + (ox + r) + ' ' + oy +
@@ -207,7 +202,7 @@ scene = {
           opacity: magOpacity,
           positioned: { left: ox - r - sw, top: oy - r - sw },
         });
-        kids.push({
+        cardKids.push({
           type: 'path',
           path:
               'M ' + hx1 + ' ' + hy1 +
@@ -226,7 +221,7 @@ scene = {
         if (rippleP > 0.001 && rippleP < 1) {
           var rr = btnD / 2 + 30 * rippleP;
           var rw = rr * 2;
-          kids.push({
+          cardKids.push({
             type: 'path',
             path:
                 'M ' + (bcx + rr) + ' ' + bcy +
@@ -242,6 +237,54 @@ scene = {
           });
         }
       }
+
+      // ---- Camera: zoom into the typing area, shift focus to the button,
+      // pull back out. No camera node exists in the runtime, so a
+      // full-frame stack with scale + offset props composes one: panning
+      // the focus point F to the frame center is offset = C - F, and the
+      // scale then magnifies about that focus point (translate wrapper
+      // applies inside the scale wrapper).
+      var ccx = F.cx;
+      var ccy = F.cy;
+      var fcx = pillX + pillW / 2; // typing-area focus point
+      var fcy = pillY + pillH * 0.35;
+      var bcxp = btnX + btnD / 2; // button focus point
+      var bcyp = btnY + btnD / 2;
+
+      var zoomA = tw(12, 22, 0, 1, 'easeInOut'); // into the pill
+      var shiftP = tw(92, 16, 0, 1, 'easeInOut'); // pill -> button
+      var outP = tw(130, 18, 0, 1, 'easeInOut'); // pull back out
+      // Portrait cards already span 86% of the frame width — keep the zoom
+      // small enough that the card edges stay in view; horizontal has room.
+      var zoomAmt = isP ? 0.12 : 0.30;
+      var extraAmt = isP ? 0.06 : 0.12;
+      // Full focus-to-button reads broken in portrait (the huge card exits
+      // the frame); there a 45% nudge keeps context, horizontal pans fully.
+      var panAmt = isP ? 0.35 : 1.0;
+      var tx = fcx + (bcxp - fcx) * panAmt;
+      var ty = fcy + (bcyp - fcy) * panAmt;
+      var camS = 1 + zoomAmt * zoomA;
+      var vx = ccx + (fcx - ccx) * zoomA;
+      var vy = ccy + (fcy - ccy) * zoomA;
+      if (shiftP > 0) {
+        camS += extraAmt * shiftP;
+        vx = fcx + (tx - fcx) * shiftP;
+        vy = fcy + (ty - fcy) * shiftP;
+      }
+      if (outP > 0) {
+        camS = 1 + (zoomAmt + extraAmt) * (1 - outP);
+        vx = tx + (ccx - tx) * outP;
+        vy = ty + (ccy - ty) * outP;
+      }
+
+      kids.push({
+        type: 'stack',
+        fit: 'expand',
+        scale: camS,
+        offsetX: ccx - vx,
+        offsetY: ccy - vy,
+        children: cardKids,
+      });
     }
 
     return { type: 'stack', fit: 'expand', children: kids };
