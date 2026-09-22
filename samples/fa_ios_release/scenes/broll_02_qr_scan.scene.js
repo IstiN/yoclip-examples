@@ -22,6 +22,8 @@ scene = {
     if (typeof VIDEO_SLOTS !== 'undefined' && VIDEO_SLOTS) {
       kids.push(faVideoSlot('download_qr_scan_' + T.name + '_' +
         (F.portrait ? 'v' : 'h'), T, F, {
+        chip: false,
+
         chipY: F.portrait ? F.H * 0.925 : F.H * 0.87,
       }));
     }

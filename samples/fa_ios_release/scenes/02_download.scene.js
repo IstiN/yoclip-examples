@@ -104,10 +104,10 @@ scene = {
         width: getW,
         opacity: cardIn,
         style: {
-          fontSize: 26, fontFamily: 'Impact', fontWeight: '700',
-          color: '#FFFFFF', letterSpacing: 3, textAlign: 'center',
+          fontSize: 30, fontFamily: 'Impact', fontWeight: '700',
+          color: '#FFFFFF', letterSpacing: 2, textAlign: 'center',
         },
-        positioned: { left: getX, top: iy + 4 + (getH - 30) / 2 },
+        positioned: { left: getX, top: iy + 4 + 10 },
       }));
       kids.push(faText('In-App Purchases', {
         width: getW + 60,
@@ -242,33 +242,33 @@ scene = {
         positioned: { left: ix, top: div2Y },
       }));
       var prY = div2Y + 22;
-      kids.push(faRRect(180, 46, 23, T.violetDeep, {
+      kids.push(faRRect(200, 52, 26, T.violetDeep, {
         opacity: 0.95 * cardIn,
         positioned: { left: ix, top: prY },
       }));
       kids.push(faText('USD 11.99', {
-        width: 180,
+        width: 200,
         opacity: cardIn,
         style: {
-          fontSize: 22, fontFamily: 'monospace', fontWeight: '800',
-          color: '#FFFFFF', letterSpacing: 1, textAlign: 'center',
+          fontSize: 26, fontFamily: 'monospace', fontWeight: '800',
+          color: '#FFFFFF', letterSpacing: 0.5, textAlign: 'center',
         },
-        positioned: { left: ix, top: prY + 12 },
+        positioned: { left: ix, top: prY + 11 },
       }));
-      var tfW = isP ? 330 : 300;
-      kids.push(faRRect(tfW, 46, 23, '#1A2EBD9E', {
+      var tfW = isP ? 360 : 330;
+      kids.push(faRRect(tfW, 52, 26, '#1A2EBD9E', {
         opacity: 0.9 * cardIn,
         border: { color: T.teal, width: 1.5 },
-        positioned: { left: ix + 196, top: prY },
+        positioned: { left: ix + 216, top: prY },
       }));
       kids.push(faText('TESTFLIGHT — FREE BETA', {
         width: tfW,
         opacity: cardIn,
         style: {
-          fontSize: 19, fontFamily: 'monospace', fontWeight: '700',
-          color: T.teal, letterSpacing: 1, textAlign: 'center',
+          fontSize: 22, fontFamily: 'monospace', fontWeight: '700',
+          color: T.teal, letterSpacing: 0.5, textAlign: 'center',
         },
-        positioned: { left: ix + 196, top: prY + 14 },
+        positioned: { left: ix + 216, top: prY + 13 },
       }));
 
       // ---- Feature rows: ring + dot checkmarks. --------------------------
@@ -277,7 +277,7 @@ scene = {
         'WIDGETS, APPS & GAMES ON-DEVICE',
         'YOUR KEYS STAY IN THE KEYCHAIN',
       ];
-      var featY0 = prY + 70;
+      var featY0 = prY + 76;
       for (var fi = 0; fi < feats.length; fi++) {
         var fIn = tw(34 + fi * 6, 10, 0, 1, 'easeOut');
         var fy = featY0 + fi * (isP ? 50 : 44);

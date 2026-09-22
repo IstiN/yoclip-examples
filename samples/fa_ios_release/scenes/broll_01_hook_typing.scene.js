@@ -28,6 +28,7 @@ scene = {
       var isP = F.portrait;
       var slotW = Math.min(F.W * 0.66, 920);
       kids.push(faVideoSlot('hook_typing_' + T.name + '_' + (isP ? 'v' : 'h'), T, F, {
+        chip: false,
         chipX: isP ? F.cx - slotW / 2 : F.W * 0.06,
         chipY: isP ? F.H * 0.44 : F.H * 0.68,
       }));
