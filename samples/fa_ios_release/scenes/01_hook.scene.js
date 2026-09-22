@@ -99,8 +99,9 @@ scene = {
     }
 
     // ---- Prompt card with typing ask ------------------------------------
-    // The card and the typing start with the scene itself (user: blur and
-    // prompt input begin exactly at the hook's cut, 10.0s).
+    // Story beat: he's SEARCHING, not writing to an agent yet. Google-style
+    // field: gray wordmark, white input pill with the typed query, and a
+    // teal SEND pill that pops in at the pill's right end once typing ends.
     var cardIn = tw(0, 16, 0, 1, 'easeOutCubic');
     var cardW = isP ? F.W * 0.86 : F.W * 0.38;
     var cardH = isP ? m * 0.40 : m * 0.40;
@@ -120,34 +121,41 @@ scene = {
         positioned: { left: cardX, top: cardY },
       }));
 
-      // Header row: prompt glyph + label. Dot centered on the text's cap
-      // center (Robo caps sit ~15px below a 26px text box top).
-      kids.push(faRRect(14, 14, 7, T.teal, {
-        opacity: cardIn,
-        positioned: { left: cardX + 28, top: cardY + 30 },
-      }));
-      kids.push(faText('PROMPT // FA iOS AGENT', {
-        opacity: cardIn * 0.9,
+      // Search wordmark — gray, quiet, unmistakably "typing into a browser".
+      kids.push(faText('Google', {
+        opacity: cardIn * 0.85,
         style: {
-          fontSize: isP ? 26 : 22,
-          fontFamily: 'monospace',
-          fontWeight: '700',
-          color: T.teal,
-          letterSpacing: 2,
+          fontSize: isP ? 34 : 24,
+          fontWeight: '600',
+          color: '#9AA0A6',
+          letterSpacing: 0.5,
         },
-        positioned: { left: cardX + 52, top: cardY + (isP ? 23 : 25) },
+        positioned: { left: cardX + 28, top: cardY + 24 },
       }));
 
-      // Typed line — portrait wraps inside the card at a readable size
+      // Input pill: the query types inside it; SEND docks to its right end.
+      var pad = isP ? 28 : 24;
+      var pillX = cardX + pad;
+      var pillY = cardY + (isP ? 84 : 76);
+      var pillW = cardW - pad * 2;
+      var pillH = cardH - pad - (isP ? 84 : 76);
+
+      kids.push(faRRect(pillW, pillH, 26, T.card, {
+        opacity: cardIn,
+        border: { color: '#DADCE0', width: 1.5 },
+        positioned: { left: pillX, top: pillY },
+      }));
+
+      // Typed line — wraps inside the pill at a readable size.
       var ask = 'how to build a real app compiled natively directly on my iphone';
       var t0 = 0, t1 = 80;
       var prog = clamp01((frame - t0) / (t1 - t0));
       var chars = Math.round(prog * ask.length);
       var typing = frame >= t0 && frame <= t1 + 2;
       var showCaret = frame >= t0 && (typing || Math.floor(frame / 6) % 2 === 0) && frame < 106;
-      var fs = isP ? 46 : 30;
+      var fs = isP ? 44 : 28;
       kids.push(faText(ask.substring(0, chars) + (showCaret ? '_' : ''), {
-        width: isP ? cardW - 64 : undefined,
+        width: pillW - pad * 2,
         opacity: cardIn,
         style: {
           fontSize: fs,
@@ -157,43 +165,41 @@ scene = {
           textAlign: 'left',
           letterSpacing: 0,
         },
-        positioned: { left: cardX + 28, top: cardY + cardH * (isP ? 0.34 : 0.40) },
+        positioned: { left: pillX + pad, top: pillY + pad * 0.9 },
       }));
-    }
 
-    // ---- Send button charges and fires ----------------------------------
-    var btnIn = tw(136, 12, 0, 1, 'easeOutBack');
-    if (btnIn > 0.003) {
-      var bw = isP ? 400 : 320;
-      var bh = isP ? 96 : 74;
-      var bx = isP ? cx - bw / 2 : cardX + cardW - bw - 6;
-      var by = isP ? cardY + cardH + 46 : cardY + cardH + 44;
-      var pulse = frame >= 150 ? 1 + 0.05 * Math.sin((frame - 150) * 0.6) : 1;
-
-      kids.push(faRRect(bw, bh, bh / 2, T.teal, {
-        opacity: 0.35 * btnIn,
-        blur: 26,
-        scale: pulse,
-        positioned: { left: bx, top: by },
-      }));
-      kids.push(faRRect(bw, bh, bh / 2, T.teal, {
-        opacity: btnIn,
-        scale: pulse,
-        positioned: { left: bx, top: by },
-      }));
-      kids.push(faText('SEND  ->', {
-        width: bw,
-        opacity: btnIn,
-        style: {
-          fontSize: isP ? 32 : 26,
-          fontFamily: 'monospace',
-          fontWeight: '800',
-          color: T.isLight ? '#FFFFFF' : '#05070D',
-          textAlign: 'center',
-          letterSpacing: 2,
-        },
-        positioned: { left: bx, top: by + (isP ? 30 : 22) },
-      }));
+      // SEND pill — pops in at the input pill's bottom-right when the ask
+      // is fully typed (mirrors the app's real composer button).
+      var sendIn = clamp01(tw(t1 + 6, 14, 0, 1, 'cubicBezier(0.22, 1, 0.36, 1)'));
+      var sendW = isP ? 184 : 148;
+      var sendH = isP ? 62 : 52;
+      if (sendIn > 0.003) {
+        kids.push(faRRect(sendW, sendH, sendH / 2, T.teal, {
+          opacity: sendIn,
+          offsetY: 12 * (1 - sendIn),
+          positioned: {
+            left: pillX + pillW - sendW - pad * 0.8,
+            top: pillY + pillH - sendH - pad * 0.8,
+          },
+        }));
+        kids.push(faText('SEND ->', {
+          opacity: sendIn,
+          style: {
+            fontSize: isP ? 25 : 20,
+            fontFamily: 'monospace',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            letterSpacing: 2,
+          },
+          width: sendW,
+          positioned: {
+            left: pillX + pillW - sendW - pad * 0.8,
+            top:
+                pillY + pillH - sendH - pad * 0.8 + (sendH - (isP ? 25 : 20)) / 2 - 2,
+          },
+        }));
+      }
     }
 
     return { type: 'stack', fit: 'expand', children: kids };
