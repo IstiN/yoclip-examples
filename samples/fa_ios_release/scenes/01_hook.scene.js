@@ -63,17 +63,9 @@ scene = {
         fontSize: headSize,
         fontFamily: 'Impact',
         fontWeight: '700',
-        color: T.text,
+        color: T.isLight ? '#0B0F19' : '#FFFFFF',
         textAlign: isP ? 'center' : 'left',
         letterSpacing: 2,
-        gradient: {
-          begin: 'topCenter',
-          end: 'bottomCenter',
-          colors: T.isLight
-            ? ['#3C4043', '#0B0F19', '#0B0F19']
-            : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
-          stops: [0.0, 0.45, 1.0],
-        },
       },
       positioned: { left: headLeft, top: headY },
     }));
@@ -86,15 +78,9 @@ scene = {
         fontSize: headSize,
         fontFamily: 'Impact',
         fontWeight: '700',
-        color: T.text,
+        color: T.isLight ? '#0B0F19' : '#FFFFFF',
         textAlign: isP ? 'center' : 'left',
         letterSpacing: 2,
-        gradient: {
-          begin: 'topCenter',
-          end: 'bottomCenter',
-          colors: [T.violetPale, T.violet, T.violetDeep],
-          stops: [0.0, 0.5, 1.0],
-        },
       },
       positioned: { left: headLeft, top: headY + headSize * 1.15 },
     }));
