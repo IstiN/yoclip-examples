@@ -107,7 +107,7 @@ scene = {
           fontSize: 30, fontFamily: 'Impact', fontWeight: '700',
           color: '#FFFFFF', letterSpacing: 2, textAlign: 'center',
         },
-        positioned: { left: getX, top: iy + 4 + 10 },
+        positioned: { left: getX, top: iy + 4 + 6 },
       }));
       kids.push(faText('In-App Purchases', {
         width: getW + 60,
@@ -253,7 +253,7 @@ scene = {
           fontSize: 26, fontFamily: 'monospace', fontWeight: '800',
           color: '#FFFFFF', letterSpacing: 0.5, textAlign: 'center',
         },
-        positioned: { left: ix, top: prY + 11 },
+        positioned: { left: ix, top: prY + 8 },
       }));
       var tfW = isP ? 360 : 330;
       kids.push(faRRect(tfW, 52, 26, '#1A2EBD9E', {
@@ -268,7 +268,7 @@ scene = {
           fontSize: 22, fontFamily: 'monospace', fontWeight: '700',
           color: T.teal, letterSpacing: 0.5, textAlign: 'center',
         },
-        positioned: { left: ix + 216, top: prY + 13 },
+        positioned: { left: ix + 216, top: prY + 10 },
       }));
 
       // ---- Feature rows: ring + dot checkmarks. --------------------------
