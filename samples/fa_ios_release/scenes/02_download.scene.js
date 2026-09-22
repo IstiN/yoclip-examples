@@ -317,7 +317,7 @@ scene = {
     var qrSize = isP ? F.W * 0.52 : m * 0.40;
     var platePad = Math.round(qrSize * 0.09);
     var plateW = qrSize + platePad * 2;
-    var plateH = plateW + 130;
+    var plateH = plateW + 140;
     var plateX = isP ? cx - plateW / 2 : F.W * 0.60;
     var plateY = isP ? F.H * 0.52 : F.H * 0.24;
 
@@ -351,26 +351,38 @@ scene = {
         }));
       }
 
-      kids.push(faText('fa1.dev', {
+      // Footer: hairline divider, then the full link centered (the QR
+      // matrix itself encodes https://fa1.dev), caption under it.
+      var qrBot = plateY + platePad + qrSize;
+      var pcx2 = plateX + plateW / 2;
+      kids.push(faRRect(qrSize, 1.5, 0.75, T.border, {
+        opacity: 0.7 * qrIn,
+        positioned: { left: pcx2 - qrSize / 2, top: qrBot + 20 },
+      }));
+      kids.push(faText('https://fa1.dev', {
+        width: plateW - platePad * 2,
         opacity: qrIn,
         style: {
-          fontSize: isP ? 40 : 36,
-          fontFamily: 'Impact',
-          fontWeight: '700',
+          fontSize: isP ? 34 : 30,
+          fontFamily: 'monospace',
+          fontWeight: '800',
           color: T.text,
-          letterSpacing: 2,
+          letterSpacing: 1,
+          textAlign: 'center',
         },
-        positioned: { left: plateX + platePad + 2, top: plateY + plateH - 84 },
+        positioned: { left: plateX + platePad, top: qrBot + 44 },
       }));
       kids.push(faText('SCAN · INSTALL · BUILD', {
-        opacity: qrIn * 0.8,
+        width: plateW - platePad * 2,
+        opacity: qrIn * 0.85,
         style: {
-          fontSize: isP ? 20 : 18,
+          fontSize: isP ? 19 : 17,
           fontFamily: 'monospace',
           color: T.teal,
-          letterSpacing: 2,
+          letterSpacing: 3,
+          textAlign: 'center',
         },
-        positioned: { left: plateX + platePad + 2, top: plateY + plateH - 36 },
+        positioned: { left: plateX + platePad, top: qrBot + 98 },
       }));
     }
 
