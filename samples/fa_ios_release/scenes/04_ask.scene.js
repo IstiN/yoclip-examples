@@ -50,7 +50,7 @@ scene = {
     var x0 = cx - chatW / 2;
 
     // ---- User bubble (right, violet) --------------------------------------
-    var qIn = tw(12, 12, 0, 1, 'easeOutBack');
+    var qIn = backOut(clamp01((frame - 12) / 12));
     var qY = isP ? F.H * 0.115 : F.H * 0.14;
     if (qIn > 0.003) {
       var qText = 'Can you build ANY app and run it natively on my iPhone?';
@@ -92,7 +92,7 @@ scene = {
         kids.push({
           type: 'circle',
           size: 12,
-          color: T.teal,
+          fill: T.teal,
           opacity: tIn * 0.85,
           positioned: { left: x0 + 30 + d * 34, top: dotY + 26 - bounce },
         });
@@ -107,10 +107,10 @@ scene = {
       { t: 'FLAME3D — REAL 3D GAMES, NOT WEBGL.', c: 'violet' },
       { t: 'API KEYS LIVE IN YOUR KEYCHAIN. NEVER OURS.', c: 'teal' },
     ];
-    var aIn = tw(58, 14, 0, 1, 'easeOutCubic');
+    var aIn = tw(58, 14, 0, 1, 'easeOut');
     var aY = isP ? F.H * 0.30 : F.H * 0.36;
     var bGap = isP ? 62 : 58;
-    var aH = 130 + bullets.length * bGap;
+    var aH = 90 + bullets.length * bGap; // hugs the bullet stack
 
     if (aIn > 0.003) {
       kids.push(faRRect(chatW, aH + 60, 30, T.card, {
@@ -187,6 +187,37 @@ scene = {
       },
       positioned: { left: 0, top: isP ? F.H * 0.86 : F.H * 0.85 },
     }));
+
+    // ---- Handoff arrival from 03_connect ------------------------------------
+    // The teal dot that flew out of 03's CONNECTED pill lands at the centre of
+    // the typing dots (KEEP IN SYNC with 03_ask: x0 + 64, dotY + 32) and pulses
+    // until the typing bubble materialises around it at frame 34.
+    if (frame < 34) {
+      var hdY = isP ? F.H * 0.30 : F.H * 0.36;
+      var hx = x0 + 64;
+      var hy = hdY + 32;
+      var pulse = 0.5 + 0.5 * Math.sin(frame * 0.42);
+      kids.push({ type: 'circle', size: 40 + 14 * pulse, fill: T.teal,
+        opacity: 0.16 + 0.10 * pulse, blur: 16,
+        positioned: { left: hx - (40 + 14 * pulse) / 2, top: hy - (40 + 14 * pulse) / 2 } });
+      kids.push({ type: 'circle', size: 16, fill: T.tealBright, opacity: 0.95,
+        positioned: { left: hx - 8, top: hy - 8 } });
+      // Landing ripple (once, right at the cut).
+      var rip = clamp01(frame / 12);
+      if (rip > 0 && rip < 1) {
+        kids.push({ type: 'circle', size: 16 + 70 * rip, fill: T.teal,
+          opacity: (1 - rip) * 0.35,
+          positioned: { left: hx - (16 + 70 * rip) / 2, top: hy - (16 + 70 * rip) / 2 } });
+      }
+    }
+
+    // ---- Exit dip: dissolve to the shared bg tone (leads into 05_build) -----
+    var ex = clamp01((frame - 178) / 14);
+    if (ex > 0.003) {
+      var exa = Math.round(ex * 255).toString(16).padStart(2, '0');
+      var exb = T.bg.replace('#', '').toUpperCase();
+      kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + exa + exb });
+    }
 
     return { type: 'stack', fit: 'expand', children: kids };
   },

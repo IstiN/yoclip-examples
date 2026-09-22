@@ -45,7 +45,7 @@ scene = {
     var cx = F.cx;
 
     // Title
-    var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');
+    var titleIn = expoOut(clamp01((frame - 4) / 12));
     kids.push(faText('CONNECT YOUR AI PROVIDER.', {
       width: F.W,
       opacity: clamp01(titleIn * 1.2),
@@ -109,7 +109,7 @@ scene = {
       var px = x0 + col * (chipW + gap);
       var py = y0 + row * (chipH + vgap);
       var inAt = 8 + i * 9;
-      var pIn = tw(inAt, 12, 0, 1, 'easeOutBack');
+      var pIn = backOut(clamp01((frame - inAt) / 12));
       var lit = frame >= inAt + 13; // flips to "connected" state
       var colr = lit ? T.teal : T.violet;
 
@@ -169,30 +169,57 @@ scene = {
             });
           }
         } else {
-          var ck = tw(inAt + 14, 8, 0, 1, 'easeOutBack');
+          var ck = backOut(clamp01((frame - inAt - 14) / 8));
           kids.push(faRRect(36, 36, 18, T.teal, {
-            opacity: ck,
+            opacity: clamp01(ck),
             positioned: { left: stX, top: stY },
           }));
-          kids.push(faText('✓', {
-            opacity: ck,
-            style: {
-              fontSize: 26, fontFamily: 'monospace', fontWeight: '800',
-              color: T.isLight ? '#FFFFFF' : '#05070D',
-            },
-            positioned: { left: stX + 8, top: stY + 2 },
-          }));
+          kids.push(checkNode(stX + 18, stY + 18, 30,
+            T.isLight ? '#FFFFFF' : '#05070D', ck, clamp01(ck)));
         }
       }
     }
 
+    // ---- Mesh hairlines: connectors draw on once both endpoints are lit ----
+    var meshIn = [];
+    for (var mi = 0; mi < providers.length; mi++) {
+      var mrow = Math.floor(mi / cols);
+      var mcol = mi % cols;
+      // Horizontal neighbour.
+      if (mcol < cols - 1) {
+        meshIn.push({ a: mi, b: mi + 1, h: true });
+      }
+      // Vertical neighbour.
+      if (mrow < rows - 1) {
+        meshIn.push({ a: mi, b: mi + cols, h: false });
+      }
+    }
+    for (var si2 = 0; si2 < meshIn.length; si2++) {
+      var seg = meshIn[si2];
+      var litA = frame >= 8 + seg.a * 9 + 13;
+      var litB = frame >= 8 + seg.b * 9 + 13;
+      if (!litA || !litB) continue;
+      var segP = clamp01((frame - (8 + seg.b * 9 + 13)) / 10);
+      var pa = {
+        x: x0 + (seg.a % cols) * (chipW + gap) + (seg.h ? chipW : chipW / 2),
+        y: y0 + Math.floor(seg.a / cols) * (chipH + vgap) + (seg.h ? chipH / 2 : chipH),
+      };
+      var pb = {
+        x: x0 + (seg.b % cols) * (chipW + gap) + (seg.h ? 0 : chipW / 2),
+        y: y0 + Math.floor(seg.b / cols) * (chipH + vgap) + (seg.h ? chipH / 2 : 0),
+      };
+      kids.push(polylineScreen([pa, pb], 2, segP, T.teal, 0.22 * segP));
+    }
+
     // ---- Status pill --------------------------------------------------------
-    var stIn = tw(96, 14, 0, 1, 'easeOutExpo');
+    // Tail: the pill fades into the handoff dot that flies to 04 (below).
+    var pillOut = 1 - clamp01((frame - 122) / 8);
+    var stIn = tw(96, 14, 0, 1, 'easeOut') * pillOut;
+    var pillW = isP ? F.W * 0.86 : 760;
+    var pillH = 84;
+    var pillX = cx - pillW / 2;
+    var pillY = isP ? F.H * 0.72 : F.H * 0.66;
     if (stIn > 0.003) {
-      var pillW = isP ? F.W * 0.86 : 760;
-      var pillH = 84;
-      var pillX = cx - pillW / 2;
-      var pillY = isP ? F.H * 0.72 : F.H * 0.66;
       var glow = 0.5 + 0.2 * Math.sin(frame * 0.45);
 
       kids.push(faRRect(pillW, pillH, pillH / 2, T.teal, {
@@ -229,7 +256,7 @@ scene = {
     var fnIn = tw(112, 12, 0, 1, 'easeOut');
     kids.push(faText('SWITCH PROVIDERS ANYTIME — ONE TAP, ZERO LOCK-IN.', {
       width: F.W,
-      opacity: fnIn * 0.7,
+      opacity: fnIn * 0.7 * pillOut,
       style: {
         fontSize: isP ? 20 : 19,
         fontFamily: 'monospace',
@@ -239,6 +266,58 @@ scene = {
       },
       positioned: { left: 0, top: isP ? F.H * 0.85 : F.H * 0.83 },
     }));
+
+    // ---- Handoff to 04_ask --------------------------------------------------
+    // The CONNECTED pill collapses into its pulse dot, which flies to 04's
+    // typing-indicator spot and becomes the cursor Fa "types" with.
+    // KEEP IN SYNC with 04_ask: landing = centre of the typing dots.
+    var chatW4 = isP ? F.W * 0.88 : Math.min(F.W * 0.62, 1150);
+    var landX = cx - chatW4 / 2 + 64;
+    var landY = (isP ? F.H * 0.30 : F.H * 0.36) + 32;
+
+    // Content veil: dips the whole scene to the shared bg tone under the dot.
+    var veil = clamp01((frame - 130) / 12);
+    if (veil > 0.003) {
+      var va = Math.round(veil * 255).toString(16).padStart(2, '0');
+      var vb = T.bg.replace('#', '').toUpperCase();
+      kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + va + vb });
+    }
+
+    // The pill's pulse dot lifts out and swooshes (right-bowed arc) to 04's
+    // typing spot, glowing so it reads against the dipping background.
+    var flyT = clamp01((frame - 124) / 20);
+    if (flyT > 0) {
+      var e = flyT * flyT * (3 - 2 * flyT); // smoothstep
+      var sx2 = pillX + 41;
+      var sy2 = pillY + pillH / 2;
+      var q1x = sx2 + (landX - sx2) * 0.5 + Math.min(240, F.W * 0.16); // bow right
+      var q1y = sy2 + (landY - sy2) * 0.5;
+      function bez(a, q, b, t) {
+        var u = 1 - t;
+        return u * u * a + 2 * u * t * q + t * t * b;
+      }
+      var dr = 7 + 11 * e;
+      // trail
+      for (var ti = 1; ti <= 3; ti++) {
+        var tt = Math.max(0, e - ti * 0.055);
+        if (tt <= 0) break;
+        var tx2 = bez(sx2, q1x, landX, tt);
+        var ty2 = bez(sy2, q1y, landY, tt);
+        var tr = dr * (1 - ti * 0.22);
+        kids.push({ type: 'circle', size: tr * 2, fill: T.teal,
+          opacity: 0.30 - ti * 0.07,
+          positioned: { left: tx2 - tr, top: ty2 - tr } });
+      }
+      // glow + core
+      kids.push({ type: 'circle', size: dr * 3.4, fill: T.teal,
+        opacity: 0.30, blur: 22,
+        positioned: { left: bez(sx2, q1x, landX, e) - dr * 1.7,
+          top: bez(sy2, q1y, landY, e) - dr * 1.7 } });
+      kids.push({ type: 'circle', size: dr * 2, fill: T.tealBright,
+        opacity: flyT < 1 ? 1 : 1,
+        positioned: { left: bez(sx2, q1x, landX, e) - dr,
+          top: bez(sy2, q1y, landY, e) - dr } });
+    }
 
     return { type: 'stack', fit: 'expand', children: kids };
   },

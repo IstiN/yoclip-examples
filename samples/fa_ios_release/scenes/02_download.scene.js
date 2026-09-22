@@ -32,7 +32,7 @@ scene = {
     var cx = F.cx;
 
     // Section title
-    var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');
+    var titleIn = expoOut(clamp01((frame - 4) / 12));
     kids.push(faText('GET FA. ANYWHERE YOU ARE.', {
       width: F.W,
       opacity: clamp01(titleIn * 1.2),
@@ -57,7 +57,7 @@ scene = {
     }));
 
     // ---- App Store card --------------------------------------------------
-    var cardIn = tw(10, 16, 0, 1, 'easeOutCubic');
+    var cardIn = tw(10, 16, 0, 1, 'easeOut');
     var cardW = isP ? F.W * 0.88 : F.W * 0.40;
     var cardH = isP ? F.H * 0.30 : F.H * 0.50;
     var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.055;
@@ -313,7 +313,7 @@ scene = {
     }
 
     // ---- QR card ----------------------------------------------------------
-    var qrIn = tw(52, 16, 0, 1, 'easeOutCubic');
+    var qrIn = tw(52, 16, 0, 1, 'easeOut');
     var qrSize = isP ? F.W * 0.52 : m * 0.40;
     var platePad = Math.round(qrSize * 0.09);
     var plateW = qrSize + platePad * 2;

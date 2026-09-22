@@ -32,7 +32,7 @@ scene = {
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
-    var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');
+    var titleIn = expoOut(clamp01((frame - 4) / 12));
     kids.push(faText('WATCH FA BUILD.', {
       width: F.W,
       opacity: clamp01(titleIn * 1.2),
@@ -83,7 +83,8 @@ scene = {
       var px = x0 + col * (cardW + gap);
       var py = y0 + row * (cardH + gap);
       var inAt = 12 + i * 14;
-      var cIn = tw(inAt, 12, 0, 1, 'easeOutCubic');
+      var buildStart = inAt + 10;
+      var cIn = tw(inAt, 12, 0, 1, 'easeOut');
       if (cIn <= 0.003) continue;
 
       var tint = apps[i].tint === 'teal' ? T.teal : T.violet;
@@ -95,9 +96,9 @@ scene = {
         offsetY: 22 * (1 - cIn),
         positioned: { left: px, top: py },
       }));
-      kids.push(faRRect(cardW, 8, 4, tint, {
+      kids.push(faRRect(cardW - 48, 8, 4, tint, {
         opacity: 0.9 * cIn,
-        positioned: { left: px, top: py },
+        positioned: { left: px + 24, top: py },
       }));
 
       kids.push(faText(apps[i].name, {
@@ -122,8 +123,35 @@ scene = {
         positioned: { left: px + 28, top: py + 26 + fs + 14 },
       }));
 
+      // Mini app-UI skeleton — the app "taking shape" while it builds
+      var skX = px + 28;
+      var skY = py + cardH * 0.215;
+      var skW = cardW - 56;
+      var skH = cardH * 0.20;
+      kids.push(faRRect(skW, skH, 14, T.surface2, {
+        opacity: 0.5 * cIn,
+        border: { color: T.border, width: 1 },
+        positioned: { left: skX, top: skY },
+      }));
+      // toolbar: traffic dot + title hairline
+      kids.push(faRRect(12, 12, 6, tint, { opacity: 0.5 * cIn,
+        positioned: { left: skX + 16, top: skY + 14 } }));
+      kids.push(faRRect(skW * 0.30, 8, 4, T.dim, { opacity: 0.35 * cIn,
+        positioned: { left: skX + 38, top: skY + 16 } }));
+      // content rows shimmer in with the build
+      var skRows = [0.82, 0.58, 0.70];
+      for (var ski = 0; ski < skRows.length; ski++) {
+        var skIn = clamp01((frame - buildStart - 6 - ski * 10) / 8);
+        if (skIn <= 0.01) continue;
+        var skShim = done ? 0.5 : (0.32 + 0.25 * prand(frame + i * 11 + ski * 29));
+        kids.push(faRRect(skW * skRows[ski] * skIn, skH * 0.16,
+          skH * 0.08, T.dim, {
+          opacity: skShim * cIn * skIn,
+          positioned: { left: skX + 16, top: skY + 36 + ski * (skH * 0.20) },
+        }));
+      }
+
       // Compile log lines (flicker while building)
-      var buildStart = inAt + 10;
       var pct = clamp01((frame - buildStart) / 150);
       var done = pct >= 0.999;
       for (var li = 0; li < apps[i].log.length; li++) {
@@ -178,7 +206,7 @@ scene = {
           kids.push({
             type: 'circle',
             size: 90 + bp * 90,
-            color: tint,
+            fill: tint,
             opacity: (1 - bp) * 0.35 * cIn,
             blur: 6,
             positioned: {
@@ -187,14 +215,20 @@ scene = {
             },
           });
         }
-        kids.push(faText('✓', {
-          opacity: cIn,
-          style: {
-            fontSize: 40, fontFamily: 'monospace', fontWeight: '800', color: tint,
-          },
-          positioned: { left: px + cardW - 72, top: py + 22 },
-        }));
+        var cbx = px + cardW - 52;
+        var cby = py + 42;
+        kids.push({ type: 'circle', size: 44, fill: tint, opacity: 0.16 * cIn,
+          positioned: { left: cbx - 22, top: cby - 22 } });
+        kids.push(checkNode(cbx, cby, 28, tint, bp, cIn));
       }
+    }
+
+    // Exit dip: dissolve to the shared bg tone (leads into 06_publish)
+    var ex = clamp01((frame - 226) / 14);
+    if (ex > 0.003) {
+      var exa = Math.round(ex * 255).toString(16).padStart(2, '0');
+      var exb = T.bg.replace('#', '').toUpperCase();
+      kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + exa + exb });
     }
 
     // Footer ticker

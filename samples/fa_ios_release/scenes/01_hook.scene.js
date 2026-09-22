@@ -92,7 +92,7 @@ scene = {
     // above the live footage; readable text needs the video knocked back).
     // sigma blurs the footage behind, tint darkens it. Fades in with the
     // headline. After 451 the same scrim softens the broll slot plate.
-    var scrimIn = clamp01(tw(0, 12, 0, 1, 'easeOutExpo'));
+    var scrimIn = expoOut(clamp01(frame / 12));
     kids.push({
       type: 'backdropBlur',
       sigma: isP ? 26 : 20,
@@ -112,8 +112,8 @@ scene = {
     // ---- Headline: metallic Impact ---------------------------------------
     // Portrait: centered stacked block. Landscape: left column (card sits
     // on the right) so the two never overlap.
-    var h1In = tw(8, 14, 0, 1, 'easeOutExpo');
-    var h2In = tw(22, 14, 0, 1, 'easeOutExpo');
+    var h1In = expoOut(clamp01((frame - 8) / 14));
+    var h2In = expoOut(clamp01((frame - 22) / 14));
     var headSize = isP ? Math.round(m * 0.082) : Math.round(m * 0.052);
     var headY = isP ? F.H * 0.28 : F.H * 0.24;
     var headLeft = isP ? 0 : F.W * 0.06;
@@ -168,7 +168,7 @@ scene = {
     // zooms into the typing area while he types, shifts focus to the teal
     // magnifier button, the button presses (dip + ripple = simulated
     // click), and the camera pulls back out.
-    var cardIn = tw(0, 16, 0, 1, 'easeOutCubic');
+    var cardIn = tw(0, 16, 0, 1, 'easeOut');
     var cardW = isP ? F.W * 0.86 : F.W * 0.38;
     var cardH = isP ? m * 0.40 : m * 0.40;
     var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.55;

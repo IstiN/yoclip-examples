@@ -31,26 +31,35 @@ scene = {
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
+    // Enter veil: continues 06_publish's exit dip (broll plate under us is
+    // the same bg tone, so the cut reads as one continuous dissolve).
+    var veilIn = 1 - clamp01(frame / 14);
+    if (veilIn > 0.003) {
+      var va = Math.round(veilIn * 255).toString(16).padStart(2, '0');
+      var vb = T.bg.replace('#', '').toUpperCase();
+      kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + va + vb });
+    }
+
     // Ambient glow behind everything
     var glow = 0.30 + 0.08 * Math.sin(frame * 0.35);
     kids.push({
       type: 'circle',
       size: m * 0.9,
-      color: T.violet,
-      opacity: glow * 0.35,
+      fill: T.violet,
+      opacity: glow * 0.30,
       blur: 140,
-      positioned: { left: cx - m * 0.45, top: (isP ? F.H * 0.30 : F.H * 0.42) - m * 0.45 },
+      positioned: { left: cx - m * 0.45, top: (isP ? F.H * 0.265 : F.H * 0.40) - m * 0.45 },
     });
 
     // ---- Fa mark writes itself ---------------------------------------------
-    var markH = isP ? m * 0.30 : m * 0.42;
+    var markH = isP ? m * 0.34 : m * 0.42;
     var markCx = isP ? cx : F.W * 0.30;
-    var markCy = isP ? F.H * 0.28 : F.H * 0.40;
+    var markCy = isP ? F.H * 0.265 : F.H * 0.40;
 
-    var fP = tw(6, 30, 0, 1, 'easeInOutCubic');
+    var fP = tw(6, 30, 0, 1, 'easeInOut');
     var accentP = tw(16, 24, 0, 1, 'easeOut');
-    var bowlP = tw(10, 28, 0, 1, 'easeInOutCubic');
-    var stemP = tw(20, 26, 0, 1, 'easeInOutCubic');
+    var bowlP = tw(10, 28, 0, 1, 'easeInOut');
+    var stemP = tw(20, 26, 0, 1, 'easeInOut');
 
     // Glow burst when the mark completes
     if (frame >= 40 && frame <= 64) {
@@ -58,8 +67,8 @@ scene = {
       kids.push({
         type: 'circle',
         size: markH * (1.3 + bp * 1.2),
-        color: T.teal,
-        opacity: (1 - bp) * 0.30,
+        fill: T.teal,
+        opacity: (1 - bp) * 0.22,
         blur: 60,
         positioned: {
           left: markCx - markH * (1.3 + bp * 1.2) / 2,
@@ -74,8 +83,8 @@ scene = {
     kids.push(markNode);
 
     // ---- Tagline -------------------------------------------------------------
-    var tagIn = tw(46, 14, 0, 1, 'easeOutExpo');
-    var tagY = isP ? F.H * 0.52 : F.H * 0.26;
+    var tagIn = expoOut(clamp01((frame - 46) / 14));
+    var tagY = isP ? F.H * 0.465 : F.H * 0.26;
     var tagX = isP ? 0 : F.W * 0.50;
     kids.push(faText('THE FIRST REAL', {
       width: isP ? F.W : F.W * 0.48,
@@ -132,12 +141,12 @@ scene = {
     }
 
     // ---- QR + fa1.dev --------------------------------------------------------
-    var qrIn = tw(68, 14, 0, 1, 'easeOutCubic');
+    var qrIn = tw(68, 14, 0, 1, 'easeOut');
     var qrSize = isP ? F.W * 0.34 : m * 0.26;
     var platePad = Math.round(qrSize * 0.08);
     var plateW = qrSize + platePad * 2;
     var plateX = isP ? cx - plateW / 2 : tagX;
-    var plateY = isP ? F.H * 0.66 : tagY + m * 0.185;
+    var plateY = isP ? F.H * 0.615 : tagY + m * 0.185;
 
     if (qrIn > 0.003) {
       kids.push(faRRect(plateW + 28, plateW + 28, 30, T.teal, {
@@ -160,30 +169,34 @@ scene = {
 
     var urlIn = tw(84, 12, 0, 1, 'easeOut');
     kids.push(faText('fa1.dev', {
+      width: isP ? F.W : null,
       opacity: urlIn,
       style: {
         fontSize: isP ? 46 : 40,
         fontFamily: 'Impact',
         fontWeight: '700',
         color: T.text,
+        textAlign: isP ? 'center' : null,
         letterSpacing: 2,
       },
       positioned: {
-        left: isP ? cx - 66 : plateX + plateW + 34,
-        top: isP ? plateY + plateW + 22 : plateY + plateW / 2 - 24,
+        left: isP ? 0 : plateX + plateW + 34,
+        top: isP ? plateY + plateW + 16 : plateY + plateW / 2 - 24,
       },
     }));
     kids.push(faText('SCAN THE CODE — START BUILDING', {
+      width: isP ? F.W : null,
       opacity: urlIn * 0.75,
       style: {
         fontSize: isP ? 20 : 19,
         fontFamily: 'monospace',
         color: T.teal,
+        textAlign: isP ? 'center' : null,
         letterSpacing: 2,
       },
       positioned: {
-        left: isP ? cx - 158 : plateX + plateW + 34,
-        top: isP ? plateY + plateW + 76 : plateY + plateW / 2 + 24,
+        left: isP ? 0 : plateX + plateW + 34,
+        top: isP ? plateY + plateW + 72 : plateY + plateW / 2 + 24,
       },
     }));
 
@@ -199,9 +212,25 @@ scene = {
         textAlign: 'center',
         letterSpacing: 4,
       },
-      positioned: { left: 0, top: isP ? F.H * 0.93 : F.H * 0.90 },
+      positioned: { left: 0, top: isP ? F.H * 0.94 : F.H * 0.90 },
     }));
 
-    return { type: 'stack', fit: 'expand', children: kids };
+    // Final settle: a barely-there continuous push-in, so the lockup breathes
+    // instead of sitting frozen (portrait mark/tagline/QR shift upward with it).
+    var settleP = clamp01(frame / 144);
+    var settle = 1 + 0.014 * settleP * settleP;
+    var root = { type: 'stack', fit: 'expand', children: kids };
+    if (settle !== 1) {
+      root = {
+        type: 'stack',
+        fit: 'expand',
+        scale: settle,
+        offsetX: (F.W - F.W * settle) / 2,
+        offsetY: (F.H - F.H * settle) / 2 + (isP ? -12 * settleP : -7 * settleP),
+        children: [root],
+      };
+    }
+
+    return root;
   },
 };

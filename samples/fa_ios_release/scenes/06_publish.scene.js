@@ -29,7 +29,7 @@ scene = {
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
-    var titleIn = tw(4, 12, 0, 1, 'easeOutExpo');
+    var titleIn = expoOut(clamp01((frame - 4) / 12));
     kids.push(faText('PUBLISH TO THE WIDGET CATALOG.', {
       width: F.W,
       opacity: clamp01(titleIn * 1.2),
@@ -69,7 +69,7 @@ scene = {
     var wW = (gridW - gap * (cols - 1)) / cols;
     var wH = isP ? wW * 0.92 : F.H * 0.24;
     var x0 = cx - gridW / 2;
-    var y0 = isP ? F.H * 0.16 : F.H * 0.22;
+    var y0 = isP ? F.H * 0.175 : F.H * 0.22;
 
     for (var i = 0; i < widgets.length; i++) {
       var col = i % cols;
@@ -78,7 +78,7 @@ scene = {
       var py = y0 + row * (wH + gap);
       // Cascade: column-major stagger, one per beat half
       var inAt = 12 + (col * rows + row) * 10;
-      var wIn = tw(inAt, 12, 0, 1, 'easeOutBack');
+      var wIn = backOut(clamp01((frame - inAt) / 12));
       if (wIn <= 0.003) continue;
 
       var tint = widgets[i].c === 'teal' ? T.teal : T.violet;
@@ -117,29 +117,66 @@ scene = {
       }));
 
       if (live) {
-        var ck = tw(134, 8, 0, 1, 'easeOutBack');
+        var ck = backOut(clamp01((frame - 134) / 8));
         kids.push(faRRect(34, 34, 17, T.teal, {
-          opacity: ck,
+          opacity: clamp01(ck),
           positioned: { left: px + wW - 56, top: py + 18 },
         }));
-        kids.push(faText('✓', {
-          opacity: ck,
-          style: {
-            fontSize: 24, fontFamily: 'monospace', fontWeight: '800',
-            color: T.isLight ? '#FFFFFF' : '#05070D',
-          },
-          positioned: { left: px + wW - 48, top: py + 19 },
-        }));
+        kids.push(checkNode(px + wW - 39, py + 35, 24,
+          T.isLight ? '#FFFFFF' : '#05070D', ck, clamp01(ck)));
       }
     }
 
+    // ---- Publishing beam: grid -> catalog transfer ---------------------------
+    var beamW = gridW * 0.72;
+    var beamX = cx - beamW / 2;
+    var beamY = isP ? F.H * 0.545 : F.H * 0.50;
+    var beamIn = clamp01((frame - 100) / 10);
+    if (beamIn > 0.01) {
+      var bp2 = clamp01((frame - 104) / 30);
+      var bpe = bp2 * bp2 * (3 - 2 * bp2);
+      kids.push(faRRect(beamW, 12, 6, T.surface2, {
+        opacity: beamIn,
+        border: { color: T.border, width: 1 },
+        positioned: { left: beamX, top: beamY },
+      }));
+      if (bpe > 0.001) {
+        kids.push(faRRect(Math.max(12, beamW * bpe), 12, 6, T.teal, {
+          opacity: beamIn,
+          positioned: { left: beamX, top: beamY },
+        }));
+        if (bpe < 1) {
+          kids.push({ type: 'circle', size: 26, fill: T.tealBright,
+            opacity: 0.85 * beamIn, blur: 9,
+            positioned: { left: beamX + beamW * bpe - 13, top: beamY - 7 } });
+        }
+      }
+      // Status line under the beam
+      var live2 = frame >= 134;
+      kids.push(faText(live2
+        ? 'PUBLISHED — LIVE IN THE CATALOG'
+        : 'PUBLISHING TO CATALOG · ' + Math.round(bpe * 100) + '%', {
+        width: beamW,
+        opacity: beamIn * (live2 ? 0.95 : 0.7),
+        style: {
+          fontSize: isP ? 24 : 22,
+          fontFamily: 'monospace',
+          fontWeight: '700',
+          color: live2 ? T.teal : T.dim,
+          textAlign: 'center',
+          letterSpacing: 2,
+        },
+        positioned: { left: beamX, top: beamY + 30 },
+      }));
+    }
+
     // ---- Publish pill -------------------------------------------------------
-    var pIn = tw(140, 14, 0, 1, 'easeOutExpo');
+    var pIn = expoOut(clamp01((frame - 140) / 14));
     if (pIn > 0.003) {
       var pillW = isP ? F.W * 0.86 : 700;
       var pillH = 88;
       var pillX = cx - pillW / 2;
-      var pillY = isP ? F.H * 0.78 : F.H * 0.72;
+      var pillY = isP ? F.H * 0.745 : F.H * 0.71;
       var glow = 0.5 + 0.2 * Math.sin(frame * 0.5);
 
       kids.push(faRRect(pillW, pillH, pillH / 2, T.violet, {
@@ -151,6 +188,8 @@ scene = {
         opacity: pIn,
         positioned: { left: pillX, top: pillY },
       }));
+      kids.push({ type: 'circle', size: 14, fill: '#FFFFFF', opacity: 0.92 * pIn,
+        positioned: { left: pillX + 34, top: pillY + pillH / 2 - 7 } });
       kids.push(faText('LIVE FOR ALL FA USERS', {
         opacity: pIn,
         style: {
@@ -160,7 +199,7 @@ scene = {
           color: '#FFFFFF',
           letterSpacing: 3,
         },
-        positioned: { left: pillX + (isP ? 68 : 88), top: pillY + 26 },
+        positioned: { left: pillX + (isP ? 62 : 70), top: pillY + 26 },
       }));
     }
 
@@ -176,8 +215,16 @@ scene = {
         textAlign: 'center',
         letterSpacing: 2.5,
       },
-      positioned: { left: 0, top: isP ? F.H * 0.875 : F.H * 0.85 },
+      positioned: { left: 0, top: isP ? F.H * 0.855 : F.H * 0.835 },
     }));
+
+    // Exit dip: dissolve to the shared bg tone (leads into 07_lockup)
+    var ex = clamp01((frame - 178) / 14);
+    if (ex > 0.003) {
+      var exa = Math.round(ex * 255).toString(16).padStart(2, '0');
+      var exb = T.bg.replace('#', '').toUpperCase();
+      kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + exa + exb });
+    }
 
     return { type: 'stack', fit: 'expand', children: kids };
   },

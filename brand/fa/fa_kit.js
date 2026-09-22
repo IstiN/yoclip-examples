@@ -35,6 +35,58 @@ function clamp01(v) {
   return v;
 }
 
+// ---- Easings --------------------------------------------------------------
+// The JSR tween table only knows easeIn/easeOut/easeInOut (+emphasized /
+// standard aliases); anything else silently falls back to easeInOut. These
+// helpers give scenes real overshoot / snap on RAW linear progress:
+//   backOut(clamp01((frame - at) / dur))  instead of  tw(..., 'easeOutBack')
+//   expoOut(clamp01((frame - at) / dur))  instead of  tw(..., 'easeOutExpo')
+function backOut(t) {
+  var s = 1.70158;
+  t = t - 1;
+  return t * t * ((s + 1) * t + s) + 1;
+}
+
+function expoOut(t) {
+  return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+}
+
+/// Vector checkmark (two-segment stroke) centered at (cx, cy), roughly
+/// [size] px tall. Use instead of a '✓' text glyph — the mono font has no
+/// check glyph and renders a tofu box. progress draws it on.
+/// NOTE: screen-space on purpose — polylineNode/trace route coords through
+/// the global brand mapper, which would fling screen coordinates elsewhere.
+function checkNode(cx, cy, size, color, progress, opacity) {
+  var s = size;
+  var sw = Math.max(3, s * 0.16);
+  var pts = [
+    { x: cx - s * 0.42, y: cy + s * 0.02 },
+    { x: cx - s * 0.10, y: cy + s * 0.34 },
+    { x: cx + s * 0.46, y: cy - s * 0.32 },
+  ];
+  var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (var i = 0; i < pts.length; i++) {
+    if (pts[i].x < minX) minX = pts[i].x;
+    if (pts[i].y < minY) minY = pts[i].y;
+    if (pts[i].x > maxX) maxX = pts[i].x;
+    if (pts[i].y > maxY) maxY = pts[i].y;
+  }
+  var d = 'M' + pts[0].x.toFixed(2) + ',' + pts[0].y.toFixed(2) +
+    ' L' + pts[1].x.toFixed(2) + ',' + pts[1].y.toFixed(2) +
+    ' L' + pts[2].x.toFixed(2) + ',' + pts[2].y.toFixed(2);
+  return {
+    type: 'path',
+    path: d,
+    color: color,
+    strokeWidth: sw,
+    progress: clamp01(progress),
+    width: maxX - minX + sw,
+    height: maxY - minY + sw,
+    opacity: opacity == null ? 1 : opacity,
+    positioned: { left: minX - sw / 2, top: minY - sw / 2 },
+  };
+}
+
 /// Linear '#rrggbb' interpolation.
 function lerpColor(a, b, t) {
   t = jsr.motion.clamp(t, 0, 1);
@@ -445,6 +497,33 @@ function polylineNode(pts, sw, progress, color, opacity) {
     d += ' L' + pts[i].x.toFixed(2) + ',' + pts[i].y.toFixed(2);
   }
   return trace(d, sw, b.x, b.y, b.w, b.h, progress, color, opacity);
+}
+
+/// Screen-space polyline (NO brand mapper): pts are screen px, drawn as a
+/// stroke path fitted into its own bounds box. progress draws it on 0→1.
+function polylineScreen(pts, sw, progress, color, opacity) {
+  var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (var i = 0; i < pts.length; i++) {
+    if (pts[i].x < minX) minX = pts[i].x;
+    if (pts[i].y < minY) minY = pts[i].y;
+    if (pts[i].x > maxX) maxX = pts[i].x;
+    if (pts[i].y > maxY) maxY = pts[i].y;
+  }
+  var d = 'M' + pts[0].x.toFixed(2) + ',' + pts[0].y.toFixed(2);
+  for (var j = 1; j < pts.length; j++) {
+    d += ' L' + pts[j].x.toFixed(2) + ',' + pts[j].y.toFixed(2);
+  }
+  return {
+    type: 'path',
+    path: d,
+    color: color,
+    strokeWidth: sw,
+    progress: clamp01(progress),
+    width: maxX - minX + sw,
+    height: maxY - minY + sw,
+    opacity: opacity == null ? 1 : opacity,
+    positioned: { left: minX - sw / 2, top: minY - sw / 2 },
+  };
 }
 
 /// Interpolated bar→ring centerline, t: 0 = straight bar, 1 = closed ring.
