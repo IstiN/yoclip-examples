@@ -243,6 +243,22 @@ scene = {
       }));
     }
 
+    // White hand-off from the hook: the hook ends fully white (its flood
+    // pours out of the search button), so open on the same white and
+    // dissolve out over the first beat while the content fades in.
+    // Shapes paint `fill` (not `color`); alpha is baked into the 8-digit
+    // hex (#AARRGGBB) — the `opacity` wrap proved unreliable here.
+    var handoff = clamp01(tw(0, 14, 1, 0, 'easeOut'));
+    if (handoff > 0.003) {
+      var a = Math.round(handoff * 255).toString(16).padStart(2, '0');
+      kids.push({
+        type: 'rect',
+        width: F.W,
+        height: F.H,
+        fill: '#' + a + 'FFFFFF',
+      });
+    }
+
     return { type: 'stack', fit: 'expand', children: kids };
   },
 };

@@ -145,7 +145,7 @@ scene = {
             kids.push({
               type: 'circle',
               size: 6,
-              color: T.violet,
+              fill: T.violet,
               opacity: clamp01(pIn * (0.25 + 0.75 * (a / 8))),
               positioned: {
                 left: stX + 16 + Math.cos(segA) * 14 - 3,
@@ -193,7 +193,7 @@ scene = {
       kids.push({
         type: 'circle',
         size: 14,
-        color: T.tealBright,
+        fill: T.tealBright,
         opacity: stIn,
         positioned: { left: pillX + 34, top: pillY + pillH / 2 - 7 },
       });

@@ -227,12 +227,15 @@ scene = {
       // Search button — teal circle + white SVG magnifier.
       var magPop = clamp01((frame - (t1 + 4)) / 18);
       var magIn = magPop * (1 + 0.22 * Math.sin(magPop * Math.PI));
-      var magOpacity = clamp01(magPop * 2.2);
       // Click press: smooth half-sine dip 1 -> 0.88 -> 1 over 12 frames.
       var clickAt = t1 + 32;
       var pressT = clamp01((frame - clickAt) / 12);
       var press = 1 - 0.12 * Math.sin(pressT * Math.PI);
-      var btnScale = magIn * press;
+      // The press ignites the white flood (below): the button sinks and
+      // melts away as the pour starts.
+      var btnGone = clamp01((frame - (clickAt + 12)) / 8);
+      var magOpacity = clamp01(magPop * 2.2) * (1 - btnGone);
+      var btnScale = magIn * press * (1 - 0.25 * btnGone);
 
       if (magOpacity > 0.003) {
         cardKids.push(faRRect(btnD, btnD, btnD / 2, T.teal, {
@@ -304,6 +307,27 @@ scene = {
 
       // Card kids join the scene; the whole-scene camera below wraps them.
       for (var ci = 0; ci < cardKids.length; ci++) kids.push(cardKids[ci]);
+    }
+
+    // ---- White flood -----------------------------------------------------
+    // The click ignites a white fill that pours out of the button and
+    // covers the whole frame (scene-space, so it grows with the camera
+    // pull-out): a clean hand-off to the next screen. 02_download opens
+    // white and dissolves out over its first beat.
+    var floodP = tw(126, 26, 0, 1, 'easeInOut');
+    if (floodP > 0.001) {
+      var floodX = btnX + btnD / 2;
+      var floodY = btnY + btnD / 2;
+      // 3x the larger side: covers every corner even mid-pull-out (zoom
+      // up to ~1.42), centered off-frame at the button.
+      var maxD = Math.max(F.W, F.H) * 3;
+      var D = btnD * 0.6 + (maxD - btnD * 0.6) * floodP;
+      kids.push({
+        type: 'circle',
+        size: D,
+        fill: '#FFFFFF',
+        positioned: { left: floodX - D / 2, top: floodY - D / 2 },
+      });
     }
 
     // Whole-scene camera: everything above (scrim, headlines, card) zooms

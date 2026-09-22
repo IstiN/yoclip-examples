@@ -155,8 +155,8 @@ void main() {
   // hangs under widget-test FakeAsync. Video playback is verified in Studio
   // and CLI export instead.
   const probes = {
-    '01_hook': [10, 30, 90, 100, 116, 140, 155],
-    '02_download': [30, 120, 170],
+    '01_hook': [10, 30, 90, 100, 116, 128, 134, 140, 148, 155],
+    '02_download': [7, 30, 120, 170],
     '03_connect': [40, 110, 135],
     '04_ask': [30, 80, 150],
     '05_build': [40, 140, 220],
