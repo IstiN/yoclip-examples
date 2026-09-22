@@ -6,7 +6,7 @@
 scene = {
   id: 'broll_02_qr_scan',
   duration: 192,
-  from: 530,
+  from: 500,
   timeline: {
     label: 'B-roll · qr_scan',
     color: '#2EBD9E',

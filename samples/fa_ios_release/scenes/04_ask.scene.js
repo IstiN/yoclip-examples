@@ -8,7 +8,7 @@
 scene = {
   id: '04_ask',
   duration: 192,
-  from: 866,
+  from: 836,
   timeline: {
     label: 'Ask',
     color: '#8F6BFF',
