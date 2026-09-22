@@ -10,7 +10,7 @@
 
 scene = {
   id: 'broll_01_hook_typing',
-  duration: 49,
+  duration: 19,
   from: 451,
   timeline: {
     label: 'B-roll · hook_typing',

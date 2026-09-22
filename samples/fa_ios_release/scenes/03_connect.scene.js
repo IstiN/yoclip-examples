@@ -6,7 +6,7 @@
 scene = {
   id: '03_connect',
   duration: 144,
-  from: 692,
+  from: 662,
   timeline: {
     label: 'Connect',
     color: '#5B61F6',

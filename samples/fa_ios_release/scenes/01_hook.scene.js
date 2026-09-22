@@ -6,7 +6,7 @@
 scene = {
   id: '01_hook',
   duration: 170,
-  from: 330,
+  from: 300,
   timeline: {
     label: 'Hook',
     color: '#8F6BFF',
@@ -99,7 +99,9 @@ scene = {
     }
 
     // ---- Prompt card with typing ask ------------------------------------
-    var cardIn = tw(40, 16, 0, 1, 'easeOutCubic');
+    // The card and the typing start with the scene itself (user: blur and
+    // prompt input begin exactly at the hook's cut, 10.0s).
+    var cardIn = tw(0, 16, 0, 1, 'easeOutCubic');
     var cardW = isP ? F.W * 0.86 : F.W * 0.38;
     var cardH = isP ? m * 0.40 : m * 0.40;
     var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.55;
@@ -138,11 +140,11 @@ scene = {
 
       // Typed line — portrait wraps inside the card at a readable size
       var ask = 'how to build a real app compiled natively directly on my iphone';
-      var t0 = 52, t1 = 132;
+      var t0 = 0, t1 = 80;
       var prog = clamp01((frame - t0) / (t1 - t0));
       var chars = Math.round(prog * ask.length);
       var typing = frame >= t0 && frame <= t1 + 2;
-      var showCaret = frame >= t0 && (typing || Math.floor(frame / 6) % 2 === 0) && frame < 158;
+      var showCaret = frame >= t0 && (typing || Math.floor(frame / 6) % 2 === 0) && frame < 106;
       var fs = isP ? 46 : 30;
       kids.push(faText(ask.substring(0, chars) + (showCaret ? '_' : ''), {
         width: isP ? cardW - 64 : undefined,

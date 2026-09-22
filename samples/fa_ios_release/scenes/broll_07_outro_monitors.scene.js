@@ -7,7 +7,7 @@
 scene = {
   id: 'broll_07_outro_monitors',
   duration: 144,
-  from: 1460,
+  from: 1430,
   timeline: {
     label: 'B-roll · outro_monitors',
     color: '#8F6BFF',

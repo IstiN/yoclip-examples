@@ -3,18 +3,18 @@
 # Music grid: 150 BPM (bar = 48 frames, downbeats at frame 26 + 48k).
 #   00_intro     0-451    Grok intro video at native tempo (speed 0.8):
 #                        picture+sound run to the source end (~15s). From
-#                        330 (11s) the hook renders above it — the intro's
+#                        300 (10s) the hook renders above it — the intro's
 #                        last audio plays on underneath (background bed).
-#   01_hook      330-500  "Build an iOS app — on your iPhone?" hook
-#   02_download  500-692  QR + fa1.dev + App Store card
-#   03_connect   692-836  Connect your AI provider (BYOK)
-#   04_ask       836-1028 Chat: flutter engine, sqlite, flame3d
-#   05_build     1028-1268Generation montage: 4 apps being built
-#   06_publish   1268-1460Widget catalog + publish
-#   07_lockup    1460-1634Fa mark + "First real mobile AI harness"
+#   01_hook      300-470  "Build an iOS app — on your iPhone?" hook
+#   02_download  470-662  QR + fa1.dev + App Store card
+#   03_connect   662-806  Connect your AI provider (BYOK)
+#   04_ask       806-998  Chat: flutter engine, sqlite, flame3d
+#   05_build     998-1238 Generation montage: 4 apps being built
+#   06_publish   1238-1430Widget catalog + publish
+#   07_lockup    1430-1634Fa mark + "First real mobile AI harness"
 #
-# NOTE: the -102 shift from the original grid (hook overlays the intro from
-# 11s) puts later cuts off the 150 BPM downbeat grid — revisit if the music feels off.
+# NOTE: the -132 shift from the original grid (hook overlays the intro from
+# 10s) puts later cuts off the 150 BPM downbeat grid — revisit if the music feels off.
 #
 # Variants retarget theme (params.mode → faTheme()) and resolution
 # (width/height → yoclipFormat.orientation). Render with:
@@ -94,6 +94,6 @@ audio:
         # 10% bed under the intro video, fade up into the first content cut
         - frame: 0
           volume: 0.1
-        - frame: 306
+        - frame: 276
           volume: 0.8
           ramp: 24
