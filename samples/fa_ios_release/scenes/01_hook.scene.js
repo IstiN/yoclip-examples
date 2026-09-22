@@ -137,7 +137,7 @@ scene = {
       }));
 
       // Typed line — portrait wraps inside the card at a readable size
-      var ask = 'Build me a real app — compiled natively, right on my iPhone.';
+      var ask = 'how to build a real app compiled natively directly on my iphone';
       var t0 = 52, t1 = 132;
       var prog = clamp01((frame - t0) / (t1 - t0));
       var chars = Math.round(prog * ask.length);
