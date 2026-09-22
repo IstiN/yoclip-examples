@@ -21,7 +21,7 @@
 #   yoclip render --project samples/samples/fa_ios_release --variant dark_vertical
 
 config:
-  duration: 1634
+  duration: 1754
   fps: 30
   width: 1920
   height: 1080

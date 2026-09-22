@@ -6,7 +6,7 @@
 scene = {
   id: '03_connect',
   duration: 144,
-  from: 662,
+  from: 782,
   timeline: {
     label: 'Connect',
     color: '#5B61F6',
@@ -23,6 +23,21 @@ scene = {
     }
 
     var kids = [];
+
+    // Handoff from 02b_splash: that scene melts into white on its tail;
+    // we open on the same white and dissolve out. Shapes paint `fill` with
+    // alpha baked into the 8-digit hex (#AARRGGBB) — opacity wrap is
+    // unreliable on shapes.
+    var handoff = clamp01(tw(0, 14, 1, 0, 'easeOut'));
+    if (handoff > 0.003) {
+      var ha = Math.round(handoff * 255).toString(16).padStart(2, '0');
+      kids.push({
+        type: 'rect',
+        width: F.W,
+        height: F.H,
+        fill: '#' + ha + 'FFFFFF',
+      });
+    }
     kids.push(faRRect(F.W, F.H, 0, T.bg));
 
     var isP = F.portrait;

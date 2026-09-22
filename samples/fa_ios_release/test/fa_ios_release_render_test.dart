@@ -157,17 +157,18 @@ void main() {
   const probes = {
     '01_hook': [10, 30, 90, 100, 116, 128, 134, 140, 148, 155],
     '02_download': [7, 30, 120, 170],
-    '03_connect': [40, 110, 135],
+    '02b_splash': [12, 24, 44, 62, 82, 90, 112],
+    '03_connect': [4, 7, 40, 110, 135],
     '04_ask': [30, 80, 150],
     '05_build': [40, 140, 220],
     '06_publish': [60, 145, 180],
     '07_lockup': [50, 100, 135],
   };
 
-  test('all 4 variants load 12 scenes each', () {
+  test('all 4 variants load 13 scenes each', () {
     expect(loaded.keys, containsAll(sizes.keys));
     for (final entry in loaded.entries) {
-      expect(entry.value.length, 12, reason: 'variant ${entry.key}');
+      expect(entry.value.length, 13, reason: 'variant ${entry.key}');
     }
   });
 

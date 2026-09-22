@@ -1,4 +1,4 @@
-// Fa iOS release — 7 shots, 42.5s @ 30fps, beat-locked to the shared
+// Fa iOS release — 8 shots, 46.8s @ 30fps, beat-locked to the shared
 // 150 BPM music (48-frame bars). One codebase renders 4 deliverables via
 // variants: dark/light × horizontal/vertical.
 //
@@ -7,7 +7,8 @@
 //   brand/fa/fa_icons.js   — official vector icons (ios, apple, chrome...)
 //   brand/fa/fa_theme.js   — dark/light palettes, format + node builders
 // Project-local lib:
-//   lib/qr.js              — fa1.dev QR matrix + vector QR renderer
+//   lib/qr.js              — App Store QR matrix + vector QR renderer
+//   brand/fa/fa_splash.js  — the trailer-opening brand splash (white beat)
 //   lib/provider_icons.js  — monochrome vector marks for AI providers
 //   lib/video_slots.js     — visible placeholders for AI-generated person clips
 
@@ -16,6 +17,7 @@ project = {
     '../../brand/fa/fa_kit.js',
     '../../brand/fa/fa_icons.js',
     '../../brand/fa/fa_theme.js',
+    '../../brand/fa/fa_splash.js',
     'lib/qr.js',
     'lib/provider_icons.js',
     'lib/video_slots.js',
@@ -27,15 +29,16 @@ project = {
     // still covers the background while its audio plays out.
     { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 451 },
     { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 470 },
-    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 998 },
-    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1430 },
+    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1118 },
+    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1550 },
     // Content layer
     { path: 'scenes/01_hook.scene.js', layer: 'content', start: 300 },
     { path: 'scenes/02_download.scene.js', layer: 'content', start: 470 },
-    { path: 'scenes/03_connect.scene.js', layer: 'content', start: 662 },
-    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 806 },
-    { path: 'scenes/05_build.scene.js', layer: 'content', start: 998 },
-    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1238 },
-    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1430 },
+    { path: 'scenes/02b_brand.scene.js', layer: 'content', start: 662 },
+    { path: 'scenes/03_connect.scene.js', layer: 'content', start: 782 },
+    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 926 },
+    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1118 },
+    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1358 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1550 },
   ],
 };
