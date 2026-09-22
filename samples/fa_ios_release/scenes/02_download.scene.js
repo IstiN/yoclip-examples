@@ -393,12 +393,14 @@ scene = {
     // hex (#AARRGGBB) — the `opacity` wrap proved unreliable here.
     var handoff = clamp01(tw(0, 14, 1, 0, 'easeOut'));
     if (handoff > 0.003) {
+      // Same color the 01 click flood poured (white in light, ink in dark).
+      var floodBase = T.isLight ? 'FFFFFF' : T.bg.replace('#', '').toUpperCase();
       var a = Math.round(handoff * 255).toString(16).padStart(2, '0');
       kids.push({
         type: 'rect',
         width: F.W,
         height: F.H,
-        fill: '#' + a + 'FFFFFF',
+        fill: '#' + a + floodBase,
       });
     }
 

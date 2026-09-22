@@ -309,11 +309,14 @@ scene = {
       for (var ci = 0; ci < cardKids.length; ci++) kids.push(cardKids[ci]);
     }
 
-    // ---- White flood -----------------------------------------------------
-    // The click ignites a white fill that pours out of the button and
-    // covers the whole frame (scene-space, so it grows with the camera
-    // pull-out): a clean hand-off to the next screen. 02_download opens
-    // white and dissolves out over its first beat.
+    // ---- Click flood -----------------------------------------------------
+    // The click ignites a fill that pours out of the button and covers the
+    // whole frame (scene-space, so it grows with the camera pull-out): a
+    // clean hand-off to the next screen. 02_download opens in the same
+    // color and dissolves out over its first beat. Light theme floods
+    // white; dark theme irises to the ink background instead of flashing
+    // white (a bright flash reads as a glitch on dark UI).
+    var floodColor = T.isLight ? '#FFFFFF' : T.bg;
     var floodP = tw(126, 26, 0, 1, 'easeInOut');
     if (floodP > 0.001) {
       var floodX = btnX + btnD / 2;
@@ -325,7 +328,7 @@ scene = {
       kids.push({
         type: 'circle',
         size: D,
-        fill: '#FFFFFF',
+        fill: floodColor,
         positioned: { left: floodX - D / 2, top: floodY - D / 2 },
       });
     }
