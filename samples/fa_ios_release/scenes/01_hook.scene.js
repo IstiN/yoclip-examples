@@ -3,6 +3,70 @@
 // Metallic headline slams in, a prompt card types the user's ask with a
 // solid caret, the send button charges and fires into the next scene.
 
+// Hook camera: zoom into the typing area of the search card while the ask
+// types, shift focus to the magnifier button for the click, pull back out.
+// No camera node exists in the runtime — this returns transform props for
+// a full-frame wrapper stack (pan the focus point to frame center is
+// offset = C - F; the scale then magnifies about it). KEEP IN SYNC with
+// scenes/00_intro.scene.js: both layers apply the same transform so the
+// video background zooms in lockstep — a whole-scene camera move.
+function hookCamera(frame, F) {
+  var isP = F.portrait;
+  var pad = isP ? 28 : 24;
+  var m = Math.min(F.W, F.H);
+  var cardW = isP ? F.W * 0.86 : F.W * 0.38;
+  var cardH = m * 0.40;
+  var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.55;
+  var cardY = isP ? F.H * 0.49 : F.H * 0.24;
+  var pillX = cardX + pad;
+  var pillY = cardY + pad;
+  var pillW = cardW - pad * 2;
+  var pillH = cardH - pad * 2;
+  var btnD = isP ? 64 : 54;
+  var btnX = pillX + pillW - btnD - pad * 0.8;
+  var btnY = pillY + pillH - btnD - pad * 0.8;
+
+  function tw(at, dur, from, to) {
+    return jsr.motion.tween(frame * 1000 / 30, at * 1000 / 30, dur * 1000 / 30, from, to, 'easeInOut');
+  }
+
+  var zoomA = tw(12, 22, 0, 1); // into the typing area
+  var shiftP = tw(92, 16, 0, 1); // pill -> button
+  var outP = tw(130, 18, 0, 1); // pull back out
+  if ((zoomA === 0 && shiftP === 0) || outP === 1) return null;
+
+  // Whole-scene zoom reads as a camera push-in, so portrait can take more
+  // than a card-slide could; the pan stays partial there (the card is 86%
+  // of the frame width) while horizontal pans fully onto the button.
+  var zoomAmt = isP ? 0.22 : 0.30;
+  var extraAmt = isP ? 0.10 : 0.12;
+  var panAmt = isP ? 0.45 : 1.0;
+
+  var ccx = F.cx;
+  var ccy = F.cy;
+  var fcx = pillX + pillW / 2; // typing-area focus point
+  var fcy = pillY + pillH * 0.35;
+  var bcxp = btnX + btnD / 2; // button focus point
+  var bcyp = btnY + btnD / 2;
+  var tx = fcx + (bcxp - fcx) * panAmt;
+  var ty = fcy + (bcyp - fcy) * panAmt;
+
+  var camS = 1 + zoomAmt * zoomA;
+  var vx = ccx + (fcx - ccx) * zoomA;
+  var vy = ccy + (fcy - ccy) * zoomA;
+  if (shiftP > 0) {
+    camS += extraAmt * shiftP;
+    vx = fcx + (tx - fcx) * shiftP;
+    vy = fcy + (ty - fcy) * shiftP;
+  }
+  if (outP > 0) {
+    camS = 1 + (zoomAmt + extraAmt) * (1 - outP);
+    vx = tx + (ccx - tx) * outP;
+    vy = ty + (ccy - ty) * outP;
+  }
+  return { scale: camS, offsetX: ccx - vx, offsetY: ccy - vy };
+}
+
 scene = {
   id: '01_hook',
   duration: 170,
@@ -238,55 +302,26 @@ scene = {
         }
       }
 
-      // ---- Camera: zoom into the typing area, shift focus to the button,
-      // pull back out. No camera node exists in the runtime, so a
-      // full-frame stack with scale + offset props composes one: panning
-      // the focus point F to the frame center is offset = C - F, and the
-      // scale then magnifies about that focus point (translate wrapper
-      // applies inside the scale wrapper).
-      var ccx = F.cx;
-      var ccy = F.cy;
-      var fcx = pillX + pillW / 2; // typing-area focus point
-      var fcy = pillY + pillH * 0.35;
-      var bcxp = btnX + btnD / 2; // button focus point
-      var bcyp = btnY + btnD / 2;
-
-      var zoomA = tw(12, 22, 0, 1, 'easeInOut'); // into the pill
-      var shiftP = tw(92, 16, 0, 1, 'easeInOut'); // pill -> button
-      var outP = tw(130, 18, 0, 1, 'easeInOut'); // pull back out
-      // Portrait cards already span 86% of the frame width — keep the zoom
-      // small enough that the card edges stay in view; horizontal has room.
-      var zoomAmt = isP ? 0.12 : 0.30;
-      var extraAmt = isP ? 0.06 : 0.12;
-      // Full focus-to-button reads broken in portrait (the huge card exits
-      // the frame); there a 45% nudge keeps context, horizontal pans fully.
-      var panAmt = isP ? 0.35 : 1.0;
-      var tx = fcx + (bcxp - fcx) * panAmt;
-      var ty = fcy + (bcyp - fcy) * panAmt;
-      var camS = 1 + zoomAmt * zoomA;
-      var vx = ccx + (fcx - ccx) * zoomA;
-      var vy = ccy + (fcy - ccy) * zoomA;
-      if (shiftP > 0) {
-        camS += extraAmt * shiftP;
-        vx = fcx + (tx - fcx) * shiftP;
-        vy = fcy + (ty - fcy) * shiftP;
-      }
-      if (outP > 0) {
-        camS = 1 + (zoomAmt + extraAmt) * (1 - outP);
-        vx = tx + (ccx - tx) * outP;
-        vy = ty + (ccy - ty) * outP;
-      }
-
-      kids.push({
-        type: 'stack',
-        fit: 'expand',
-        scale: camS,
-        offsetX: ccx - vx,
-        offsetY: ccy - vy,
-        children: cardKids,
-      });
+      // Card kids join the scene; the whole-scene camera below wraps them.
+      for (var ci = 0; ci < cardKids.length; ci++) kids.push(cardKids[ci]);
     }
 
-    return { type: 'stack', fit: 'expand', children: kids };
+    // Whole-scene camera: everything above (scrim, headlines, card) zooms
+    // together, and 00_intro's video tail applies the same transform on
+    // the layer below — so the background zooms in lockstep and the move
+    // reads as one camera push, not a sliding card.
+    var cam = hookCamera(frame, F);
+    var root = { type: 'stack', fit: 'expand', children: kids };
+    if (cam) {
+      root = {
+        type: 'stack',
+        fit: 'expand',
+        scale: cam.scale,
+        offsetX: cam.offsetX,
+        offsetY: cam.offsetY,
+        children: [root],
+      };
+    }
+    return root;
   },
 };

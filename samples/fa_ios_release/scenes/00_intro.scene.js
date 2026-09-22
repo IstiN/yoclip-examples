@@ -10,6 +10,64 @@
 // seconds of audio play on underneath it. Background music is a quiet bed
 // from frame 0 (see yoclip.yaml envelope).
 
+// Hook camera — KEEP IN SYNC with scenes/01_hook.scene.js (same function
+// there). 00_intro's video tail runs UNDER the hook (global 300–451 =
+// hook-local 0–151) and must zoom in lockstep with the content layer, so
+// the whole scene reads as one camera push. Returns null when identity.
+function hookCamera(frame, F) {
+  var isP = F.portrait;
+  var pad = isP ? 28 : 24;
+  var m = Math.min(F.W, F.H);
+  var cardW = isP ? F.W * 0.86 : F.W * 0.38;
+  var cardH = m * 0.40;
+  var cardX = isP ? (F.W - cardW) / 2 : F.W * 0.55;
+  var cardY = isP ? F.H * 0.49 : F.H * 0.24;
+  var pillX = cardX + pad;
+  var pillY = cardY + pad;
+  var pillW = cardW - pad * 2;
+  var pillH = cardH - pad * 2;
+  var btnD = isP ? 64 : 54;
+  var btnX = pillX + pillW - btnD - pad * 0.8;
+  var btnY = pillY + pillH - btnD - pad * 0.8;
+
+  function tw(at, dur, from, to) {
+    return jsr.motion.tween(frame * 1000 / 30, at * 1000 / 30, dur * 1000 / 30, from, to, 'easeInOut');
+  }
+
+  var zoomA = tw(12, 22, 0, 1); // into the typing area
+  var shiftP = tw(92, 16, 0, 1); // pill -> button
+  var outP = tw(130, 18, 0, 1); // pull back out
+  if ((zoomA === 0 && shiftP === 0) || outP === 1) return null;
+
+  var zoomAmt = isP ? 0.22 : 0.30;
+  var extraAmt = isP ? 0.10 : 0.12;
+  var panAmt = isP ? 0.45 : 1.0;
+
+  var ccx = F.cx;
+  var ccy = F.cy;
+  var fcx = pillX + pillW / 2; // typing-area focus point
+  var fcy = pillY + pillH * 0.35;
+  var bcxp = btnX + btnD / 2; // button focus point
+  var bcyp = btnY + btnD / 2;
+  var tx = fcx + (bcxp - fcx) * panAmt;
+  var ty = fcy + (bcyp - fcy) * panAmt;
+
+  var camS = 1 + zoomAmt * zoomA;
+  var vx = ccx + (fcx - ccx) * zoomA;
+  var vy = ccy + (fcy - ccy) * zoomA;
+  if (shiftP > 0) {
+    camS += extraAmt * shiftP;
+    vx = fcx + (tx - fcx) * shiftP;
+    vy = fcy + (ty - fcy) * shiftP;
+  }
+  if (outP > 0) {
+    camS = 1 + (zoomAmt + extraAmt) * (1 - outP);
+    vx = tx + (ccx - tx) * outP;
+    vy = ty + (ccy - ty) * outP;
+  }
+  return { scale: camS, offsetX: ccx - vx, offsetY: ccy - vy };
+}
+
 scene = {
   id: '00_intro',
   duration: 451,
@@ -22,19 +80,31 @@ scene = {
 
   render: function(frame) {
     var F = faFormat();
+    var video = {
+      type: 'video',
+      source: 'external:intro_video',
+      fit: 'cover',
+      speed: 0.8,
+      width: F.W,
+      height: F.H,
+    };
+    // During the hook (global 300–451) zoom the video in lockstep with the
+    // content layer's camera — one whole-scene push-in.
+    var cam = hookCamera(frame - 300, F);
+    if (cam) {
+      return {
+        type: 'stack',
+        fit: 'expand',
+        scale: cam.scale,
+        offsetX: cam.offsetX,
+        offsetY: cam.offsetY,
+        children: [video],
+      };
+    }
     return {
       type: 'stack',
       fit: 'expand',
-      children: [
-        {
-          type: 'video',
-          source: 'external:intro_video',
-          fit: 'cover',
-          speed: 0.8,
-          width: F.W,
-          height: F.H,
-        },
-      ],
+      children: [video],
     };
   },
 };
