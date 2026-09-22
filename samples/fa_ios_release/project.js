@@ -26,16 +26,16 @@ project = {
     // broll_01 starts at 451 — until then the intro video (content layer)
     // still covers the background while its audio plays out.
     { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 451 },
-    { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 530 },
-    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1058 },
-    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1490 },
+    { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 470 },
+    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 998 },
+    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1430 },
     // Content layer
-    { path: 'scenes/01_hook.scene.js', layer: 'content', start: 360 },
-    { path: 'scenes/02_download.scene.js', layer: 'content', start: 530 },
-    { path: 'scenes/03_connect.scene.js', layer: 'content', start: 722 },
-    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 866 },
-    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1058 },
-    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1298 },
-    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1490 },
+    { path: 'scenes/01_hook.scene.js', layer: 'content', start: 300 },
+    { path: 'scenes/02_download.scene.js', layer: 'content', start: 470 },
+    { path: 'scenes/03_connect.scene.js', layer: 'content', start: 662 },
+    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 806 },
+    { path: 'scenes/05_build.scene.js', layer: 'content', start: 998 },
+    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1238 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1430 },
   ],
 };
