@@ -86,10 +86,10 @@ scene = {
     // AIIN is tapped at 100. Tile i (i>=1) crosses the ring top mid-spin.
     var TAP = 100;
     function lightAt(i) {
-      return i === 0 ? TAP : Math.round(40 + 52 * i * STEP / 360);
+      return i === 0 ? TAP : Math.round(40 + 60 * i * STEP / 360);
     }
 
-    var ringDeg = 360 * smooth((frame - 40) / 52); // slow, stately turn
+    var ringDeg = 360 * smooth((frame - 40) / 60); // slow, stately turn
 
     // ---- Headline: big, centred, pushed down by the incoming tiles ---------
     var titleIn = expoOut(clamp01((frame - 4) / 12));
@@ -313,8 +313,15 @@ scene = {
     // ---- Focus caption (static screen-space text, right of the arc) --------
     // The text never moves - it just snaps to whichever tile owns the front
     // point, brightening as that tile aligns.
-    var txtL = isP ? F.W * 0.58 : F.W * 0.30;
-    var txtTop = ccy - (isP ? 84 : 74);
+    // anchored to the focused tile's on-screen right edge - static during the
+    // browse (the front tile barely moves), gliding along at the settle zoom
+    var fpC = slotPos(bestI, ringDeg);
+    var fsx = (fpC.x + camX - cx) * camS + cx;
+    var fsy = (fpC.y + camY - F.H / 2) * camS + F.H / 2;
+    var heroPop = (bestI === 0 && frame >= TAP)
+      ? 1 + 0.30 * backOut(clamp01((frame - TAP) / 10)) : 1;
+    var txtL = fsx + tileD * heroPop * camS / 2 + 44;
+    var txtTop = fsy - (isP ? 84 : 74);
     var focusIn = tw(20, 12, 0, 1, 'easeOut');
     var focusA = focusIn * (0.55 + 0.45 * Math.max(0, 1 - bestD / (STEP * 0.6)));
     focusA *= 1 - smooth((frame - 104) / 12); // gone once the tap settles in
@@ -323,7 +330,7 @@ scene = {
       kids.push(faText(fp.name, {
         opacity: focusA,
         style: {
-          fontSize: isP ? 44 : 38,
+          fontSize: isP ? 64 : 52,
           fontWeight: '800',
           color: T.text,
           textAlign: 'left',
@@ -334,25 +341,25 @@ scene = {
       kids.push(faText(fp.sub, {
         opacity: focusA * 0.8,
         style: {
-          fontSize: isP ? 20 : 17,
+          fontSize: isP ? 24 : 21,
           fontWeight: '500',
           fontFamily: 'monospace',
           color: T.dim,
           textAlign: 'left',
           letterSpacing: 1,
         },
-        positioned: { left: txtL, top: txtTop + (isP ? 58 : 50) },
+        positioned: { left: txtL, top: txtTop + (isP ? 82 : 68) },
       }));
       kids.push(faText((bestI + 1) + ' / ' + N, {
         opacity: focusA * 0.55,
         style: {
-          fontSize: isP ? 16 : 14,
+          fontSize: isP ? 18 : 16,
           fontFamily: 'monospace',
           color: T.faint,
           textAlign: 'left',
           letterSpacing: 2,
         },
-        positioned: { left: txtL, top: txtTop + (isP ? 96 : 84) },
+        positioned: { left: txtL, top: txtTop + (isP ? 124 : 104) },
       }));
     }
 
