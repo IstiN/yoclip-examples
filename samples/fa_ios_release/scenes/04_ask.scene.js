@@ -1,19 +1,21 @@
 // 04 — Ask — the real Fa app chat, on a phone
 // (192 frames, 4 bars)
 //
-// Looks like the actual app screen: Fa nav bar, thread, "Ask anything…"
-// input bar with a send button. Messages EMERGE FROM THE BOTTOM (like a
-// real chat) and the older ones slide up when a new one arrives. Beats:
-// Fa arrives (handoff dot from 03 lands into the typing dots) -> greeting
-// bubble slides up -> the question TYPES into the input bar while the
-// camera leans in -> send button press (scale dip + flash) and the bubble
-// flies up into the thread, camera follows -> thinking dots -> Fa throws
-// out the capabilities card from below, rows stagger in as the thread
-// scrolls up. The background and nav are FIXED chrome outside the camera
-// wrapper, so a camera move never exposes a black band.
+// Ordered choreography, one thing at a time:
+//   1. Fa's greeting card materialises in the CENTRE (the handoff dot from
+//      03 lands right into it) and holds.
+//   2. The input bar rises from the bottom; the camera leans to it and the
+//      user types the question.
+//   3. Send button press -> the bubble launches out of the bar and lands
+//      UNDER the greeting.
+//   4. The capabilities card rises from the bar area, pushing both earlier
+//      messages up, and settles just above the input bar; rows stagger in.
+//
+// Background + nav bar are fixed chrome outside the camera wrapper, so
+// camera moves never expose a black band.
 //
 // KEEP IN SYNC with 03_connect: the teal dot lands at the centre of the
-// typing dots (x0 + 64, aY + 32), chatW must match 03's chatW4.
+// greeting card (cx, gC) — 03 computes the same point.
 
 scene = {
   id: '04_ask',
@@ -45,52 +47,65 @@ scene = {
     kids.push(faRRect(F.W, F.H, 0, T.bg));
 
     var isP = F.portrait;
-    var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
     var chatW = isP ? F.W * 0.88 : Math.min(F.W * 0.62, 1150);
     var x0 = cx - chatW / 2;
 
     var qText = 'Can you build ANY app and run it natively on my iPhone?';
-    var aY = isP ? F.H * 0.30 : F.H * 0.36;   // thread reply anchor / dots
-    var qY = isP ? F.H * 0.115 : F.H * 0.14;  // user bubble anchor
-    var barY = isP ? F.H * 0.885 : F.H * 0.875; // input bar top
-    var barH = isP ? 96 : 88;
 
-    // The thread scrolls up as the card arrives from below (real chat) and
-    // dims slightly as it passes under the fixed nav bar.
-    var shiftP = smooth((frame - 136) / 26);
-    var threadShift = (isP ? 170 : 120) * shiftP;
-    var threadFade = 1 - 0.55 * shiftP;
-
-    // ---- Camera: leans where the action is --------------------------------
-    var tDots = smooth(frame / 12) * (1 - smooth((frame - 34) / 16));
-    var tBar = smooth((frame - 62) / 16) * (1 - smooth((frame - 96) / 16));
-    var tCard = smooth((frame - 132) / 18) * (1 - smooth((frame - 166) / 12));
-    var camS = 1 + 0.07 * tDots + 0.11 * tBar + 0.045 * tCard;
-    var camX = 0;
-    var camY = -(aY - F.H / 2) * 0.30 * tDots
-      - (barY - F.H / 2) * 0.40 * tBar
-      + (aY + 200 - F.H / 2) * 0.16 * tCard;
-
-    // ---- Greeting bubble (Fa) — big, centred, rises from the bottom -------
-    var gIn = tw(48, 20, 0, 1, 'easeOut');
+    // Layout slots
+    var gC = isP ? F.H * 0.42 : F.H * 0.44;   // greeting centre ("в центре")
     var gW = chatW * (isP ? 0.80 : 0.62);
     var gH = isP ? 128 : 116;
     var gx = cx - gW / 2;
-    var gY = (isP ? F.H * 0.335 : F.H * 0.36) - threadShift;
+    var qSlot = gC + gH / 2 + 34;             // user bubble lands under it
+    var barY = isP ? F.H * 0.885 : F.H * 0.875; // input bar top
+    var barH = isP ? 96 : 88;
+
+    var bullets = [
+      { t: 'NATIVE DRAW ENGINE — FLUTTER @ 120 FPS.', c: 'violet' },
+      { t: 'ZERO HTML WRAPPERS — PURE NATIVE VIEWS.', c: 'teal' },
+      { t: 'SQLITE DATABASE — ALL DATA ON-DEVICE.', c: 'teal' },
+      { t: 'FLAME3D — REAL 3D GAMES, NOT WEBGL.', c: 'violet' },
+      { t: 'API KEYS LIVE IN YOUR KEYCHAIN. NEVER OURS.', c: 'teal' },
+    ];
+    var bGap = isP ? 62 : 58;
+    var cardH = 90 + bullets.length * bGap + 60;
+    var cardTop = barY - 36 - cardH;          // just above the input bar
+
+    // The card pushes the two earlier messages up as it arrives.
+    var push = (isP ? 120 : 262) * smooth((frame - 128) / 22);
+
+    // ---- Camera: greeting -> input bar -> follow the send -> card ---------
+    var tGreet = smooth(frame / 12) * (1 - smooth((frame - 36) / 16));
+    var tBar = smooth((frame - 58) / 14) * (1 - smooth((frame - 100) / 16));
+    var tCard = smooth((frame - 132) / 18) * (1 - smooth((frame - 170) / 10));
+    var camS = 1 + 0.08 * tGreet + 0.11 * tBar + 0.04 * tCard;
+    var camX = 0;
+    var camY = -(gC - F.H / 2) * 0.34 * tGreet
+      - (barY - F.H / 2) * 0.40 * tBar
+      + (cardTop + 200 - F.H / 2) * 0.10 * tCard;
+
+    // ---- 1. Greeting card in the centre ------------------------------------
+    var gIn = tw(32, 20, 0, 1, 'easeOut');
+    var gTop = gC - gH / 2 - push; // the card pushes the greeting up
     if (gIn > 0.003) {
-      var gRise = (barY - gY) * (1 - gIn);
-      kids.push(faRRect(gW, gH, 28, T.card, {
-        opacity: gIn * threadFade,
+      kids.push({
+        type: 'container',
+        width: gW,
+        height: gH,
+        radius: 28,
+        color: T.card,
+        opacity: gIn,
         border: { color: T.teal, width: 1.5 },
-        offsetY: gRise,
-        positioned: { left: gx, top: gY },
-      }));
+        shadows: [{ color: T.teal, opacity: 0.18, blur: 34,
+          offset: { x: 0, y: 10 } }],
+        positioned: { left: cx - gW / 2, top: gTop },
+      });
       kids.push(faText('HEY — I\'M FA.', {
         width: gW - 48,
-        opacity: gIn * 0.95 * threadFade,
-        offsetY: gRise,
+        opacity: gIn * 0.95,
         style: {
           fontSize: isP ? 30 : 28,
           fontFamily: 'monospace',
@@ -99,12 +114,11 @@ scene = {
           textAlign: 'center',
           letterSpacing: 2,
         },
-        positioned: { left: gx + 24, top: gY + (isP ? 26 : 22) },
+        positioned: { left: cx - (gW - 48) / 2, top: gTop + (isP ? 26 : 22) },
       }));
       kids.push(faText('ASK ME TO BUILD ANYTHING.', {
         width: gW - 48,
-        opacity: gIn * 0.9 * threadFade,
-        offsetY: gRise,
+        opacity: gIn * 0.9,
         style: {
           fontSize: isP ? 25 : 23,
           fontFamily: 'monospace',
@@ -113,28 +127,28 @@ scene = {
           textAlign: 'center',
           letterSpacing: 1,
         },
-        positioned: { left: gx + 24, top: gY + (isP ? 72 : 64) },
+        positioned: { left: cx - (gW - 48) / 2, top: gTop + (isP ? 72 : 64) },
       }));
     }
 
-    // ---- User bubble (right, violet) — launched from the input bar --------
-    var sendT = clamp01((frame - 98) / 18);
+    // ---- 3. User bubble — launches out of the bar, lands under greeting ----
+    var sendT = clamp01((frame - 102) / 18);
     var qIn = backOut(sendT);
     if (qIn > 0.003) {
-      var landY = qY - threadShift;             // target scrolls up too
+      var landY = qSlot - push;
       var flyY = (barY - 40) + (landY - (barY - 40)) * qIn;
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
-        opacity: qIn * 0.35 * threadFade,
+        opacity: qIn * 0.35,
         blur: 24,
         positioned: { left: x0 + chatW * 0.22 - 10, top: flyY - 8 },
       }));
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
-        opacity: qIn * threadFade,
+        opacity: qIn,
         positioned: { left: x0 + chatW * 0.22, top: flyY },
       }));
       kids.push(faText(qText, {
         width: chatW * 0.78 - 56,
-        opacity: qIn * threadFade,
+        opacity: qIn,
         style: {
           fontSize: isP ? 27 : 28,
           fontFamily: 'monospace',
@@ -144,69 +158,37 @@ scene = {
         },
         positioned: { left: x0 + chatW * 0.22 + 28, top: flyY + 26 },
       }));
-      var dIn = tw(120, 8, 0, 1, 'easeOut');
+      var dIn = tw(126, 8, 0, 1, 'easeOut');
       kids.push(faText('DELIVERED · ON-DEVICE', {
-        opacity: dIn * 0.5 * threadFade,
+        opacity: dIn * 0.5,
         style: {
           fontSize: isP ? 15 : 14,
           fontFamily: 'monospace',
           color: T.faint,
           letterSpacing: 2,
         },
-        positioned: { left: x0 + chatW * 0.22 + 8, top: qY - threadShift + 126 },
+        positioned: { left: x0 + chatW * 0.22 + 8, top: qSlot - push + 126 },
       }));
     }
 
-    // ---- Thinking dots (Fa is "typing") — the handoff dot lands here ------
-    var dotsAlive = (frame >= 34 && frame < 56) || (frame >= 116 && frame < 134);
-    var dotsIn = (frame < 56 ? tw(34, 8, 0, 1, 'easeOut')
-      : tw(116, 8, 0, 1, 'easeOut')) * (frame < 56 ? 1 - tw(50, 6, 0, 1, 'easeIn') : 1 - tw(128, 6, 0, 1, 'easeIn'));
-    if (dotsAlive && dotsIn > 0.01) {
-      kids.push(faRRect(150, 64, 32, T.card, {
-        opacity: dotsIn,
-        border: { color: T.border, width: 1.5 },
-        positioned: { left: x0, top: aY },
-      }));
-      for (var d = 0; d < 3; d++) {
-        var bounce = Math.max(0, Math.sin(frame * 0.5 - d * 0.9)) * 5;
-        kids.push({
-          type: 'circle',
-          size: 12,
-          fill: T.teal,
-          opacity: dotsIn * 0.85,
-          positioned: { left: x0 + 30 + d * 34, top: aY + 26 - bounce },
-        });
-      }
-    }
-
-    // ---- Fa capabilities card (left, teal border) — slides up from below --
-    var bullets = [
-      { t: 'NATIVE DRAW ENGINE — FLUTTER @ 120 FPS.', c: 'violet' },
-      { t: 'ZERO HTML WRAPPERS — PURE NATIVE VIEWS.', c: 'teal' },
-      { t: 'SQLITE DATABASE — ALL DATA ON-DEVICE.', c: 'teal' },
-      { t: 'FLAME3D — REAL 3D GAMES, NOT WEBGL.', c: 'violet' },
-      { t: 'API KEYS LIVE IN YOUR KEYCHAIN. NEVER OURS.', c: 'teal' },
-    ];
-    var aIn = tw(130, 18, 0, 1, 'easeOut');
-    var bGap = isP ? 62 : 58;
-    var aH = 90 + bullets.length * bGap;
-
+    // ---- 4. Fa capabilities card — rises, pushing the thread up ------------
+    var aIn = tw(130, 20, 0, 1, 'easeOut');
     if (aIn > 0.003) {
-      var cardRise = (barY - aY) * (1 - aIn) * 0.9; // emerges from the bottom
-      kids.push(faRRect(chatW, aH + 60, 30, T.card, {
+      var cardRise = (barY - cardTop) * (1 - aIn); // emerges from the bar
+      kids.push(faRRect(chatW, cardH, 30, T.card, {
         opacity: aIn * 0.4,
         blur: 36,
         offsetY: cardRise,
-        positioned: { left: x0 - 18, top: aY - 18 },
+        positioned: { left: x0 - 18, top: cardTop - 18 },
       }));
-      kids.push(faRRect(chatW, aH + 60, 30, T.card, {
+      kids.push(faRRect(chatW, cardH, 30, T.card, {
         opacity: aIn,
         border: { color: T.teal, width: 1.5 },
         offsetY: cardRise,
-        positioned: { left: x0, top: aY },
+        positioned: { left: x0, top: cardTop },
       }));
 
-      kids.push(faLogoSvgNode(x0 + 52, aY + 56 + cardRise, 56, aIn));
+      kids.push(faLogoSvgNode(x0 + 52, cardTop + 56 + cardRise, 56, aIn));
       kids.push(faText('Fa — iOS AGENT', {
         opacity: aIn * 0.9,
         offsetY: cardRise,
@@ -217,7 +199,7 @@ scene = {
           color: T.teal,
           letterSpacing: 2,
         },
-        positioned: { left: x0 + 96, top: aY + 34 },
+        positioned: { left: x0 + 96, top: cardTop + 34 },
       }));
       kids.push(faText('VERIFIED · RUNS ON-DEVICE', {
         opacity: aIn * 0.55,
@@ -228,13 +210,13 @@ scene = {
           color: T.dim,
           letterSpacing: 1.5,
         },
-        positioned: { left: x0 + 96, top: aY + 66 },
+        positioned: { left: x0 + 96, top: cardTop + 66 },
       }));
 
       for (var bi = 0; bi < bullets.length; bi++) {
-        var bIn = tw(142 + bi * 10, 10, 0, 1, 'easeOut');
-        var by = aY + 120 + bi * bGap + cardRise;
-        if (bIn > 0.01 && by + 40 < aY + aH + 40 + cardRise) {
+        var bIn = tw(142 + bi * 7, 9, 0, 1, 'easeOut');
+        var by = cardTop + 120 + bi * bGap + cardRise;
+        if (bIn > 0.01) {
           var bc = bullets[bi].c === 'violet' ? T.violet : T.teal;
           kids.push(faRRect(12, 12, 6, bc, {
             opacity: bIn,
@@ -255,16 +237,16 @@ scene = {
       }
     }
 
-    // ---- Input bar (like the app: "Ask anything…" + send) ------------------
-    var barIn = tw(46, 10, 0, 1, 'easeOut');
-    var typedN = frame < 96 ? Math.min(qText.length,
-      Math.floor((frame - 62) / 1.6)) : 0;
-    var typing = frame >= 62 && frame < 96;
+    // ---- 2. Input bar (like the app: "Ask anything…" + send) ---------------
+    var barIn = tw(56, 12, 0, 1, 'easeOut');
+    var typedN = frame < 100 ? Math.min(qText.length,
+      Math.floor((frame - 66) / 1.7)) : 0;
+    var typing = frame >= 66 && frame < 100;
     var cursor = typing && Math.floor(frame / 5) % 2 === 0 ? '_' : '';
     var shown = typing ? qText.slice(0, typedN) + cursor : '';
 
-    var press = frame >= 96 && frame < 104
-      ? Math.sin(clamp01((frame - 96) / 8) * Math.PI) : 0;
+    var press = frame >= 100 && frame < 108
+      ? Math.sin(clamp01((frame - 100) / 8) * Math.PI) : 0;
 
     var barX = x0;
     var sendD = isP ? 72 : 64;
@@ -327,8 +309,8 @@ scene = {
     var apts = [{ x: acx, y: acy - 13 }, { x: acx + 10, y: acy + 5 },
       { x: acx - 10, y: acy + 5 }];
     kids.push(polylineScreen(apts, 7, 1, '#FFFFFF', barIn));
-    if (frame >= 98 && frame < 112) {
-      var fr = (frame - 98) / 14;
+    if (frame >= 102 && frame < 116) {
+      var fr = (frame - 102) / 14;
       kids.push({
         type: 'circle',
         size: sendD + 60 * fr,
@@ -340,39 +322,22 @@ scene = {
       });
     }
 
-    // ---- Bottom reassurance line -------------------------------------------
-    var rIn = tw(168, 14, 0, 1, 'easeOut');
-    kids.push(faText('IF IT DRAWS IN SWIFTUI — FA CAN BUILD IT.', {
-      width: F.W,
-      opacity: rIn * 0.8,
-      style: {
-        fontSize: isP ? 22 : 21,
-        fontFamily: 'monospace',
-        color: T.dim,
-        textAlign: 'center',
-        letterSpacing: 2.5,
-      },
-      positioned: { left: 0, top: isP ? F.H * 0.795 : F.H * 0.79 },
-    }));
-
     // ---- Handoff arrival from 03_connect ------------------------------------
-    // The teal dot that flew out of 03's CONNECTED pill lands at the centre of
-    // the typing dots (KEEP IN SYNC with 03_connect: x0 + 64, aY + 32) and
-    // pulses until the typing bubble materialises around it at frame 34.
-    if (frame < 34) {
-      var hx = x0 + 64;
-      var hy = aY + 32;
+    // The teal dot lands at the centre of the greeting card
+    // (KEEP IN SYNC with 03_connect: cx, gC) and pulses until the greeting
+    // materialises around it.
+    if (frame < 32) {
       var pulse = 0.5 + 0.5 * Math.sin(frame * 0.42);
       kids.push({ type: 'circle', size: 40 + 14 * pulse, fill: T.teal,
         opacity: 0.16 + 0.10 * pulse, blur: 16,
-        positioned: { left: hx - (40 + 14 * pulse) / 2, top: hy - (40 + 14 * pulse) / 2 } });
+        positioned: { left: cx - (40 + 14 * pulse) / 2, top: gC - (40 + 14 * pulse) / 2 } });
       kids.push({ type: 'circle', size: 16, fill: T.tealBright, opacity: 0.95,
-        positioned: { left: hx - 8, top: hy - 8 } });
+        positioned: { left: cx - 8, top: gC - 8 } });
       var rip = clamp01(frame / 12);
       if (rip > 0 && rip < 1) {
         kids.push({ type: 'circle', size: 16 + 70 * rip, fill: T.teal,
           opacity: (1 - rip) * 0.35,
-          positioned: { left: hx - (16 + 70 * rip) / 2, top: hy - (16 + 70 * rip) / 2 } });
+          positioned: { left: cx - (16 + 70 * rip) / 2, top: gC - (16 + 70 * rip) / 2 } });
       }
     }
 

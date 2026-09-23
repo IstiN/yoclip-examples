@@ -482,10 +482,9 @@ scene = {
     // ---- Handoff to 04_ask --------------------------------------------------
     // The CONNECTED pill collapses into its pulse dot, which flies to 04's
     // typing-indicator spot and becomes the cursor Fa "types" with.
-    // KEEP IN SYNC with 04_ask: landing = centre of the typing dots.
-    var chatW4 = isP ? F.W * 0.88 : Math.min(F.W * 0.62, 1150);
-    var landX = cx - chatW4 / 2 + 64;
-    var landY = (isP ? F.H * 0.30 : F.H * 0.36) + 32;
+    // KEEP IN SYNC with 04_ask: landing = centre of the greeting card.
+    var landX = cx;
+    var landY = isP ? F.H * 0.42 : F.H * 0.44;
 
     // Content veil: dips the whole scene to the shared bg tone under the dot.
     var veil = clamp01((frame - 140) / 16);
