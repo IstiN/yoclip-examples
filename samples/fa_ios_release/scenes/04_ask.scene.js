@@ -257,32 +257,55 @@ scene = {
     var sendD = isP ? 72 : 64;
     var sendX = x0 + chatW - sendD - 14;
 
-    fixed.push(faRRect(chatW, barH, barH / 2, T.card, {
+    var tFs = isP ? 34 : 32; // big, readable input — wraps honestly
+    var tMaxW = chatW - sendD - 130;
+    // Input grows to TWO lines when the sentence no longer fits one
+    // (real iOS behaviour). The bar keeps its bottom edge and grows up.
+    var cpl = Math.max(8, Math.floor(tMaxW / (tFs * 0.60)));
+    var twoLine = shown.length > cpl;
+    var barTop = barYNow;
+    var barHNow = barH;
+    if (twoLine) {
+      barHNow = Math.round(tFs * 2 + 52);
+      barTop = barYNow - (barHNow - barH); // bottom edge stays put
+    }
+    var barCY = barTop + barHNow / 2;
+    fixed.push(faRRect(chatW, barHNow, barH / 2, T.card, {
       opacity: barIn,
       border: { color: press > 0 ? T.violet : T.border,
         width: press > 0 ? 2 : 1.5 },
       scale: press > 0 ? 1 - 0.012 * press : 1,
-      positioned: { left: barX, top: barYNow },
+      positioned: { left: barX, top: barTop },
     }));
-    fixed.push(faLogoSvgNode(barX + 44, barYNow + barH / 2, 40, barIn));
-    var tFs = isP ? 26 : 25;
-    var tMaxW = chatW - sendD - 130;
-    var tW = shown.length * tFs * 0.60;
-    var tX = barX + 78 - Math.max(0, tW - tMaxW);
+    fixed.push(faLogoSvgNode(barX + 44, barCY, 40, barIn));
     if (shown.length > 0) {
-      kids.push(faText(shown, {
-        opacity: barIn,
-        style: {
-          fontSize: tFs,
-          fontFamily: 'monospace',
-          fontWeight: '500',
-          color: T.text,
-          letterSpacing: 0,
-        },
-        positioned: { left: tX, top: barYNow + barH / 2 - tFs * 0.60 },
-      }));
+      var txStyle = {
+        fontSize: tFs,
+        fontFamily: 'monospace',
+        fontWeight: '500',
+        color: T.text,
+        letterSpacing: 0,
+      };
+      if (!twoLine) {
+        var tW = shown.length * tFs * 0.60;
+        var tX = barX + 78 - Math.max(0, tW - tMaxW);
+        fixed.push(faText(shown, { opacity: barIn, style: txStyle,
+          positioned: { left: tX, top: barCY - tFs * 0.60 } }));
+      } else {
+        txStyle.textAlign = 'left';
+        var cut = shown.lastIndexOf(' ', cpl); // wrap at a word boundary
+        if (cut < 0) cut = cpl;
+        var l1 = shown.slice(0, cut);
+        var l2 = shown.slice(cut > 0 ? cut + 1 : cpl);
+        fixed.push(faText(l1, { opacity: barIn, style: txStyle,
+          positioned: { left: barX + 78,
+            top: barTop + 18 } }));
+        fixed.push(faText(l2, { opacity: barIn, style: txStyle,
+          positioned: { left: barX + 78,
+            top: barTop + 18 + tFs * 1.5 } }));
+      }
     } else {
-      kids.push(faText('Ask anything…', {
+      fixed.push(faText('Ask anything…', {
         opacity: barIn * 0.45,
         style: {
           fontSize: tFs,
@@ -291,8 +314,7 @@ scene = {
           color: T.dim,
           letterSpacing: 0,
         },
-        positioned: { left: barX + 78,
-          top: barYNow + barH / 2 - tFs * 0.60 },
+        positioned: { left: barX + 78, top: barCY - tFs * 0.60 },
       }));
     }
 
@@ -309,9 +331,9 @@ scene = {
         colors: [T.violet, T.violetDeep], stops: [0.0, 1.0] },
       shadows: [{ color: T.violet, opacity: 0.35 + 0.25 * press, blur: 18,
         offset: { x: 0, y: 4 } }],
-      positioned: { left: sendX, top: barYNow + barH / 2 - sendD / 2 },
+      positioned: { left: sendX, top: barCY - sendD / 2 },
     });
-    var acx = sendX + sendD / 2, acy = barYNow + barH / 2;
+    var acx = sendX + sendD / 2, acy = barCY;
     var apts = [{ x: acx, y: acy - 13 }, { x: acx + 10, y: acy + 5 },
       { x: acx - 10, y: acy + 5 }];
     fixed.push(polylineScreen(apts, 7, 1, '#FFFFFF', barIn));
