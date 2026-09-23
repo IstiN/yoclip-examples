@@ -29,16 +29,17 @@ project = {
     // still covers the background while its audio plays out.
     { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 451 },
     { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 470 },
-    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1118 },
-    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1550 },
+    { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1142 },
+    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1574 },
     // Content layer
     { path: 'scenes/01_hook.scene.js', layer: 'content', start: 300 },
     { path: 'scenes/02_download.scene.js', layer: 'content', start: 470 },
     { path: 'scenes/02b_brand.scene.js', layer: 'content', start: 662 },
     { path: 'scenes/03_connect.scene.js', layer: 'content', start: 782 },
-    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 926 },
-    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1118 },
-    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1358 },
-    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1550 },
+    // 03 extended to 168 frames (782..950) - 04 starts after it
+    { path: 'scenes/04_ask.scene.js', layer: 'content', start: 950 },
+    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1142 },
+    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1382 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1574 },
   ],
 };

@@ -8,7 +8,7 @@
 #   01_hook      300-470  "Build an iOS app — on your iPhone?" hook
 #   02_download  470-662  QR + fa1.dev + App Store card
 #   03_connect   662-806  Connect your AI provider (BYOK)
-#   04_ask       806-998  Chat: flutter engine, sqlite, flame3d
+#   04_ask       806-998  Chat: flutter engine, sqlite, flame3d (+24: 03 extended)
 #   05_build     998-1238 Generation montage: 4 apps being built
 #   06_publish   1238-1430Widget catalog + publish
 #   07_lockup    1430-1634Fa mark + "First real mobile AI harness"
@@ -21,7 +21,7 @@
 #   yoclip render --project samples/samples/fa_ios_release --variant dark_vertical
 
 config:
-  duration: 1754
+  duration: 1778
   fps: 30
   width: 1920
   height: 1080

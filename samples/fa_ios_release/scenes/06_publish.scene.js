@@ -6,7 +6,7 @@
 scene = {
   id: '06_publish',
   duration: 192,
-  from: 1358,
+  from: 1382,
   timeline: {
     label: 'Publish',
     color: '#2EBD9E',

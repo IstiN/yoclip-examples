@@ -7,7 +7,7 @@
 scene = {
   id: 'broll_05_build_montage',
   duration: 240,
-  from: 1118,
+  from: 1142,
   timeline: {
     label: 'B-roll · build_montage',
     color: '#5B61F6',

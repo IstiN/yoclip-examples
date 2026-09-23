@@ -14,7 +14,7 @@
 
 scene = {
   id: '03_connect',
-  duration: 144,
+  duration: 168,
   from: 782,
   timeline: {
     label: 'Connect',
@@ -55,14 +55,14 @@ scene = {
     var providers = [
       { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin-text', tile: 'aiin' },
       { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter', tile: 'light' },
-      { name: 'ChatGPT', sub: 'Account sign-in via OAuth', icon: 'astra', tile: 'dark' },
+      { name: 'ChatGPT', sub: 'Account sign-in via OAuth', icon: 'openai', tile: 'dark' },
       { name: 'GitHub Copilot', sub: 'Account sign-in via device flow', icon: 'copilot', tile: 'ink' },
       { name: 'Claude', sub: 'Anthropic API key', icon: 'claude', tile: 'cream' },
       { name: 'Gemini', sub: 'Google AI Studio key', icon: 'gemini', tile: 'grad' },
       { name: 'Kimi K3', sub: 'Moonshot API key', icon: 'kimi', tile: 'ink' },
-      { name: 'OpenAI', sub: 'API key — platform.openai.com', icon: 'astra', tile: 'green' },
+      { name: 'OpenAI', sub: 'API key — platform.openai.com', icon: 'openai', tile: 'green' },
       { name: 'CodeMie', sub: 'Enterprise SSO', icon: 'codemie-text', tile: 'codemie' },
-      { name: 'MiniMax', sub: 'API key — MiniMax platform', icon: 'minimax-text', tile: 'minimax' },
+      { name: 'MiniMax', sub: 'API key — MiniMax platform', icon: 'minimax', tile: 'minimax' },
       { name: 'DIAL', sub: 'AI gateway — DIAL platform', icon: 'dial-text', tile: 'dial' },
     ];
     var N = providers.length;
@@ -386,8 +386,8 @@ scene = {
 
     // ---- Status pill --------------------------------------------------------
     // Tail: the pill fades into the handoff dot that flies to 04 (below).
-    var pillOut = 1 - clamp01((frame - 122) / 8);
-    var stIn = tw(112, 10, 0, 1, 'easeOut') * pillOut;
+    var pillOut = 1 - clamp01((frame - 148) / 8);
+    var stIn = tw(118, 12, 0, 1, 'easeOut') * pillOut;
     var pillW = isP ? F.W * 0.86 : 760;
     var pillH = 84;
     var pillX = cx - pillW / 2;
@@ -434,7 +434,7 @@ scene = {
     var landY = (isP ? F.H * 0.30 : F.H * 0.36) + 32;
 
     // Content veil: dips the whole scene to the shared bg tone under the dot.
-    var veil = clamp01((frame - 130) / 12);
+    var veil = clamp01((frame - 140) / 16);
     if (veil > 0.003) {
       var va = Math.round(veil * 255).toString(16).padStart(2, '0');
       var vb = T.bg.replace('#', '').toUpperCase();
@@ -443,7 +443,7 @@ scene = {
 
     // The pill's pulse dot lifts out and swooshes (right-bowed arc) to 04's
     // typing spot, glowing so it reads against the dipping background.
-    var flyT = clamp01((frame - 124) / 20);
+    var flyT = clamp01((frame - 152) / 16);
     if (flyT > 0) {
       var e = flyT * flyT * (3 - 2 * flyT); // smoothstep
       var sx2 = pillX + 41;
