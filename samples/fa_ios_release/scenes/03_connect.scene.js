@@ -1,9 +1,15 @@
 // 03 — Connect — BYOK: bring your own AI provider (144 frames, 3 bars)
 //
-// Mirrors the real onboarding list: full-width provider rows (icon tile +
-// name + auth subtitle + chevron) slide in one by one, each row connects
-// on the beat grid (chevron -> spinner -> teal check), then the status
-// pill confirms: "FA iOS AGENT — CONNECTED".
+// Mirrors the real onboarding list — all 11 providers from the flutter_agent
+// catalog (aiin, openrouter, chatgpt, copilot, anthropic, google, kimi,
+// openai, codemie, minimax, dial) as full-width rows with brand-coloured
+// icon tiles, bold names and auth-method subtitles.
+//
+// The camera travels the list: it pushes in, drifts down past the providers
+// (each row connects — chevron -> spinner -> teal check — as the camera
+// passes it), then whips back up, settles centred on AIIN and TAPS it
+// (ripple rings). AIIN connects last, the status pill confirms
+// "FA iOS AGENT — CONNECTED", and the handoff dot flies to 04.
 
 scene = {
   id: '03_connect',
@@ -26,10 +32,7 @@ scene = {
 
     var kids = [];
 
-    // Handoff from 02b_splash: that scene melts into white on its tail;
-    // we open on the same white and dissolve out. Shapes paint `fill` with
-    // alpha baked into the 8-digit hex (#AARRGGBB) — opacity wrap is
-    // unreliable on shapes.
+    // Handoff from 02b_splash: melt from white (shapes take #AARRGGBB).
     var handoff = clamp01(tw(0, 14, 1, 0, 'easeOut'));
     if (handoff > 0.003) {
       var ha = Math.round(handoff * 255).toString(16).padStart(2, '0');
@@ -46,7 +49,7 @@ scene = {
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
-    // Title
+    // ---- Title (screen space) ---------------------------------------------
     var titleIn = expoOut(clamp01((frame - 4) / 12));
     kids.push(faText('CHOOSE HOW FA THINKS.', {
       width: F.W,
@@ -83,44 +86,78 @@ scene = {
       positioned: { left: 0, top: isP ? F.H * 0.165 : F.H * 0.235 },
     }));
 
-    // ---- Provider rows — mirrors the real onboarding list -------------------
+    // ---- Provider rows (content space — the camera moves over this) -------
     var providers = [
-      { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin', tile: 'aiin' },
+      { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin-text', tile: 'aiin' },
       { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter', tile: 'light' },
       { name: 'ChatGPT', sub: 'Account sign-in via OAuth', icon: 'astra', tile: 'dark' },
-      { name: 'Claude', sub: 'API key — lives in your keychain', icon: 'claude', tile: 'cream' },
+      { name: 'GitHub Copilot', sub: 'Account sign-in via device flow', icon: 'copilot', tile: 'ink' },
+      { name: 'Claude', sub: 'Anthropic API key', icon: 'claude', tile: 'cream' },
       { name: 'Gemini', sub: 'Google AI Studio key', icon: 'gemini', tile: 'grad' },
       { name: 'Kimi K3', sub: 'Moonshot API key', icon: 'kimi', tile: 'ink' },
+      { name: 'OpenAI', sub: 'API key — platform.openai.com', icon: 'astra', tile: 'green' },
+      { name: 'CodeMie', sub: 'Enterprise SSO', icon: 'codemie-text', tile: 'codemie' },
+      { name: 'MiniMax', sub: 'API key — MiniMax platform', icon: 'minimax-text', tile: 'minimax' },
+      { name: 'DIAL', sub: 'AI gateway — DIAL platform', icon: 'dial-text', tile: 'dial' },
     ];
-    var rowW = isP ? F.W * 0.86 : 760;
-    var rowH = isP ? 96 : 62;
-    var rowGap = isP ? 14 : 9;
-    var rowX = cx - rowW / 2;
-    var listY = isP ? F.H * 0.225 : F.H * 0.27;
-    var iconD = isP ? 58 : 40;
+    var N = providers.length;
 
-    for (var i = 0; i < providers.length; i++) {
+    var rowH = isP ? 120 : 68;
+    var rowGap = isP ? 16 : 9;
+    var step = rowH + rowGap;
+    var iconD = isP ? 72 : 40;
+    var nameFs = isP ? 26 : 17;
+    var subFs = isP ? 17.5 : 12;
+    var listY = isP ? F.H * 0.19 : F.H * 0.27; // below the BYOK subtitle
+    var colW, colGap, colLX, colRX;
+    if (isP) {
+      colW = F.W * 0.74; // must survive the 1.32x camera zoom inside frame
+      colLX = cx - colW / 2;
+    } else {
+      colGap = 24;
+      colW = (F.W * 0.86 - colGap) / 2;
+      colLX = cx - colW - colGap / 2;
+      colRX = cx + colGap / 2;
+    }
+
+    function rowPos(i) {
+      if (isP) return { x: colLX, y: listY + i * step };
+      return i < 6
+        ? { x: colLX, y: listY + i * step }
+        : { x: colRX, y: listY + (i - 6) * step };
+    }
+    function rowCenter(i) {
+      var p = rowPos(i);
+      return { x: p.x + colW / 2, y: p.y + rowH / 2 };
+    }
+
+    var TAP = 106;
+    function lightAt(i) {
+      return i === 0 ? TAP : Math.round(26 + (i - 1) * 5.4);
+    }
+
+    var listKids = [];
+    for (var i = 0; i < N; i++) {
       var pr = providers[i];
-      var inAt = 8 + i * 7;
+      var inAt = 6 + i * 4;
       var rowIn = expoOut(clamp01((frame - inAt) / 10));
       if (rowIn <= 0.01) continue;
-      var lightAt = 26 + i * 12;
-      var lit = frame >= lightAt;
-      var connecting = !lit && frame >= lightAt - 13;
-      var selected = i === 0 && lit; // AIIN is the active provider
-      var ry2 = listY + i * (rowH + rowGap);
+      var la = lightAt(i);
+      var lit = frame >= la;
+      var connecting = !lit && frame >= la - 12;
+      var selected = i === 0 && lit;
+      var rp = rowPos(i);
 
-      kids.push(faRRect(rowW, rowH, 18,
+      listKids.push(faRRect(colW, rowH, 18,
         selected ? (T.isLight ? '#FFFFFF' : '#121A2E') : T.card, {
         opacity: rowIn,
-        border: { color: selected ? T.violet : T.border, width: selected ? 2 : 1.5 },
-        offsetY: 16 * (1 - rowIn),
-        positioned: { left: rowX, top: ry2 },
+        border: { color: selected ? T.violet : T.border, width: selected ? 2.5 : 1.5 },
+        positioned: { left: rp.x, top: rp.y },
       }));
 
       // Icon tile: brand-coloured squircle + monochrome glyph.
-      var tileX = rowX + 16;
-      var tileY = ry2 + (rowH - iconD) / 2;
+      var tileX = rp.x + 16;
+      var tileY = rp.y + (rowH - iconD) / 2;
       var tile = { type: 'container', width: iconD, height: iconD,
         radius: iconD * 0.28, opacity: rowIn,
         positioned: { left: tileX, top: tileY } };
@@ -136,16 +173,26 @@ scene = {
       } else if (pr.tile === 'grad') {
         tile.gradient = { begin: 'topLeft', end: 'bottomRight',
           colors: ['#4E7DF6', '#9B72F2'], stops: [0.0, 1.0] };
+      } else if (pr.tile === 'green') {
+        tile.color = '#10A37F';
+      } else if (pr.tile === 'codemie') {
+        tile.color = '#5B5BD6';
+      } else if (pr.tile === 'minimax') {
+        tile.color = '#C93C3C';
+      } else if (pr.tile === 'dial') {
+        tile.color = '#2E3A4E';
       } else {
         tile.color = '#1C2030';
       }
-      kids.push(tile);
-      if (pr.icon === 'aiin') {
-        kids.push(faText('AI', {
+      listKids.push(tile);
+      if (pr.icon.indexOf('-text') > 0) {
+        var letters = pr.icon.split('-')[0] === 'aiin' ? 'AI'
+          : pr.icon.split('-')[0].charAt(0).toUpperCase();
+        listKids.push(faText(letters, {
           width: iconD,
           opacity: rowIn,
           style: {
-            fontSize: Math.round(iconD * 0.40),
+            fontSize: Math.round(iconD * (letters.length > 1 ? 0.40 : 0.46)),
             fontWeight: '800',
             color: '#FFFFFF',
             textAlign: 'center',
@@ -156,7 +203,7 @@ scene = {
       } else {
         var glyphCol = pr.tile === 'cream' ? '#D97757'
           : (pr.tile === 'light' ? T.teal : '#FFFFFF');
-        kids.push(providerIconNode(pr.icon, glyphCol, iconD * 0.52, {
+        listKids.push(providerIconNode(pr.icon, glyphCol, iconD * 0.52, {
           opacity: rowIn,
           positioned: {
             left: tileX + iconD * 0.24,
@@ -165,70 +212,147 @@ scene = {
         }));
       }
 
-      // Name + auth subtitle (the app's row typography).
-      var nameX2 = tileX + iconD + 16;
-      kids.push(faText(pr.name, {
+      // Name + auth subtitle (the app's row typography, large).
+      var nameX = tileX + iconD + 18;
+      listKids.push(faText(pr.name, {
         opacity: rowIn,
         style: {
-          fontSize: isP ? 19 : 15.5,
+          fontSize: nameFs,
           fontWeight: '700',
           color: T.text,
           letterSpacing: 0.2,
         },
-        positioned: { left: nameX2, top: ry2 + rowH * (isP ? 0.17 : 0.14) },
+        positioned: { left: nameX, top: rp.y + rowH * (isP ? 0.17 : 0.14) },
       }));
-      kids.push(faText(pr.sub, {
+      listKids.push(faText(pr.sub, {
         opacity: rowIn * 0.85,
         style: {
-          fontSize: isP ? 13.5 : 11.5,
+          fontSize: subFs,
           fontWeight: '500',
           color: T.dim,
           letterSpacing: 0.2,
         },
-        positioned: { left: nameX2, top: ry2 + rowH * (isP ? 0.55 : 0.54) },
+        positioned: { left: nameX, top: rp.y + rowH * (isP ? 0.56 : 0.54) },
       }));
 
       // Right rail: chevron -> spinner -> teal check.
-      var rx2 = rowX + rowW - 34;
-      var ryC = ry2 + rowH / 2;
+      var rx = rp.x + colW - (isP ? 34 : 30);
+      var ryC = rp.y + rowH / 2;
       if (lit) {
-        var ck = backOut(clamp01((frame - lightAt) / 8));
-        kids.push(faRRect(34, 34, 17, T.teal, {
+        var ck = backOut(clamp01((frame - la) / 8));
+        listKids.push(faRRect(isP ? 40 : 32, isP ? 40 : 32, isP ? 20 : 16, T.teal, {
           opacity: clamp01(ck) * rowIn,
-          positioned: { left: rx2 - 17, top: ryC - 17 },
+          positioned: { left: rx - (isP ? 20 : 16), top: ryC - (isP ? 20 : 16) },
         }));
-        kids.push(checkNode(rx2, ryC, 22,
+        listKids.push(checkNode(rx, ryC, isP ? 26 : 20,
           T.isLight ? '#FFFFFF' : '#05070D', ck, clamp01(ck) * rowIn));
       } else if (connecting) {
         var ang = frame * 0.45;
         for (var a = 0; a < 8; a++) {
           var segA = ang + a * Math.PI / 4;
-          kids.push({
+          listKids.push({
             type: 'circle',
             size: 6,
             fill: T.violet,
             opacity: clamp01(rowIn * (0.25 + 0.75 * (a / 8))),
             positioned: {
-              left: rx2 + Math.cos(segA) * 11 - 3,
+              left: rx + Math.cos(segA) * 11 - 3,
               top: ryC + Math.sin(segA) * 11 - 3,
             },
           });
         }
       } else {
-        kids.push(polylineScreen(
-          [{ x: rx2 - 4, y: ryC - 8 }, { x: rx2 + 4, y: ryC }, { x: rx2 - 4, y: ryC + 8 }],
+        listKids.push(polylineScreen(
+          [{ x: rx - 4, y: ryC - 8 }, { x: rx + 4, y: ryC }, { x: rx - 4, y: ryC + 8 }],
           2.5, 1, T.faint, 0.8 * rowIn));
       }
+
+      // Tap flash on AIIN when the camera presses it.
+      if (selected) {
+        var flash = 1 - clamp01((frame - TAP) / 12);
+        if (flash > 0.003) {
+          listKids.push(faRRect(colW, rowH, 18, '#FFFFFF', {
+            opacity: flash * 0.22,
+            positioned: { left: rp.x, top: rp.y },
+          }));
+        }
+      }
+    }
+
+    // ---- Camera journey -----------------------------------------------------
+    // Push in -> drift down past the providers -> whip back up and settle
+    // centred on AIIN (the tap target). Focus/scale piecewise, smoothstep.
+    function smooth(t) { t = clamp01(t); return t * t * (3 - 2 * t); }
+    var p1 = smooth((frame - 8) / 14);
+    var p2 = smooth((frame - 22) / (isP ? 56 : 44));
+    var p3 = smooth((frame - (isP ? 78 : 66)) / 24);
+
+    var sIn = isP ? 1.32 : 1.22;
+    var sEnd = isP ? 1.12 : 1.0; // landscape settles back to the neutral frame
+    var s = 1 + (sIn - 1) * p1;
+    s = s + (sEnd - sIn) * p3;
+
+    var fA, fB, fC;
+    if (isP) {
+      fA = rowCenter(1);
+      fB = rowCenter(9);
+      fC = rowCenter(0);
+    } else {
+      // landscape: scan the left column, step to the right one, pull back out
+      fA = { x: colLX + colW / 2, y: rowCenter(2).y };
+      fB = { x: colRX + colW / 2, y: rowCenter(2).y };
+      fC = { x: cx, y: F.H / 2 }; // neutral full frame for the tap
+    }
+    var fx = cx + (fA.x - cx) * p1;
+    fx = fx + (fB.x - fA.x) * p2;
+    fx = fx + (fC.x - fB.x) * p3;
+    var fy = F.H / 2 + (fA.y - F.H / 2) * p1;
+    fy = fy + (fB.y - fA.y) * p2;
+    fy = fy + (fC.y - fB.y) * p3;
+
+    var camX = -(fx - cx);
+    var camY = -(fy - F.H / 2);
+
+    kids.push({
+      type: 'stack',
+      fit: 'expand',
+      scale: s,
+      offsetX: camX,
+      offsetY: camY,
+      children: listKids,
+    });
+
+    // ---- Tap ripple on AIIN (screen centre — the camera framed it there) ---
+    if (frame >= TAP) {
+      var tp = clamp01((frame - TAP) / 20);
+      // AIIN's on-screen position at the settled camera (pre-scale offsets)
+      var aiinC = rowCenter(0);
+      var tapX = (aiinC.x + camX - cx) * s + cx;
+      var tapY = (aiinC.y + camY - F.H / 2) * s + F.H / 2;
+      var ringPts = [];
+      for (var ra = 0; ra < 24; ra++) {
+        var an = ra / 24 * Math.PI * 2;
+        ringPts.push({ x: tapX + Math.cos(an) * (30 + tp * 190),
+          y: tapY + Math.sin(an) * (30 + tp * 190) });
+      }
+      kids.push(polylineScreen(ringPts, 3, 1, T.violet, (1 - tp) * 0.55));
+      var ring2 = [];
+      for (var rb = 0; rb < 24; rb++) {
+        var an2 = rb / 24 * Math.PI * 2;
+        ring2.push({ x: tapX + Math.cos(an2) * (16 + tp * 120),
+          y: tapY + Math.sin(an2) * (16 + tp * 120) });
+      }
+      kids.push(polylineScreen(ring2, 2.5, 1, T.teal, (1 - tp) * 0.4));
     }
 
     // ---- Status pill --------------------------------------------------------
     // Tail: the pill fades into the handoff dot that flies to 04 (below).
     var pillOut = 1 - clamp01((frame - 122) / 8);
-    var stIn = tw(104, 12, 0, 1, 'easeOut') * pillOut;
+    var stIn = tw(112, 10, 0, 1, 'easeOut') * pillOut;
     var pillW = isP ? F.W * 0.86 : 760;
     var pillH = 84;
     var pillX = cx - pillW / 2;
-    var pillY = isP ? F.H * 0.72 : F.H * 0.705;
+    var pillY = isP ? F.H * 0.30 : F.H * 0.705; // portrait: the free band above AIIN
     if (stIn > 0.003) {
       var glow = 0.5 + 0.2 * Math.sin(frame * 0.45);
 
@@ -263,19 +387,21 @@ scene = {
     }
 
     // Footnote
-    var fnIn = tw(112, 12, 0, 1, 'easeOut');
-    kids.push(faText('SWITCH PROVIDERS ANYTIME — ONE TAP, ZERO LOCK-IN.', {
-      width: F.W,
-      opacity: fnIn * 0.7 * pillOut,
-      style: {
-        fontSize: isP ? 20 : 19,
-        fontFamily: 'monospace',
-        color: T.faint,
-        textAlign: 'center',
-        letterSpacing: 2,
-      },
-      positioned: { left: 0, top: isP ? F.H * 0.85 : F.H * 0.83 },
-    }));
+    if (!isP) {
+      var fnIn = tw(112, 12, 0, 1, 'easeOut');
+      kids.push(faText('SWITCH PROVIDERS ANYTIME — ONE TAP, ZERO LOCK-IN.', {
+        width: F.W,
+        opacity: fnIn * 0.7 * pillOut,
+        style: {
+          fontSize: 19,
+          fontFamily: 'monospace',
+          color: T.faint,
+          textAlign: 'center',
+          letterSpacing: 2,
+        },
+        positioned: { left: 0, top: F.H * 0.83 },
+      }));
+    }
 
     // ---- Handoff to 04_ask --------------------------------------------------
     // The CONNECTED pill collapses into its pulse dot, which flies to 04's

@@ -58,6 +58,12 @@ function providerIconSvg(name, color) {
         '<path d="M3.4 11.4L12 15.7l8.6-4.3 1.9 1L12 17.7l-10.5-5.3z" opacity="0.72"/>' +
         '<path d="M3.4 15.9L12 20.2l8.6-4.3 1.9 1L12 22.2l-10.5-5.3z" opacity="0.45"/>'
       );
+    case 'copilot':
+      return svg(
+        '<path d="M4.8 9.6c.5-2.8 3.4-4.8 7.2-4.8s6.7 2 7.2 4.8l-2.3.01C16.4 8 14.4 6.9 12 6.9S7.6 8 7.1 9.6z"/>' +
+        '<rect x="3.2" y="10.4" width="7.6" height="6" rx="3"/>' +
+        '<rect x="13.2" y="10.4" width="7.6" height="6" rx="3"/>'
+      );
     case 'openrouter':
       return svg(
         '<circle cx="5" cy="19" r="2.4"/>' +
