@@ -91,15 +91,14 @@ scene = {
 
     var ringDeg = 360 * smooth((frame - 40) / 60); // slow, stately turn
 
-    // ---- Headline: big, centred, pushed down by the incoming tiles ---------
+    // ---- Headline: three beats - ALONE (hero shot), then the camera pulls
+    // away (shrink + fade + slight fall), then the provider tiles fly in ----
     var titleIn = expoOut(clamp01((frame - 4) / 12));
-    var push = smooth((frame - 26) / 24); // tiles land on the ring -> text sinks
-    var pushed = (1 - smooth((frame - 100) / 10)) * // gone after the tap
-      (1 - smooth((frame - 50) / 12) * 0.75); // ...and mostly once sunk
+    var push = smooth((frame - 26) / 22); // camera recede, text dissolves
     var hFs = (isP ? m * 0.088 : m * 0.070) * (1 - push * 0.42);
     var hTop = (isP ? F.H * 0.352 : F.H * 0.30) +
-      push * (isP ? F.H * 0.428 : F.H * 0.57); // landscape: clear under the ring
-    var hOp = clamp01(titleIn * 1.15) * (0.9 + 0.1 * (1 - push)) * pushed;
+      push * (isP ? F.H * 0.055 : F.H * 0.04); // falls back as it recedes
+    var hOp = clamp01(titleIn * 1.15) * (1 - push);
     if (hOp > 0.004) {
       var hStyle = {
         fontSize: Math.round(hFs),
@@ -186,7 +185,7 @@ scene = {
 
     for (var i = 0; i < N; i++) {
       var pr = providers[i];
-      var inAt = 12 + i * 2.2;
+      var inAt = 30 + i * 1.9; // after the headline recede begins
       var fly = expoOut(clamp01((frame - inAt) / 14));
       if (fly <= 0.01) continue;
 
@@ -357,7 +356,7 @@ scene = {
       ? 1 + 0.30 * backOut(clamp01((frame - TAP) / 10)) : 1;
     var txtL = fsx + tileD * heroPop * camS / 2 + 44;
     var txtTop = fsy - (isP ? 84 : 74);
-    var focusIn = tw(20, 12, 0, 1, 'easeOut');
+    var focusIn = tw(58, 12, 0, 1, 'easeOut');
     var focusA = focusIn * (0.55 + 0.45 * Math.max(0, 1 - bestD / (STEP * 0.6)));
     focusA *= 1 - smooth((frame - 104) / 12); // gone once the tap settles in
     if (focusA > 0.01) {
