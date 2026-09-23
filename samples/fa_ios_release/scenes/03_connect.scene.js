@@ -1,15 +1,16 @@
 // 03 — Connect — BYOK: bring your own AI provider (144 frames, 3 bars)
 //
-// Mirrors the real onboarding list — all 11 providers from the flutter_agent
-// catalog (aiin, openrouter, chatgpt, copilot, anthropic, google, kimi,
-// openai, codemie, minimax, dial) as full-width rows with brand-coloured
-// icon tiles, bold names and auth-method subtitles.
-//
-// The camera travels the list: it pushes in, drifts down past the providers
-// (each row connects — chevron -> spinner -> teal check — as the camera
-// passes it), then whips back up, settles centred on AIIN and TAPS it
-// (ripple rings). AIIN connects last, the status pill confirms
-// "FA iOS AGENT — CONNECTED", and the handoff dot flies to 04.
+// Carousel concept: the big "CHOOSE HOW FA THINKS." headline sits dead
+// centre with the BYOK line under it, then all 11 provider tiles from the
+// flutter_agent catalog (aiin, openrouter, chatgpt, copilot, anthropic,
+// google, kimi, openai, codemie, minimax, dial) fly in along a semicircular
+// arc from the top - and as they arrive they PUSH the headline down and
+// out. The tiles form a carousel ring that makes one full elegant turn;
+// each tile connects (teal check badge) as it passes the top of the ring.
+// The turn ends exactly where it started - with AIIN at the top: the camera
+// settles on it, ripple rings tap it, AIIN pops with the violet selected
+// border, the status pill confirms "FA iOS AGENT - CONNECTED", and the
+// handoff dot flies to 04.
 
 scene = {
   id: '03_connect',
@@ -29,6 +30,7 @@ scene = {
     function tw(at, dur, from, to, easing) {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
+    function smooth(t) { t = clamp01(t); return t * t * (3 - 2 * t); }
 
     var kids = [];
 
@@ -49,44 +51,7 @@ scene = {
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
-    // ---- Title (screen space) ---------------------------------------------
-    var titleIn = expoOut(clamp01((frame - 4) / 12));
-    kids.push(faText('CHOOSE HOW FA THINKS.', {
-      width: F.W,
-      opacity: clamp01(titleIn * 1.2),
-      offsetY: 18 * (1 - titleIn),
-      style: {
-        fontSize: isP ? Math.round(m * 0.058) : Math.round(m * 0.042),
-        fontFamily: 'Impact',
-        fontWeight: '700',
-        color: T.text,
-        textAlign: 'center',
-        letterSpacing: 3,
-        gradient: {
-          begin: 'topCenter',
-          end: 'bottomCenter',
-          colors: T.isLight
-            ? ['#3C4043', '#0B0F19']
-            : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
-          stops: T.isLight ? [0.0, 1.0] : [0.0, 0.45, 1.0],
-        },
-      },
-      positioned: { left: 0, top: isP ? F.H * 0.10 : F.H * 0.14 },
-    }));
-    kids.push(faText('BYOK — YOUR KEYS, YOUR KEYCHAIN. NO MIDDLEMAN.', {
-      width: F.W,
-      opacity: titleIn * 0.75,
-      style: {
-        fontSize: isP ? 21 : 20,
-        fontFamily: 'monospace',
-        color: T.dim,
-        textAlign: 'center',
-        letterSpacing: 2,
-      },
-      positioned: { left: 0, top: isP ? F.H * 0.165 : F.H * 0.235 },
-    }));
-
-    // ---- Provider rows (content space — the camera moves over this) -------
+    // ---- Carousel geometry --------------------------------------------------
     var providers = [
       { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin-text', tile: 'aiin' },
       { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter', tile: 'light' },
@@ -101,66 +66,141 @@ scene = {
       { name: 'DIAL', sub: 'AI gateway — DIAL platform', icon: 'dial-text', tile: 'dial' },
     ];
     var N = providers.length;
+    var STEP = 360 / N;
 
-    var rowH = isP ? 120 : 68;
-    var rowGap = isP ? 16 : 9;
-    var step = rowH + rowGap;
-    var iconD = isP ? 72 : 40;
-    var nameFs = isP ? 26 : 17;
-    var subFs = isP ? 17.5 : 12;
-    var listY = isP ? F.H * 0.19 : F.H * 0.27; // below the BYOK subtitle
-    var colW, colGap, colLX, colRX;
-    if (isP) {
-      colW = F.W * 0.74; // must survive the 1.32x camera zoom inside frame
-      colLX = cx - colW / 2;
-    } else {
-      colGap = 24;
-      colW = (F.W * 0.86 - colGap) / 2;
-      colLX = cx - colW - colGap / 2;
-      colRX = cx + colGap / 2;
+    var ccy = isP ? F.H * 0.44 : F.H * 0.42;   // ring centre
+    var R = isP ? F.H * 0.30 : F.H * 0.34;     // ring radius
+    var tileD = isP ? 104 : 76;
+
+    function tileAngle(i) { return (-90 + i * STEP) * Math.PI / 180; }
+    function slotPos(i, ringDeg) {
+      var a = tileAngle(i) + ringDeg * Math.PI / 180;
+      return { x: cx + R * Math.cos(a), y: ccy + R * Math.sin(a) };
     }
 
-    function rowPos(i) {
-      if (isP) return { x: colLX, y: listY + i * step };
-      return i < 6
-        ? { x: colLX, y: listY + i * step }
-        : { x: colRX, y: listY + (i - 6) * step };
-    }
-    function rowCenter(i) {
-      var p = rowPos(i);
-      return { x: p.x + colW / 2, y: p.y + rowH / 2 };
-    }
-
-    var TAP = 106;
+    // Timing: tiles fly in staggered, ring spins 40-78 (one full turn),
+    // AIIN is tapped at 100. Tile i (i>=1) crosses the ring top mid-spin.
+    var TAP = 100;
     function lightAt(i) {
-      return i === 0 ? TAP : Math.round(26 + (i - 1) * 5.4);
+      return i === 0 ? TAP : Math.round(40 + 38 * (360 - i * STEP) / 360);
     }
+
+    var ringDeg = 360 * smooth((frame - 40) / 38);
+
+    // ---- Headline: big, centred, pushed down by the incoming tiles ---------
+    var titleIn = expoOut(clamp01((frame - 4) / 12));
+    var push = smooth((frame - 26) / 24); // tiles land on the ring -> text sinks
+    var pushed = tw(96, 12, 1, 0, 'easeOut') * (1 - 0); // fade out after the tap
+    pushed = 1 - smooth((frame - 100) / 10);
+    var hFs = (isP ? m * 0.088 : m * 0.070) * (1 - push * 0.42);
+    var hTop = (isP ? F.H * 0.352 : F.H * 0.30) +
+      push * (isP ? F.H * 0.428 : F.H * 0.57); // landscape: clear under the ring
+    var hOp = clamp01(titleIn * 1.15) * (0.9 + 0.1 * (1 - push)) * pushed;
+    if (hOp > 0.004) {
+      var hStyle = {
+        fontSize: Math.round(hFs),
+        fontFamily: 'Impact',
+        fontWeight: '700',
+        color: T.text,
+        textAlign: 'center',
+        letterSpacing: 3,
+        gradient: {
+          begin: 'topCenter',
+          end: 'bottomCenter',
+          colors: T.isLight
+            ? ['#3C4043', '#0B0F19']
+            : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+          stops: T.isLight ? [0.0, 1.0] : [0.0, 0.45, 1.0],
+        },
+      };
+      if (isP) {
+        kids.push(faText('CHOOSE HOW', {
+          width: F.W, opacity: hOp,
+          style: hStyle,
+          positioned: { left: 0, top: hTop },
+        }));
+        kids.push(faText('FA THINKS.', {
+          width: F.W, opacity: hOp,
+          style: hStyle,
+          positioned: { left: 0, top: hTop + hFs * 1.04 },
+        }));
+        kids.push(faText('BYOK — YOUR KEYS, YOUR KEYCHAIN. NO MIDDLEMAN.', {
+          width: F.W, opacity: hOp * 0.75,
+          style: {
+            fontSize: 21,
+            fontFamily: 'monospace',
+            color: T.dim,
+            textAlign: 'center',
+            letterSpacing: 2,
+          },
+          positioned: { left: 0, top: hTop + hFs * 2.24 + 18 },
+        }));
+      } else {
+        kids.push(faText('CHOOSE HOW FA THINKS.', {
+          width: F.W, opacity: hOp,
+          style: hStyle,
+          positioned: { left: 0, top: hTop },
+        }));
+        kids.push(faText('BYOK — YOUR KEYS, YOUR KEYCHAIN. NO MIDDLEMAN.', {
+          width: F.W, opacity: hOp * 0.75,
+          style: {
+            fontSize: 20,
+            fontFamily: 'monospace',
+            color: T.dim,
+            textAlign: 'center',
+            letterSpacing: 2,
+          },
+          positioned: { left: 0, top: hTop + hFs * 1.3 + 16 },
+        }));
+      }
+    }
+
+    // ---- Carousel ring (content space inside the settle camera) -------------
+    var recede = 1 - 0.62 * smooth((frame - TAP) / 8); // non-AIIN tiles dim after the tap
 
     var listKids = [];
+
+    // Faint guide circle fades in as the carousel forms.
+    var guideIn = tw(36, 12, 0, 1, 'easeOut');
+    if (guideIn > 0.01) {
+      var guide = [];
+      for (var g = 0; g < 56; g++) {
+        var ga = g / 56 * Math.PI * 2;
+        guide.push({ x: cx + Math.cos(ga) * R, y: ccy + Math.sin(ga) * R });
+      }
+      listKids.push(polylineScreen(guide, 2, 1, T.faint, 0.16 * guideIn));
+    }
+
     for (var i = 0; i < N; i++) {
       var pr = providers[i];
-      var inAt = 6 + i * 4;
-      var rowIn = expoOut(clamp01((frame - inAt) / 10));
-      if (rowIn <= 0.01) continue;
+      var inAt = 12 + i * 2.2;
+      var fly = expoOut(clamp01((frame - inAt) / 14));
+      if (fly <= 0.01) continue;
+
+      // Semicircular fly-in: sweep the slot angle while the radius shrinks,
+      // plus a playful per-tile spin that settles at 0.
+      var arcOff = (1 - fly) * 62 * Math.PI / 180;
+      var rr = R * (1 + (1 - fly) * 1.15);
+      var a = tileAngle(i) + (ringDeg + (1 - fly) * 0) * Math.PI / 180 + arcOff;
+      var tx = cx + rr * Math.cos(a);
+      var ty = ccy + rr * Math.sin(a);
+      var spin = (1 - fly) * -(150 + i * 6);
+
       var la = lightAt(i);
       var lit = frame >= la;
-      var connecting = !lit && frame >= la - 12;
       var selected = i === 0 && lit;
-      var rp = rowPos(i);
+      var op = (i === 0 ? 1 : recede) * clamp01(fly * 1.4);
 
-      listKids.push(faRRect(colW, rowH, 18,
-        selected ? (T.isLight ? '#FFFFFF' : '#121A2E') : T.card, {
-        opacity: rowIn,
-        border: { color: selected ? T.violet : T.border, width: selected ? 2.5 : 1.5 },
-        positioned: { left: rp.x, top: rp.y },
-      }));
+      var pop = 1;
+      if (selected) pop = 1 + 0.30 * backOut(clamp01((frame - TAP) / 10));
+      else if (lit) pop = 1 + 0.10 * backOut(clamp01((frame - la) / 8));
 
-      // Icon tile: brand-coloured squircle + monochrome glyph.
-      var tileX = rp.x + 16;
-      var tileY = rp.y + (rowH - iconD) / 2;
-      var tile = { type: 'container', width: iconD, height: iconD,
-        radius: iconD * 0.28, opacity: rowIn,
-        positioned: { left: tileX, top: tileY } };
+      var half = tileD * pop / 2;
+
+      // Tile: brand-coloured squircle + monochrome glyph.
+      var tile = { type: 'container', width: tileD * pop, height: tileD * pop,
+        radius: tileD * 0.28, opacity: op, rotation: spin,
+        positioned: { left: tx - half, top: ty - half } };
       if (pr.tile === 'aiin') {
         tile.gradient = { begin: 'topLeft', end: 'bottomRight',
           colors: [T.violet, T.violetDeep], stops: [0.0, 1.0] };
@@ -184,163 +224,96 @@ scene = {
       } else {
         tile.color = '#1C2030';
       }
+      if (selected) {
+        tile.border = { color: T.violet, width: 3 };
+      } else if (lit) {
+        tile.border = { color: T.teal, width: 2 };
+      } else {
+        tile.border = { color: T.border, width: 1.5 };
+      }
+      if (selected) {
+        tile.shadows = [{ color: T.violet, opacity: 0.45, blur: 34,
+          offset: { x: 0, y: 6 } }];
+      }
       listKids.push(tile);
+
       if (pr.icon.indexOf('-text') > 0) {
         var letters = pr.icon.split('-')[0] === 'aiin' ? 'AI'
           : pr.icon.split('-')[0].charAt(0).toUpperCase();
         listKids.push(faText(letters, {
-          width: iconD,
-          opacity: rowIn,
+          width: tileD * pop,
+          opacity: op,
+          rotation: spin,
           style: {
-            fontSize: Math.round(iconD * (letters.length > 1 ? 0.40 : 0.46)),
+            fontSize: Math.round(tileD * pop * (letters.length > 1 ? 0.40 : 0.46)),
             fontWeight: '800',
             color: '#FFFFFF',
             textAlign: 'center',
             letterSpacing: 0.5,
           },
-          positioned: { left: tileX, top: tileY + iconD * 0.26 },
+          positioned: { left: tx - half, top: ty - half + tileD * pop * 0.26 },
         }));
       } else {
         var glyphCol = pr.tile === 'cream' ? '#D97757'
           : (pr.tile === 'light' ? T.teal : '#FFFFFF');
-        listKids.push(providerIconNode(pr.icon, glyphCol, iconD * 0.52, {
-          opacity: rowIn,
+        listKids.push(providerIconNode(pr.icon, glyphCol, tileD * pop * 0.52, {
+          opacity: op,
+          rotation: spin,
           positioned: {
-            left: tileX + iconD * 0.24,
-            top: tileY + iconD * 0.24,
+            left: tx - tileD * pop * 0.26,
+            top: ty - tileD * pop * 0.26,
           },
         }));
       }
 
-      // Name + auth subtitle (the app's row typography, large).
-      var nameX = tileX + iconD + 18;
-      listKids.push(faText(pr.name, {
-        opacity: rowIn,
-        style: {
-          fontSize: nameFs,
-          fontWeight: '700',
-          color: T.text,
-          letterSpacing: 0.2,
-        },
-        positioned: { left: nameX, top: rp.y + rowH * (isP ? 0.17 : 0.14) },
-      }));
-      listKids.push(faText(pr.sub, {
-        opacity: rowIn * 0.85,
-        style: {
-          fontSize: subFs,
-          fontWeight: '500',
-          color: T.dim,
-          letterSpacing: 0.2,
-        },
-        positioned: { left: nameX, top: rp.y + rowH * (isP ? 0.56 : 0.54) },
-      }));
-
-      // Right rail: chevron -> spinner -> teal check.
-      var rx = rp.x + colW - (isP ? 34 : 30);
-      var ryC = rp.y + rowH / 2;
+      // Connection: teal check badge pinned to the tile's corner.
       if (lit) {
         var ck = backOut(clamp01((frame - la) / 8));
-        listKids.push(faRRect(isP ? 40 : 32, isP ? 40 : 32, isP ? 20 : 16, T.teal, {
-          opacity: clamp01(ck) * rowIn,
-          positioned: { left: rx - (isP ? 20 : 16), top: ryC - (isP ? 20 : 16) },
+        var bd = tileD * 0.42;
+        var bx = tx + tileD * pop / 2 - bd * 0.72;
+        var by = ty + tileD * pop / 2 - bd * 0.72;
+        listKids.push(faRRect(bd, bd, bd / 2, T.teal, {
+          opacity: clamp01(ck) * op,
+          positioned: { left: bx, top: by },
         }));
-        listKids.push(checkNode(rx, ryC, isP ? 26 : 20,
-          T.isLight ? '#FFFFFF' : '#05070D', ck, clamp01(ck) * rowIn));
-      } else if (connecting) {
-        var ang = frame * 0.45;
-        for (var a = 0; a < 8; a++) {
-          var segA = ang + a * Math.PI / 4;
-          listKids.push({
-            type: 'circle',
-            size: 6,
-            fill: T.violet,
-            opacity: clamp01(rowIn * (0.25 + 0.75 * (a / 8))),
-            positioned: {
-              left: rx + Math.cos(segA) * 11 - 3,
-              top: ryC + Math.sin(segA) * 11 - 3,
-            },
-          });
-        }
-      } else {
-        listKids.push(polylineScreen(
-          [{ x: rx - 4, y: ryC - 8 }, { x: rx + 4, y: ryC }, { x: rx - 4, y: ryC + 8 }],
-          2.5, 1, T.faint, 0.8 * rowIn));
-      }
-
-      // Tap flash on AIIN when the camera presses it.
-      if (selected) {
-        var flash = 1 - clamp01((frame - TAP) / 12);
-        if (flash > 0.003) {
-          listKids.push(faRRect(colW, rowH, 18, '#FFFFFF', {
-            opacity: flash * 0.22,
-            positioned: { left: rp.x, top: rp.y },
-          }));
-        }
+        listKids.push(checkNode(bx + bd / 2, by + bd / 2, bd * 0.62,
+          T.isLight ? '#FFFFFF' : '#05070D', ck, clamp01(ck) * op));
       }
     }
 
-    // ---- Camera journey -----------------------------------------------------
-    // Push in -> drift down past the providers -> whip back up and settle
-    // centred on AIIN (the tap target). Focus/scale piecewise, smoothstep.
-    function smooth(t) { t = clamp01(t); return t * t * (3 - 2 * t); }
-    var p1 = smooth((frame - 8) / 14);
-    var p2 = smooth((frame - 22) / (isP ? 56 : 44));
-    var p3 = smooth((frame - (isP ? 78 : 66)) / 24);
-
-    var sIn = isP ? 1.32 : 1.22;
-    var sEnd = isP ? 1.12 : 1.0; // landscape settles back to the neutral frame
-    var s = 1 + (sIn - 1) * p1;
-    s = s + (sEnd - sIn) * p3;
-
-    var fA, fB, fC;
-    if (isP) {
-      fA = rowCenter(1);
-      fB = rowCenter(9);
-      fC = rowCenter(0);
-    } else {
-      // landscape: scan the left column, step to the right one, pull back out
-      fA = { x: colLX + colW / 2, y: rowCenter(2).y };
-      fB = { x: colRX + colW / 2, y: rowCenter(2).y };
-      fC = { x: cx, y: F.H / 2 }; // neutral full frame for the tap
-    }
-    var fx = cx + (fA.x - cx) * p1;
-    fx = fx + (fB.x - fA.x) * p2;
-    fx = fx + (fC.x - fB.x) * p3;
-    var fy = F.H / 2 + (fA.y - F.H / 2) * p1;
-    fy = fy + (fB.y - fA.y) * p2;
-    fy = fy + (fC.y - fB.y) * p3;
-
-    var camX = -(fx - cx);
-    var camY = -(fy - F.H / 2);
+    // ---- Settle camera: after the tap, ease onto the AIIN tile --------------
+    var setT = smooth((frame - 100) / 12);
+    var camS = 1 + 0.10 * setT;
+    var aiin = slotPos(0, ringDeg);
+    var camX = -(aiin.x - cx) * setT;
+    var camY = -((aiin.y) - F.H / 2) * setT;
 
     kids.push({
       type: 'stack',
       fit: 'expand',
-      scale: s,
+      scale: camS,
       offsetX: camX,
       offsetY: camY,
       children: listKids,
     });
 
-    // ---- Tap ripple on AIIN (screen centre — the camera framed it there) ---
+    // ---- Tap ripple on AIIN (screen space, tracks the settled camera) -------
     if (frame >= TAP) {
       var tp = clamp01((frame - TAP) / 20);
-      // AIIN's on-screen position at the settled camera (pre-scale offsets)
-      var aiinC = rowCenter(0);
-      var tapX = (aiinC.x + camX - cx) * s + cx;
-      var tapY = (aiinC.y + camY - F.H / 2) * s + F.H / 2;
+      var tapX = (aiin.x + camX - cx) * camS + cx;
+      var tapY = (aiin.y + camY - F.H / 2) * camS + F.H / 2;
       var ringPts = [];
       for (var ra = 0; ra < 24; ra++) {
         var an = ra / 24 * Math.PI * 2;
-        ringPts.push({ x: tapX + Math.cos(an) * (30 + tp * 190),
-          y: tapY + Math.sin(an) * (30 + tp * 190) });
+        ringPts.push({ x: tapX + Math.cos(an) * (26 + tp * 170),
+          y: tapY + Math.sin(an) * (26 + tp * 170) });
       }
       kids.push(polylineScreen(ringPts, 3, 1, T.violet, (1 - tp) * 0.55));
       var ring2 = [];
       for (var rb = 0; rb < 24; rb++) {
         var an2 = rb / 24 * Math.PI * 2;
-        ring2.push({ x: tapX + Math.cos(an2) * (16 + tp * 120),
-          y: tapY + Math.sin(an2) * (16 + tp * 120) });
+        ring2.push({ x: tapX + Math.cos(an2) * (14 + tp * 110),
+          y: tapY + Math.sin(an2) * (14 + tp * 110) });
       }
       kids.push(polylineScreen(ring2, 2.5, 1, T.teal, (1 - tp) * 0.4));
     }
@@ -352,7 +325,7 @@ scene = {
     var pillW = isP ? F.W * 0.86 : 760;
     var pillH = 84;
     var pillX = cx - pillW / 2;
-    var pillY = isP ? F.H * 0.30 : F.H * 0.705; // portrait: the free band above AIIN
+    var pillY = isP ? F.H * 0.585 : F.H * 0.705; // right under the centred AIIN tile
     if (stIn > 0.003) {
       var glow = 0.5 + 0.2 * Math.sin(frame * 0.45);
 
@@ -383,23 +356,6 @@ scene = {
           letterSpacing: 3,
         },
         positioned: { left: pillX + (isP ? 62 : 70), top: pillY + 29 },
-      }));
-    }
-
-    // Footnote
-    if (!isP) {
-      var fnIn = tw(112, 12, 0, 1, 'easeOut');
-      kids.push(faText('SWITCH PROVIDERS ANYTIME — ONE TAP, ZERO LOCK-IN.', {
-        width: F.W,
-        opacity: fnIn * 0.7 * pillOut,
-        style: {
-          fontSize: 19,
-          fontFamily: 'monospace',
-          color: T.faint,
-          textAlign: 'center',
-          letterSpacing: 2,
-        },
-        positioned: { left: 0, top: F.H * 0.83 },
       }));
     }
 
