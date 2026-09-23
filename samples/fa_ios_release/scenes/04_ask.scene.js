@@ -64,7 +64,13 @@ scene = {
     var barY = isP ? F.H * 0.885 : F.H * 0.875; // input bar top
     var barH = isP ? 96 : 88;
     var kbH = Math.round(Math.min(F.W * 0.52, F.H * 0.30)); // keyboard mock
-    var kbBar = smooth((frame - 56) / 14) * (1 - smooth((frame - 108) / 14));
+    var tFs = isP ? 40 : 36;  // input text size (shared with the bubble morph)
+    var barH2 = Math.round(tFs * 2 + 64);       // the grown 2-line bar
+    var bFs2 = isP ? 30 : 28;                   // landed bubble text size
+    var barX = x0;
+    var sendD = isP ? 72 : 64;
+    var sendX = x0 + chatW - sendD - 14;
+    var kbBar = smooth((frame - 56) / 14) * (1 - smooth((frame - 124) / 12));
     var barYNow = barY - (kbH + 8) * kbBar; // bar rides up on the keyboard
 
     var bullets = [
@@ -79,21 +85,20 @@ scene = {
     var cardTop = barY - 36 - cardH;          // just above the input bar
 
     // The card pushes the two earlier messages up as it arrives.
-    var push = (isP ? 120 : 262) * smooth((frame - 128) / 22);
+    var push = (isP ? 120 : 262) * smooth((frame - 120) / 28);
+    var threadLift = (kbH + 8) * kbBar; // chat scrolls up over the keyboard
 
     // ---- Camera: greeting -> input bar -> follow the send -> card ---------
     var tGreet = smooth(frame / 12) * (1 - smooth((frame - 36) / 16));
     var tBar = smooth((frame - 58) / 14) * (1 - smooth((frame - 96) / 14));
     var tCard = smooth((frame - 132) / 18) * (1 - smooth((frame - 170) / 10));
-    var camS = 1 + 0.08 * tGreet + 0.035 * tBar + 0.04 * tCard;
+    var camS = 1 + 0.04 * tCard;   // one camera beat: the card rise
     var camX = 0;
-    var camY = -(gC - F.H / 2) * 0.34 * tGreet
-      - (barY - (kbH + 8) - F.H / 2) * 0.30 * tBar
-      + (cardTop + 200 - F.H / 2) * 0.10 * tCard;
+    var camY = (cardTop + 200 - F.H / 2) * 0.10 * tCard;
 
     // ---- 1. Greeting card in the centre ------------------------------------
     var gIn = tw(32, 20, 0, 1, 'easeOut');
-    var gTop = gC - gH / 2 - push; // the card pushes the greeting up
+    var gTop = gC - gH / 2 - push - threadLift; // keyboard lift + card push
     if (gIn > 0.003) {
       kids.push({
         type: 'container',
@@ -136,34 +141,78 @@ scene = {
     }
 
     // ---- 3. User bubble — launches out of the bar, lands under greeting ----
-    var sendT = clamp01((frame - 108) / 18);
+    var sendT = clamp01((frame - 107) / 17);
     var qIn = backOut(sendT);
-    if (qIn > 0.003) {
-      var landY = qSlot - push;
-      var flyFrom = barY - (kbH + 8) - 40; // the raised input bar
-      var flyY = flyFrom + (landY - flyFrom) * qIn;
+    // world-landed bubble takes over once the morph settles
+    var landIn = tw(124, 6, 0, 1, 'easeOut');
+    if (landIn > 0.003) {
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
-        opacity: qIn * 0.35,
+        opacity: landIn * 0.35,
         blur: 24,
-        positioned: { left: x0 + chatW * 0.22 - 10, top: flyY - 8 },
+        positioned: { left: x0 + chatW * 0.22 - 10,
+          top: qSlot - push - threadLift - 8 },
       }));
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
-        opacity: qIn,
-        positioned: { left: x0 + chatW * 0.22, top: flyY },
+        opacity: landIn,
+        positioned: { left: x0 + chatW * 0.22, top: qSlot - push - threadLift },
       }));
       kids.push(faText(qText, {
         width: chatW * 0.78 - 56,
-        opacity: qIn,
+        opacity: landIn,
         style: {
-          fontSize: isP ? 27 : 28,
+          fontSize: bFs2,
           fontFamily: 'monospace',
           fontWeight: '600',
           color: '#FFFFFF',
           letterSpacing: 0,
+          textAlign: 'left',
         },
-        positioned: { left: x0 + chatW * 0.22 + 28, top: flyY + 26 },
+        positioned: { left: x0 + chatW * 0.22 + 28,
+          top: qSlot - push - threadLift + 26 },
       }));
-      var dIn = tw(132, 8, 0, 1, 'easeOut');
+    }
+    if (qIn > 0.003 && landIn < 0.997) {
+      var landY = qSlot - push - threadLift;
+      // The message IS the input field: start from the raised bar rect
+      // and morph position+size into the chat bubble.
+      var fromX = barX, fromW = chatW;
+      var fromY = barY - (kbH + 8) - (barH2 - barH);
+      var fromH = barH2;
+      var toX = x0 + chatW * 0.22, toW = chatW * 0.78;
+      var toH = 118;
+      var mx = fromX + (toX - fromX) * qIn;
+      var my = fromY + (landY - fromY) * qIn;
+      var mw = fromW + (toW - fromW) * qIn;
+      var mh = fromH + (toH - fromH) * qIn;
+      var mr = fromH / 2 + (26 - fromH / 2) * qIn;
+      fixed.push(faRRect(mw, mh, mr, T.violetDeep, {
+        opacity: qIn * 0.35,
+        blur: 24,
+        positioned: { left: mx - 10, top: my - 8 },
+      }));
+      fixed.push(faRRect(mw, mh, mr, T.violetDeep, {
+        opacity: qIn,
+        positioned: { left: mx, top: my },
+      }));
+      fixed.push(faText(qText, {
+        width: mw - 56,
+        opacity: qIn,
+        style: {
+          fontSize: tFs + (bFs2 - tFs) * qIn,
+          fontFamily: 'monospace',
+          fontWeight: '600',
+          color: '#FFFFFF',
+          letterSpacing: 0,
+          textAlign: 'left',
+        },
+        positioned: {
+          left: barX + 104 + (toX + 28 - barX - 104) * qIn,
+          top: fromY + 24 + (26 - 24) * qIn + (my - fromY),
+        },
+      }));
+    }
+    var dIn = tw(132, 8, 0, 1, 'easeOut');
+    if (dIn > 0.01) {
       kids.push(faText('DELIVERED · ON-DEVICE', {
         opacity: dIn * 0.5,
         style: {
@@ -172,7 +221,8 @@ scene = {
           color: T.faint,
           letterSpacing: 2,
         },
-        positioned: { left: x0 + chatW * 0.22 + 8, top: qSlot - push + 126 },
+        positioned: { left: x0 + chatW * 0.22 + 8,
+          top: qSlot - push - threadLift + 126 },
       }));
     }
 
@@ -252,29 +302,22 @@ scene = {
 
     var press = frame >= 106 && frame < 114
       ? Math.sin(clamp01((frame - 106) / 8) * Math.PI) : 0;
+    var pressD = 1 - 0.22 * press;
 
-    var barX = x0;
-    var sendD = isP ? 72 : 64;
-    var sendX = x0 + chatW - sendD - 14;
-
-    var tFs = isP ? 34 : 32; // big, readable input — wraps honestly
     var tMaxW = chatW - sendD - 130;
     // Input grows to TWO lines when the sentence no longer fits one
     // (real iOS behaviour). The bar keeps its bottom edge and grows up.
     var cpl = Math.max(8, Math.floor(tMaxW / (tFs * 0.60)));
     var twoLine = shown.length > cpl;
     var barTop = barYNow;
-    var barHNow = barH;
-    if (twoLine) {
-      barHNow = Math.round(tFs * 2 + 52);
-      barTop = barYNow - (barHNow - barH); // bottom edge stays put
-    }
+    var barHNow = twoLine ? barH2 : barH;
+    if (twoLine) barTop = barYNow - (barH2 - barH); // bottom edge stays put
     var barCY = barTop + barHNow / 2;
     fixed.push(faRRect(chatW, barHNow, barH / 2, T.card, {
       opacity: barIn,
       border: { color: press > 0 ? T.violet : T.border,
         width: press > 0 ? 2 : 1.5 },
-      scale: press > 0 ? 1 - 0.012 * press : 1,
+      scale: press > 0 ? 1 - 0.02 * press : 1,
       positioned: { left: barX, top: barTop },
     }));
     fixed.push(faLogoSvgNode(barX + 44, barCY, 40, barIn));
@@ -288,8 +331,10 @@ scene = {
       };
       if (!twoLine) {
         var tW = shown.length * tFs * 0.60;
-        var tX = barX + 78 - Math.max(0, tW - tMaxW);
+        var tX = barX + 104 - Math.max(0, tW - tMaxW);
+        txStyle.textAlign = 'left';
         fixed.push(faText(shown, { opacity: barIn, style: txStyle,
+          width: tMaxW,
           positioned: { left: tX, top: barCY - tFs * 0.60 } }));
       } else {
         txStyle.textAlign = 'left';
@@ -298,11 +343,11 @@ scene = {
         var l1 = shown.slice(0, cut);
         var l2 = shown.slice(cut > 0 ? cut + 1 : cpl);
         fixed.push(faText(l1, { opacity: barIn, style: txStyle,
-          positioned: { left: barX + 78,
-            top: barTop + 18 } }));
+          positioned: { left: barX + 104,
+            top: barTop + 24 } }));
         fixed.push(faText(l2, { opacity: barIn, style: txStyle,
-          positioned: { left: barX + 78,
-            top: barTop + 18 + tFs * 1.5 } }));
+          positioned: { left: barX + 104,
+            top: barTop + 24 + tFs * 1.55 } }));
       }
     } else {
       fixed.push(faText('Ask anything…', {
@@ -313,13 +358,15 @@ scene = {
           fontWeight: '500',
           color: T.dim,
           letterSpacing: 0,
+          textAlign: 'left',
         },
-        positioned: { left: barX + 78, top: barCY - tFs * 0.60 },
+        width: tMaxW,
+        positioned: { left: barX + 104, top: barCY - tFs * 0.60 },
       }));
     }
 
     // send button: violet disc + up-arrow triangle, presses in
-    var sendS = 1 - 0.14 * press;
+    var sendS = pressD;
     fixed.push({
       type: 'container',
       width: sendD,
@@ -337,22 +384,22 @@ scene = {
     var apts = [{ x: acx, y: acy - 13 }, { x: acx + 10, y: acy + 5 },
       { x: acx - 10, y: acy + 5 }];
     fixed.push(polylineScreen(apts, 7, 1, '#FFFFFF', barIn));
-    if (frame >= 108 && frame < 122) {
-      var fr = (frame - 108) / 14;
+    if (frame >= 106 && frame < 122) {
+      var fr = (frame - 106) / 16;
       fixed.push({
         type: 'circle',
-        size: sendD + 60 * fr,
+        size: sendD + 90 * fr,
         fill: '#00000000',
         border: { color: T.violet, width: 3 },
-        opacity: (1 - fr) * 0.7,
+        opacity: (1 - fr) * 0.9,
         positioned: { left: acx - (sendD + 60 * fr) / 2,
-          top: acy - (sendD + 60 * fr) / 2 },
+          top: acy - (sendD + 90 * fr) / 2 },
       });
     }
 
     // ---- Mobile keyboard mock (rises under the bar, keys light up) --------
-    if (frame >= 54 && frame < 124) {
-      var kbAmt = smooth((frame - 54) / 14) * (1 - smooth((frame - 108) / 14));
+    if (frame >= 54 && frame < 140) {
+      var kbAmt = smooth((frame - 54) / 14) * (1 - smooth((frame - 124) / 12));
       var kbY = F.H - kbH + (1 - kbAmt) * (kbH + 40);
       var kbNodes = faKeyboard({
         x: 0, y: kbY, w: F.W, h: kbH, opacity: 1,
