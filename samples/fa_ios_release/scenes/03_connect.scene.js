@@ -68,30 +68,34 @@ scene = {
     var N = providers.length;
     var STEP = 360 / N;
 
-    var ccy = isP ? F.H * 0.44 : F.H * 0.42;   // ring centre
-    var R = isP ? F.H * 0.30 : F.H * 0.34;     // ring radius
-    var tileD = isP ? 104 : 76;
+    // Right-shifted ring: the centre sits past the right edge, so only the
+    // left arc is on screen - 3-4 large tiles at a time. The FRONT point
+    // (leftmost, closest to frame centre) is the connect/tap stage.
+    var R = isP ? F.H * 0.46 : F.H * 0.78; // landscape: right side off-screen
+    var ccy = isP ? F.H * 0.42 : F.H * 0.42;
+    var ccx = (isP ? F.W * 0.25 : F.W * 0.22) + R; // centre off-screen right
+    var tileD = isP ? 200 : 190;
 
-    function tileAngle(i) { return (-90 + i * STEP) * Math.PI / 180; }
+    function tileAngle(i) { return (180 - i * STEP) * Math.PI / 180; }
     function slotPos(i, ringDeg) {
       var a = tileAngle(i) + ringDeg * Math.PI / 180;
-      return { x: cx + R * Math.cos(a), y: ccy + R * Math.sin(a) };
+      return { x: ccx + R * Math.cos(a), y: ccy + R * Math.sin(a) };
     }
 
     // Timing: tiles fly in staggered, ring spins 40-78 (one full turn),
     // AIIN is tapped at 100. Tile i (i>=1) crosses the ring top mid-spin.
     var TAP = 100;
     function lightAt(i) {
-      return i === 0 ? TAP : Math.round(40 + 38 * (360 - i * STEP) / 360);
+      return i === 0 ? TAP : Math.round(40 + 52 * i * STEP / 360);
     }
 
-    var ringDeg = 360 * smooth((frame - 40) / 38);
+    var ringDeg = 360 * smooth((frame - 40) / 52); // slow, stately turn
 
     // ---- Headline: big, centred, pushed down by the incoming tiles ---------
     var titleIn = expoOut(clamp01((frame - 4) / 12));
     var push = smooth((frame - 26) / 24); // tiles land on the ring -> text sinks
-    var pushed = tw(96, 12, 1, 0, 'easeOut') * (1 - 0); // fade out after the tap
-    pushed = 1 - smooth((frame - 100) / 10);
+    var pushed = (1 - smooth((frame - 100) / 10)) * // gone after the tap
+      (1 - smooth((frame - 50) / 12) * 0.75); // ...and mostly once sunk
     var hFs = (isP ? m * 0.088 : m * 0.070) * (1 - push * 0.42);
     var hTop = (isP ? F.H * 0.352 : F.H * 0.30) +
       push * (isP ? F.H * 0.428 : F.H * 0.57); // landscape: clear under the ring
@@ -160,6 +164,15 @@ scene = {
 
     var listKids = [];
 
+    // Focus caption: a static text block right of the front slot that snaps
+    // to whichever tile currently owns the front point of the ring.
+    var bestI = 0;
+    var bestD = 1e9;
+    for (var fi = 0; fi < N; fi++) {
+      var fd = ((ringDeg - fi * STEP) % 360 + 360) % 360;
+      if (fd > 180) fd = 360 - fd;
+      if (fd < bestD) { bestD = fd; bestI = fi; }
+    }
     // Faint guide circle fades in as the carousel forms.
     var guideIn = tw(36, 12, 0, 1, 'easeOut');
     if (guideIn > 0.01) {
@@ -177,12 +190,12 @@ scene = {
       var fly = expoOut(clamp01((frame - inAt) / 14));
       if (fly <= 0.01) continue;
 
-      // Semicircular fly-in: sweep the slot angle while the radius shrinks,
-      // plus a playful per-tile spin that settles at 0.
-      var arcOff = (1 - fly) * 62 * Math.PI / 180;
+      // Semicircular fly-in: sweep down from above along the ring while the
+      // radius shrinks, plus a playful per-tile spin that settles at 0.
+      var arcOff = -(1 - fly) * 70 * Math.PI / 180;
       var rr = R * (1 + (1 - fly) * 1.15);
-      var a = tileAngle(i) + (ringDeg + (1 - fly) * 0) * Math.PI / 180 + arcOff;
-      var tx = cx + rr * Math.cos(a);
+      var a = tileAngle(i) + ringDeg * Math.PI / 180 + arcOff;
+      var tx = ccx + rr * Math.cos(a);
       var ty = ccy + rr * Math.sin(a);
       var spin = (1 - fly) * -(150 + i * 6);
 
@@ -286,7 +299,7 @@ scene = {
     var camS = 1 + 0.10 * setT;
     var aiin = slotPos(0, ringDeg);
     var camX = -(aiin.x - cx) * setT;
-    var camY = -((aiin.y) - F.H / 2) * setT;
+    var camY = -(aiin.y - F.H / 2) * setT;
 
     kids.push({
       type: 'stack',
@@ -296,6 +309,52 @@ scene = {
       offsetY: camY,
       children: listKids,
     });
+
+    // ---- Focus caption (static screen-space text, right of the arc) --------
+    // The text never moves - it just snaps to whichever tile owns the front
+    // point, brightening as that tile aligns.
+    var txtL = isP ? F.W * 0.58 : F.W * 0.30;
+    var txtTop = ccy - (isP ? 84 : 74);
+    var focusIn = tw(20, 12, 0, 1, 'easeOut');
+    var focusA = focusIn * (0.55 + 0.45 * Math.max(0, 1 - bestD / (STEP * 0.6)));
+    focusA *= 1 - smooth((frame - 104) / 12); // gone once the tap settles in
+    if (focusA > 0.01) {
+      var fp = providers[bestI];
+      kids.push(faText(fp.name, {
+        opacity: focusA,
+        style: {
+          fontSize: isP ? 44 : 38,
+          fontWeight: '800',
+          color: T.text,
+          textAlign: 'left',
+          letterSpacing: 0.5,
+        },
+        positioned: { left: txtL, top: txtTop },
+      }));
+      kids.push(faText(fp.sub, {
+        opacity: focusA * 0.8,
+        style: {
+          fontSize: isP ? 20 : 17,
+          fontWeight: '500',
+          fontFamily: 'monospace',
+          color: T.dim,
+          textAlign: 'left',
+          letterSpacing: 1,
+        },
+        positioned: { left: txtL, top: txtTop + (isP ? 58 : 50) },
+      }));
+      kids.push(faText((bestI + 1) + ' / ' + N, {
+        opacity: focusA * 0.55,
+        style: {
+          fontSize: isP ? 16 : 14,
+          fontFamily: 'monospace',
+          color: T.faint,
+          textAlign: 'left',
+          letterSpacing: 2,
+        },
+        positioned: { left: txtL, top: txtTop + (isP ? 96 : 84) },
+      }));
+    }
 
     // ---- Tap ripple on AIIN (screen space, tracks the settled camera) -------
     if (frame >= TAP) {
@@ -325,7 +384,7 @@ scene = {
     var pillW = isP ? F.W * 0.86 : 760;
     var pillH = 84;
     var pillX = cx - pillW / 2;
-    var pillY = isP ? F.H * 0.585 : F.H * 0.705; // right under the centred AIIN tile
+    var pillY = isP ? F.H * 0.62 : F.H * 0.705; // right under the centred AIIN tile
     if (stIn > 0.003) {
       var glow = 0.5 + 0.2 * Math.sin(frame * 0.45);
 
