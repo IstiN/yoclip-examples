@@ -59,8 +59,8 @@ scene = {
 
     // The thread scrolls up as the card arrives from below (real chat) and
     // dims slightly as it passes under the fixed nav bar.
-    var shiftP = smooth((frame - 128) / 18);
-    var threadShift = (isP ? 250 : 180) * shiftP;
+    var shiftP = smooth((frame - 136) / 26);
+    var threadShift = (isP ? 170 : 120) * shiftP;
     var threadFade = 1 - 0.55 * shiftP;
 
     // ---- Camera: leans where the action is --------------------------------
@@ -73,27 +73,47 @@ scene = {
       - (barY - F.H / 2) * 0.40 * tBar
       + (aY + 200 - F.H / 2) * 0.16 * tCard;
 
-    // ---- Greeting bubble (Fa, left) — slides up out of the bottom ----------
-    var gIn = tw(50, 16, 0, 1, 'easeOut');
-    var gY = qY + (isP ? 165 : 152) - threadShift;
+    // ---- Greeting bubble (Fa) — big, centred, rises from the bottom -------
+    var gIn = tw(48, 20, 0, 1, 'easeOut');
+    var gW = chatW * (isP ? 0.80 : 0.62);
+    var gH = isP ? 128 : 116;
+    var gx = cx - gW / 2;
+    var gY = (isP ? F.H * 0.335 : F.H * 0.36) - threadShift;
     if (gIn > 0.003) {
-      kids.push(faRRect(chatW * 0.72, 84, 24, T.card, {
-        opacity: gIn,
-        border: { color: T.border, width: 1.5 },
-        offsetY: (barY - gY) * (1 - gIn), // rises from the input bar
-        positioned: { left: x0, top: gY },
+      var gRise = (barY - gY) * (1 - gIn);
+      kids.push(faRRect(gW, gH, 28, T.card, {
+        opacity: gIn * threadFade,
+        border: { color: T.teal, width: 1.5 },
+        offsetY: gRise,
+        positioned: { left: gx, top: gY },
       }));
-      kids.push(faText('HEY — I\'M FA. ASK ME TO BUILD ANYTHING.', {
-        opacity: gIn * 0.95,
-        offsetY: (barY - gY) * (1 - gIn),
+      kids.push(faText('HEY — I\'M FA.', {
+        width: gW - 48,
+        opacity: gIn * 0.95 * threadFade,
+        offsetY: gRise,
         style: {
-          fontSize: isP ? 22 : 21,
+          fontSize: isP ? 30 : 28,
+          fontFamily: 'monospace',
+          fontWeight: '800',
+          color: T.teal,
+          textAlign: 'center',
+          letterSpacing: 2,
+        },
+        positioned: { left: gx + 24, top: gY + (isP ? 26 : 22) },
+      }));
+      kids.push(faText('ASK ME TO BUILD ANYTHING.', {
+        width: gW - 48,
+        opacity: gIn * 0.9 * threadFade,
+        offsetY: gRise,
+        style: {
+          fontSize: isP ? 25 : 23,
           fontFamily: 'monospace',
           fontWeight: '600',
           color: T.text,
-          letterSpacing: 0.5,
+          textAlign: 'center',
+          letterSpacing: 1,
         },
-        positioned: { left: x0 + 26, top: gY + 30 },
+        positioned: { left: gx + 24, top: gY + (isP ? 72 : 64) },
       }));
     }
 
