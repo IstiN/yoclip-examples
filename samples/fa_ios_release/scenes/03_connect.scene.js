@@ -54,16 +54,16 @@ scene = {
     // ---- Carousel geometry --------------------------------------------------
     var providers = [
       { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin-text', tile: 'aiin' },
-      { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter', tile: 'light' },
+      { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter-site', tile: 'light' },
       { name: 'ChatGPT', sub: 'Account sign-in via OAuth', icon: 'openai', tile: 'dark' },
       { name: 'GitHub Copilot', sub: 'Account sign-in via device flow', icon: 'copilot', tile: 'ink' },
       { name: 'Claude', sub: 'Anthropic API key', icon: 'claude', tile: 'cream' },
       { name: 'Gemini', sub: 'Google AI Studio key', icon: 'gemini', tile: 'grad' },
       { name: 'Kimi K3', sub: 'Moonshot API key', icon: 'kimi', tile: 'ink' },
       { name: 'OpenAI', sub: 'API key — platform.openai.com', icon: 'openai', tile: 'green' },
-      { name: 'CodeMie', sub: 'Enterprise SSO', icon: 'codemie-text', tile: 'codemie' },
+      { name: 'CodeMie', sub: 'Enterprise SSO', icon: 'codemie', tile: 'ink' },
       { name: 'MiniMax', sub: 'API key — MiniMax platform', icon: 'minimax', tile: 'minimax' },
-      { name: 'DIAL', sub: 'AI gateway — DIAL platform', icon: 'dial-text', tile: 'dial' },
+      { name: 'DIAL', sub: 'AI gateway — DIAL platform', icon: 'dial', tile: 'light' },
     ];
     var N = providers.length;
     var STEP = 360 / N;
@@ -250,9 +250,38 @@ scene = {
       }
       listKids.push(tile);
 
-      if (pr.icon.indexOf('-text') > 0) {
-        var letters = pr.icon.split('-')[0] === 'aiin' ? 'AI'
-          : pr.icon.split('-')[0].charAt(0).toUpperCase();
+      if (pr.icon === 'aiin-text') {
+        // aiin.by wordmark: 'AIIN' white -> violet + small '.BY'
+        listKids.push(faText('AIIN', {
+          width: tileD * pop,
+          opacity: op,
+          rotation: spin,
+          style: {
+            fontSize: Math.round(tileD * pop * 0.30),
+            fontWeight: '800',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            letterSpacing: 0.5,
+            gradient: { begin: 'centerLeft', end: 'centerRight',
+              colors: ['#FFFFFF', '#8B7CF7'], stops: [0.3, 0.8] },
+          },
+          positioned: { left: tx - half, top: ty - tileD * pop * 0.23 },
+        }));
+        listKids.push(faText('.BY', {
+          width: tileD * pop,
+          opacity: op * 0.85,
+          rotation: spin,
+          style: {
+            fontSize: Math.round(tileD * pop * 0.15),
+            fontWeight: '700',
+            color: '#9AA3AF',
+            textAlign: 'center',
+            letterSpacing: 1,
+          },
+          positioned: { left: tx - half, top: ty + tileD * pop * 0.13 },
+        }));
+      } else if (pr.icon.indexOf('-text') > 0) {
+        var letters = pr.icon.split('-')[0].charAt(0).toUpperCase();
         listKids.push(faText(letters, {
           width: tileD * pop,
           opacity: op,

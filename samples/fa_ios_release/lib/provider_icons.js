@@ -23,6 +23,35 @@ function providerIconSvg(name, color) {
       '<g fill="' + c + '">' + body + '</g></svg>';
   }
   switch (name) {
+    case 'codemie':
+      // CodeMie (codemie.ai): C ring in their brand gradient + white spark
+      return svg(
+        '<defs><linearGradient id="cmg" gradientUnits="userSpaceOnUse" ' +
+        'x1="57.88" y1="-11.16" x2="-37.14" y2="105.33">' +
+        '<stop offset="0.019" stop-color="#ECB1FF"/>' +
+        '<stop offset="0.375" stop-color="#C447EB"/>' +
+        '<stop offset="1" stop-color="#3E1866"/></linearGradient></defs>' +
+        '<g transform="scale(0.3) translate(1.5,0)">' +
+        '<path fill="url(#cmg)" d="M0 40C0 17.9086 17.9086 0 40 0C51.9032 0 62.5979 5.2068 69.9167 13.4477L61.055 21.3177C55.8901 15.5021 48.3751 11.8519 40 11.8519C24.4542 11.8519 11.8519 24.4542 11.8519 40C11.8519 55.5458 24.4542 68.1481 40 68.1481C48.3751 68.1481 55.8901 64.4979 61.055 58.6823L69.9167 66.5523C62.5979 74.7932 51.9032 80 40 80C17.9086 80 0 62.0914 0 40Z"/>' +
+        '<path fill="#FFFFFF" d="M22.1777 40.0555C33.2106 40.8257 39.1673 46.678 40.0423 57.6235C40.0479 57.6966 40.1488 57.6966 40.1544 57.6235C41.035 46.678 46.9862 40.8201 58.019 40.0555C58.0919 40.0555 58.0919 39.9487 58.019 39.9431C46.9862 39.1729 41.0294 33.3207 40.1544 22.3751C40.1488 22.302 40.0479 22.302 40.0423 22.3751C39.1616 33.3207 33.2106 39.1786 22.1777 39.9431C22.1048 39.9431 22.1048 40.0499 22.1777 40.0555Z"/></g>'
+      );
+    case 'dial':
+      // DIAL / dialx.ai: split rounded square, cyan | violet (their favicon)
+      return svg(
+        '<defs><linearGradient id="dlg" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#38BDF8"/><stop offset="1" stop-color="#3090C0"/>' +
+        '</linearGradient><linearGradient id="drg" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#9030F0"/>' +
+        '</linearGradient></defs>' +
+        '<path fill="url(#dlg)" d="M13 1H8C4.13 1 1 4.13 1 8v8c0 3.87 3.13 7 7 7h5z"/>' +
+        '<path fill="url(#drg)" d="M13 1h3c3.87 0 7 3.13 7 7v8c0 3.87-3.13 7-7 7h-3z"/>'
+      );
+    case 'openrouter-site':
+      // OpenRouter (openrouter.ai current mark, from their site inline SVG)
+      return svg(
+        '<g transform="translate(0,3.52) scale(0.06565) translate(-19.82,-17.199)">' +
+        '<path d="M303.9475,17.19926c42.79734,0,77.48933,34.69327,77.48933,77.48933s-34.69199,77.48933-77.48933,77.48933l76.86166,76.86244c9.76367,9.76313,2.84903,26.45667-10.95697,26.45667h-220.88335c-71.32686,0-129.14889-57.82202-129.14889-129.14889S77.64197,17.19926,148.96884,17.19926h154.97866z"/></g>'
+      );
     case 'openai':
       // OpenAI rosette (official Simple Icons mark)
       return svg(
