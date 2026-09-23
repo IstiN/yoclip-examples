@@ -1,5 +1,5 @@
 // 04 — Ask — the real Fa app chat, on a phone
-// (192 frames, 4 bars)
+// (444 frames — the ask chat breathes: x2 pacing + read tail)
 //
 // Ordered choreography, one thing at a time:
 //   1. Fa's greeting card materialises in the CENTRE (the handoff dot from
@@ -19,7 +19,7 @@
 
 scene = {
   id: '04_ask',
-  duration: 192,
+  duration: 444,
   from: 950,
   timeline: {
     label: 'Ask',
@@ -56,7 +56,7 @@ scene = {
     var qText = 'Can you build ANY app and run it natively on my iPhone?';
 
     // Layout slots
-    var gC = isP ? F.H * 0.42 : F.H * 0.44;   // greeting centre ("в центре")
+    var gC = isP ? F.H * 0.46 : F.H * 0.47;   // greeting centre ("в центре")
     var gW = chatW * (isP ? 0.80 : 0.62);
     var gH = isP ? 128 : 116;
     var gx = cx - gW / 2;
@@ -70,8 +70,9 @@ scene = {
     var barX = x0;
     var sendD = isP ? 72 : 64;
     var sendX = x0 + chatW - sendD - 14;
-    var kbBar = smooth((frame - 56) / 14) * (1 - smooth((frame - 124) / 12));
-    var barYNow = barY - (kbH + 8) * kbBar; // bar rides up on the keyboard
+    var barLift = barY + barH + 12 + kbH - F.H; // park the bar on the keys
+    var kbBar = smooth((frame - 112) / 28) * (1 - smooth((frame - 248) / 24));
+    var barYNow = barY - barLift * kbBar; // bar rides up onto the keyboard
 
     var bullets = [
       { t: 'NATIVE DRAW ENGINE — FLUTTER @ 120 FPS.', c: 'violet' },
@@ -80,24 +81,22 @@ scene = {
       { t: 'FLAME3D — REAL 3D GAMES, NOT WEBGL.', c: 'violet' },
       { t: 'API KEYS LIVE IN YOUR KEYCHAIN. NEVER OURS.', c: 'teal' },
     ];
-    var bGap = isP ? 62 : 58;
-    var cardH = 90 + bullets.length * bGap + 60;
-    var cardTop = barY - 36 - cardH;          // just above the input bar
+    var bGap = isP ? 58 : 54;
+    var cardH = 84 + bullets.length * bGap + 56;
+    var cardTop = barY - 28 - cardH;          // just above the input bar
 
     // The card pushes the two earlier messages up as it arrives.
-    var push = (isP ? 120 : 262) * smooth((frame - 120) / 28);
-    var threadLift = (kbH + 8) * kbBar; // chat scrolls up over the keyboard
+    var push = (isP ? 36 : 262) * smooth((frame - 240) / 56);
+    var threadLift = Math.min(kbH + 8, F.H * 0.22) * kbBar; // scroll, capped
 
     // ---- Camera: greeting -> input bar -> follow the send -> card ---------
-    var tGreet = smooth(frame / 12) * (1 - smooth((frame - 36) / 16));
-    var tBar = smooth((frame - 58) / 14) * (1 - smooth((frame - 96) / 14));
-    var tCard = smooth((frame - 132) / 18) * (1 - smooth((frame - 170) / 10));
+    var tCard = smooth((frame - 264) / 36) * (1 - smooth((frame - 420) / 24));
     var camS = 1 + 0.04 * tCard;   // one camera beat: the card rise
     var camX = 0;
     var camY = (cardTop + 200 - F.H / 2) * 0.10 * tCard;
 
     // ---- 1. Greeting card in the centre ------------------------------------
-    var gIn = tw(32, 20, 0, 1, 'easeOut');
+    var gIn = tw(64, 40, 0, 1, 'easeOut');
     var gTop = gC - gH / 2 - push - threadLift; // keyboard lift + card push
     if (gIn > 0.003) {
       kids.push({
@@ -141,10 +140,10 @@ scene = {
     }
 
     // ---- 3. User bubble — launches out of the bar, lands under greeting ----
-    var sendT = clamp01((frame - 107) / 17);
+    var sendT = clamp01((frame - 214) / 34);
     var qIn = backOut(sendT);
     // world-landed bubble takes over once the morph settles
-    var landIn = tw(124, 6, 0, 1, 'easeOut');
+    var landIn = tw(248, 12, 0, 1, 'easeOut');
     if (landIn > 0.003) {
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
         opacity: landIn * 0.35,
@@ -211,7 +210,7 @@ scene = {
         },
       }));
     }
-    var dIn = tw(132, 8, 0, 1, 'easeOut');
+    var dIn = tw(264, 16, 0, 1, 'easeOut');
     if (dIn > 0.01) {
       kids.push(faText('DELIVERED · ON-DEVICE', {
         opacity: dIn * 0.5,
@@ -221,13 +220,13 @@ scene = {
           color: T.faint,
           letterSpacing: 2,
         },
-        positioned: { left: x0 + chatW * 0.22 + 8,
-          top: qSlot - push - threadLift + 126 },
+        positioned: { left: x0 + chatW * 0.22 + 28,
+          top: qSlot - push - threadLift + 142 },
       }));
     }
 
     // ---- 4. Fa capabilities card — rises, pushing the thread up ------------
-    var aIn = tw(130, 20, 0, 1, 'easeOut');
+    var aIn = tw(260, 40, 0, 1, 'easeOut');
     if (aIn > 0.003) {
       var cardRise = (barY - cardTop) * (1 - aIn); // emerges from the bar
       kids.push(faRRect(chatW, cardH, 30, T.card, {
@@ -269,7 +268,7 @@ scene = {
       }));
 
       for (var bi = 0; bi < bullets.length; bi++) {
-        var bIn = tw(146 + bi * 7, 9, 0, 1, 'easeOut');
+        var bIn = tw(292 + bi * 14, 18, 0, 1, 'easeOut');
         var by = cardTop + 120 + bi * bGap + cardRise;
         if (bIn > 0.01) {
           var bc = bullets[bi].c === 'violet' ? T.violet : T.teal;
@@ -293,15 +292,15 @@ scene = {
     }
 
     // ---- 2. Input bar (like the app: "Ask anything…" + send) ---------------
-    var barIn = tw(56, 12, 0, 1, 'easeOut');
-    var typedN = frame < 106 ? Math.min(qText.length,
-      Math.floor((frame - 58) / 0.85)) : 0;
-    var typing = frame >= 58 && frame < 106;
+    var barIn = tw(112, 24, 0, 1, 'easeOut');
+    var typedN = frame < 212 ? Math.min(qText.length,
+      Math.floor((frame - 116) / 1.7)) : 0;
+    var typing = frame >= 116 && frame < 212;
     var cursor = typing && Math.floor(frame / 5) % 2 === 0 ? '_' : '';
     var shown = typing ? qText.slice(0, typedN) + cursor : '';
 
-    var press = frame >= 106 && frame < 114
-      ? Math.sin(clamp01((frame - 106) / 8) * Math.PI) : 0;
+    var press = frame >= 212 && frame < 228
+      ? Math.sin(clamp01((frame - 212) / 16) * Math.PI) : 0;
     var pressD = 1 - 0.22 * press;
 
     var tMaxW = chatW - sendD - 130;
@@ -384,8 +383,8 @@ scene = {
     var apts = [{ x: acx, y: acy - 13 }, { x: acx + 10, y: acy + 5 },
       { x: acx - 10, y: acy + 5 }];
     fixed.push(polylineScreen(apts, 7, 1, '#FFFFFF', barIn));
-    if (frame >= 106 && frame < 122) {
-      var fr = (frame - 106) / 16;
+    if (frame >= 212 && frame < 244) {
+      var fr = (frame - 212) / 18;
       fixed.push({
         type: 'circle',
         size: sendD + 90 * fr,
@@ -398,12 +397,14 @@ scene = {
     }
 
     // ---- Mobile keyboard mock (rises under the bar, keys light up) --------
-    if (frame >= 54 && frame < 140) {
-      var kbAmt = smooth((frame - 54) / 14) * (1 - smooth((frame - 124) / 12));
+    if (frame >= 108 && frame < 280) {
+      var kbAmt = smooth((frame - 108) / 28) * (1 - smooth((frame - 248) / 24));
       var kbY = F.H - kbH + (1 - kbAmt) * (kbH + 40);
       var kbNodes = faKeyboard({
         x: 0, y: kbY, w: F.W, h: kbH, opacity: 1,
         pressed: qText.slice(0, typedN),
+        frame: frame,
+        pressedAt: typedN > 0 ? 116 + (typedN - 1) * 1.7 : 0,
       });
       for (var kni = 0; kni < kbNodes.length; kni++) fixed.push(kbNodes[kni]);
     }
@@ -412,7 +413,7 @@ scene = {
     // The teal dot lands at the centre of the greeting card
     // (KEEP IN SYNC with 03_connect: cx, gC) and pulses until the greeting
     // materialises around it.
-    if (frame < 32) {
+    if (frame < 64) {
       var pulse = 0.5 + 0.5 * Math.sin(frame * 0.42);
       kids.push({ type: 'circle', size: 40 + 14 * pulse, fill: T.teal,
         opacity: 0.16 + 0.10 * pulse, blur: 16,
@@ -468,7 +469,7 @@ scene = {
 
     // ---- Exit dip: dissolve to the shared bg tone (leads into 05_build) -----
     var exKids = [];
-    var ex = clamp01((frame - 180) / 12);
+    var ex = clamp01((frame - 420) / 24);
     if (ex > 0.003) {
       var exa = Math.round(ex * 255).toString(16).padStart(2, '0');
       var exb = T.bg.replace('#', '').toUpperCase();

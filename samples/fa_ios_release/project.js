@@ -37,9 +37,10 @@ project = {
     { path: 'scenes/02b_brand.scene.js', layer: 'content', start: 662 },
     { path: 'scenes/03_connect.scene.js', layer: 'content', start: 782 },
     // 03 extended to 168 frames (782..950) - 04 starts after it
+    // 04 stretched to 444 (x2 pacing + card read tail) on 2026-09-23
     { path: 'scenes/04_ask.scene.js', layer: 'content', start: 950 },
-    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1142 },
-    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1382 },
-    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1574 },
+    { path: 'scenes/05_build.scene.js', layer: 'content', start: 1394 },
+    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1634 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1826 },
   ],
 };

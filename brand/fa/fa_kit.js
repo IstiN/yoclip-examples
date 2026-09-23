@@ -812,6 +812,13 @@ function faKeyboard(opts) {
   var op = (o.opacity != null) ? o.opacity : 1;
   var pressed = (o.pressed || '');
   var lastCh = pressed.length > 0 ? pressed.charAt(pressed.length - 1) : '';
+  // key-press animation: quick dip in, springy release (frame-driven)
+  var pFrame = o.frame || 0;
+  var pAt = o.pressedAt || 0;
+  var pT = pAt > 0 ? (pFrame - pAt) / 7 : 1;
+  pT = Math.max(0, Math.min(1, pT));
+  var pPulse = pAt > 0 ? Math.sin(pT * Math.PI) : 0;
+  var pDown = pAt > 0 && pT < 1;
 
   var isL = T.isLight;
   var kbBg = isL ? '#D4D7DE' : '#1B1F2A';
@@ -874,14 +881,15 @@ function faKeyboard(opts) {
       var fg = isPressed ? (isL ? '#F2F4F8' : '#171A22') : keyFg;
       nodes.push(faRRect(kw, keyH, Math.round(keyH * 0.18), bg, {
         opacity: op,
-        scale: isPressed ? 0.93 : 1,
+        scale: isPressed ? 1 - 0.14 * pPulse : 1,
+        offsetY: isPressed ? pPulse * keyH * 0.08 : 0,
         positioned: { left: Math.round(kx), top: rowY },
       }));
       if (label) {
         var fs = Math.round(keyH * (label.length > 2 ? 0.30 : 0.42));
         nodes.push(faText(label, {
           width: kw,
-          opacity: op,
+          opacity: isPressed && pDown ? op * (1 - 0.55 * pPulse) : op,
           style: {
             fontSize: fs,
             fontFamily: label.length > 2 ? 'sans-serif' : 'monospace',
