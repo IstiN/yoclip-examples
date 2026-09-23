@@ -1,7 +1,9 @@
 // 03 — Connect — BYOK: bring your own AI provider (144 frames, 3 bars)
 //
-// Provider chips light up one by one on the beat grid, each flips to a
-// checkmark, then the status pill confirms: "FA iOS AGENT — CONNECTED".
+// Mirrors the real onboarding list: full-width provider rows (icon tile +
+// name + auth subtitle + chevron) slide in one by one, each row connects
+// on the beat grid (chevron -> spinner -> teal check), then the status
+// pill confirms: "FA iOS AGENT — CONNECTED".
 
 scene = {
   id: '03_connect',
@@ -46,7 +48,7 @@ scene = {
 
     // Title
     var titleIn = expoOut(clamp01((frame - 4) / 12));
-    kids.push(faText('CONNECT YOUR AI PROVIDER.', {
+    kids.push(faText('CHOOSE HOW FA THINKS.', {
       width: F.W,
       opacity: clamp01(titleIn * 1.2),
       offsetY: 18 * (1 - titleIn),
@@ -78,147 +80,155 @@ scene = {
         textAlign: 'center',
         letterSpacing: 2,
       },
-      positioned: { left: 0, top: isP ? F.H * 0.165 : F.H * 0.265 },
+      positioned: { left: 0, top: isP ? F.H * 0.165 : F.H * 0.235 },
     }));
 
-    // ---- Provider chips ---------------------------------------------------
-    // ASTRA leads (OpenAI), then the rest light up on the beat grid.
+    // ---- Provider rows — mirrors the real onboarding list -------------------
     var providers = [
-      { name: 'ASTRA', tag: 'OPENAI', icon: 'astra' },
-      { name: 'GPT-5.2', tag: 'OPENAI', icon: 'gpt' },
-      { name: 'KIMI K3', tag: 'MOONSHOT', icon: 'kimi' },
-      { name: 'CLAUDE', tag: 'ANTHROPIC', icon: 'claude' },
-      { name: 'GEMINI', tag: 'GOOGLE', icon: 'gemini' },
-      { name: 'GLM 5.3', tag: 'Z.AI', icon: 'glm' },
-      { name: 'AIIN.BY', tag: '300+ MODELS', icon: 'aiin' },
-      { name: 'OpenRouter', tag: '300+ MODELS', icon: 'openrouter' },
+      { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin', tile: 'aiin' },
+      { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter', tile: 'light' },
+      { name: 'ChatGPT', sub: 'Account sign-in via OAuth', icon: 'astra', tile: 'dark' },
+      { name: 'Claude', sub: 'API key — lives in your keychain', icon: 'claude', tile: 'cream' },
+      { name: 'Gemini', sub: 'Google AI Studio key', icon: 'gemini', tile: 'grad' },
+      { name: 'Kimi K3', sub: 'Moonshot API key', icon: 'kimi', tile: 'ink' },
     ];
-    var cols = isP ? 2 : 4;
-    var rows = isP ? 4 : 2;
-    var chipW = isP ? F.W * 0.44 : Math.min(F.W * 0.19, 300);
-    var chipH = isP ? 138 : 150;
-    var gap = isP ? F.W * 0.04 : F.W * 0.024;
-    var vgap = isP ? 32 : 36;
-    var gridW = cols * chipW + (cols - 1) * gap;
-    var x0 = cx - gridW / 2;
-    var y0 = isP ? F.H * 0.26 : F.H * 0.32;
+    var rowW = isP ? F.W * 0.86 : 760;
+    var rowH = isP ? 96 : 62;
+    var rowGap = isP ? 14 : 9;
+    var rowX = cx - rowW / 2;
+    var listY = isP ? F.H * 0.225 : F.H * 0.27;
+    var iconD = isP ? 58 : 40;
 
     for (var i = 0; i < providers.length; i++) {
-      var col = i % cols;
-      var row = Math.floor(i / cols);
-      var px = x0 + col * (chipW + gap);
-      var py = y0 + row * (chipH + vgap);
-      var inAt = 8 + i * 9;
-      var pIn = backOut(clamp01((frame - inAt) / 12));
-      var lit = frame >= inAt + 13; // flips to "connected" state
-      var colr = lit ? T.teal : T.violet;
+      var pr = providers[i];
+      var inAt = 8 + i * 7;
+      var rowIn = expoOut(clamp01((frame - inAt) / 10));
+      if (rowIn <= 0.01) continue;
+      var lightAt = 26 + i * 12;
+      var lit = frame >= lightAt;
+      var connecting = !lit && frame >= lightAt - 13;
+      var selected = i === 0 && lit; // AIIN is the active provider
+      var ry2 = listY + i * (rowH + rowGap);
 
-      if (pIn > 0.003) {
-        kids.push(faRRect(chipW, chipH, 20, T.card, {
-          opacity: pIn,
-          border: { color: lit ? T.teal : T.border, width: lit ? 2 : 1.5 },
-          offsetY: 18 * (1 - pIn),
-          positioned: { left: px, top: py },
-        }));
+      kids.push(faRRect(rowW, rowH, 18,
+        selected ? (T.isLight ? '#FFFFFF' : '#121A2E') : T.card, {
+        opacity: rowIn,
+        border: { color: selected ? T.violet : T.border, width: selected ? 2 : 1.5 },
+        offsetY: 16 * (1 - rowIn),
+        positioned: { left: rowX, top: ry2 },
+      }));
 
-        // Provider mark (themed monochrome vector icon)
-        var iconS = 42;
-        kids.push(providerIconNode(providers[i].icon, colr, iconS, {
-          opacity: pIn,
-          positioned: { left: px + 22, top: py + 26 },
-        }));
-        var nameX = px + 22 + iconS + 16;
-        kids.push(faText(providers[i].name, {
-          opacity: pIn,
+      // Icon tile: brand-coloured squircle + monochrome glyph.
+      var tileX = rowX + 16;
+      var tileY = ry2 + (rowH - iconD) / 2;
+      var tile = { type: 'container', width: iconD, height: iconD,
+        radius: iconD * 0.28, opacity: rowIn,
+        positioned: { left: tileX, top: tileY } };
+      if (pr.tile === 'aiin') {
+        tile.gradient = { begin: 'topLeft', end: 'bottomRight',
+          colors: [T.violet, T.violetDeep], stops: [0.0, 1.0] };
+      } else if (pr.tile === 'light') {
+        tile.color = T.isLight ? '#F2F4F9' : '#E9EDF5';
+      } else if (pr.tile === 'dark') {
+        tile.color = '#202124';
+      } else if (pr.tile === 'cream') {
+        tile.color = '#F0EDE6';
+      } else if (pr.tile === 'grad') {
+        tile.gradient = { begin: 'topLeft', end: 'bottomRight',
+          colors: ['#4E7DF6', '#9B72F2'], stops: [0.0, 1.0] };
+      } else {
+        tile.color = '#1C2030';
+      }
+      kids.push(tile);
+      if (pr.icon === 'aiin') {
+        kids.push(faText('AI', {
+          width: iconD,
+          opacity: rowIn,
           style: {
-            fontSize: isP ? 27 : 26,
-            fontFamily: 'monospace',
+            fontSize: Math.round(iconD * 0.40),
             fontWeight: '800',
-            color: lit ? T.teal : T.text,
-            letterSpacing: 1,
+            color: '#FFFFFF',
+            textAlign: 'center',
+            letterSpacing: 0.5,
           },
-          positioned: { left: nameX, top: py + 30 },
+          positioned: { left: tileX, top: tileY + iconD * 0.26 },
         }));
-        kids.push(faText(providers[i].tag, {
-          opacity: pIn * 0.6,
-          style: {
-            fontSize: isP ? 18 : 16,
-            fontFamily: 'monospace',
-            color: T.dim,
-            letterSpacing: 1.5,
+      } else {
+        var glyphCol = pr.tile === 'cream' ? '#D97757'
+          : (pr.tile === 'light' ? T.teal : '#FFFFFF');
+        kids.push(providerIconNode(pr.icon, glyphCol, iconD * 0.52, {
+          opacity: rowIn,
+          positioned: {
+            left: tileX + iconD * 0.24,
+            top: tileY + iconD * 0.24,
           },
-          positioned: { left: nameX, top: py + 74 },
         }));
+      }
 
-        // Status corner: spinner -> check
-        var stX = px + chipW - 52;
-        var stY = py + chipH - 52;
-        if (!lit) {
-          var ang = frame * 0.35;
-          for (var a = 0; a < 8; a++) {
-            var segA = ang + a * Math.PI / 4;
-            kids.push({
-              type: 'circle',
-              size: 6,
-              fill: T.violet,
-              opacity: clamp01(pIn * (0.25 + 0.75 * (a / 8))),
-              positioned: {
-                left: stX + 16 + Math.cos(segA) * 14 - 3,
-                top: stY + 16 + Math.sin(segA) * 14 - 3,
-              },
-            });
-          }
-        } else {
-          var ck = backOut(clamp01((frame - inAt - 14) / 8));
-          kids.push(faRRect(36, 36, 18, T.teal, {
-            opacity: clamp01(ck),
-            positioned: { left: stX, top: stY },
-          }));
-          kids.push(checkNode(stX + 18, stY + 18, 30,
-            T.isLight ? '#FFFFFF' : '#05070D', ck, clamp01(ck)));
+      // Name + auth subtitle (the app's row typography).
+      var nameX2 = tileX + iconD + 16;
+      kids.push(faText(pr.name, {
+        opacity: rowIn,
+        style: {
+          fontSize: isP ? 19 : 15.5,
+          fontWeight: '700',
+          color: T.text,
+          letterSpacing: 0.2,
+        },
+        positioned: { left: nameX2, top: ry2 + rowH * (isP ? 0.17 : 0.14) },
+      }));
+      kids.push(faText(pr.sub, {
+        opacity: rowIn * 0.85,
+        style: {
+          fontSize: isP ? 13.5 : 11.5,
+          fontWeight: '500',
+          color: T.dim,
+          letterSpacing: 0.2,
+        },
+        positioned: { left: nameX2, top: ry2 + rowH * (isP ? 0.55 : 0.54) },
+      }));
+
+      // Right rail: chevron -> spinner -> teal check.
+      var rx2 = rowX + rowW - 34;
+      var ryC = ry2 + rowH / 2;
+      if (lit) {
+        var ck = backOut(clamp01((frame - lightAt) / 8));
+        kids.push(faRRect(34, 34, 17, T.teal, {
+          opacity: clamp01(ck) * rowIn,
+          positioned: { left: rx2 - 17, top: ryC - 17 },
+        }));
+        kids.push(checkNode(rx2, ryC, 22,
+          T.isLight ? '#FFFFFF' : '#05070D', ck, clamp01(ck) * rowIn));
+      } else if (connecting) {
+        var ang = frame * 0.45;
+        for (var a = 0; a < 8; a++) {
+          var segA = ang + a * Math.PI / 4;
+          kids.push({
+            type: 'circle',
+            size: 6,
+            fill: T.violet,
+            opacity: clamp01(rowIn * (0.25 + 0.75 * (a / 8))),
+            positioned: {
+              left: rx2 + Math.cos(segA) * 11 - 3,
+              top: ryC + Math.sin(segA) * 11 - 3,
+            },
+          });
         }
+      } else {
+        kids.push(polylineScreen(
+          [{ x: rx2 - 4, y: ryC - 8 }, { x: rx2 + 4, y: ryC }, { x: rx2 - 4, y: ryC + 8 }],
+          2.5, 1, T.faint, 0.8 * rowIn));
       }
-    }
-
-    // ---- Mesh hairlines: connectors draw on once both endpoints are lit ----
-    var meshIn = [];
-    for (var mi = 0; mi < providers.length; mi++) {
-      var mrow = Math.floor(mi / cols);
-      var mcol = mi % cols;
-      // Horizontal neighbour.
-      if (mcol < cols - 1) {
-        meshIn.push({ a: mi, b: mi + 1, h: true });
-      }
-      // Vertical neighbour.
-      if (mrow < rows - 1) {
-        meshIn.push({ a: mi, b: mi + cols, h: false });
-      }
-    }
-    for (var si2 = 0; si2 < meshIn.length; si2++) {
-      var seg = meshIn[si2];
-      var litA = frame >= 8 + seg.a * 9 + 13;
-      var litB = frame >= 8 + seg.b * 9 + 13;
-      if (!litA || !litB) continue;
-      var segP = clamp01((frame - (8 + seg.b * 9 + 13)) / 10);
-      var pa = {
-        x: x0 + (seg.a % cols) * (chipW + gap) + (seg.h ? chipW : chipW / 2),
-        y: y0 + Math.floor(seg.a / cols) * (chipH + vgap) + (seg.h ? chipH / 2 : chipH),
-      };
-      var pb = {
-        x: x0 + (seg.b % cols) * (chipW + gap) + (seg.h ? 0 : chipW / 2),
-        y: y0 + Math.floor(seg.b / cols) * (chipH + vgap) + (seg.h ? chipH / 2 : 0),
-      };
-      kids.push(polylineScreen([pa, pb], 2, segP, T.teal, 0.22 * segP));
     }
 
     // ---- Status pill --------------------------------------------------------
     // Tail: the pill fades into the handoff dot that flies to 04 (below).
     var pillOut = 1 - clamp01((frame - 122) / 8);
-    var stIn = tw(96, 14, 0, 1, 'easeOut') * pillOut;
+    var stIn = tw(104, 12, 0, 1, 'easeOut') * pillOut;
     var pillW = isP ? F.W * 0.86 : 760;
     var pillH = 84;
     var pillX = cx - pillW / 2;
-    var pillY = isP ? F.H * 0.72 : F.H * 0.66;
+    var pillY = isP ? F.H * 0.72 : F.H * 0.705;
     if (stIn > 0.003) {
       var glow = 0.5 + 0.2 * Math.sin(frame * 0.45);
 
