@@ -53,8 +53,8 @@ scene = {
 
     // ---- Carousel geometry --------------------------------------------------
     var providers = [
-      { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin-text', tile: 'aiin' },
-      { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter-site', tile: 'light' },
+      { name: 'AIIN', sub: 'aiin.by — key auto-registered', icon: 'aiin-text', tile: 'none' },
+      { name: 'OpenRouter', sub: 'OAuth or API key — 300+ models', icon: 'openrouter-site', tile: 'or' },
       { name: 'ChatGPT', sub: 'Account sign-in via OAuth', icon: 'openai', tile: 'dark' },
       { name: 'GitHub Copilot', sub: 'Account sign-in via device flow', icon: 'copilot', tile: 'ink' },
       { name: 'Claude', sub: 'Anthropic API key', icon: 'claude', tile: 'cream' },
@@ -63,7 +63,7 @@ scene = {
       { name: 'OpenAI', sub: 'API key — platform.openai.com', icon: 'openai', tile: 'green' },
       { name: 'CodeMie', sub: 'Enterprise SSO', icon: 'codemie', tile: 'ink' },
       { name: 'MiniMax', sub: 'API key — MiniMax platform', icon: 'minimax', tile: 'minimax' },
-      { name: 'DIAL', sub: 'AI gateway — DIAL platform', icon: 'dial', tile: 'light' },
+      { name: 'DIAL', sub: 'AI gateway — DIAL platform', icon: 'dial', tile: 'ink' },
     ];
     var N = providers.length;
     var STEP = 360 / N;
@@ -232,8 +232,8 @@ scene = {
         tile.color = '#5B5BD6';
       } else if (pr.tile === 'minimax') {
         tile.color = '#C93C3C';
-      } else if (pr.tile === 'dial') {
-        tile.color = '#2E3A4E';
+      } else if (pr.tile === 'or') {
+        tile.color = '#0A0F14';
       } else {
         tile.color = '#1C2030';
       }
@@ -248,37 +248,43 @@ scene = {
         tile.shadows = [{ color: T.violet, opacity: 0.45, blur: 34,
           offset: { x: 0, y: 6 } }];
       }
-      listKids.push(tile);
+      if (pr.tile !== 'none') listKids.push(tile);
 
       if (pr.icon === 'aiin-text') {
-        // aiin.by wordmark: 'AIIN' white -> violet + small '.BY'
+        // aiin.by wordmark, bare like on their homepage: 'AIIN' + '.BY'
+        // on one baseline; 'AI' part follows the theme (white / ink)
+        var aiInk = T.isLight ? '#16181D' : '#FFFFFF';
+        var wmFs = tileD * pop * 0.34;
+        var wmBy = tileD * pop * 0.17;
+        var wmW = 1.96 * wmFs + 0.18 * wmFs + 1.62 * wmBy;
         listKids.push(faText('AIIN', {
-          width: tileD * pop,
+          width: wmFs * 2.4,
           opacity: op,
           rotation: spin,
           style: {
-            fontSize: Math.round(tileD * pop * 0.30),
+            fontSize: Math.round(wmFs),
             fontWeight: '800',
-            color: '#FFFFFF',
-            textAlign: 'center',
+            color: aiInk,
+            textAlign: 'left',
             letterSpacing: 0.5,
             gradient: { begin: 'centerLeft', end: 'centerRight',
-              colors: ['#FFFFFF', '#8B7CF7'], stops: [0.3, 0.8] },
+              colors: [aiInk, '#8B7CF7'], stops: [0.3, 0.8] },
           },
-          positioned: { left: tx - half, top: ty - tileD * pop * 0.23 },
+          positioned: { left: tx - wmW / 2, top: ty - wmFs * 0.60 },
         }));
         listKids.push(faText('.BY', {
-          width: tileD * pop,
-          opacity: op * 0.85,
+          width: wmBy * 2.2,
+          opacity: op,
           rotation: spin,
           style: {
-            fontSize: Math.round(tileD * pop * 0.15),
+            fontSize: Math.round(wmBy),
             fontWeight: '700',
             color: '#9AA3AF',
-            textAlign: 'center',
+            textAlign: 'left',
             letterSpacing: 1,
           },
-          positioned: { left: tx - half, top: ty + tileD * pop * 0.13 },
+          positioned: { left: tx - wmW / 2 + 2.14 * wmFs,
+            top: ty - wmFs * 0.60 + 0.72 * (wmFs - wmBy) },
         }));
       } else if (pr.icon.indexOf('-text') > 0) {
         var letters = pr.icon.split('-')[0].charAt(0).toUpperCase();

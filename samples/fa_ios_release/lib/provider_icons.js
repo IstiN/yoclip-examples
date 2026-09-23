@@ -36,21 +36,23 @@ function providerIconSvg(name, color) {
         '<path fill="#FFFFFF" d="M22.1777 40.0555C33.2106 40.8257 39.1673 46.678 40.0423 57.6235C40.0479 57.6966 40.1488 57.6966 40.1544 57.6235C41.035 46.678 46.9862 40.8201 58.019 40.0555C58.0919 40.0555 58.0919 39.9487 58.019 39.9431C46.9862 39.1729 41.0294 33.3207 40.1544 22.3751C40.1488 22.302 40.0479 22.302 40.0423 22.3751C39.1616 33.3207 33.2106 39.1786 22.1777 39.9431C22.1048 39.9431 22.1048 40.0499 22.1777 40.0555Z"/></g>'
       );
     case 'dial':
-      // DIAL / dialx.ai: split rounded square, cyan | violet (their favicon)
+      // DIAL / dialx.ai: their favicon = two overlapping gradient squircles
+      // (violet behind, cyan in front, brand hexes sampled from the PNG)
       return svg(
-        '<defs><linearGradient id="dlg" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0" stop-color="#38BDF8"/><stop offset="1" stop-color="#3090C0"/>' +
-        '</linearGradient><linearGradient id="drg" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#9030F0"/>' +
+        '<defs><linearGradient id="dpg" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#DF19FB"/><stop offset="1" stop-color="#B33FF5"/>' +
+        '</linearGradient><linearGradient id="dcg" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#02DAE0"/><stop offset="1" stop-color="#2EB4E5"/>' +
         '</linearGradient></defs>' +
-        '<path fill="url(#dlg)" d="M13 1H8C4.13 1 1 4.13 1 8v8c0 3.87 3.13 7 7 7h5z"/>' +
-        '<path fill="url(#drg)" d="M13 1h3c3.87 0 7 3.13 7 7v8c0 3.87-3.13 7-7 7h-3z"/>'
+        '<rect x="1.2" y="0.3" width="21.75" height="23.55" rx="6" fill="url(#dpg)"/>' +
+        '<rect x="1.2" y="0" width="13.35" height="20.85" rx="4.8" fill="url(#dcg)"/>'
       );
     case 'openrouter-site':
-      // OpenRouter (openrouter.ai current mark, from their site inline SVG)
+      // OpenRouter brand v2 glyph (from openrouter.ai/brand/v2/openrouter-dark.svg,
+      // FULL path incl. the inner cutout) in their lime on near-black
       return svg(
-        '<g transform="translate(0,3.52) scale(0.06565) translate(-19.82,-17.199)">' +
-        '<path d="M303.9475,17.19926c42.79734,0,77.48933,34.69327,77.48933,77.48933s-34.69199,77.48933-77.48933,77.48933l76.86166,76.86244c9.76367,9.76313,2.84903,26.45667-10.95697,26.45667h-220.88335c-71.32686,0-129.14889-57.82202-129.14889-129.14889S77.64197,17.19926,148.96884,17.19926h154.97866z"/></g>'
+        '<g transform="translate(-1.3016,2.389) scale(0.065672)">' +
+        '<path fill="#C8FF00" d="M303.9475,17.19926c42.79734,0,77.48933,34.69327,77.48933,77.48933s-34.69199,77.48933-77.48933,77.48933l76.86166,76.86244c9.76367,9.76313,2.84903,26.45667-10.95697,26.45667h-220.88335c-71.32686,0-129.14889-57.82202-129.14889-129.14889S77.64197,17.19926,148.96884,17.19926h154.97866ZM148.96884,68.85881c-42.79607,0-77.48933,34.69327-77.48933,77.48933s34.69327,77.48933,77.48933,77.48933,77.48933-34.69327,77.48933-77.48933-34.69327-77.48933-77.48933-77.48933Z"/></g>'
       );
     case 'openai':
       // OpenAI rosette (official Simple Icons mark)
