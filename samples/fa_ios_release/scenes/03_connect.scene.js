@@ -362,17 +362,20 @@ scene = {
     focusA *= 1 - smooth((frame - 104) / 12); // gone once the tap settles in
     if (focusA > 0.01) {
       var fp = providers[bestI];
-      kids.push(faText(fp.name, {
-        opacity: focusA,
-        style: {
-          fontSize: isP ? 64 : 52,
-          fontWeight: '800',
-          color: T.text,
-          textAlign: 'left',
-          letterSpacing: 0.5,
-        },
-        positioned: { left: txtL, top: txtTop },
-      }));
+      var bare = fp.icon === 'aiin-text'; // tile already spells AIIN - no dup
+      if (!bare) {
+        kids.push(faText(fp.name, {
+          opacity: focusA,
+          style: {
+            fontSize: isP ? 64 : 52,
+            fontWeight: '800',
+            color: T.text,
+            textAlign: 'left',
+            letterSpacing: 0.5,
+          },
+          positioned: { left: txtL, top: txtTop },
+        }));
+      }
       kids.push(faText(fp.sub, {
         opacity: focusA * 0.8,
         style: {
@@ -383,7 +386,7 @@ scene = {
           textAlign: 'left',
           letterSpacing: 1,
         },
-        positioned: { left: txtL, top: txtTop + (isP ? 82 : 68) },
+        positioned: { left: txtL, top: txtTop + (bare ? 0 : (isP ? 82 : 68)) },
       }));
       kids.push(faText((bestI + 1) + ' / ' + N, {
         opacity: focusA * 0.55,
@@ -394,7 +397,8 @@ scene = {
           textAlign: 'left',
           letterSpacing: 2,
         },
-        positioned: { left: txtL, top: txtTop + (isP ? 124 : 104) },
+        positioned: { left: txtL,
+          top: txtTop + (bare ? (isP ? 38 : 32) : (isP ? 124 : 104)) },
       }));
     }
 
@@ -423,40 +427,56 @@ scene = {
     // Tail: the pill fades into the handoff dot that flies to 04 (below).
     var pillOut = 1 - clamp01((frame - 148) / 8);
     var stIn = tw(118, 12, 0, 1, 'easeOut') * pillOut;
-    var pillW = isP ? F.W * 0.86 : 760;
-    var pillH = 84;
+    var pillFs = isP ? 30 : 28;
+    var pillTxtW = 24 * (pillFs * 0.60 + 3); // mono ~0.60em + letterSpacing 3
+    var pillH = isP ? 88 : 80;
+    var pillW = 40 + 44 + 18 + pillTxtW + 44; // pad + check + gap + text + pad
     var pillX = cx - pillW / 2;
-    var pillY = isP ? F.H * 0.62 : F.H * 0.705; // right under the centred AIIN tile
+    var pillY = (isP ? F.H * 0.635 : F.H * 0.70) - pillH / 2; // under the AIIN wordmark
     if (stIn > 0.003) {
       var glow = 0.5 + 0.2 * Math.sin(frame * 0.45);
 
-      kids.push(faRRect(pillW, pillH, pillH / 2, T.teal, {
-        opacity: 0.22 * glow * stIn,
-        blur: 30,
+      kids.push(faRRect(pillW, pillH, pillH / 2, T.violet, {
+        opacity: 0.38 * glow * stIn,
+        blur: 40,
         positioned: { left: pillX, top: pillY },
       }));
-      kids.push(faRRect(pillW, pillH, pillH / 2, T.card, {
-        opacity: stIn,
-        border: { color: T.teal, width: 2 },
-        positioned: { left: pillX, top: pillY },
-      }));
+      // faRRect doesn't map gradient/shadows - raw container nodes (as tiles)
       kids.push({
-        type: 'circle',
-        size: 14,
-        fill: T.tealBright,
+        type: 'container',
+        width: pillW,
+        height: pillH,
+        radius: pillH / 2,
         opacity: stIn,
-        positioned: { left: pillX + 34, top: pillY + pillH / 2 - 7 },
+        gradient: { begin: 'topLeft', end: 'bottomRight',
+          colors: [T.violet, T.violetDeep], stops: [0.0, 1.0] },
+        shadows: [{ color: T.violet, opacity: 0.35, blur: 30,
+          offset: { x: 0, y: 8 } }],
+        positioned: { left: pillX, top: pillY },
       });
+      kids.push({
+        type: 'container',
+        width: 44,
+        height: 44,
+        radius: 22,
+        opacity: stIn,
+        gradient: { begin: 'topLeft', end: 'bottomRight',
+          colors: ['#34D399', '#0E9F6E'], stops: [0.0, 1.0] },
+        positioned: { left: pillX + 40, top: pillY + pillH / 2 - 22 },
+      });
+      kids.push(checkNode(pillX + 40 + 22, pillY + pillH / 2, 13, '#FFFFFF',
+        stIn, stIn));
       kids.push(faText('FA iOS AGENT — CONNECTED', {
         opacity: stIn,
         style: {
-          fontSize: isP ? 30 : 30,
+          fontSize: pillFs,
           fontFamily: 'monospace',
           fontWeight: '800',
-          color: T.teal,
+          color: '#FFFFFF',
           letterSpacing: 3,
         },
-        positioned: { left: pillX + (isP ? 62 : 70), top: pillY + 29 },
+        positioned: { left: pillX + 40 + 44 + 18,
+          top: pillY + pillH / 2 - pillFs * 0.60 },
       }));
     }
 
