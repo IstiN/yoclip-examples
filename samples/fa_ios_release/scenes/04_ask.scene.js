@@ -42,6 +42,7 @@ scene = {
     }
 
     var kids = [];      // world (moves with the camera)
+    var fixed = [];     // fixed UI (input bar + keyboard) — crisp, no zoom
     var chrome = [];    // fixed UI (nav bar) - drawn above the camera layer
 
     kids.push(faRRect(F.W, F.H, 0, T.bg));
@@ -62,6 +63,9 @@ scene = {
     var qSlot = gC + gH / 2 + 34;             // user bubble lands under it
     var barY = isP ? F.H * 0.885 : F.H * 0.875; // input bar top
     var barH = isP ? 96 : 88;
+    var kbH = Math.round(Math.min(F.W * 0.52, F.H * 0.30)); // keyboard mock
+    var kbBar = smooth((frame - 56) / 14) * (1 - smooth((frame - 108) / 14));
+    var barYNow = barY - (kbH + 8) * kbBar; // bar rides up on the keyboard
 
     var bullets = [
       { t: 'NATIVE DRAW ENGINE — FLUTTER @ 120 FPS.', c: 'violet' },
@@ -79,12 +83,12 @@ scene = {
 
     // ---- Camera: greeting -> input bar -> follow the send -> card ---------
     var tGreet = smooth(frame / 12) * (1 - smooth((frame - 36) / 16));
-    var tBar = smooth((frame - 58) / 14) * (1 - smooth((frame - 100) / 16));
+    var tBar = smooth((frame - 58) / 14) * (1 - smooth((frame - 96) / 14));
     var tCard = smooth((frame - 132) / 18) * (1 - smooth((frame - 170) / 10));
-    var camS = 1 + 0.08 * tGreet + 0.11 * tBar + 0.04 * tCard;
+    var camS = 1 + 0.08 * tGreet + 0.035 * tBar + 0.04 * tCard;
     var camX = 0;
     var camY = -(gC - F.H / 2) * 0.34 * tGreet
-      - (barY - F.H / 2) * 0.40 * tBar
+      - (barY - (kbH + 8) - F.H / 2) * 0.30 * tBar
       + (cardTop + 200 - F.H / 2) * 0.10 * tCard;
 
     // ---- 1. Greeting card in the centre ------------------------------------
@@ -132,11 +136,12 @@ scene = {
     }
 
     // ---- 3. User bubble — launches out of the bar, lands under greeting ----
-    var sendT = clamp01((frame - 102) / 18);
+    var sendT = clamp01((frame - 108) / 18);
     var qIn = backOut(sendT);
     if (qIn > 0.003) {
       var landY = qSlot - push;
-      var flyY = (barY - 40) + (landY - (barY - 40)) * qIn;
+      var flyFrom = barY - (kbH + 8) - 40; // the raised input bar
+      var flyY = flyFrom + (landY - flyFrom) * qIn;
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
         opacity: qIn * 0.35,
         blur: 24,
@@ -158,7 +163,7 @@ scene = {
         },
         positioned: { left: x0 + chatW * 0.22 + 28, top: flyY + 26 },
       }));
-      var dIn = tw(126, 8, 0, 1, 'easeOut');
+      var dIn = tw(132, 8, 0, 1, 'easeOut');
       kids.push(faText('DELIVERED · ON-DEVICE', {
         opacity: dIn * 0.5,
         style: {
@@ -214,7 +219,7 @@ scene = {
       }));
 
       for (var bi = 0; bi < bullets.length; bi++) {
-        var bIn = tw(142 + bi * 7, 9, 0, 1, 'easeOut');
+        var bIn = tw(146 + bi * 7, 9, 0, 1, 'easeOut');
         var by = cardTop + 120 + bi * bGap + cardRise;
         if (bIn > 0.01) {
           var bc = bullets[bi].c === 'violet' ? T.violet : T.teal;
@@ -239,27 +244,27 @@ scene = {
 
     // ---- 2. Input bar (like the app: "Ask anything…" + send) ---------------
     var barIn = tw(56, 12, 0, 1, 'easeOut');
-    var typedN = frame < 100 ? Math.min(qText.length,
-      Math.floor((frame - 66) / 1.7)) : 0;
-    var typing = frame >= 66 && frame < 100;
+    var typedN = frame < 106 ? Math.min(qText.length,
+      Math.floor((frame - 58) / 0.85)) : 0;
+    var typing = frame >= 58 && frame < 106;
     var cursor = typing && Math.floor(frame / 5) % 2 === 0 ? '_' : '';
     var shown = typing ? qText.slice(0, typedN) + cursor : '';
 
-    var press = frame >= 100 && frame < 108
-      ? Math.sin(clamp01((frame - 100) / 8) * Math.PI) : 0;
+    var press = frame >= 106 && frame < 114
+      ? Math.sin(clamp01((frame - 106) / 8) * Math.PI) : 0;
 
     var barX = x0;
     var sendD = isP ? 72 : 64;
     var sendX = x0 + chatW - sendD - 14;
 
-    kids.push(faRRect(chatW, barH, barH / 2, T.card, {
+    fixed.push(faRRect(chatW, barH, barH / 2, T.card, {
       opacity: barIn,
       border: { color: press > 0 ? T.violet : T.border,
         width: press > 0 ? 2 : 1.5 },
       scale: press > 0 ? 1 - 0.012 * press : 1,
-      positioned: { left: barX, top: barY },
+      positioned: { left: barX, top: barYNow },
     }));
-    kids.push(faLogoSvgNode(barX + 44, barY + barH / 2, 40, barIn));
+    fixed.push(faLogoSvgNode(barX + 44, barYNow + barH / 2, 40, barIn));
     var tFs = isP ? 26 : 25;
     var tMaxW = chatW - sendD - 130;
     var tW = shown.length * tFs * 0.60;
@@ -274,7 +279,7 @@ scene = {
           color: T.text,
           letterSpacing: 0,
         },
-        positioned: { left: tX, top: barY + barH / 2 - tFs * 0.60 },
+        positioned: { left: tX, top: barYNow + barH / 2 - tFs * 0.60 },
       }));
     } else {
       kids.push(faText('Ask anything…', {
@@ -286,13 +291,14 @@ scene = {
           color: T.dim,
           letterSpacing: 0,
         },
-        positioned: { left: barX + 78, top: barY + barH / 2 - tFs * 0.60 },
+        positioned: { left: barX + 78,
+          top: barYNow + barH / 2 - tFs * 0.60 },
       }));
     }
 
     // send button: violet disc + up-arrow triangle, presses in
     var sendS = 1 - 0.14 * press;
-    kids.push({
+    fixed.push({
       type: 'container',
       width: sendD,
       height: sendD,
@@ -303,15 +309,15 @@ scene = {
         colors: [T.violet, T.violetDeep], stops: [0.0, 1.0] },
       shadows: [{ color: T.violet, opacity: 0.35 + 0.25 * press, blur: 18,
         offset: { x: 0, y: 4 } }],
-      positioned: { left: sendX, top: barY + barH / 2 - sendD / 2 },
+      positioned: { left: sendX, top: barYNow + barH / 2 - sendD / 2 },
     });
-    var acx = sendX + sendD / 2, acy = barY + barH / 2;
+    var acx = sendX + sendD / 2, acy = barYNow + barH / 2;
     var apts = [{ x: acx, y: acy - 13 }, { x: acx + 10, y: acy + 5 },
       { x: acx - 10, y: acy + 5 }];
-    kids.push(polylineScreen(apts, 7, 1, '#FFFFFF', barIn));
-    if (frame >= 102 && frame < 116) {
-      var fr = (frame - 102) / 14;
-      kids.push({
+    fixed.push(polylineScreen(apts, 7, 1, '#FFFFFF', barIn));
+    if (frame >= 108 && frame < 122) {
+      var fr = (frame - 108) / 14;
+      fixed.push({
         type: 'circle',
         size: sendD + 60 * fr,
         fill: '#00000000',
@@ -320,6 +326,17 @@ scene = {
         positioned: { left: acx - (sendD + 60 * fr) / 2,
           top: acy - (sendD + 60 * fr) / 2 },
       });
+    }
+
+    // ---- Mobile keyboard mock (rises under the bar, keys light up) --------
+    if (frame >= 54 && frame < 124) {
+      var kbAmt = smooth((frame - 54) / 14) * (1 - smooth((frame - 108) / 14));
+      var kbY = F.H - kbH + (1 - kbAmt) * (kbH + 40);
+      var kbNodes = faKeyboard({
+        x: 0, y: kbY, w: F.W, h: kbH, opacity: 1,
+        pressed: qText.slice(0, typedN),
+      });
+      for (var kni = 0; kni < kbNodes.length; kni++) fixed.push(kbNodes[kni]);
     }
 
     // ---- Handoff arrival from 03_connect ------------------------------------
@@ -393,6 +410,7 @@ scene = {
       faRRect(F.W, F.H, 0, T.bg),               // fixed bg — no black band
       { type: 'stack', fit: 'expand', scale: camS,
         offsetX: camX, offsetY: camY, children: kids },
+      { type: 'stack', fit: 'expand', children: fixed },
       { type: 'stack', fit: 'expand', children: chrome },
       { type: 'stack', fit: 'expand', children: exKids },
     ] };

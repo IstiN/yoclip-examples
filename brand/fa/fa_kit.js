@@ -793,3 +793,109 @@ function streak(i, ySvg, xSvg, lenSvg, thick, color, frame, fps, at, dur, dir) {
     positioned: { left: pt.x + d * p * 240, top: pt.y - thick / 2 },
   };
 }
+
+/// faKeyboard — mobile QWERTY keyboard mockup, reusable across scenes.
+/// iOS-style: 4 key rows, special keys, pressed-key highlight driven by the
+/// text being typed (`opts.pressed` = the string typed so far — the key that
+/// produced its last char lights up). Returns an ARRAY of nodes; spread or
+/// push each. Scales with `opts.w`, colors follow the active theme.
+///
+///   kids.push.apply(kids, faKeyboard({
+///     x: 0, y: F.H - 540, w: F.W, opacity: kbIn, pressed: typedText,
+///   }));
+function faKeyboard(opts) {
+  var o = opts || {};
+  var T = faTheme();
+  var x = o.x || 0;
+  var y = o.y || 0;
+  var w = o.w || 390;
+  var op = (o.opacity != null) ? o.opacity : 1;
+  var pressed = (o.pressed || '');
+  var lastCh = pressed.length > 0 ? pressed.charAt(pressed.length - 1) : '';
+
+  var isL = T.isLight;
+  var kbBg = isL ? '#D4D7DE' : '#1B1F2A';
+  var keyBg = isL ? '#FFFFFF' : '#6B7078';
+  var keyBgDark = isL ? '#B9BDC7' : '#3A3F4C';
+  var keyFg = isL ? '#171A22' : '#F2F4F8';
+
+  var gap = Math.round(w * 0.011);
+  var edge = Math.round(w * 0.012);
+  var kbH = o.h || Math.round(w * 0.52);
+  var keyH = Math.round((kbH - gap * 3 - w * 0.045) / 4);
+  var rows = [
+    { keys: ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'] },
+    { keys: ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'], inset: 0.5 },
+    { keys: ['S', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'S'],
+      weight: [1.4, 1, 1, 1, 1, 1, 1, 1, 1.4],
+      label: { 0: null, 8: null }, special: { 0: 1, 8: 1 } },
+    { keys: ['123', 'E', 'SPACE', 'R'],
+      weight: [1.3, 1.2, 4.4, 1.6],
+      label: { 0: '123', 1: null, 2: 'space', 3: 'return' },
+      special: { 0: 1, 1: 1, 3: 1 } },
+  ];
+  // rows 0/1 letters come straight from keys; row 3 has custom labels.
+  var layout = [
+    { keys: rows[0].keys },
+    { keys: rows[1].keys, inset: 0.5 },
+    rows[2],
+    rows[3],
+  ];
+
+  var nodes = [];
+  nodes.push(faRRect(w, kbH, w * 0.03, kbBg, {
+    opacity: op,
+    positioned: { left: x, top: y },
+  }));
+
+  var rowY = y + Math.round(w * 0.016);
+  for (var r = 0; r < layout.length; r++) {
+    var row = layout[r];
+    var n = row.keys.length;
+    var weights = row.weight;
+    var wsum = 0;
+    for (var i = 0; i < n; i++) wsum += (weights ? weights[i] : 1);
+    var avail = w - edge * 2 - gap * (n - 1);
+    var unit = avail / wsum;
+    var inset = row.inset ? (unit + gap) * row.inset : 0;
+    var kx = x + edge + inset;
+    for (var k = 0; k < n; k++) {
+      var kw = Math.round(unit * (weights ? weights[k] : 1));
+      var key = row.keys[k];
+      var label = row.label && row.label[k] != null ? row.label[k]
+        : (row.special && row.special[k] ? null : key);
+      var isSpecial = (row.special && row.special[k] === 1) ||
+        (label === 'space') || (label === 'return') || (label === '123');
+      var isPressed = lastCh.length > 0 && !row.special &&
+        key === lastCh.toUpperCase();
+      if (label === 'space' && lastCh === ' ') isPressed = true;
+      var bg = isSpecial ? keyBgDark : keyBg;
+      if (isPressed) bg = isL ? '#0E1118' : '#F2F4F8';
+      var fg = isPressed ? (isL ? '#F2F4F8' : '#171A22') : keyFg;
+      nodes.push(faRRect(kw, keyH, Math.round(keyH * 0.18), bg, {
+        opacity: op,
+        scale: isPressed ? 0.93 : 1,
+        positioned: { left: Math.round(kx), top: rowY },
+      }));
+      if (label) {
+        var fs = Math.round(keyH * (label.length > 2 ? 0.30 : 0.42));
+        nodes.push(faText(label, {
+          width: kw,
+          opacity: op,
+          style: {
+            fontSize: fs,
+            fontFamily: label.length > 2 ? 'sans-serif' : 'monospace',
+            fontWeight: '600',
+            color: fg,
+            textAlign: 'center',
+          },
+          positioned: { left: Math.round(kx),
+            top: rowY + keyH / 2 - fs * 0.60 },
+        }));
+      }
+      kx += kw + gap;
+    }
+    rowY += keyH + gap;
+  }
+  return nodes;
+}
