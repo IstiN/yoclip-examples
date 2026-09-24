@@ -58,7 +58,7 @@ scene = {
     // Layout slots
     var gC = isP ? F.H * 0.46 : F.H * 0.47;   // greeting centre ("в центре")
     var gW = chatW * (isP ? 0.80 : 0.62);
-    var gH = isP ? 128 : 116;
+    var gH = isP ? 182 : 162;
     var gx = cx - gW / 2;
     var qSlot = gC + gH / 2 + 34;             // user bubble lands under it
     var barY = isP ? F.H * 0.885 : F.H * 0.875; // input bar top
@@ -111,31 +111,57 @@ scene = {
           offset: { x: 0, y: 10 } }],
         positioned: { left: cx - gW / 2, top: gTop },
       });
-      kids.push(faText('HEY — I\'M FA.', {
-        width: gW - 48,
-        opacity: gIn * 0.95,
+      // prompt mark ">_ Fa" (terminal style), Fa moved here from the input
+      var gx = cx - gW / 2 + 44;
+      kids.push(faText('>_', {
+        opacity: gIn,
         style: {
-          fontSize: isP ? 30 : 28,
+          fontSize: isP ? 42 : 38,
           fontFamily: 'monospace',
           fontWeight: '800',
           color: T.teal,
-          textAlign: 'center',
+          textAlign: 'left',
           letterSpacing: 2,
         },
-        positioned: { left: cx - (gW - 48) / 2, top: gTop + (isP ? 26 : 22) },
+        positioned: { left: gx, top: gTop + (isP ? 24 : 20) },
+      }));
+      kids.push(faText('Fa', {
+        opacity: gIn,
+        style: {
+          fontSize: isP ? 42 : 38,
+          fontFamily: 'sans-serif',
+          fontWeight: '800',
+          color: T.violet,
+          textAlign: 'left',
+          letterSpacing: 0,
+        },
+        positioned: { left: gx + (isP ? 86 : 78), top: gTop + (isP ? 24 : 20) },
+      }));
+      kids.push(faText('HEY — I\'M FA.', {
+        width: gW - 88,
+        opacity: gIn * 0.95,
+        style: {
+          fontSize: isP ? 29 : 27,
+          fontFamily: 'monospace',
+          fontWeight: '800',
+          color: T.teal,
+          textAlign: 'left',
+          letterSpacing: 2,
+        },
+        positioned: { left: gx, top: gTop + (isP ? 82 : 72) },
       }));
       kids.push(faText('ASK ME TO BUILD ANYTHING.', {
-        width: gW - 48,
+        width: gW - 88,
         opacity: gIn * 0.9,
         style: {
-          fontSize: isP ? 25 : 23,
+          fontSize: isP ? 24 : 22,
           fontFamily: 'monospace',
           fontWeight: '600',
           color: T.text,
-          textAlign: 'center',
+          textAlign: 'left',
           letterSpacing: 1,
         },
-        positioned: { left: cx - (gW - 48) / 2, top: gTop + (isP ? 72 : 64) },
+        positioned: { left: gx, top: gTop + (isP ? 126 : 112) },
       }));
     }
 
@@ -319,7 +345,19 @@ scene = {
       scale: press > 0 ? 1 - 0.02 * press : 1,
       positioned: { left: barX, top: barTop },
     }));
-    fixed.push(faLogoSvgNode(barX + 44, barCY, 40, barIn));
+    // "+" attachment button (iOS style) instead of the Fa logo
+    fixed.push(faRRect(56, 56, 28, T.dim, {
+      opacity: barIn * 0.35,
+      positioned: { left: barX + 30, top: barCY - 28 },
+    }));
+    fixed.push(faRRect(26, 5, 2.5, T.text, {
+      opacity: barIn * 0.8,
+      positioned: { left: barX + 45, top: barCY - 2.5 },
+    }));
+    fixed.push(faRRect(5, 26, 2.5, T.text, {
+      opacity: barIn * 0.8,
+      positioned: { left: barX + 55.5, top: barCY - 13 },
+    }));
     if (shown.length > 0) {
       var txStyle = {
         fontSize: tFs,
@@ -330,7 +368,7 @@ scene = {
       };
       if (!twoLine) {
         var tW = shown.length * tFs * 0.60;
-        var tX = barX + 104 - Math.max(0, tW - tMaxW);
+        var tX = barX + 106 - Math.max(0, tW - tMaxW);
         txStyle.textAlign = 'left';
         fixed.push(faText(shown, { opacity: barIn, style: txStyle,
           width: tMaxW,
