@@ -88,8 +88,7 @@ scene = {
     var cardCentreTop = Math.round((F.H - cardH) / 2 + F.H * 0.03);
     var cardDrop = (cardCentreTop - cardTop)
       * smooth((frame - 300) / 24);
-    var sinkT = smooth((frame - 300) / 24);
-    var threadSink = F.H * 0.55 * sinkT; // chat sinks away, dimmed
+    var threadFade = 1 - smooth((frame - 296) / 22); // recede into depth
 
     // The card pushes the two earlier messages up as it arrives.
     var push = (isP ? 36 : 262) * smooth((frame - 240) / 56);
@@ -103,7 +102,7 @@ scene = {
     // ---- 1. Greeting card in the centre ------------------------------------
     var gIn = tw(64, 40, 0, 1, 'easeOut');
     var gTop = gC - gH / 2 - push - threadLift
-      + threadSink; // keyboard lift, card push, finale sink
+      ; // keyboard lift + card push (no travel — the thread fades)
     if (gIn > 0.003) {
       kids.push({
         type: 'container',
@@ -111,7 +110,7 @@ scene = {
         height: gH,
         radius: 28,
         color: T.card,
-        opacity: gIn * (1 - 0.78 * sinkT),
+        opacity: gIn * threadFade,
         border: { color: T.teal, width: 1.5 },
         shadows: [{ color: T.teal, opacity: 0.18, blur: 34,
           offset: { x: 0, y: 10 } }],
@@ -120,7 +119,7 @@ scene = {
       // prompt mark ">_ Fa" (terminal style), Fa moved here from the input
       var gx = cx - gW / 2 + 44;
       kids.push(faText('>_', {
-        opacity: gIn * (1 - 0.78 * sinkT),
+        opacity: gIn * threadFade,
         style: {
           fontSize: isP ? 42 : 38,
           fontFamily: 'monospace',
@@ -132,7 +131,7 @@ scene = {
         positioned: { left: gx, top: gTop + (isP ? 24 : 20) },
       }));
       kids.push(faText('Fa', {
-        opacity: gIn * (1 - 0.78 * sinkT),
+        opacity: gIn * threadFade,
         style: {
           fontSize: isP ? 42 : 38,
           fontFamily: 'sans-serif',
@@ -145,7 +144,7 @@ scene = {
       }));
       kids.push(faText('HEY — I\'M FA.', {
         width: gW - 88,
-        opacity: gIn * 0.95 * (1 - 0.78 * sinkT),
+        opacity: gIn * 0.95 * threadFade,
         style: {
           fontSize: isP ? 29 : 27,
           fontFamily: 'monospace',
@@ -158,7 +157,7 @@ scene = {
       }));
       kids.push(faText('ASK ME TO BUILD ANYTHING.', {
         width: gW - 88,
-        opacity: gIn * 0.9 * (1 - 0.78 * sinkT),
+        opacity: gIn * 0.9 * threadFade,
         style: {
           fontSize: isP ? 24 : 22,
           fontFamily: 'monospace',
@@ -181,16 +180,16 @@ scene = {
         opacity: landIn * 0.35,
         blur: 24,
         positioned: { left: x0 + chatW * 0.22 - 10,
-          top: qSlot - push - threadLift + threadSink - 8 },
+          top: qSlot - push - threadLift - 8 },
       }));
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
-        opacity: landIn * (1 - 0.78 * sinkT),
+        opacity: landIn * threadFade,
         positioned: { left: x0 + chatW * 0.22,
-          top: qSlot - push - threadLift + threadSink },
+          top: qSlot - push - threadLift },
       }));
       kids.push(faText(qText, {
         width: chatW * 0.78 - 56,
-        opacity: landIn * (1 - 0.78 * sinkT),
+        opacity: landIn * threadFade,
         style: {
           fontSize: bFs2,
           fontFamily: 'monospace',
@@ -200,11 +199,11 @@ scene = {
           textAlign: 'left',
         },
         positioned: { left: x0 + chatW * 0.22 + 28,
-          top: qSlot - push - threadLift + threadSink + 26 },
+          top: qSlot - push - threadLift + 26 },
       }));
     }
     if (qIn > 0.003 && landIn < 0.997) {
-      var landY = qSlot - push - threadLift + threadSink;
+      var landY = qSlot - push - threadLift;
       // The message IS the input field: start from the raised bar rect
       // and morph position+size into the chat bubble.
       var fromX = barX, fromW = chatW;
@@ -246,7 +245,7 @@ scene = {
     var dIn = tw(264, 16, 0, 1, 'easeOut');
     if (dIn > 0.01) {
       kids.push(faText('DELIVERED · ON-DEVICE', {
-        opacity: dIn * 0.5 * (1 - 0.78 * sinkT),
+        opacity: dIn * 0.5 * threadFade,
         style: {
           fontSize: isP ? 15 : 14,
           fontFamily: 'monospace',
