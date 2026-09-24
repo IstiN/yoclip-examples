@@ -1,6 +1,8 @@
 // 07 — Lockup — Fa mark + "First real mobile AI harness" + QR (144 frames, 3 bars)
 //
-// Portrait: Fa mark writes center-top, tagline, QR + fa1.dev bottom.
+// The closing brand beat: white plate (like the 02b/05b splash — one brand
+// language at both ends of the film), Fa mark writes itself, tagline, QR.
+// Portrait: mark center-top, tagline, QR + fa1.dev bottom.
 // Landscape: Fa mark left, tagline + QR right.
 
 scene = {
@@ -24,29 +26,31 @@ scene = {
 
     var kids = [];
 
-    // No full-frame background — broll_07_outro_monitors paints it
-    // underneath (slot plate now, hero monitor-wall footage later).
+    // White brand plate — the lockup closes the film on the splash's white.
+    kids.push({
+      type: 'rect', width: F.W, height: F.H, fill: '#FFFFFF',
+      positioned: { left: 0, top: 0 },
+    });
 
     var isP = F.portrait;
     var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
-    // Enter veil: continues 06_publish's exit dip (broll plate under us is
-    // the same bg tone, so the cut reads as one continuous dissolve).
+    // Enter veil: the elements arrive over white (the download's dark exit
+    // cuts straight to the plate — same dark->white grammar as the splash).
     var veilIn = 1 - clamp01(frame / 14);
     if (veilIn > 0.003) {
       var va = Math.round(veilIn * 255).toString(16).padStart(2, '0');
-      var vb = T.bg.replace('#', '').toUpperCase();
-      kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + va + vb });
+      kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + va + 'FFFFFF' });
     }
 
     // Ambient glow behind everything
-    var glow = 0.30 + 0.08 * Math.sin(frame * 0.35);
+    var glow = 0.14 + 0.04 * Math.sin(frame * 0.35);
     kids.push({
       type: 'circle',
       size: m * 0.9,
       fill: T.violet,
-      opacity: glow * 0.30,
+      opacity: glow * 0.55,
       blur: 140,
       positioned: { left: cx - m * 0.45, top: (isP ? F.H * 0.265 : F.H * 0.40) - m * 0.45 },
     });
@@ -94,16 +98,14 @@ scene = {
         fontSize: isP ? Math.round(m * 0.062) : Math.round(m * 0.048),
         fontFamily: 'Impact',
         fontWeight: '700',
-        color: T.text,
+        color: '#0B0F19',
         textAlign: isP ? 'center' : 'left',
         letterSpacing: 2.5,
         gradient: {
           begin: 'topCenter',
           end: 'bottomCenter',
-          colors: T.isLight
-            ? ['#3C4043', '#0B0F19']
-            : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
-          stops: T.isLight ? [0.0, 1.0] : [0.0, 0.45, 1.0],
+          colors: ['#3C4043', '#0B0F19'],
+          stops: [0.0, 1.0],
         },
       },
       positioned: { left: tagX, top: tagY },
@@ -116,14 +118,14 @@ scene = {
         fontSize: isP ? Math.round(m * 0.062) : Math.round(m * 0.048),
         fontFamily: 'Impact',
         fontWeight: '700',
-        color: T.text,
+        color: T.violetDeep,
         textAlign: isP ? 'center' : 'left',
         letterSpacing: 2.5,
         gradient: {
           begin: 'topCenter',
           end: 'bottomCenter',
-          colors: [T.violetPale, T.violet, T.violetDeep],
-          stops: [0.0, 0.5, 1.0],
+          colors: [T.violet, T.violetDeep],
+          stops: [0.0, 1.0],
         },
       },
       positioned: { left: tagX, top: tagY + (isP ? m * 0.085 : m * 0.065) },
@@ -150,13 +152,13 @@ scene = {
 
     if (qrIn > 0.003) {
       kids.push(faRRect(plateW + 28, plateW + 28, 30, T.teal, {
-        opacity: 0.12 * qrIn,
+        opacity: 0.16 * qrIn,
         blur: 40,
         positioned: { left: plateX - 14, top: plateY - 14 },
       }));
-      kids.push(faRRect(plateW, plateW, 24, T.card, {
+      kids.push(faRRect(plateW, plateW, 24, '#FFFFFF', {
         opacity: qrIn,
-        border: { color: T.border, width: 1.5 },
+        border: { color: '#DFE2E9', width: 1.5 },
         offsetY: 18 * (1 - qrIn),
         positioned: { left: plateX, top: plateY },
       }));
@@ -175,7 +177,7 @@ scene = {
         fontSize: isP ? 46 : 40,
         fontFamily: 'Impact',
         fontWeight: '700',
-        color: T.text,
+        color: '#0B0F19',
         textAlign: isP ? 'center' : null,
         letterSpacing: 2,
       },
@@ -208,7 +210,7 @@ scene = {
       style: {
         fontSize: isP ? 21 : 20,
         fontFamily: 'monospace',
-        color: T.faint,
+        color: '#9E9EA8',
         textAlign: 'center',
         letterSpacing: 4,
       },
