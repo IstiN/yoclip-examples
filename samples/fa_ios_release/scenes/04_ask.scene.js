@@ -84,6 +84,8 @@ scene = {
     var bGap = isP ? 58 : 54;
     var cardH = 84 + bullets.length * bGap + 56;
     var cardTop = barY - 28 - cardH;          // just above the input bar
+    var cardDrop = ((F.H - 76) - (barY - 28))
+      * smooth((frame - 300) / 24); // settles down as the bar dissolves
 
     // The card pushes the two earlier messages up as it arrives.
     var push = (isP ? 36 : 262) * smooth((frame - 240) / 56);
@@ -135,7 +137,7 @@ scene = {
           textAlign: 'left',
           letterSpacing: 0,
         },
-        positioned: { left: gx + (isP ? 86 : 78), top: gTop + (isP ? 24 : 20) },
+        positioned: { left: gx + (isP ? 64 : 58), top: gTop + (isP ? 24 : 20) },
       }));
       kids.push(faText('HEY — I\'M FA.', {
         width: gW - 88,
@@ -254,7 +256,7 @@ scene = {
     // ---- 4. Fa capabilities card — rises, pushing the thread up ------------
     var aIn = tw(260, 40, 0, 1, 'easeOut');
     if (aIn > 0.003) {
-      var cardRise = (barY - cardTop) * (1 - aIn); // emerges from the bar
+      var cardRise = (barY - cardTop) * (1 - aIn) + cardDrop;
       kids.push(faRRect(chatW, cardH, 30, T.card, {
         opacity: aIn * 0.4,
         blur: 36,
@@ -318,7 +320,8 @@ scene = {
     }
 
     // ---- 2. Input bar (like the app: "Ask anything…" + send) ---------------
-    var barIn = tw(112, 24, 0, 1, 'easeOut');
+    var barIn = tw(112, 24, 0, 1, 'easeOut')
+      * (1 - smooth((frame - 300) / 24)); // gone once the card is shown
     var typedN = frame < 212 ? Math.min(qText.length,
       Math.floor((frame - 116) / 1.7)) : 0;
     var typing = frame >= 116 && frame < 212;
