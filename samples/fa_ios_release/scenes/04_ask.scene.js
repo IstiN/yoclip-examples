@@ -81,25 +81,29 @@ scene = {
       { t: 'FLAME3D — REAL 3D GAMES, NOT WEBGL.', c: 'violet' },
       { t: 'API KEYS LIVE IN YOUR KEYCHAIN. NEVER OURS.', c: 'teal' },
     ];
-    var bGap = isP ? 58 : 54;
-    var cardH = 84 + bullets.length * bGap + 56;
+    var bGap = isP ? 74 : 66;
+    var cardH = 100 + bullets.length * bGap + 64;
     var cardTop = barY - 28 - cardH;          // just above the input bar
-    var cardDrop = ((F.H - 76) - (barY - 28))
-      * smooth((frame - 300) / 24); // settles down as the bar dissolves
+    // the card glides to the centre of the screen as the bar dissolves
+    var cardCentreTop = Math.round((F.H - cardH) / 2 + F.H * 0.03);
+    var cardDrop = (cardCentreTop - cardTop)
+      * smooth((frame - 300) / 24);
+    var sinkT = smooth((frame - 300) / 24);
+    var threadSink = F.H * 0.55 * sinkT; // chat sinks away, dimmed
 
     // The card pushes the two earlier messages up as it arrives.
     var push = (isP ? 36 : 262) * smooth((frame - 240) / 56);
     var threadLift = Math.min(kbH + 8, F.H * 0.22) * kbBar; // scroll, capped
 
     // ---- Camera: greeting -> input bar -> follow the send -> card ---------
-    var tCard = smooth((frame - 264) / 36) * (1 - smooth((frame - 420) / 24));
-    var camS = 1 + 0.04 * tCard;   // one camera beat: the card rise
+    var camS = 1; // the card glides itself; camera stays at rest
     var camX = 0;
-    var camY = (cardTop + 200 - F.H / 2) * 0.10 * tCard;
+    var camY = 0;
 
     // ---- 1. Greeting card in the centre ------------------------------------
     var gIn = tw(64, 40, 0, 1, 'easeOut');
-    var gTop = gC - gH / 2 - push - threadLift; // keyboard lift + card push
+    var gTop = gC - gH / 2 - push - threadLift
+      + threadSink; // keyboard lift, card push, finale sink
     if (gIn > 0.003) {
       kids.push({
         type: 'container',
@@ -107,7 +111,7 @@ scene = {
         height: gH,
         radius: 28,
         color: T.card,
-        opacity: gIn,
+        opacity: gIn * (1 - 0.78 * sinkT),
         border: { color: T.teal, width: 1.5 },
         shadows: [{ color: T.teal, opacity: 0.18, blur: 34,
           offset: { x: 0, y: 10 } }],
@@ -116,7 +120,7 @@ scene = {
       // prompt mark ">_ Fa" (terminal style), Fa moved here from the input
       var gx = cx - gW / 2 + 44;
       kids.push(faText('>_', {
-        opacity: gIn,
+        opacity: gIn * (1 - 0.78 * sinkT),
         style: {
           fontSize: isP ? 42 : 38,
           fontFamily: 'monospace',
@@ -128,7 +132,7 @@ scene = {
         positioned: { left: gx, top: gTop + (isP ? 24 : 20) },
       }));
       kids.push(faText('Fa', {
-        opacity: gIn,
+        opacity: gIn * (1 - 0.78 * sinkT),
         style: {
           fontSize: isP ? 42 : 38,
           fontFamily: 'sans-serif',
@@ -141,7 +145,7 @@ scene = {
       }));
       kids.push(faText('HEY — I\'M FA.', {
         width: gW - 88,
-        opacity: gIn * 0.95,
+        opacity: gIn * 0.95 * (1 - 0.78 * sinkT),
         style: {
           fontSize: isP ? 29 : 27,
           fontFamily: 'monospace',
@@ -154,7 +158,7 @@ scene = {
       }));
       kids.push(faText('ASK ME TO BUILD ANYTHING.', {
         width: gW - 88,
-        opacity: gIn * 0.9,
+        opacity: gIn * 0.9 * (1 - 0.78 * sinkT),
         style: {
           fontSize: isP ? 24 : 22,
           fontFamily: 'monospace',
@@ -177,15 +181,16 @@ scene = {
         opacity: landIn * 0.35,
         blur: 24,
         positioned: { left: x0 + chatW * 0.22 - 10,
-          top: qSlot - push - threadLift - 8 },
+          top: qSlot - push - threadLift + threadSink - 8 },
       }));
       kids.push(faRRect(chatW * 0.78, 118, 26, T.violetDeep, {
-        opacity: landIn,
-        positioned: { left: x0 + chatW * 0.22, top: qSlot - push - threadLift },
+        opacity: landIn * (1 - 0.78 * sinkT),
+        positioned: { left: x0 + chatW * 0.22,
+          top: qSlot - push - threadLift + threadSink },
       }));
       kids.push(faText(qText, {
         width: chatW * 0.78 - 56,
-        opacity: landIn,
+        opacity: landIn * (1 - 0.78 * sinkT),
         style: {
           fontSize: bFs2,
           fontFamily: 'monospace',
@@ -195,11 +200,11 @@ scene = {
           textAlign: 'left',
         },
         positioned: { left: x0 + chatW * 0.22 + 28,
-          top: qSlot - push - threadLift + 26 },
+          top: qSlot - push - threadLift + threadSink + 26 },
       }));
     }
     if (qIn > 0.003 && landIn < 0.997) {
-      var landY = qSlot - push - threadLift;
+      var landY = qSlot - push - threadLift + threadSink;
       // The message IS the input field: start from the raised bar rect
       // and morph position+size into the chat bubble.
       var fromX = barX, fromW = chatW;
@@ -241,7 +246,7 @@ scene = {
     var dIn = tw(264, 16, 0, 1, 'easeOut');
     if (dIn > 0.01) {
       kids.push(faText('DELIVERED · ON-DEVICE', {
-        opacity: dIn * 0.5,
+        opacity: dIn * 0.5 * (1 - 0.78 * sinkT),
         style: {
           fontSize: isP ? 15 : 14,
           fontFamily: 'monospace',
@@ -270,44 +275,44 @@ scene = {
         positioned: { left: x0, top: cardTop },
       }));
 
-      kids.push(faLogoSvgNode(x0 + 52, cardTop + 56 + cardRise, 56, aIn));
+      kids.push(faLogoSvgNode(x0 + 56, cardTop + 64 + cardRise, 66, aIn));
       kids.push(faText('Fa — iOS AGENT', {
         opacity: aIn * 0.9,
         offsetY: cardRise,
         style: {
-          fontSize: isP ? 22 : 21,
+          fontSize: isP ? 30 : 27,
           fontFamily: 'monospace',
           fontWeight: '700',
           color: T.teal,
           letterSpacing: 2,
         },
-        positioned: { left: x0 + 96, top: cardTop + 34 },
+        positioned: { left: x0 + 110, top: cardTop + 38 },
       }));
       kids.push(faText('VERIFIED · RUNS ON-DEVICE', {
         opacity: aIn * 0.55,
         offsetY: cardRise,
         style: {
-          fontSize: isP ? 17 : 16,
+          fontSize: isP ? 20 : 19,
           fontFamily: 'monospace',
           color: T.dim,
           letterSpacing: 1.5,
         },
-        positioned: { left: x0 + 96, top: cardTop + 66 },
+        positioned: { left: x0 + 110, top: cardTop + 80 },
       }));
 
       for (var bi = 0; bi < bullets.length; bi++) {
         var bIn = tw(292 + bi * 14, 18, 0, 1, 'easeOut');
-        var by = cardTop + 120 + bi * bGap + cardRise;
+        var by = cardTop + 138 + bi * bGap + cardRise;
         if (bIn > 0.01) {
           var bc = bullets[bi].c === 'violet' ? T.violet : T.teal;
-          kids.push(faRRect(12, 12, 6, bc, {
+          kids.push(faRRect(14, 14, 7, bc, {
             opacity: bIn,
-            positioned: { left: x0 + 34, top: by + 10 },
+            positioned: { left: x0 + 36, top: by + 12 },
           }));
           kids.push(faText(bullets[bi].t, {
             opacity: bIn * 0.92,
             style: {
-              fontSize: isP ? 23 : 22,
+              fontSize: isP ? 31 : 28,
               fontFamily: 'monospace',
               fontWeight: '600',
               color: T.text,
