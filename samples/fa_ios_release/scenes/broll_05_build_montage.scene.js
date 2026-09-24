@@ -1,12 +1,12 @@
-// broll_05 — build_montage video slot (background layer, 1058–1298)
+// broll_05 — build_montage video slot (background layer under 05_build)
 //
-// Person-at-desk coding montage behind the 05_build app cards (render it
+// Person-at-desk coding montage behind the 05_build beats (render it
 // dim — opacity ~0.35 — once the real clip lands). Marks only, no chip:
 // the card grid covers most of the frame. See assets/VIDEO_PROMPTS.md.
 
 scene = {
   id: 'broll_05_build_montage',
-  duration: 240,
+  duration: 1104,
   from: 1142,
   timeline: {
     label: 'B-roll · build_montage',

@@ -1,13 +1,22 @@
-// 05 — Build — generation montage: 4 apps building in parallel
-// (240 frames, 5 bars)
+// 05 — Build — three prompts, three apps (852 frames)
 //
-// Cards stagger in on beats; each builds a different real app with a
-// progress bar and flickering compile log lines.
+// The montage became a story, one beat per app:
+//   1. photo chip + "I want my shopping list app"  -> LISTKIT (shopping list)
+//   2. "and now improve my english"               -> LINGO COACH (tutor)
+//   3. "make me a 2048 game"                      -> TWENTY48 (puzzle)
+//
+// Each beat (260 frames): the input bar parks on the rising keyboard, the
+// prompt types itself with per-key presses, send fires, the bar dissolves,
+// a violet dot flies to the centre and blooms into the app card; the UI
+// materialises group by group under a compile sheen, holds DONE — INSTALLED,
+// then hands off to the next prompt. Ends on the ticker.
+//
+// KEEP IN SYNC with project.js (start: 1394 overrides from below).
 
 scene = {
   id: '05_build',
-  duration: 240,
-  from: 1142,
+  duration: 852,
+  from: 1394,
   timeline: {
     label: 'Build',
     color: '#5B61F6',
@@ -23,52 +32,55 @@ scene = {
       return jsr.motion.tween(ms, at * 1000 / 30, dur * 1000 / 30, from, to, easing);
     }
 
+    function smooth(x) {
+      var t = clamp01(x);
+      return t * t * (3 - 2 * t);
+    }
+
     var kids = [];
 
-    // No full-frame background — broll_05_build_montage paints it
-    // underneath (slot plate now, dim coding-montage video later).
+    // No full-frame background — broll_05_build_montage paints it underneath.
 
     var isP = F.portrait;
-    var m = Math.min(F.W, F.H);
     var cx = F.cx;
 
-    var titleIn = expoOut(clamp01((frame - 4) / 12));
-    kids.push(faText('WATCH FA BUILD.', {
-      width: F.W,
-      opacity: clamp01(titleIn * 1.2),
-      offsetY: 16 * (1 - titleIn),
-      style: {
-        fontSize: isP ? Math.round(m * 0.056) : Math.round(m * 0.040),
-        fontFamily: 'Impact',
-        fontWeight: '700',
-        color: T.text,
-        textAlign: 'center',
-        letterSpacing: 3,
-        gradient: {
-          begin: 'topCenter',
-          end: 'bottomCenter',
-          colors: T.isLight
-            ? ['#3C4043', '#0B0F19']
-            : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
-          stops: T.isLight ? [0.0, 1.0] : [0.0, 0.45, 1.0],
-        },
-      },
-      positioned: { left: 0, top: isP ? F.H * 0.055 : F.H * 0.075 },
-    }));
+    var chatW = isP ? F.W * 0.88 : Math.min(F.W * 0.62, 1150);
+    var x0 = cx - chatW / 2;
 
-    var apps = [
-      { name: 'LISTKIT', kind: 'SHOPPING LIST', tint: 'teal', ui: 'list' },
-      { name: 'HYPE TYPE', kind: 'MARKETING CONTENT', tint: 'violet', ui: 'social' },
-      { name: 'LINGO COACH', kind: 'LEARN ENGLISH', tint: 'teal', ui: 'lesson' },
-      { name: 'VOXEL RUN', kind: '3D GAME', tint: 'violet', ui: 'game' },
+    var tintOf = function(name) { return name === 'violet' ? T.violet : T.teal; };
+
+    var beats = [
+      { prompt: 'I want my shopping list app', chip: true,
+        name: 'LISTKIT', kind: 'SHOPPING LIST', tint: 'teal', ui: 'list',
+        build: '4.2S', veil: 'teal' },
+      { prompt: 'and now improve my english', chip: false,
+        name: 'LINGO COACH', kind: 'ENGLISH TUTOR', tint: 'violet', ui: 'lesson',
+        build: '3.8S', veil: 'violet' },
+      { prompt: 'make me a 2048 game', chip: false,
+        name: 'TWENTY48', kind: 'PUZZLE GAME', tint: 'teal', ui: 'g2048',
+        build: '5.1S', veil: 'teal' },
     ];
 
-    // ---- M3-ish mini helpers (screen-space, all inside the card stack) -----
+    var BEAT_LEN = 260;
+    var CPS = 2.2;          // frames per typed character
+    var TYPE_START = 14;    // beat-local
+    var EXIT_AT = 236;      // beat-local card hand-off
+
+    // Beat timing derivation
+    function beatTiming(b) {
+      var typeEnd = TYPE_START + Math.ceil(b.prompt.length * CPS);
+      var sendAt = typeEnd + 14;
+      return {
+        typeEnd: typeEnd,
+        sendAt: sendAt,
+        doneAt: sendAt + 100,   // card in 16 + build 66 + settle
+      };
+    }
+    var bases = [12, 12 + BEAT_LEN, 12 + BEAT_LEN * 2];
+
+    // ---- Shared mini helpers (screen-space) --------------------------------
     function rev(p, th) { return clamp01((p - th) * 6); }
 
-    // Polygon nodes paint at the stack ORIGIN unless the points are rebased
-    // to (0,0) with positioned carrying the min corner (see fa_kit flatPoly).
-    // Alpha rides on the opacity prop exactly like flatPoly's does.
     function bake(hex, op) {
       if (op == null || op >= 0.995) return hex;
       var a = Math.round(clamp01(op) * 255).toString(16).padStart(2, '0');
@@ -122,79 +134,63 @@ scene = {
       return n;
     }
 
-    // Heart glyph: two lobes + a triangle, all [tint].
-    function uiHeart(gx, gy, r, tint, op) {
-      return [
-        { type: 'circle', size: r * 1.05, fill: tint, opacity: op,
-          positioned: { left: gx - r * 1.02, top: gy - r * 0.92 } },
-        { type: 'circle', size: r * 1.05, fill: tint, opacity: op,
-          positioned: { left: gx - r * 0.03, top: gy - r * 0.92 } },
-        uiPoly([gx - r * 0.52, gy - r * 0.28, gx + r * 0.52, gy - r * 0.28, gx, gy + r * 0.95], tint, op),
-      ];
-    }
-
-    // Chat-bubble glyph.
-    function uiBubble(gx, gy, r, tint, op) {
-      return [
-        uiBox(r * 1.9, r * 1.45, r * 0.6, tint, { pos: { left: gx - r * 0.95, top: gy - r * 0.85 }, op: op }),
-        uiPoly([gx - r * 0.55, gy + r * 0.42, gx + r * 0.12, gy + r * 0.42, gx - r * 0.48, gy + r * 1.05], tint, op),
-      ];
-    }
-
-    // Share glyph: three dots and two connecting strokes.
-    function uiShare(gx, gy, r, tint, op) {
-      var pts = [
-        { x: gx - r * 0.9, y: gy }, { x: gx + r * 0.9, y: gy - r * 0.85 },
-        { x: gx + r * 0.9, y: gy + r * 0.85 },
-      ];
-      var out = [];
-      for (var si = 0; si < 3; si++) {
-        out.push({ type: 'circle', size: r * 0.72, fill: tint, opacity: op,
-          positioned: { left: pts[si].x - r * 0.36, top: pts[si].y - r * 0.36 } });
-      }
-      out.push(polylineScreen([pts[0], pts[1]], 1.6, 1, tint, op));
-      out.push(polylineScreen([pts[0], pts[2]], 1.6, 1, tint, op));
-      return out;
-    }
-
-    // Lightning bolt (streak) glyph.
-    function uiBolt(gx, gy, r, tint, op) {
-      var raw = [[13, 2], [3, 14], [11, 14], [9, 22], [21, 10], [13, 10], [15, 2]];
-      var pts = [];
-      for (var bi = 0; bi < raw.length; bi++) {
-        pts.push(gx + (raw[bi][0] - 12) / 24 * 2 * r, gy + (raw[bi][1] - 12) / 24 * 2 * r);
-      }
-      return [uiPoly(pts, tint, op)];
-    }
-
-    // ---- The four app UIs ---------------------------------------------------
-    // Each painter draws a real app screen fragment into the mockup box
-    // (mx,my,mw,mh); groups materialise as build progress passes thresholds.
-    function paintListKit(mx, my, mw, mh, tint, pct, out, baseOp) {
-      var u = mw / 320;
-      function grp(a, oy, nodes) {
-        for (var i = 0; i < nodes.length; i++) {
-          var nd = nodes[i];
-          if (a < 1) {
-            if (nd.opacity != null) nd.opacity *= a;
-            else nd.opacity = a;
-            if (nd.type !== 'polygon') {
-              nd.offsetY = (nd.offsetY || 0) + oy;
-            }
+    function grpWrap(out, a, oy, nodes) {
+      for (var i = 0; i < nodes.length; i++) {
+        var nd = nodes[i];
+        if (a < 1) {
+          if (nd.opacity != null) nd.opacity *= a;
+          else nd.opacity = a;
+          if (nd.type !== 'polygon') {
+            nd.offsetY = (nd.offsetY || 0) + oy;
           }
-          out.push(nd);
         }
+        out.push(nd);
       }
-      // App bar: title + counter pill.
+    }
+
+    // Photo attachment chip ("or upload a photo").
+    function chipNode(x, y, w, h, op, badge) {
+      var nodes = [
+        uiBox(w, h, Math.min(14, h / 2), null, {
+          gradient: { begin: 'topLeft', end: 'bottomRight',
+            colors: T.isLight ? ['#BFE4DC', '#8FD8C6'] : ['#164A41', '#0E2F2A'],
+            stops: [0.0, 1.0] },
+          pos: { left: x, top: y }, op: op,
+        }),
+        { type: 'circle', size: h * 0.24, fill: '#FFE9A8', opacity: op,
+          positioned: { left: x + w * 0.14, top: y + h * 0.18 } },
+        uiPoly([x + w * 0.06, y + h * 0.92, x + w * 0.40, y + h * 0.42,
+                x + w * 0.60, y + h * 0.68, x + w * 0.72, y + h * 0.56,
+                x + w * 0.95, y + h * 0.92],
+          T.isLight ? '#2E8C77' : '#3FBFA0', op),
+      ];
+      if (badge) {
+        var bd = 26;
+        nodes.push({ type: 'circle', size: bd, fill: T.isLight ? '#0B0F19' : '#FFFFFF',
+          opacity: op * 0.9, positioned: { left: x + w - bd * 0.4, top: y - bd * 0.4 } });
+        nodes.push(faRRect(bd * 0.5, 2.4, 1.2, T.isLight ? '#FFFFFF' : '#0B0F19', {
+          opacity: op * 0.9,
+          positioned: { left: x + w - bd * 0.4 + bd * 0.25, top: y - bd * 0.4 + bd / 2 - 1.2 },
+        }));
+        nodes.push(faRRect(2.4, bd * 0.5, 1.2, T.isLight ? '#FFFFFF' : '#0B0F19', {
+          opacity: op * 0.9,
+          positioned: { left: x + w - bd * 0.4 + bd / 2 - 1.2, top: y - bd * 0.4 + bd * 0.25 },
+        }));
+      }
+      return nodes;
+    }
+
+    // ---- App UI painters ----------------------------------------------------
+    function paintListKit(mx, my, mw, mh, tint, pct, out, baseOp, frame) {
+      var u = mw / 320;
       var a0 = rev(pct, 0.08);
       if (a0 > 0.01) {
-        grp(a0, 7 * (1 - a0), [
+        grpWrap(out, a0, 7 * (1 - a0), [
           uiText('Shopping List', 13.5 * u + 4, T.text, { w: '700', pos: { left: mx + 14 * u, top: my + mh * 0.055 }, op: baseOp }),
           uiBox(58 * u, 20 * u, 10 * u, T.isLight ? '#DDF3EE' : '#123B35', { pos: { left: mx + mw - 72 * u, top: my + mh * 0.042 }, op: baseOp }),
           uiText('8 left', 10 * u + 2, tint, { w: '700', align: 'center', width: 58 * u, pos: { left: mx + mw - 72 * u, top: my + mh * 0.042 + 4 * u }, op: baseOp }),
         ]);
       }
-      // Task rows.
       var items = [
         { n: 'Oat milk', s: '2 pcs · aisle 3', p: '2.49', done: true },
         { n: 'Rye bread', s: '1 loaf · bakery', p: '1.79', done: true },
@@ -220,117 +216,48 @@ scene = {
           nodes.push(checkNode(rowX + 13 * u + rh * 0.23, ry + rh * 0.5, rh * 0.30,
             T.isLight ? '#FFFFFF' : '#05070D', 1, baseOp));
         }
-        grp(ra, 7 * (1 - ra), nodes);
+        grpWrap(out, ra, 7 * (1 - ra), nodes);
       }
-      // FAB overlapping the sheet corner.
       var fa = rev(pct, 0.85);
       if (fa > 0.01) {
         var fd = 44 * u, fx = mx + mw - fd * 0.72, fy = my + mh - fd * 0.72;
-        var fnodes = [
+        grpWrap(out, fa, -6 * (1 - fa), [
           uiBox(fd, fd, 16 * u, tint, { pos: { left: fx, top: fy }, op: baseOp }),
           uiBox(fd * 0.52, 3.4 * u, 1.7 * u, T.isLight ? '#FFFFFF' : '#05070D', { pos: { left: fx + fd * 0.24, top: fy + fd / 2 - 1.7 * u }, op: baseOp }),
           uiBox(3.4 * u, fd * 0.52, 1.7 * u, T.isLight ? '#FFFFFF' : '#05070D', { pos: { left: fx + fd / 2 - 1.7 * u, top: fy + fd * 0.24 }, op: baseOp }),
-        ];
-        grp(fa, -6 * (1 - fa), fnodes);
-      }
-    }
-
-    function paintHypeType(mx, my, mw, mh, tint, pct, out, baseOp) {
-      var u = mw / 320;
-      function grp(a, oy, nodes) {
-        for (var i = 0; i < nodes.length; i++) {
-          var nd = nodes[i];
-          if (a < 1) {
-            if (nd.opacity != null) nd.opacity *= a;
-            else nd.opacity = a;
-            if (nd.type !== 'polygon') {
-              nd.offsetY = (nd.offsetY || 0) + oy;
-            }
-          }
-          out.push(nd);
-        }
-      }
-      // App bar: avatar + handle.
-      var a0 = rev(pct, 0.08);
-      if (a0 > 0.01) {
-        grp(a0, 7 * (1 - a0), [
-          uiBox(mh * 0.075, mh * 0.075, mh * 0.0375, tint, { pos: { left: mx + 14 * u, top: my + mh * 0.035 }, op: baseOp }),
-          uiText('studio.noir', 11 * u + 3, T.text, { w: '700', pos: { left: mx + 14 * u + mh * 0.075 + 9 * u, top: my + mh * 0.049 }, op: baseOp }),
-          uiText('2m', 9.5 * u + 2, T.faint, { pos: { left: mx + mw - 60 * u, top: my + mh * 0.052 }, op: baseOp }),
         ]);
-      }
-      // Hero promo card.
-      var ha = rev(pct, 0.20);
-      var hx = mx + 12 * u, hy = my + mh * 0.155, hw = mw - 24 * u, hh = mh * 0.52;
-      if (ha > 0.01) {
-        var hnodes = [
-          uiBox(hw, hh, 14 * u, null, { gradient: { begin: 'topLeft', end: 'bottomRight', colors: [T.violet, T.violetDeep], stops: [0.0, 1.0] }, pos: { left: hx, top: hy }, op: baseOp }),
-          uiText('SUMMER DROP', 21 * u + 4, '#FFFFFF', { w: '700', font: 'Impact', ls: 1.5, align: 'center', width: hw, pos: { left: hx, top: hy + hh * 0.24 }, op: baseOp }),
-          uiText('ENDS SUNDAY - 30% OFF EVERYTHING', 8.5 * u + 2, '#FFFFFF', { w: '600', ls: 1.6, align: 'center', width: hw, pos: { left: hx, top: hy + hh * 0.47 }, op: baseOp * 0.9 }),
-          uiBox(86 * u, 25 * u, 12.5 * u, T.isLight ? '#FFFFFF' : '#FFFFFF', { pos: { left: hx + hw / 2 - 43 * u, top: hy + hh * 0.64 }, op: baseOp }),
-          uiText('SHOP NOW', 9 * u + 2, T.violetDeep, { w: '700', ls: 1.2, align: 'center', width: 86 * u, pos: { left: hx + hw / 2 - 43 * u, top: hy + hh * 0.64 + 6.5 * u }, op: baseOp }),
-        ];
-        grp(ha, 8 * (1 - ha), hnodes);
-      }
-      // Engagement chips.
-      var ca = rev(pct, 0.62);
-      if (ca > 0.01) {
-        var cy2 = my + mh * 0.745, ch = mh * 0.095;
-        var chips = [
-          { w: 74 * u, label: '2.4k' }, { w: 64 * u, label: '156' }, { w: 78 * u, label: 'Share' },
-        ];
-        var cnodes = [];
-        var cx2 = mx + 12 * u;
-        for (var ci = 0; ci < chips.length; ci++) {
-          cnodes.push(uiBox(chips[ci].w, ch, ch / 2, T.isLight ? '#F0EBFF' : '#221C3A', { pos: { left: cx2, top: cy2 }, op: baseOp }));
-          cnodes.push(uiText(chips[ci].label, 9 * u + 2, T.text, { w: '600', pos: { left: cx2 + 26 * u, top: cy2 + ch * 0.28 }, op: baseOp }));
-          var gx = cx2 + 14 * u, gy = cy2 + ch / 2;
-          if (ci === 0) cnodes = cnodes.concat(uiHeart(gx, gy, 5.5 * u, tint, baseOp));
-          if (ci === 1) cnodes = cnodes.concat(uiBubble(gx, gy, 5.5 * u, tint, baseOp));
-          if (ci === 2) cnodes = cnodes.concat(uiShare(gx, gy, 5.5 * u, tint, baseOp));
-          cx2 += chips[ci].w + 9 * u;
-        }
-        grp(ca, 7 * (1 - ca), cnodes);
       }
     }
 
     function paintLingoCoach(mx, my, mw, mh, tint, pct, out, baseOp) {
       var u = mw / 320;
-      function grp(a, oy, nodes) {
-        for (var i = 0; i < nodes.length; i++) {
-          var nd = nodes[i];
-          if (a < 1) {
-            if (nd.opacity != null) nd.opacity *= a;
-            else nd.opacity = a;
-            if (nd.type !== 'polygon') {
-              nd.offsetY = (nd.offsetY || 0) + oy;
-            }
-          }
-          out.push(nd);
-        }
-      }
-      // Header: lesson + streak.
       var a0 = rev(pct, 0.08);
       if (a0 > 0.01) {
-        grp(a0, 7 * (1 - a0), [
+        var head = [
           uiText('Lesson 12', 12.5 * u + 3, T.text, { w: '700', pos: { left: mx + 14 * u, top: my + mh * 0.04 }, op: baseOp }),
-        ].concat(uiBolt(mx + mw - 52 * u, my + mh * 0.062, 7 * u, tint, baseOp)).concat([
-          uiText('12', 10.5 * u + 2, tint, { w: '700', pos: { left: mx + mw - 42 * u, top: my + mh * 0.042 }, op: baseOp }),
-        ]));
+        ];
+        // streak bolt
+        var raw = [[13, 2], [3, 14], [11, 14], [9, 22], [21, 10], [13, 10], [15, 2]];
+        var pts = [];
+        for (var bi = 0; bi < raw.length; bi++) {
+          pts.push(mx + mw - 52 * u + (raw[bi][0] - 12) / 24 * 2 * 7 * u,
+                   my + mh * 0.062 + (raw[bi][1] - 12) / 24 * 2 * 7 * u);
+        }
+        head.push(uiPoly(pts, tint, baseOp));
+        head.push(uiText('12', 10.5 * u + 2, tint, { w: '700', pos: { left: mx + mw - 42 * u, top: my + mh * 0.042 }, op: baseOp }));
+        grpWrap(out, a0, 7 * (1 - a0), head);
       }
-      // XP bar.
       var xa = rev(pct, 0.16);
       if (xa > 0.01) {
-        grp(xa, 6 * (1 - xa), [
+        grpWrap(out, xa, 6 * (1 - xa), [
           uiBox(mw - 28 * u, 5 * u, 2.5 * u, T.isLight ? '#E4E7EC' : T.card, { pos: { left: mx + 14 * u, top: my + mh * 0.115 }, op: baseOp }),
           uiBox((mw - 28 * u) * 0.65 * clamp01(pct * 1.4), 5 * u, 2.5 * u, tint, { pos: { left: mx + 14 * u, top: my + mh * 0.115 }, op: baseOp }),
         ]);
       }
-      // Word card.
       var wa = rev(pct, 0.26);
       var wx = mx + 12 * u, wy = my + mh * 0.19, ww = mw - 24 * u, wh = mh * 0.27;
       if (wa > 0.01) {
-        grp(wa, 8 * (1 - wa), [
+        grpWrap(out, wa, 8 * (1 - wa), [
           uiBox(ww, wh, 16 * u, T.isLight ? '#FFFFFF' : T.card, { border: tint, bw: 1.5, pos: { left: wx, top: wy }, op: baseOp }),
           uiText('apple', 24 * u + 5, T.text, { w: '700', align: 'center', width: ww, pos: { left: wx, top: wy + wh * 0.22 }, op: baseOp }),
           uiText('NOUN · A ROUND FRUIT', 8 * u + 2, T.dim, { w: '600', ls: 1.4, align: 'center', width: ww, pos: { left: wx, top: wy + wh * 0.62 }, op: baseOp }),
@@ -338,7 +265,6 @@ scene = {
           uiText('NEW WORD', 7 * u + 1.5, tint, { w: '700', ls: 0.8, align: 'center', width: 58 * u, pos: { left: wx + ww - 68 * u, top: wy - 8 * u + 4 * u }, op: baseOp }),
         ]);
       }
-      // Answer options.
       var opts = [
         { t: 'яблоко', ok: true }, { t: 'окно', ok: false }, { t: 'машина', ok: false },
       ];
@@ -356,249 +282,483 @@ scene = {
           onodes.push(checkNode(mx + mw - 12 * u - 24 * u, oy2 + oh / 2, 15 * u,
             T.isLight ? '#FFFFFF' : '#05070D', 1, baseOp));
         }
-        grp(oa, 7 * (1 - oa), onodes);
+        grpWrap(out, oa, 7 * (1 - oa), onodes);
       }
-      // CTA.
       var ba = rev(pct, 0.82);
       if (ba > 0.01) {
-        grp(ba, 7 * (1 - ba), [
+        grpWrap(out, ba, 7 * (1 - ba), [
           uiBox(mw - 24 * u, mh * 0.075, 12 * u, tint, { pos: { left: mx + 12 * u, top: my + mh * 0.875 }, op: baseOp }),
           uiText('CONTINUE', 10 * u + 2, T.isLight ? '#FFFFFF' : '#05070D', { w: '700', ls: 1.2, align: 'center', width: mw - 24 * u, pos: { left: mx + 12 * u, top: my + mh * 0.875 + mh * 0.024 }, op: baseOp }),
         ]);
       }
     }
 
-    function paintVoxelRun(mx, my, mw, mh, tint, pct, out, baseOp) {
+    function paint2048(mx, my, mw, mh, tint, pct, out, baseOp, frame) {
       var u = mw / 320;
-      function grp(a, oy, nodes) {
-        for (var i = 0; i < nodes.length; i++) {
-          var nd = nodes[i];
-          if (a < 1) {
-            if (nd.opacity != null) nd.opacity *= a;
-            else nd.opacity = a;
-            if (nd.type !== 'polygon') {
-              nd.offsetY = (nd.offsetY || 0) + oy;
-            }
-          }
-          out.push(nd);
-        }
-      }
-      // HUD: lives + combo + score.
-      var a0 = rev(pct, 0.08);
+      var a0 = rev(pct, 0.06);
       if (a0 > 0.01) {
-        var hnodes = [];
-        for (var hi = 0; hi < 3; hi++) {
-          hnodes = hnodes.concat(uiHeart(mx + 20 * u + hi * 17 * u, my + mh * 0.055, 6 * u, tint, baseOp * (hi < 2 ? 1 : 0.30)));
+        grpWrap(out, a0, 7 * (1 - a0), [
+          uiText('2048', 24 * u + 4, tint, { w: '800', font: 'Impact', ls: 1, pos: { left: mx + 14 * u, top: my + mh * 0.02 }, op: baseOp }),
+          uiBox(96 * u, 26 * u, 8 * u, T.isLight ? '#F0EBFF' : '#221C3A', { pos: { left: mx + mw - 110 * u, top: my + mh * 0.03 }, op: baseOp }),
+          uiText('SCORE 12 316', 8.5 * u + 2, tint, { w: '700', ls: 0.5, align: 'center', width: 96 * u, pos: { left: mx + mw - 110 * u, top: my + mh * 0.03 + 8 * u }, op: baseOp }),
+        ]);
+      }
+      var gap = 8 * u;
+      var gx0 = mx + 12 * u, gy0 = my + mh * 0.135, gw2 = mw - 24 * u;
+      var cell = Math.min((gw2 - 3 * gap) / 4, (mh * 0.60 - 3 * gap) / 4);
+      var gh2 = 4 * cell + 3 * gap;
+      var ga = rev(pct, 0.14);
+      if (ga > 0.01) {
+        var gnodes = [uiBox(gw2, gh2 + 2 * gap, 12 * u, T.isLight ? '#BBADA0' : '#2A241F', { pos: { left: gx0, top: gy0 }, op: baseOp })];
+        for (var gi = 0; gi < 16; gi++) {
+          var gr2 = Math.floor(gi / 4), gc2 = gi % 4;
+          gnodes.push(uiBox(cell, cell, 8 * u, T.isLight ? '#CDC1B4' : '#3A332C', {
+            pos: { left: gx0 + gap + gc2 * (cell + gap), top: gy0 + gap + gr2 * (cell + gap) }, op: baseOp }));
         }
-        hnodes.push(uiBox(30 * u, 17 * u, 8.5 * u, T.isLight ? '#F0EBFF' : '#221C3A', { pos: { left: mx + mw - 84 * u, top: my + mh * 0.018 }, op: baseOp }));
-        hnodes.push(uiText('x2', 8.5 * u + 2, tint, { w: '700', align: 'center', width: 30 * u, pos: { left: mx + mw - 84 * u, top: my + mh * 0.018 + 3.5 * u }, op: baseOp }));
-        hnodes.push(uiText('1250', 12 * u + 3, T.text, { w: '700', align: 'right', width: 44 * u, pos: { left: mx + mw - 14 * u - 44 * u, top: my + mh * 0.018 }, op: baseOp }));
-        grp(a0, 7 * (1 - a0), hnodes);
+        grpWrap(out, ga, 8 * (1 - ga), gnodes);
       }
-      // Scene window.
-      var sa = rev(pct, 0.20);
-      var sx2 = mx + 12 * u, sy2 = my + mh * 0.135, sw2 = mw - 24 * u, sh2 = mh * 0.575;
-      if (sa > 0.01) {
-        var scx = sx2 + sw2 / 2, scy = sy2 + sh2 * 0.60;
-        var rx = sw2 * 0.36, ry = sh2 * 0.26;
-        var cube = sw2 * 0.105;
-        var snodes = [
-          uiBox(sw2, sh2, 14 * u, T.isLight ? '#F1F2F7' : '#0B101E', { border: T.border, bw: 1, pos: { left: sx2, top: sy2 }, op: baseOp }),
-          { type: 'circle', size: sw2 * 0.7, fill: T.violet, opacity: 0.16 * baseOp, blur: 44,
-            positioned: { left: scx - sw2 * 0.35, top: scy - sw2 * 0.35 } },
-          // isometric floor
-          uiPoly([scx - rx, scy, scx, scy + ry, scx + rx, scy, scx, scy - ry],
-            T.isLight ? '#E1E4EE' : '#1A2236', baseOp),
-          // the voxel player: left face, right face, top face
-          uiPoly([scx - cube, scy - ry * 0.72, scx, scy - ry * 0.72 + cube * 0.62, scx, scy + cube * 0.85, scx - cube, scy + cube * 0.85 - ry * 0.62],
-            T.violetDeep, baseOp),
-          uiPoly([scx + cube, scy - ry * 0.72, scx, scy - ry * 0.72 + cube * 0.62, scx, scy + cube * 0.85, scx + cube, scy + cube * 0.85 - ry * 0.62],
-            lerpColor(T.violet, '#000000', 0.38), baseOp),
-          uiPoly([scx, scy - ry * 0.72 - cube * 0.62, scx + cube, scy - ry * 0.72, scx, scy - ry * 0.72 + cube * 0.62, scx - cube, scy - ry * 0.72],
-            lerpColor(T.violet, '#FFFFFF', 0.22), baseOp),
-          // coin
-          { type: 'circle', size: 10 * u, fill: T.teal, opacity: baseOp,
-            positioned: { left: scx + sw2 * 0.22, top: scy - sh2 * 0.10 } },
-          { type: 'circle', size: 4 * u, fill: '#FFFFFF', opacity: 0.8 * baseOp,
-            positioned: { left: scx + sw2 * 0.22 + 3 * u, top: scy - sh2 * 0.10 + 3 * u } },
-        ];
-        grp(sa, 8 * (1 - sa), snodes);
+      var tiles = [
+        { v: '2', r: 0, c: 0 }, { v: '4', r: 0, c: 1 }, { v: '8', r: 0, c: 2 }, { v: '16', r: 0, c: 3 },
+        { v: '64', r: 1, c: 0 }, { v: '128', r: 1, c: 2 }, { v: '256', r: 2, c: 1 }, { v: '1024', r: 3, c: 3 },
+      ];
+      var pal2048 = {
+        '2': ['#EEE4DA', '#776E65'], '4': ['#EDE0C8', '#776E65'], '8': ['#F2B179', '#FFFFFF'],
+        '16': ['#F59563', '#FFFFFF'], '64': ['#F65E3B', '#FFFFFF'], '128': ['#EDCF72', '#FFFFFF'],
+        '256': ['#EDCC61', '#FFFFFF'], '1024': ['#EDC850', '#FFFFFF'],
+      };
+      for (var ti = 0; ti < tiles.length; ti++) {
+        var ta = rev(pct, 0.22 + ti * 0.07);
+        if (ta <= 0.01) continue;
+        var tl = tiles[ti];
+        var pal = pal2048[tl.v];
+        var tx2 = gx0 + gap + tl.c * (cell + gap), ty2 = gy0 + gap + tl.r * (cell + gap);
+        var tfs2 = tl.v.length > 2 ? cell * 0.28 : cell * 0.40;
+        var pulse = (pct > 0.9 && ti === 5) ? 1 + 0.025 * Math.sin(frame * 0.5) : 1;
+        grpWrap(out, ta, 6 * (1 - ta), [
+          uiBox(cell * pulse, cell * pulse, 8 * u, pal[0], {
+            pos: { left: tx2 + (cell - cell * pulse) / 2, top: ty2 + (cell - cell * pulse) / 2 }, op: baseOp }),
+          uiText(tl.v, tfs2, pal[1], { w: '800', align: 'center', width: cell,
+            pos: { left: tx2, top: ty2 + cell / 2 - tfs2 * 0.62 }, op: baseOp }),
+        ]);
       }
-      // Controls: joystick + jump.
-      var ca = rev(pct, 0.62);
-      if (ca > 0.01) {
-        var jd = 52 * u, jx = mx + 12 * u + jd * 0.25, jy = my + mh * 0.775;
-        var bd = 46 * u, bx2 = mx + mw - 12 * u - bd, by2 = my + mh * 0.775;
-        var cwx = jx + jd / 2 + Math.sin(frame * 0.28) * 4 * u;
-        var cwy = jy + jd / 2 + Math.cos(frame * 0.22) * 3 * u;
-        grp(ca, 7 * (1 - ca), [
-          { type: 'circle', size: jd, fill: T.isLight ? '#FFFFFF' : T.card, stroke: T.border, strokeWidth: 2, opacity: baseOp,
-            positioned: { left: jx, top: jy } },
-          { type: 'circle', size: jd * 0.42, fill: tint, opacity: baseOp,
-            positioned: { left: cwx - jd * 0.21, top: cwy - jd * 0.21 } },
-          uiBox(bd, bd, 14 * u, tint, { pos: { left: bx2, top: by2 }, op: baseOp }),
-          uiPoly([bx2 + bd / 2, by2 + bd * 0.28, bx2 + bd * 0.70, by2 + bd * 0.62, bx2 + bd * 0.30, by2 + bd * 0.62],
-            T.isLight ? '#FFFFFF' : '#05070D', baseOp),
+      var ma = rev(pct, 0.80);
+      if (ma > 0.01) {
+        grpWrap(out, ma, 6 * (1 - ma), [
+          uiBox(150 * u, 26 * u, 13 * u, tint, { pos: { left: mx + mw / 2 - 75 * u, top: gy0 + gh2 + 2 * gap + 8 }, op: baseOp }),
+          uiText('MERGE! +16 PTS', 9 * u + 2, T.isLight ? '#FFFFFF' : '#05070D', { w: '700', ls: 1, align: 'center', width: 150 * u, pos: { left: mx + mw / 2 - 75 * u, top: gy0 + gh2 + 2 * gap + 8 + 8 * u }, op: baseOp }),
+          uiText('SWIPE TO MERGE TILES', 8 * u + 2, T.faint, { w: '600', ls: 1.6, align: 'center', width: mw - 24 * u, pos: { left: mx + 12 * u, top: my + mh * 0.94 }, op: baseOp }),
         ]);
       }
     }
 
-    // Grid geometry
-    var cols = isP ? 2 : 4;
-    var rows = isP ? 2 : 1;
-    var gap = isP ? F.W * 0.04 : F.W * 0.02;
-    var gridW = isP ? F.W * 0.90 : F.W * 0.90;
-    var cardW = (gridW - gap * (cols - 1)) / cols;
-    var cardH = isP ? (F.H * 0.72 - gap) / 2 : F.H * 0.52;
-    var x0 = cx - gridW / 2;
-    var y0 = isP ? F.H * 0.15 : F.H * 0.24;
+    function paintApp(ui, mx, my, mw, mh, tint, pct, out, baseOp, frame) {
+      if (ui === 'list') paintListKit(mx, my, mw, mh, tint, pct, out, baseOp, frame);
+      if (ui === 'lesson') paintLingoCoach(mx, my, mw, mh, tint, pct, out, baseOp);
+      if (ui === 'g2048') paint2048(mx, my, mw, mh, tint, pct, out, baseOp, frame);
+    }
 
-    for (var i = 0; i < apps.length; i++) {
-      var col = i % cols;
-      var row = Math.floor(i / cols);
-      var px = x0 + col * (cardW + gap);
-      var py = y0 + row * (cardH + gap);
-      var inAt = 12 + i * 14;
-      var buildStart = inAt + 10;
-      var cIn = tw(inAt, 12, 0, 1, 'easeOut');
-      if (cIn <= 0.003) continue;
-
-      var tint = apps[i].tint === 'teal' ? T.teal : T.violet;
-      var fs = Math.max(18, Math.round(cardW * 0.075));
-
-      kids.push(faRRect(cardW, cardH, 24, T.card, {
-        opacity: cIn,
-        border: { color: T.border, width: 1.5 },
-        offsetY: 22 * (1 - cIn),
-        positioned: { left: px, top: py },
+    // ---- Kicker (whole scene) ----------------------------------------------
+    var kickIn = expoOut(clamp01((frame - 2) / 12));
+    var promptN = frame < bases[1] ? 1 : (frame < bases[2] ? 2 : 3);
+    kids.push(faText('WATCH FA BUILD.', {
+      width: F.W,
+      opacity: clamp01(kickIn * 1.2),
+      offsetY: 14 * (1 - kickIn),
+      style: {
+        fontSize: isP ? 44 : 34,
+        fontFamily: 'Impact',
+        fontWeight: '700',
+        color: T.text,
+        textAlign: 'center',
+        letterSpacing: 3,
+        gradient: {
+          begin: 'topCenter',
+          end: 'bottomCenter',
+          colors: T.isLight
+            ? ['#3C4043', '#0B0F19']
+            : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+          stops: T.isLight ? [0.0, 1.0] : [0.0, 0.45, 1.0],
+        },
+      },
+      positioned: { left: 0, top: isP ? F.H * 0.040 : F.H * 0.062 },
+    }));
+    if (frame >= bases[0]) {
+      kids.push(faText('PROMPT ' + promptN + ' / 3', {
+        width: chatW,
+        opacity: kickIn * 0.55,
+        style: {
+          fontSize: isP ? 20 : 18,
+          fontFamily: 'monospace',
+          color: T.faint,
+          textAlign: 'right',
+          letterSpacing: 2.5,
+        },
+        positioned: { left: x0, top: (isP ? F.H * 0.040 : F.H * 0.062) + (isP ? 62 : 48) },
       }));
-      kids.push(faRRect(cardW - 48, 8, 4, tint, {
-        opacity: 0.9 * cIn,
-        positioned: { left: px + 24, top: py },
-      }));
+    }
 
-      var nameFs = Math.max(19, Math.round(cardW * 0.052));
-      var iconD = nameFs + 12;
-      kids.push(uiBox(iconD, iconD, iconD * 0.30,
-        T.isLight ? (apps[i].tint === 'teal' ? '#DDF3EE' : '#E9E6FB')
-                  : (apps[i].tint === 'teal' ? '#123B35' : '#221C3A'),
-        { pos: { left: px + 26, top: py + 18 }, op: cIn }));
-      kids.push(uiText(apps[i].name.charAt(0), iconD * 0.52, tint,
-        { w: '800', font: 'Impact', align: 'center', width: iconD,
-          pos: { left: px + 26, top: py + 18 + iconD * 0.22 }, op: cIn }));
-      kids.push(uiText(apps[i].name, nameFs, T.text,
-        { w: '700', font: 'Impact', ls: 1.2,
-          pos: { left: px + 26 + iconD + 12, top: py + 24 }, op: cIn }));
-      kids.push(uiText(apps[i].kind, nameFs * 0.44, T.dim,
-        { w: '600', ls: 1.6, align: 'right', width: cardW - 52 - iconD - 12 - 52,
-          pos: { left: px + 26 + iconD + 12, top: py + 24 + nameFs + 4 }, op: cIn * 0.8 }));
+    // ---- Input bar / keyboard geometry (shared with 04_ask) -----------------
+    var barY = isP ? F.H * 0.885 : F.H * 0.875;
+    var barH = isP ? 96 : 88;
+    var kbH = Math.round(Math.min(F.W * 0.52, F.H * 0.30));
+    var tFs = isP ? 36 : 32;
+    var barX = x0;
+    var sendD = isP ? 72 : 64;
+    var sendX = x0 + chatW - sendD - 14;
 
-      // ---- Real app UI mockup, materialising with the build progress ----
-      var pct = clamp01((frame - buildStart) / 150);
-      var done = pct >= 0.999;
-      var mx2 = px + 24, my2 = py + iconD + 34;
-      var mw2 = cardW - 48, mh2 = cardH - (iconD + 34) - 100;
-      kids.push(uiBox(mw2, mh2, 18, T.isLight ? '#F4F5F9' : '#0D1220',
-        { border: T.border, bw: 1, pos: { left: mx2, top: my2 }, op: cIn }));
-      if (apps[i].ui === 'list') paintListKit(mx2, my2, mw2, mh2, tint, pct, kids, cIn);
-      if (apps[i].ui === 'social') paintHypeType(mx2, my2, mw2, mh2, tint, pct, kids, cIn);
-      if (apps[i].ui === 'lesson') paintLingoCoach(mx2, my2, mw2, mh2, tint, pct, kids, cIn);
-      if (apps[i].ui === 'game') paintVoxelRun(mx2, my2, mw2, mh2, tint, pct, kids, cIn);
+    // Result card geometry (beat-independent)
+    var cardW = isP ? F.W * 0.84 : F.H * 0.66 * 0.78;
+    var cardH = isP ? F.H * 0.50 : F.H * 0.66;
+    var cardX = cx - cardW / 2;
+    var cardTop = isP ? F.H * 0.185 : F.H * 0.225;
+    var cardCX = cx;
+    var cardCY = cardTop + cardH / 2;
+    var pillY = isP ? F.H * 0.095 : F.H * 0.115;
+    var statY = isP ? F.H * 0.150 : F.H * 0.185;
+    var pillFs = isP ? 24 : 22;
 
-      // Build sheen: two light bands sweeping the mockup while it compiles.
-      if (!done && pct > 0.02 && pct < 0.995) {
-        var bands = [];
-        for (var bi2 = 0; bi2 < 2; bi2++) {
-          var bxp = ((frame * (5 + bi2 * 2) + bi2 * 90) % (mw2 + 130)) - 65;
-          bands.push({
-            type: 'container', width: 46, height: mh2 - 8, radius: 23,
-            gradient: { begin: 'centerLeft', end: 'centerRight',
-              colors: ['#00FFFFFF', '#12FFFFFF', '#00FFFFFF'], stops: [0.0, 0.5, 1.0] },
-            positioned: { left: mx2 + 4 + bxp, top: my2 + 4 },
+    // ---- Beats --------------------------------------------------------------
+    for (var bi2 = 0; bi2 < beats.length; bi2++) {
+      var base = bases[bi2];
+      if (frame < base || frame >= base + BEAT_LEN) continue;
+      var t = frame - base;
+      var B = beats[bi2];
+      var tm = beatTiming(B);
+      var tint = tintOf(B.tint);
+
+      // bar + keyboard ride: park the bar on the keys while typing
+      var kbIn = smooth(t / 14);
+      var kbOut = smooth((t - (tm.sendAt + 6)) / 22);
+      var kbAmt = kbIn * (1 - kbOut);
+      var barLift = barY + barH + 12 + kbH - F.H;
+      var barYNow = barY - barLift * kbAmt;
+
+      var typedN = t < tm.typeEnd
+        ? Math.min(B.prompt.length, Math.floor((t - TYPE_START) / CPS))
+        : (t < tm.sendAt ? B.prompt.length : 0);
+      var typing = t >= TYPE_START && t < tm.typeEnd;
+      var cursor = typing && Math.floor(frame / 5) % 2 === 0 ? '_' : '';
+      var shown = typing ? B.prompt.slice(0, typedN) + cursor
+        : (t < tm.sendAt ? B.prompt : '');
+
+      // send press
+      var press = t >= tm.sendAt && t < tm.sendAt + 14
+        ? Math.sin(clamp01((t - tm.sendAt) / 14) * Math.PI) : 0;
+      var pressD = 1 - 0.22 * press;
+
+      // bar dissolve + pill appear
+      var barOut = smooth((t - (tm.sendAt + 8)) / 20);
+      var pillIn = tw(tm.sendAt + 10, 14, 0, 1, 'easeOut');
+      var beatAlpha = 1 - smooth((t - EXIT_AT) / 20);   // hand-off fade
+
+      var chipW = 64, chipH = 46;
+      var textX = B.chip ? barX + 88 + chipW + 18 : barX + 106;
+      var tMaxW = chatW - (textX - barX) - sendD - 30;
+
+      // ---- Input bar ----
+      var barIn = kbIn * (1 - barOut);
+      if (barIn > 0.005) {
+        var barCY = barYNow + barH / 2;
+        kids.push(faRRect(chatW, barH, barH / 2, T.card, {
+          opacity: barIn,
+          border: { color: press > 0 ? tint : T.border, width: press > 0 ? 2 : 1.5 },
+          scale: press > 0 ? 1 - 0.02 * press : 1,
+          positioned: { left: barX, top: barYNow },
+        }));
+        if (!B.chip) {
+          // "+" attachment button
+          kids.push(faRRect(56, 56, 28, T.dim, {
+            opacity: barIn * 0.35, positioned: { left: barX + 30, top: barCY - 28 } }));
+          kids.push(faRRect(26, 5, 2.5, T.text, {
+            opacity: barIn * 0.8, positioned: { left: barX + 45, top: barCY - 2.5 } }));
+          kids.push(faRRect(5, 26, 2.5, T.text, {
+            opacity: barIn * 0.8, positioned: { left: barX + 55.5, top: barCY - 13 } }));
+        }
+        if (B.chip) {
+          var chipIn = backOut(clamp01((t - 8) / 12));
+          if (chipIn > 0.01) {
+            var chs = 0.6 + 0.4 * chipIn;
+            var chNodes = chipNode(0, 0, chipW * chs, chipH * chs, barIn * chipIn, true);
+            for (var ci3 = 0; ci3 < chNodes.length; ci3++) {
+              var cn3 = chNodes[ci3];
+              cn3.positioned.left += barX + 88;
+              cn3.positioned.top += barCY - chipH / 2;
+              kids.push(cn3);
+            }
+          }
+        }
+        if (shown.length > 0) {
+          kids.push(faText(shown, {
+            opacity: barIn, width: tMaxW,
+            style: {
+              fontSize: tFs, fontFamily: 'monospace', fontWeight: '500',
+              color: T.text, letterSpacing: 0, textAlign: 'left',
+            },
+            positioned: { left: textX, top: barCY - tFs * 0.60 },
+          }));
+        } else {
+          kids.push(faText(B.chip ? 'Add a caption…' : 'Ask anything…', {
+            opacity: barIn * 0.45, width: tMaxW,
+            style: {
+              fontSize: tFs, fontFamily: 'monospace', fontWeight: '500',
+              color: T.dim, letterSpacing: 0, textAlign: 'left',
+            },
+            positioned: { left: textX, top: barCY - tFs * 0.60 },
+          }));
+        }
+
+        // send button
+        kids.push({
+          type: 'container', width: sendD, height: sendD, radius: sendD / 2,
+          opacity: barIn, scale: pressD,
+          gradient: { begin: 'topLeft', end: 'bottomRight',
+            colors: [T.violet, T.violetDeep], stops: [0.0, 1.0] },
+          shadows: [{ color: T.violet, opacity: 0.35 + 0.25 * press, blur: 18,
+            offset: { x: 0, y: 4 } }],
+          positioned: { left: sendX, top: barCY - sendD / 2 },
+        });
+        var acx = sendX + sendD / 2, acy = barCY;
+        kids.push(polylineScreen([{ x: acx, y: acy - 13 }, { x: acx + 10, y: acy + 5 },
+          { x: acx - 10, y: acy + 5 }], 7, 1, '#FFFFFF', barIn));
+        if (press > 0) {
+          var fr = (t - tm.sendAt) / 14;
+          kids.push({
+            type: 'circle', size: sendD + 90 * fr, fill: '#00000000',
+            border: { color: T.violet, width: 3 }, opacity: (1 - fr) * 0.9,
+            positioned: { left: acx - (sendD + 60 * fr) / 2, top: acy - (sendD + 90 * fr) / 2 },
           });
         }
-        kids.push({
-          type: 'clipRRect', radius: 18,
-          positioned: { left: mx2, top: my2, width: mw2, height: mh2 },
-          child: { type: 'stack', children: bands },
-        });
       }
 
-      // Progress bar
-      var barW = cardW - 56;
-      var barY = py + cardH - 62;
-      kids.push(faRRect(barW, 14, 7, T.surface2, {
-        opacity: cIn,
-        border: { color: T.border, width: 1 },
-        positioned: { left: px + 28, top: barY },
-      }));
-      if (pct > 0.001) {
-        kids.push(faRRect(Math.max(14, barW * pct), 14, 7, tint, {
-          opacity: cIn,
-          positioned: { left: px + 28, top: barY },
+      // ---- Keyboard ----
+      if (kbAmt > 0.005) {
+        var kbY = F.H - kbH + (1 - kbAmt) * (kbH + 40);
+        var kbNodes = faKeyboard({
+          x: 0, y: kbY, w: F.W, h: kbH, opacity: 1,
+          pressed: B.prompt.slice(0, typedN),
+          frame: frame,
+          pressedAt: typedN > 0 ? base + TYPE_START + (typedN - 1) * CPS : 0,
+        });
+        for (var kni = 0; kni < kbNodes.length; kni++) kids.push(kbNodes[kni]);
+      }
+
+      // ---- Sent pill (the prompt stays visible while Fa builds) ----
+      if (pillIn > 0.01 && beatAlpha > 0.01) {
+        var pillText = B.prompt;
+        var mChipW = 40, mChipH = 28;
+        var pillW = 28 + (B.chip ? mChipW + 14 : 0) +
+          pillText.length * pillFs * 0.60 + 28;
+        var pillX = cx - pillW / 2;
+        var pn = {
+          opacity: pillIn * beatAlpha,
+          border: { color: tint, width: 1.5 },
+          positioned: { left: pillX, top: pillY },
+        };
+        kids.push(faRRect(pillW, isP ? 68 : 60, (isP ? 68 : 60) / 2, T.card, pn));
+        var innerX = pillX + 28;
+        if (B.chip) {
+          var mch = chipNode(innerX, pillY + ((isP ? 68 : 60) - mChipH) / 2, mChipW, mChipH,
+            pillIn * beatAlpha, false);
+          for (var mi = 0; mi < mch.length; mi++) kids.push(mch[mi]);
+          innerX += mChipW + 14;
+        }
+        kids.push(faText(pillText, {
+          opacity: pillIn * 0.85 * beatAlpha,
+          style: {
+            fontSize: pillFs, fontFamily: 'monospace', fontWeight: '500',
+            color: T.text, letterSpacing: 0, textAlign: 'left',
+          },
+          positioned: { left: innerX, top: pillY + (isP ? 21 : 17) },
         }));
       }
 
-      // Percent / DONE label
-      var label = done ? 'DONE — INSTALLED' : Math.round(pct * 100) + '%';
-      kids.push(faText(label, {
-        opacity: cIn * 0.9,
-        style: {
-          fontSize: Math.max(15, fs - 8),
-          fontFamily: 'monospace',
-          fontWeight: '700',
-          color: done ? tint : T.dim,
-          letterSpacing: 1.5,
-        },
-        positioned: { left: px + 28, top: barY - 34 },
-      }));
+      // ---- Status line above the card ----
+      if (t >= tm.sendAt + 8 && beatAlpha > 0.01) {
+        var done = t >= tm.doneAt;
+        var dots = done ? '' : '...'.slice(0, 1 + Math.floor(frame / 10) % 3);
+        var sLabel = done
+          ? B.name + ' — INSTALLED IN ' + B.build
+          : 'FA IS BUILDING ' + B.name + dots;
+        kids.push(faText(sLabel, {
+          width: F.W,
+          opacity: (done ? 0.95 : 0.65) * beatAlpha,
+          style: {
+            fontSize: isP ? 24 : 21,
+            fontFamily: 'monospace',
+            fontWeight: '700',
+            color: done ? tint : T.dim,
+            textAlign: 'center',
+            letterSpacing: 2,
+          },
+          positioned: { left: 0, top: statY },
+        }));
+        if (done) {
+          var dbp = clamp01((t - tm.doneAt) / 14);
+          var dcx = cx + (sLabel.length * (isP ? 24 : 21) * 0.62) / 2 + 40;
+          kids.push({ type: 'circle', size: 34, fill: tint, opacity: beatAlpha * 0.95,
+            positioned: { left: dcx - 17, top: statY + 2 } });
+          kids.push(checkNode(dcx, statY + 19, 20, T.isLight ? '#FFFFFF' : '#05070D', dbp, beatAlpha));
+        }
+      }
 
-      // Done burst ring
-      if (done) {
-        var bp = clamp01((frame - buildStart - 150) / 20);
-        if (bp > 0 && bp < 1) {
+      // ---- The violet dot flies from send to the centre, blooms into card ----
+      var dotP = smooth((t - (tm.sendAt + 4)) / 14);
+      if (dotP > 0.001 && dotP < 0.999) {
+        var fromX2 = sendX + sendD / 2;
+        var fromY2 = barY - barLift + barH / 2;   // parked bar centre
+        var dx = fromX2 + (cardCX - fromX2) * dotP;
+        var dy = fromY2 + (cardCY - fromY2) * dotP - Math.sin(dotP * Math.PI) * 60;
+        var dSize = 16 + 10 * Math.sin(dotP * Math.PI);
+        kids.push({ type: 'circle', size: dSize + 26, fill: T.violet, opacity: 0.18,
+          blur: 18, positioned: { left: dx - (dSize + 26) / 2, top: dy - (dSize + 26) / 2 } });
+        kids.push({ type: 'circle', size: dSize, fill: T.violetBright, opacity: 0.95,
+          positioned: { left: dx - dSize / 2, top: dy - dSize / 2 } });
+      }
+      if (t >= tm.sendAt + 16 && t < tm.sendAt + 30) {
+        var brp = (t - tm.sendAt - 16) / 14;
+        kids.push({
+          type: 'circle', size: 40 + brp * 130, fill: '#00000000',
+          border: { color: T.violet, width: 3 }, opacity: (1 - brp) * 0.8,
+          positioned: { left: cardCX - (40 + brp * 130) / 2, top: cardCY - (40 + brp * 130) / 2 },
+        });
+      }
+
+      // ---- App card ----
+      var cIn = backOut(clamp01((t - (tm.sendAt + 16)) / 16));
+      if (cIn > 0.005 && beatAlpha > 0.01) {
+        var pct = clamp01((t - (tm.sendAt + 34)) / 66);
+        var done2 = pct >= 0.999;
+        var cOp = cIn * beatAlpha;
+        var cScale = 0.55 + 0.45 * cIn;
+        kids.push(faRRect(cardW, cardH, 34, T.card, {
+          opacity: cOp * 0.4, blur: 36, scale: cScale,
+          positioned: { left: cardX - 18, top: cardTop - 18 },
+        }));
+        kids.push(faRRect(cardW, cardH, 34, T.card, {
+          opacity: cOp, scale: cScale,
+          border: { color: tint, width: 1.5 },
+          positioned: { left: cardX, top: cardTop },
+        }));
+        var mx2 = cardX + 24, my2 = cardTop + 30;
+        var mw2 = cardW - 48, mh2 = cardH - 116;
+        kids.push(uiBox(mw2, mh2, 18, T.isLight ? '#F4F5F9' : '#0D1220', {
+          border: T.border, bw: 1, pos: { left: mx2, top: my2 }, op: cOp }));
+        paintApp(B.ui, mx2, my2, mw2, mh2, tint, pct, kids, cOp, frame);
+
+        // compile sheen while building
+        if (!done2 && pct > 0.02 && pct < 0.995) {
+          var bands = [];
+          for (var bi3 = 0; bi3 < 2; bi3++) {
+            var bxp = ((frame * (5 + bi3 * 2) + bi3 * 90) % (mw2 + 130)) - 65;
+            bands.push({
+              type: 'container', width: 46, height: mh2 - 8, radius: 23,
+              gradient: { begin: 'centerLeft', end: 'centerRight',
+                colors: ['#00FFFFFF', '#12FFFFFF', '#00FFFFFF'], stops: [0.0, 0.5, 1.0] },
+              positioned: { left: mx2 + 4 + bxp, top: my2 + 4 },
+            });
+          }
           kids.push({
-            type: 'circle',
-            size: 90 + bp * 90,
-            fill: tint,
-            opacity: (1 - bp) * 0.35 * cIn,
-            blur: 6,
-            positioned: {
-              left: px + cardW - 80 - (90 + bp * 90) / 2,
-              top: py + 20 - (90 + bp * 90) / 2 + 30,
-            },
+            type: 'clipRRect', radius: 18,
+            positioned: { left: mx2, top: my2, width: mw2, height: mh2 },
+            child: { type: 'stack', children: bands },
           });
         }
-        var cbx = mx2 + mw2 - 22;
-        var cby = my2 + 2;
-        kids.push({ type: 'circle', size: 44, fill: tint, opacity: 0.92 * cIn,
-          positioned: { left: cbx - 22, top: cby - 22 } });
-        kids.push(checkNode(cbx, cby, 26, T.isLight ? '#FFFFFF' : '#05070D', bp, cIn));
+
+        // progress bar along the card bottom
+        var pbW = cardW - 48;
+        kids.push(faRRect(pbW, 10, 5, T.surface2, {
+          opacity: cOp, border: { color: T.border, width: 1 },
+          positioned: { left: cardX + 24, top: cardTop + cardH - 40 },
+        }));
+        if (pct > 0.001) {
+          kids.push(faRRect(Math.max(10, pbW * pct), 10, 5, tint, {
+            opacity: cOp,
+            positioned: { left: cardX + 24, top: cardTop + cardH - 40 },
+          }));
+        }
+
+        // done burst
+        if (done2) {
+          var bp2 = clamp01((t - tm.doneAt) / 16);
+          if (bp2 > 0 && bp2 < 1) {
+            kids.push({
+              type: 'circle', size: 120 + bp2 * 140, fill: tint,
+              opacity: (1 - bp2) * 0.30 * cOp, blur: 10,
+              positioned: { left: cardCX - (120 + bp2 * 140) / 2,
+                top: cardCY - (120 + bp2 * 140) / 2 },
+            });
+          }
+        }
+
+        // under-card line
+        var ucIn = tw(tm.doneAt, 14, 0, 1, 'easeOut');
+        if (ucIn > 0.01) {
+          kids.push(faText('RUNNING NATIVE ON THIS IPHONE — 120 FPS', {
+            width: F.W,
+            opacity: ucIn * 0.5 * beatAlpha,
+            style: {
+              fontSize: isP ? 20 : 17,
+              fontFamily: 'monospace',
+              color: T.faint,
+              textAlign: 'center',
+              letterSpacing: 2,
+            },
+            positioned: { left: 0, top: cardTop + cardH + 28 },
+          }));
+        }
+      }
+
+      // ---- Hand-off veil ----
+      if (t >= EXIT_AT && t < EXIT_AT + 22) {
+        var vOp = 0.09 * Math.sin(Math.PI * (t - EXIT_AT) / 22);
+        kids.push({ type: 'rect', width: F.W, height: F.H, fill: bake(tint, vOp) });
       }
     }
 
-    // Exit dip: dissolve to the shared bg tone (leads into 06_publish)
-    var ex = clamp01((frame - 226) / 14);
+    // ---- Outro ticker -------------------------------------------------------
+    var oIn = tw(800, 18, 0, 1, 'easeOut');
+    if (oIn > 0.01) {
+      kids.push(faText('THREE PROMPTS. THREE APPS.', {
+        width: F.W,
+        opacity: oIn,
+        offsetY: 16 * (1 - oIn),
+        style: {
+          fontSize: isP ? 58 : 44,
+          fontFamily: 'Impact',
+          fontWeight: '700',
+          color: T.text,
+          textAlign: 'center',
+          letterSpacing: 3,
+          gradient: {
+            begin: 'topCenter', end: 'bottomCenter',
+            colors: T.isLight ? ['#3C4043', '#0B0F19'] : ['#FFFFFF', '#ECECEF', '#9E9EA8'],
+            stops: T.isLight ? [0.0, 1.0] : [0.0, 0.45, 1.0],
+          },
+        },
+        positioned: { left: 0, top: isP ? F.H * 0.42 : F.H * 0.40 },
+      }));
+      kids.push(faText('ZERO LAPTOPS.', {
+        width: F.W,
+        opacity: tw(812, 18, 0, 1, 'easeOut'),
+        style: {
+          fontSize: isP ? 30 : 24,
+          fontFamily: 'monospace',
+          fontWeight: '700',
+          color: T.teal,
+          textAlign: 'center',
+          letterSpacing: 4,
+        },
+        positioned: { left: 0, top: (isP ? F.H * 0.42 : F.H * 0.40) + (isP ? 92 : 72) },
+      }));
+    }
+
+    // ---- Exit dip into 06_publish -------------------------------------------
+    var ex = clamp01((frame - 836) / 16);
     if (ex > 0.003) {
       var exa = Math.round(ex * 255).toString(16).padStart(2, '0');
       var exb = T.bg.replace('#', '').toUpperCase();
       kids.push({ type: 'rect', width: F.W, height: F.H, fill: '#' + exa + exb });
     }
-
-    // Footer ticker
-    var fIn = tw(180, 14, 0, 1, 'easeOut');
-    kids.push(faText('FOUR APPS. ONE PROMPT EACH. ZERO LAPTOPS.', {
-      width: F.W,
-      opacity: fIn * 0.8,
-      style: {
-        fontSize: isP ? 22 : 21,
-        fontFamily: 'monospace',
-        color: T.dim,
-        textAlign: 'center',
-        letterSpacing: 2.5,
-      },
-      positioned: { left: 0, top: isP ? F.H * 0.925 : F.H * 0.86 },
-    }));
 
     return { type: 'stack', fit: 'expand', children: kids };
   },

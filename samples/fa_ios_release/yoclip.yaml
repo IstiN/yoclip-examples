@@ -9,9 +9,10 @@
 #   02_download  470-662  QR + fa1.dev + App Store card
 #   03_connect   662-806  Connect your AI provider (BYOK)
 #   04_ask       806-1394 Chat (950-1394 scene; x2 pacing + card read tail)
-#   05_build    1394-1634 Generation montage: 4 apps being built
-#   06_publish  1634-1826 Widget catalog + publish
-#   07_lockup   1826-2030 Fa mark + "First real mobile AI harness"
+#   05_build    1394-2246 Three prompts, three apps (shopping list from a
+#                        photo / english tutor / 2048), prompt->result beats
+#   06_publish  2246-2438 Widget catalog + publish
+#   07_lockup   2438-2642 Fa mark + "First real mobile AI harness"
 #
 # NOTE: the -132 shift from the original grid (hook overlays the intro from
 # 10s) puts later cuts off the 150 BPM downbeat grid — revisit if the music feels off.
@@ -21,7 +22,7 @@
 #   yoclip render --project samples/samples/fa_ios_release --variant dark_vertical
 
 config:
-  duration: 2030
+  duration: 2642
   fps: 30
   width: 1920
   height: 1080

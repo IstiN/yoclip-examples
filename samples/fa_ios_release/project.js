@@ -30,7 +30,7 @@ project = {
     { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 451 },
     { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 470 },
     { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1142 },
-    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 1574 },
+    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 2186 },
     // Content layer
     { path: 'scenes/01_hook.scene.js', layer: 'content', start: 300 },
     { path: 'scenes/02_download.scene.js', layer: 'content', start: 470 },
@@ -39,8 +39,9 @@ project = {
     // 03 extended to 168 frames (782..950) - 04 starts after it
     // 04 stretched to 444 (x2 pacing + card read tail) on 2026-09-23
     { path: 'scenes/04_ask.scene.js', layer: 'content', start: 950 },
+    // 05 rebuilt as 3 prompt->app beats (852) on 2026-09-24
     { path: 'scenes/05_build.scene.js', layer: 'content', start: 1394 },
-    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 1634 },
-    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 1826 },
+    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 2246 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 2438 },
   ],
 };
