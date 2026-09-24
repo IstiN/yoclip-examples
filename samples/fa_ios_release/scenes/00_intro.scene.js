@@ -88,6 +88,16 @@ scene = {
       width: F.W,
       height: F.H,
     };
+    // Landscape only: `cover` crops a 768x1168 portrait source into 16:9
+    // with ~2/3 of its height hidden, centered — the subject rides low.
+    // From 5s ease the crop window up so by 6.5s the top shows ~27% more
+    // than the bottom (alignment y −0.27 = a quarter of the hidden band),
+    // then hold; the hook camera takes over at 10s.
+    if (!F.portrait) {
+      var bias = Math.min(1, Math.max(0, (frame - 150) / 45)); // 5s→6.5s
+      var eased = bias < 1 ? (1 - Math.cos(bias * Math.PI)) / 2 : 1;
+      video.alignment = [0, -0.27 * eased];
+    }
     // During the hook (global 300–451) zoom the video in lockstep with the
     // content layer's camera — one whole-scene push-in.
     var cam = hookCamera(frame - 300, F);
