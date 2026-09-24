@@ -11,8 +11,9 @@
 #   04_ask       806-1394 Chat (950-1394 scene; x2 pacing + card read tail)
 #   05_build    1394-2246 Three prompts, three apps (shopping list from a
 #                        photo / english tutor / 2048), prompt->result beats
-#   06_publish  2246-2438 Widget catalog + publish
-#   07_lockup   2438-2642 Fa mark + "First real mobile AI harness"
+#   05b_splash  2246-2366 Brand splash re-run (white beat, copy of 02b)
+#   05c_download 2366-2558 App Store card re-run (copy of 02)
+#   07_lockup   2558-2762 Fa mark + "First real mobile AI harness"
 #
 # NOTE: the -132 shift from the original grid (hook overlays the intro from
 # 10s) puts later cuts off the 150 BPM downbeat grid — revisit if the music feels off.
@@ -22,7 +23,7 @@
 #   yoclip render --project samples/samples/fa_ios_release --variant dark_vertical
 
 config:
-  duration: 2642
+  duration: 2762
   fps: 30
   width: 1920
   height: 1080
@@ -67,6 +68,8 @@ scenes:
   - scenes/05_build.scene.js
   - scenes/06_publish.scene.js
   - scenes/07_lockup.scene.js
+  - scenes/05b_splash.scene.js
+  - scenes/05c_download.scene.js
 
 theme:
   colors:

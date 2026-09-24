@@ -161,14 +161,15 @@ void main() {
     '03_connect': [4, 7, 20, 40, 60, 110, 126, 143, 152, 160, 166],
     '04_ask': [8, 30, 60, 100, 120, 144, 168, 192, 212, 224, 236, 252, 300, 340, 368, 410, 430],
     '05_build': [20, 36, 92, 100, 126, 204, 244, 284, 340, 368, 462, 556, 612, 706, 780, 820],
-    '06_publish': [60, 120, 145, 180, 184],
+    '05b_splash': [12, 62, 112],
+    '05c_download': [7, 120, 170],
     '07_lockup': [8, 50, 100, 135, 143],
   };
 
-  test('all 4 variants load 13 scenes each', () {
+  test('all 4 variants load 14 scenes each', () {
     expect(loaded.keys, containsAll(sizes.keys));
     for (final entry in loaded.entries) {
-      expect(entry.value.length, 13, reason: 'variant ${entry.key}');
+      expect(entry.value.length, 14, reason: 'variant ${entry.key}');
     }
   });
 

@@ -30,7 +30,7 @@ project = {
     { path: 'scenes/broll_01_hook_typing.scene.js', layer: 'background', start: 451 },
     { path: 'scenes/broll_02_qr_scan.scene.js', layer: 'background', start: 470 },
     { path: 'scenes/broll_05_build_montage.scene.js', layer: 'background', start: 1142 },
-    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 2186 },
+    { path: 'scenes/broll_07_outro_monitors.scene.js', layer: 'background', start: 2366 },
     // Content layer
     { path: 'scenes/01_hook.scene.js', layer: 'content', start: 300 },
     { path: 'scenes/02_download.scene.js', layer: 'content', start: 470 },
@@ -41,7 +41,10 @@ project = {
     { path: 'scenes/04_ask.scene.js', layer: 'content', start: 950 },
     // 05 rebuilt as 3 prompt->app beats (852) on 2026-09-24
     { path: 'scenes/05_build.scene.js', layer: 'content', start: 1394 },
-    { path: 'scenes/06_publish.scene.js', layer: 'content', start: 2246 },
-    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 2438 },
+    // catalog publish pulled for now — the film re-peaks with the splash
+    // and the store card right before the lockup (2026-09-24)
+    { path: 'scenes/05b_splash.scene.js', layer: 'content', start: 2246 },
+    { path: 'scenes/05c_download.scene.js', layer: 'content', start: 2366 },
+    { path: 'scenes/07_lockup.scene.js', layer: 'content', start: 2558 },
   ],
 };

@@ -303,17 +303,20 @@ scene = {
           uiText('SCORE 12 316', 8.5 * u + 2, tint, { w: '700', ls: 0.5, align: 'center', width: 96 * u, pos: { left: mx + mw - 110 * u, top: my + mh * 0.03 + 8 * u }, op: baseOp }),
         ]);
       }
-      var gap = 8 * u;
-      var gx0 = mx + 12 * u, gy0 = my + mh * 0.135, gw2 = mw - 24 * u;
-      var cell = Math.min((gw2 - 3 * gap) / 4, (mh * 0.60 - 3 * gap) / 4);
-      var gh2 = 4 * cell + 3 * gap;
+      var gap = 9 * u;
+      var boardMaxW = mw - 24 * u;
+      var cell = Math.min((boardMaxW - 3 * gap) / 4, (mh * 0.66 - 3 * gap) / 4);
+      var bw2 = 4 * cell + 3 * gap;             // board is square-ish, centred
+      var bh2 = bw2;
+      var gx0 = mx + (mw - bw2) / 2, gy0 = my + mh * 0.135;
       var ga = rev(pct, 0.14);
       if (ga > 0.01) {
-        var gnodes = [uiBox(gw2, gh2 + 2 * gap, 12 * u, T.isLight ? '#BBADA0' : '#2A241F', { pos: { left: gx0, top: gy0 }, op: baseOp })];
+        // the board stays dark in both themes — the classic tiles pop on it
+        var gnodes = [uiBox(bw2 + 2 * gap, bh2 + 2 * gap, 14 * u, '#221D18', { pos: { left: gx0 - gap, top: gy0 - gap }, op: baseOp })];
         for (var gi = 0; gi < 16; gi++) {
           var gr2 = Math.floor(gi / 4), gc2 = gi % 4;
-          gnodes.push(uiBox(cell, cell, 8 * u, T.isLight ? '#CDC1B4' : '#3A332C', {
-            pos: { left: gx0 + gap + gc2 * (cell + gap), top: gy0 + gap + gr2 * (cell + gap) }, op: baseOp }));
+          gnodes.push(uiBox(cell, cell, 9 * u, '#3A332C', {
+            pos: { left: gx0 + gc2 * (cell + gap), top: gy0 + gr2 * (cell + gap) }, op: baseOp }));
         }
         grpWrap(out, ga, 8 * (1 - ga), gnodes);
       }
@@ -331,7 +334,7 @@ scene = {
         if (ta <= 0.01) continue;
         var tl = tiles[ti];
         var pal = pal2048[tl.v];
-        var tx2 = gx0 + gap + tl.c * (cell + gap), ty2 = gy0 + gap + tl.r * (cell + gap);
+        var tx2 = gx0 + tl.c * (cell + gap), ty2 = gy0 + tl.r * (cell + gap);
         var tfs2 = tl.v.length > 2 ? cell * 0.28 : cell * 0.40;
         var pulse = (pct > 0.9 && ti === 5) ? 1 + 0.025 * Math.sin(frame * 0.5) : 1;
         grpWrap(out, ta, 6 * (1 - ta), [
@@ -344,9 +347,9 @@ scene = {
       var ma = rev(pct, 0.80);
       if (ma > 0.01) {
         grpWrap(out, ma, 6 * (1 - ma), [
-          uiBox(150 * u, 26 * u, 13 * u, tint, { pos: { left: mx + mw / 2 - 75 * u, top: gy0 + gh2 + 2 * gap + 8 }, op: baseOp }),
-          uiText('MERGE! +16 PTS', 9 * u + 2, T.isLight ? '#FFFFFF' : '#05070D', { w: '700', ls: 1, align: 'center', width: 150 * u, pos: { left: mx + mw / 2 - 75 * u, top: gy0 + gh2 + 2 * gap + 8 + 8 * u }, op: baseOp }),
-          uiText('SWIPE TO MERGE TILES', 8 * u + 2, T.faint, { w: '600', ls: 1.6, align: 'center', width: mw - 24 * u, pos: { left: mx + 12 * u, top: my + mh * 0.94 }, op: baseOp }),
+          uiBox(150 * u, 26 * u, 13 * u, tint, { pos: { left: mx + mw / 2 - 75 * u, top: gy0 + bh2 + gap + 8 }, op: baseOp }),
+          uiText('MERGE! +16 PTS', 9 * u + 2, T.isLight ? '#FFFFFF' : '#05070D', { w: '700', ls: 1, align: 'center', width: 150 * u, pos: { left: mx + mw / 2 - 75 * u, top: gy0 + bh2 + gap + 8 + 8 * u }, op: baseOp }),
+          uiText('SWIPE TO MERGE TILES', 8 * u + 2, T.faint, { w: '600', ls: 1.6, align: 'center', width: mw - 24 * u, pos: { left: mx + 12 * u, top: my + mh * 0.945 }, op: baseOp }),
         ]);
       }
     }
@@ -408,7 +411,7 @@ scene = {
 
     // Result card geometry (beat-independent)
     var cardW = isP ? F.W * 0.84 : F.H * 0.66 * 0.78;
-    var cardH = isP ? F.H * 0.50 : F.H * 0.66;
+    var cardH = isP ? F.H * 0.56 : F.H * 0.66;
     var cardX = cx - cardW / 2;
     var cardTop = isP ? F.H * 0.185 : F.H * 0.225;
     var cardCX = cx;
