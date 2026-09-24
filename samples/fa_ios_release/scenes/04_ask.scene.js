@@ -100,7 +100,7 @@ scene = {
     var camY = 0;
 
     // ---- 1. Greeting card in the centre ------------------------------------
-    var gIn = tw(64, 40, 0, 1, 'easeOut');
+    var gIn = tw(20, 28, 0, 1, 'easeOut'); // wraps the dot right away
     var gTop = gC - gH / 2 - push - threadLift
       ; // keyboard lift + card push (no travel — the thread fades)
     if (gIn > 0.003) {
@@ -458,7 +458,7 @@ scene = {
     // The teal dot lands at the centre of the greeting card
     // (KEEP IN SYNC with 03_connect: cx, gC) and pulses until the greeting
     // materialises around it.
-    if (frame < 64) {
+    if (frame < 24) {
       var pulse = 0.5 + 0.5 * Math.sin(frame * 0.42);
       kids.push({ type: 'circle', size: 40 + 14 * pulse, fill: T.teal,
         opacity: 0.16 + 0.10 * pulse, blur: 16,
