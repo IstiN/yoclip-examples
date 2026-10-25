@@ -96,6 +96,83 @@ scene = {
     // bottom corners for free.
     // ------------------------------------------------------------------
     var heroE = eo3(seg(frame, 4, 26));
+    // Live vector launch preview: no baked prompt, cursor or stock GLB
+    // screenshot. The same original rocket/satellite language as 07_space
+    // keeps the deck and the full-screen 3D beat visually continuous.
+    var previewH = heroH - capH;
+    var previewKids = [
+      {
+        type: 'container',
+        gradient: {
+          type: 'linear', begin: 'topCenter', end: 'bottomCenter',
+          colors: ['#111b3d', '#080b1c'],
+        },
+      },
+      {
+        type: 'container', alignment: 'center', width: 520, height: 420,
+        gradient: { type: 'radial', colors: ['#387c3aed', '#007c3aed'] },
+      },
+    ];
+    for (var ps = 0; ps < 42; ps++) {
+      previewKids.push({
+        type: 'container', alignment: 'center',
+        width: ps % 9 === 0 ? 3 : 2, height: ps % 9 === 0 ? 3 : 2,
+        borderRadius: 999,
+        offsetX: ((ps * 83) % Math.max(1, heroW - 40)) - (heroW - 40) / 2,
+        offsetY: ((ps * 47) % Math.max(1, previewH - 50)) - (previewH - 50) / 2,
+        color: ps % 4 === 0 ? '#a5f3fc' : '#ffffff',
+        opacity: 0.35 + 0.5 * shimmer(frame + ps * 3, 38),
+      });
+    }
+    previewKids.push(
+      {
+        type: 'container', alignment: 'center', offsetY: 250,
+        width: 780, height: 330, borderRadius: 999,
+        gradient: {
+          type: 'linear', begin: 'topCenter', end: 'bottomCenter',
+          colors: ['#285ca8', '#111d48', '#080a18'],
+        },
+        borderColor: '#a5f3fc', borderWidth: 2,
+      },
+      {
+        type: 'container', alignment: 'center', offsetX: 36, offsetY: -10,
+        width: 460, height: 150, borderRadius: 999, rotation: -14,
+        borderColor: '#667c3aed', borderWidth: 2,
+      },
+      {
+        type: 'container', alignment: 'center', offsetX: 36, offsetY: -10,
+        width: 330, height: 104, borderRadius: 999, rotation: 20,
+        borderColor: '#8022d3ee', borderWidth: 1.5,
+      },
+      {
+        type: 'image', source: 'external:rocket_vector', fit: 'contain',
+        alignment: 'center', offsetX: 64, offsetY: -34 + 4 * Math.sin(frame * 0.07),
+        width: 156, height: 206,
+      },
+      {
+        type: 'image', source: 'external:satellite_vector', fit: 'contain',
+        alignment: 'center', offsetX: -174, offsetY: -102,
+        width: 116, height: 116,
+      },
+      {
+        type: 'container', alignment: 'center', offsetX: 212, offsetY: -142,
+        width: 48, height: 48, borderRadius: 999,
+        gradient: { type: 'radial', colors: ['#f0f7ff', '#7385aa', '#26314d'] },
+      },
+      {
+        type: 'text', alignment: 'topLeft', offsetX: 20, offsetY: 18,
+        text: 'LIVE RENDER  /  SCENE 003',
+        style: { fontSize: 12, color: '#a5b4fc', fontFamily: font, fontWeight: 700, letterSpacing: 1.6 },
+      },
+      {
+        type: 'text', alignment: 'bottomLeft', offsetX: 20, offsetY: -18,
+        text: 'VECTOR WORLD  ·  LIVE',
+        style: { fontSize: 11, color: '#c5f4ff', fontFamily: font, letterSpacing: 1.4 },
+      }
+    );
+    var heroPreview = {
+      type: 'stack', fit: 'expand', children: previewKids,
+    };
     children.push({
       type: 'container',
       alignment: 'center',
@@ -116,13 +193,7 @@ scene = {
             width: heroW,
             height: heroH - capH,
             clip: true,
-            child: {
-              type: 'image',
-              source: 'external:golden_space',
-              fit: 'cover',
-              width: heroW,
-              height: heroH - capH,
-            },
+            child: heroPreview,
           },
           {
             type: 'container',
@@ -271,7 +342,9 @@ scene = {
     // card is the same 170x108 format as the rest, not a square).
     // ------------------------------------------------------------------
     if (!portrait) {
-      var railSrcs = ['golden_kaleido', 'golden_chat', 'golden_space', 'golden_website', 'golden_polish'];
+      // Scenic, text-free previews stay legible at 170px; UI screenshots
+      // become unreadable noise at thumbnail size.
+      var railSrcs = ['golden_kaleido', 'golden_tunnel', 'golden_space', 'golden_monolith', 'golden_endcard'];
       var railH = railSrcs.length * thumbH + (railSrcs.length - 1) * thumbGap;
       for (var j = 0; j < railSrcs.length; j++) {
         children.push({
@@ -283,6 +356,8 @@ scene = {
           height: thumbH,
           opacity: eo3(staggerItem(frame, j, 2, 4, 16)) * outro,
           borderRadius: 14,
+          borderColor: j === 0 ? '#cc7c3aed' : '#99ffffff',
+          borderWidth: j === 0 ? 2.5 : 1.5,
           shadow: { color: '#2e1a2b4a', blur: 16, offsetX: 0, offsetY: 7 },
           clip: true,
           child: {

@@ -150,10 +150,10 @@ scene = {
       var lineOp = staggerItem(frame, li, 34, 10, 6);
       codeKids.push({
         type: 'text',
-        text: typewriter(codeLines[li][0], frame, lineStart, 90),
+        text: typewriter(codeLines[li][0], frame, lineStart, 90).replace(/^\s+/, ''),
         textAlign: 'left',
         opacity: lineOp,
-        margin: { top: li === 0 ? 0 : 8 },
+        margin: { left: [0, 24, 48, 72, 72, 48, 24, 0][li], top: li === 0 ? 0 : 8 },
         style: {
           fontSize: portrait ? 22 : 26,
           color: codeLines[li][1],
@@ -300,30 +300,37 @@ scene = {
       },
     };
 
-    // -- RIGHT: "Animate it!" card with the live knight portrait.
-    // NOTE: the flame host asserts on dispose when its game never gets a
-    // layout — an exact opacity-0 / scale-0 entrance frame starves it, so
-    // the pop starts early enough to be non-zero in every captured frame
-    // and both props keep a floor.
+    // -- RIGHT: a branded motion core replaces the stock chibi knight.
+    // Original vector geometry, orbiting scene nodes and a live playhead
+    // explain animation while staying in the product's visual language.
     var animIn = pop(frame, 40, 22);
-    var podiumMeshes = [
-      meshXform(meshCylinder(0.85, 0.28, 18), { color: '#241d3d', translate: [0, -1.12, 0] }),
-      meshXform(meshCylinder(0.85, 0.05, 18), { color: accent, translate: [0, -0.96, 0] }),
-    ];
-    var animCam = { position: [0, 0.75, 3.4], target: [0, -0.15, 0], fov: 45 };
     var animCardW = portrait ? 880 : 660;
     var animCardH = portrait ? 560 : 620;
+    var coreBob = float(frame, 8, 0.06);
+    var orbitNodes = [];
+    for (var on = 0; on < 4; on++) {
+      var oa = frame * 0.025 + on * Math.PI * 0.5;
+      orbitNodes.push({
+        type: 'container', alignment: 'center',
+        offsetX: Math.cos(oa) * (portrait ? 230 : 205),
+        offsetY: 8 + Math.sin(oa) * 78,
+        width: on === 0 ? 24 : 16, height: on === 0 ? 24 : 16,
+        borderRadius: 999, color: on % 2 ? primaryLight : accent,
+        borderColor: '#ccffffff', borderWidth: 2,
+        shadow: { color: on % 2 ? '#887c3aed' : '#8822d3ee', blur: 18, offsetX: 0, offsetY: 0 },
+      });
+    }
+    var trackW = animCardW - 120;
+    var playProgress = 0.12 + 0.78 * (0.5 + 0.5 * Math.sin(frame * 0.035));
     var animCard = {
       type: 'container',
       alignment: portrait ? 'center' : 'centerRight',
       offsetX: portrait ? 0 : -80,
-      offsetY: (portrait ? 400 : 40),
+      offsetY: portrait ? 400 : 40,
       width: animCardW,
       height: animCardH,
-      opacity: Math.max(0.02, animIn.opacity),
-      // Flame host asserts on dispose when its game never gets a layout —
-      // a zero-scale entrance state starves it, so keep a floor.
-      scale: Math.max(0.02, animIn.scale),
+      opacity: animIn.opacity,
+      scale: Math.max(0.001, animIn.scale),
       color: cardBg,
       borderRadius: 20,
       borderColor: cardBorder,
@@ -331,48 +338,86 @@ scene = {
       shadow: { color: yoclipColorA('primary', 0x44, '#7c3aed'), blur: 40, offsetX: 0, offsetY: 14 },
       clip: true,
       child: {
-        type: 'stack',
-        fit: 'expand',
-        children: [
+        type: 'stack', fit: 'expand', children: [
           {
-            type: 'scene3d',
-            meshes: podiumMeshes,
-            camera: animCam,
-            light: { direction: [0.3, -0.7, 0.6] },
+            type: 'container',
+            gradient: { type: 'radial', colors: ['#332e1b5e', '#1617122b', '#17122b'], stops: [0, 0.62, 1] },
+          },
+          // Quiet viewport grid.
+          { type: 'container', alignment: 'center', width: 1, height: animCardH, color: '#141fffff' },
+          { type: 'container', alignment: 'center', width: animCardW, height: 1, color: '#141fffff' },
+          {
+            type: 'text', alignment: 'topCenter', offsetY: 24, text: animateLabel,
+            style: { fontSize: 24, color: primaryLight, fontFamily: font, fontWeight: 700, letterSpacing: 3 },
           },
           {
-            type: 'scene3d',
-            engine: 'flame',
-            id: 'v2-course-anim',
-            time: frame / 30,
-            camera: animCam,
-            light: { ambient: 0.75, diffuse: 1.3, position: [4, 6, 5] },
-            models: [{
-              modelId: 'knight',
-              src: 'models/Knight.glb',
-              position: [0, -0.98, 0],
-              rotation: [0, Math.sin(frame * 0.02) * 16, 0],
-              scale: [0.55, 0.55, 0.55],
-              animation: 'Cheer',
-            }],
+            type: 'row', alignment: 'topLeft', offsetX: animCardW - 96, offsetY: 28,
+            crossAxisAlignment: 'center', children: [
+              { type: 'container', width: 8, height: 8, borderRadius: 999, color: '#34d399' },
+              { type: 'text', text: 'LIVE', margin: { left: 8 }, style: { fontSize: 14, color: '#a7f3d0', fontFamily: font, fontWeight: 700, letterSpacing: 2 } },
+            ],
           },
           {
-            type: 'text',
-            alignment: 'topCenter',
-            offsetY: 24,
-            text: animateLabel,
-            style: {
-              fontSize: 24,
-              color: primaryLight,
-              fontFamily: font,
-              fontWeight: 700,
-              letterSpacing: 3,
+            type: 'container', alignment: 'center', offsetY: 8,
+            width: 430, height: 430,
+            gradient: { type: 'radial', colors: ['#4d7c3aed', '#137c3aed', '#007c3aed'], stops: [0, 0.58, 1] },
+          },
+          {
+            type: 'container', alignment: 'center', offsetY: 8,
+            width: portrait ? 500 : 430, height: 170,
+            rotation: -12 + Math.sin(frame * 0.03) * 4,
+            borderRadius: 999, borderColor: '#8067e8f9', borderWidth: 2,
+            shadow: { color: '#5922d3ee', blur: 16, offsetX: 0, offsetY: 0 },
+          },
+          {
+            type: 'container', alignment: 'center', offsetY: 8,
+            width: portrait ? 360 : 310, height: 116,
+            rotation: 20 + Math.sin(frame * 0.024) * 5,
+            borderRadius: 999, borderColor: '#66a78bfa', borderWidth: 2,
+          },
+          {
+            type: 'container', alignment: 'center', offsetY: 132,
+            width: 270, height: 48, borderRadius: 999,
+            color: '#59000000', blur: 14,
+          },
+          {
+            type: 'container', alignment: 'center', offsetY: 8 + coreBob,
+            width: 196, height: 196, borderRadius: 999,
+            gradient: {
+              type: 'radial', radius: 0.72,
+              colors: ['#f5f3ff', '#c4b5fd', '#7c3aed', '#312e81'],
+              stops: [0, 0.28, 0.68, 1],
+            },
+            borderColor: '#99ffffff', borderWidth: 2,
+            shadow: { color: '#807c3aed', blur: 34, offsetX: 0, offsetY: 16 },
+            child: {
+              type: 'image', source: 'external:yo_bubble', fit: 'contain',
+              alignment: 'center', width: 126, height: 126,
             },
           },
-        ],
+        ].concat(orbitNodes, [
+          // A real animated timeline fills the lower card with useful state.
+          {
+            type: 'container', alignment: 'bottomCenter', offsetY: -26,
+            width: animCardW - 64, height: 64,
+            color: '#8f0d0a1a', borderRadius: 14,
+            borderColor: '#2e655fa8', borderWidth: 1,
+            child: {
+              type: 'stack', fit: 'expand', children: [
+                {
+                  type: 'text', alignment: 'topLeft', offsetX: 18, offsetY: 8,
+                  text: 'SCENE.RENDER  /  FRAME ' + ('00' + frame).slice(-3),
+                  style: { fontSize: 14, color: '#a5b4fc', fontFamily: font, letterSpacing: 1.2 },
+                },
+                { type: 'container', alignment: 'bottomLeft', offsetX: 18, offsetY: -13, width: trackW, height: 4, borderRadius: 2, color: '#334155' },
+                { type: 'container', alignment: 'bottomLeft', offsetX: 18, offsetY: -13, width: Math.max(4, trackW * playProgress), height: 4, borderRadius: 2, color: accent },
+                { type: 'container', alignment: 'bottomLeft', offsetX: 18 + trackW * playProgress - 5, offsetY: -8, width: 10, height: 14, borderRadius: 3, color: '#ffffff' },
+              ],
+            },
+          },
+        ]),
       },
     };
-
     // -- Formula block slides up.
     var formIn = ease(frame, 122, 142, eo3);
     var formulaBlock = {

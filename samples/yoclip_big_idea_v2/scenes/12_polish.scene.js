@@ -58,9 +58,9 @@ scene = {
     // -- Beat timing.
     var MORPH = 44;   // text morph starts
     var SPLIT = 72;   // report slides left, analytics pops right
-    var PICK = 124;   // cursor clicks "Pyramid"
-    var SHARE = 156;  // share pill pops
-    var DIM = 208;    // world dims, button stays lit
+    var PICK = 102;   // cursor clicks "Pyramid"
+    var SHARE = 146;  // share pill pops; the trimmed 181f scene must show it
+    var DIM = 158;    // world dims, button stays lit into the pipeline
     var legendOp = seg(frame, MORPH + 24, MORPH + 34);
 
     // -- The report card (continuity from 11, simplified).
@@ -136,8 +136,9 @@ scene = {
       type: 'container',
       alignment: 'center',
       offsetY: -96 - 28 * chipFade,
-      // Explicit width — a container > row stretches to the card otherwise.
+      // Fixed chip geometry; width alone made a full-height dark column.
       width: 320,
+      height: 58,
       opacity: chipOp2,
       scale: Math.max(0.05, chipPop.scale),
       color: ink,
@@ -272,76 +273,55 @@ scene = {
 
     var bullets = [stat1, stat2, stat3];
     var bulletKids = [];
-    var bulletFade = 1 - seg(frame, PICK + 2, PICK + 14);
+    var bulletFade = 1 - seg(frame, PICK + 2, PICK + 10);
     for (var b = 0; b < 3; b++) {
-      var bIn = staggerItem(frame, b, SPLIT + 18, 8, 12);
+      var bIn = staggerItem(frame, b, SPLIT + 10, 6, 8);
       bulletKids.push({
-        type: 'row',
-        crossAxisAlignment: 'center',
+        type: 'row', crossAxisAlignment: 'center',
         margin: { top: b === 0 ? 0 : 26 },
-        opacity: bIn * bulletFade,
-        offsetY: (1 - eo3(bIn)) * 16,
+        opacity: bIn * bulletFade, offsetY: (1 - eo3(bIn)) * 16,
         children: [
+          { type: 'container', width: 14, height: 14, borderRadius: 7, color: accent },
           {
-            type: 'container',
-            width: 14,
-            height: 14,
-            borderRadius: 7,
-            color: accent,
-          },
-          {
-            type: 'text',
-            text: bullets[b][0] + ' — ' + bullets[b][1],
-            margin: { left: 16 },
+            type: 'text', text: bullets[b][0] + ' — ' + bullets[b][1], margin: { left: 16 },
             style: { fontSize: portrait ? 26 : 27, color: ink, fontFamily: font, fontWeight: 600 },
           },
         ],
       });
     }
 
-    // 3-tier pyramid draws on tier by tier (bottom -> top). Real tiers,
-    // not pills: decreasing widths form one triangular silhouette, each
-    // tier its own shade (primary -> primaryLight -> accent), square-ish
-    // corners. Tiers pop in via scale (path nodes are stroke-only, so a
-    // filled trapezoid is not available).
-    var tierSpecs = [
-      [0, 460, PICK + 8],   // Describe (bottom)
-      [1, 330, PICK + 18],  // Render
-      [2, 200, PICK + 28],  // Ship (top)
-    ];
-    var tierColors = [primary, primaryLight, accent];
-    var tierKids = [];
-    // Children render top tier first; draw order bottom -> top via delays.
-    for (var ti = tierSpecs.length - 1; ti >= 0; ti--) {
-      var spec = tierSpecs[ti];
-      var tSc = Math.max(0.05, ease(frame, spec[2], spec[2] + 16, eoBack));
-      var tOp = seg(frame, spec[2], spec[2] + 8);
-      tierKids.push({
-        type: 'container',
-        width: spec[1],
-        height: 96,
-        margin: { top: ti === tierSpecs.length - 1 ? 0 : 6 },
-        opacity: tOp,
-        scale: tSc,
-        color: tierColors[spec[0]],
-        borderRadius: 6,
-        child: {
-          type: 'stack',
-          fit: 'expand',
-          children: [{
-            type: 'text',
-            alignment: 'center',
-            text: pyramid[spec[0]] || '',
-            style: {
-              fontSize: 25,
-              color: spec[0] === 2 ? '#164e63' : '#ffffff',
-              fontFamily: font,
-              fontWeight: 700,
-            },
-          }],
-        },
+    // Real trapezoids made from twenty crisp vector scanlines per tier.
+    // Unlike rounded pills, the shared widths join into one triangular
+    // silhouette. Bullets reach zero before the first tier starts.
+    function pyramidTier(topW, bottomW, color, label, start, darkText) {
+      var stripes = [];
+      var rows = 20;
+      for (var si = 0; si < rows; si++) {
+        var p = (si + 0.5) / rows;
+        stripes.push({
+          type: 'container', alignment: 'center',
+          offsetY: -48 + (si + 0.5) * 96 / rows,
+          width: lerp(topW, bottomW, p), height: 96 / rows + 0.7,
+          color: color, opacity: 0.84 + 0.16 * p,
+        });
+      }
+      stripes.push({
+        type: 'text', alignment: 'center', offsetY: topW < 100 ? 18 : 0, text: label,
+        style: { fontSize: 24, color: darkText ? '#164e63' : '#ffffff', fontFamily: font, fontWeight: 700 },
       });
+      return {
+        type: 'container', width: 460, height: 96,
+        margin: { top: start === PICK + 32 ? 0 : 6 },
+        opacity: seg(frame, start, start + 7),
+        scale: Math.max(0.02, ease(frame, start, start + 12, eoBack)),
+        child: { type: 'stack', fit: 'expand', children: stripes },
+      };
     }
+    var tierKids = [
+      pyramidTier(70, 260, accent, pyramid[2] || '', PICK + 32, true),
+      pyramidTier(260, 370, primaryLight, pyramid[1] || '', PICK + 22, false),
+      pyramidTier(370, 460, primary, pyramid[0] || '', PICK + 12, false),
+    ];
 
     var analyticsCard = {
       type: 'container',
@@ -390,8 +370,8 @@ scene = {
 
     // Floating chart menu above the analytics card — a tight segmented
     // control, not a row of loose chips.
-    var menuPop = pop(frame, SPLIT + 26, 16);
-    var menuOut = seg(frame, PICK + 24, PICK + 38);
+    var menuPop = pop(frame, SPLIT + 16, 12);
+    var menuOut = seg(frame, PICK + 20, PICK + 32);
     var menuItems = ['Circle stats', 'Bar stats', 'Pyramid', 'Funnel'];
     var menuKids = [];
     for (var mi = 0; mi < menuItems.length; mi++) {
@@ -420,8 +400,9 @@ scene = {
       offsetX: anaX,
       // Clears the card top by ~36px — a tighter gap read as an overlap.
       offsetY: anaY - anaH / 2 - 64,
-      // Explicit width — a container > row stretches to the frame otherwise.
+      // Fixed segmented-control geometry.
       width: 560,
+      height: 54,
       opacity: menuPop.opacity * (1 - menuOut),
       scale: Math.max(0.05, menuPop.scale),
       color: '#ffffff',
@@ -439,8 +420,8 @@ scene = {
 
     // -- Beat 3: big blue Share pill; cursor glides, dips; world dims.
     var sharePop = pop(frame, SHARE, 16);
-    var shareDip = seg(frame, 196, 200) * (1 - seg(frame, 200, 207));
-    var shareGlow = 24 + 30 * seg(frame, 202, 210) * shimmer(frame, 22);
+    var shareDip = seg(frame, 170, 173) * (1 - seg(frame, 173, 178));
+    var shareGlow = 24 + 30 * seg(frame, 174, 180) * shimmer(frame, 22);
     var sharePill = {
       type: 'container',
       alignment: 'bottomCenter',
@@ -481,13 +462,13 @@ scene = {
     };
 
     // Cursor: picks "Pyramid" in the menu, then clicks the Share pill.
-    var curOp2 = seg(frame, 104, 110) * (1 - seg(frame, PICK + 14, PICK + 22));
-    var glide2 = ease(frame, 110, PICK, eio3);
-    var curOp3 = seg(frame, 176, 182) * (1 - seg(frame, 214, 222));
-    var glide3 = ease(frame, 182, 196, eio3);
+    var curOp2 = seg(frame, 84, 90) * (1 - seg(frame, PICK + 10, PICK + 18));
+    var glide2 = ease(frame, 90, PICK, eio3);
+    var curOp3 = seg(frame, SHARE + 12, SHARE + 18) * (1 - seg(frame, 174, 181));
+    var glide3 = ease(frame, SHARE + 18, 170, eio3);
     var menuChipX = anaX + 96; // "Pyramid" chip center (3rd of 4)
     var curX, curY, curOp;
-    if (frame < 170) {
+    if (frame < SHARE + 6) {
       curX = lerp(anaX + 420, menuChipX, glide2);
       curY = lerp(anaY + 300, anaY - anaH / 2 - 56, glide2);
       curOp = curOp2;
@@ -511,12 +492,13 @@ scene = {
 
     // Post-click confirmation: a "Link copied" toast rises above the pill —
     // without it the glowing button just hung there for two dead seconds.
-    var toastPop = pop(frame, 214, 14);
+    var toastPop = pop(frame, 174, 10);
     var toast = {
       type: 'container',
       alignment: 'bottomCenter',
       offsetY: portrait ? -168 : -180,
       width: 300,
+      height: 58,
       opacity: toastPop.opacity,
       scale: Math.max(0.05, toastPop.scale),
       color: ink,

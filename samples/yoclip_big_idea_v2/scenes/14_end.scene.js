@@ -61,35 +61,15 @@ scene = {
     // -- Beat 4 (100–120): the mic-drop meta line, then HOLD to the end.
     var metaIn = ease(frame, 100, 118, eo3);
 
-    // ---- Landscape: flat 2D SVG ridge silhouettes (layers below) -----------
-    var groundY = -1.1;
-
-    // ---- The real 3D logo (all GLB parts), bobbing above the near dune. ----
-    // The end card IS the brand moment — the logo must dominate but FIT:
-    // 1.15× over the original framing with a gentle push-in keeps the whole
-    // arc inside the frame with air around it (1.5× + camZ 8 overflowed).
-    var logoY = groundY + 0.05 + 0.06 * Math.sin(frame * 0.07);
-    var logoModels = [];
-    var logoSc = Math.max(0.001, logoPop.scale) * 1.15;
-    var logoParts = ['arc', 'bubble', 'l', 'i', 'idot', 'p'];
-    for (var pi = 0; pi < logoParts.length; pi++) {
-      logoModels.push({
-        modelId: logoParts[pi],
-        src: 'models/logo/' + logoParts[pi] + '.glb',
-        unlit: true,
-        position: [0, logoY, 0],
-        rotation: [0, 4 * Math.sin(frame * 0.03), 0],
-        scale: [logoSc, logoSc, logoSc],
-      });
-    }
-
-    // ---- Camera: gentle drift, framed wide enough that the whole wordmark
-    // (incl. the arc) stays inside the frame with margin; target sits a
-    // touch below the logo center so the mark floats above the tagline.
+    // ---- Bespoke vector brand lockup ---------------------------------------
+    // The GPU logo was both small and vulnerable to Impeller placeholders.
+    // The original brand SVG is crisp at any size and gives the finale a
+    // dominant, perfectly legible mark in every render environment.
     var push = ease(frame, 0, 179, eio3);
-    var camY = lerp(2.0, 1.7, push);
-    var camZ = lerp(10.6, 9.6, push);
-    var cam = { position: [0, camY, camZ], target: [0, 0.3, 0], fov: 50 };
+    var logoW = portrait ? 760 : 1080;
+    var logoH = Math.round(logoW * 520 / 820);
+    var logoY = (portrait ? -300 : -200) + 6 * Math.sin(frame * 0.07);
+    var logoSc = Math.max(0.001, logoPop.scale) * (1 + 0.025 * push);
 
     var layers = [
       // Vivid sunset sky (same language as 01_monolith).
@@ -110,6 +90,7 @@ scene = {
         alignment: 'center',
         width: 1000,
         height: 1000,
+        borderRadius: 999,
         offsetX: 420,
         offsetY: 240,
         opacity: worldIn,
@@ -165,29 +146,22 @@ scene = {
         offsetX: 28 * Math.sin(frame * 0.018 + 3.9),
         opacity: worldIn,
       },
-      // Breathing radial glow behind the logo.
+      // A soft light halo separates the dark-ink mark from the sunset.
       {
-        type: 'container',
-        alignment: 'center',
-        offsetY: portrait ? -300 : -120,
-        width: 900,
-        height: 900,
-        opacity: glowOp,
+        type: 'container', alignment: 'center',
+        offsetY: portrait ? -300 : -180,
+        width: portrait ? 900 : 1260, height: portrait ? 700 : 780,
+        borderRadius: 999, opacity: glowOp,
         gradient: {
           type: 'radial',
-          colors: [yoclipColorA('primary', 0x30, '#7c3aed'), yoclipColorA('primary', 0x00, '#7c3aed')],
-          stops: [0, 1],
+          colors: ['#b3fff7ed', '#59f2defe', '#00f2defe'],
+          stops: [0, 0.58, 1],
         },
       },
-      // The real 3D logo.
       {
-        type: 'scene3d',
-        engine: 'flame',
-        id: 'v2-end-logo',
-        time: frame / 30,
-        camera: cam,
-        light: { ambient: 1.7, diffuse: 1.4, position: [4, 6, 6] },
-        models: logoModels,
+        type: 'image', source: 'external:logo_on_light', fit: 'contain',
+        alignment: 'center', width: logoW, height: logoH,
+        offsetY: logoY, scale: logoSc, opacity: logoPop.opacity,
       },
       // Tagline over the dune field (ink on light lavender) — dropped 50px
       // so the enlarged logo above never overlaps it.
@@ -198,7 +172,7 @@ scene = {
         text: tagline,
         opacity: tagIn,
         style: {
-          fontSize: portrait ? 56 : 84,
+          fontSize: portrait ? 56 : 80,
           color: ink,
           fontFamily: font,
           fontWeight: 700,
@@ -214,6 +188,7 @@ scene = {
         opacity: urlIn,
         // Explicit width — a container > row stretches to the frame.
         width: portrait ? 480 : 460,
+        height: 66,
         color: '#c014121f',
         borderRadius: 999,
         borderColor: '#40ffffff',

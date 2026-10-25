@@ -1,24 +1,15 @@
-// 12b — Star map: the yoclip feature set as a glowing constellation.
-//
-// Adapted from the "citation star map" reference: a full-screen hero of
-// glowing jewel nodes spread on an ellipsoid, faint gold edges to the
-// nearest neighbours, slow auto-rotate, and a fly-in entrance. Feature
-// hubs (Render / Scenes / Studio / Golden tests / CLI) are the biggest
-// stars and get labels. All 2D: fake-3D via manual Y-rotation + weak
-// perspective (no renderer projection needed), so nodes can be soft
-// radial-gradient glows instead of cubes.
-//
-// Renderer notes: edges are one-point path widgets; depth dimming is just
-// per-node opacity/scale from the rotated z. Clamp opacities to [0,1].
+// 12b — Star map: the yoclip feature set as a precise orbital system.
+// Crisp vector nodes, elliptical tracks and a calm brand hub replace the
+// old blur-heavy point cloud and its normalization-broken path spokes.
 
 scene = {
   id: 'starmap',
   duration: 150,
   slides: [73],
-  description: 'Constellation hero: ~40 glowing jewel nodes on an ellipsoid web (faint gold edges to nearest neighbours) auto-rotate in fake-3D; the 5 biggest hubs are labeled Render / Scenes / Studio / Golden tests / CLI; fly-in zoom entrance, holds.',
+  description: 'A premium orbital system map: the yoclip hub at center, eight crisp feature nodes on luminous elliptical tracks, subtle connectors and traveling render pulses; staggered entrances and a slow drift.',
   voicePrompts: {
-    en: 'A calm cosmic pad with soft chimes as the constellation rotates.',
-    ru: 'Спокойный космический пад, мягкие перезвоны — созвездие вращается.',
+    en: 'A calm cosmic pad with soft chimes as the system assembles.',
+    ru: 'Спокойный космический пад и мягкие перезвоны по мере сборки системы.',
   },
   timeline: {
     label: yoclipT('starmap').timeline || 'Star map',
@@ -27,8 +18,10 @@ scene = {
   },
   render: function(frame) {
     var portrait = yoclipIsPortrait();
-    var k = portrait ? 0.6 : 1.0;
+    var k = portrait ? 0.60 : 1.0;
     var font = yoclipFont();
+    var outro = fadeOut(frame, 140, 10);
+    var worldIn = ease(frame, 0, 18, eo3);
 
     function cap01(x) { return Math.max(0, Math.min(1, x)); }
     function ga(hex, a) {
@@ -37,175 +30,152 @@ scene = {
       return '#' + ah + hex.slice(1);
     }
 
-    var flyIn = ease(frame, 0, 40, eo3);          // entrance zoom + fade
-    var labelIn = ease(frame, 60, 90, eo3);
-
-    // ---- Nodes on an ellipsoid (golden-angle spread) -------------------------
-    var JEWEL = ['#22d3ee', '#a78bfa', '#ec4899', '#fbbf24', '#34d399', '#7dd3fc'];
-    var NN = 42;
-    var RX = 660 * k, RY = 340 * k, RZ = 460 * k;
-    var rot = frame * 0.008 + (1 - flyIn) * 0.8;   // slow autoRotate
-    var zoom = lerp(0.55, 1.0, flyIn);
-
-    var pts = [];
-    for (var i = 0; i < NN; i++) {
-      var yy = 1 - 2 * (i + 0.5) / NN;
-      var rr = Math.sqrt(Math.max(0, 1 - yy * yy));
-      var th = i * 2.39996 + rot;
-      var x3 = RX * rr * Math.cos(th);
-      var z3 = RZ * rr * Math.sin(th);
-      var y3 = RY * yy;
-      var sc = zoom / (1 + z3 * 0.0011);           // weak perspective
-      pts.push({
-        x: 960 + x3 * sc,
-        y: 540 + y3 * sc,
-        z: z3,
-        sc: sc,
-        deg: 0.5 + 0.5 * ((i * 73) % 10) / 10,     // pseudo degree size
-        c: JEWEL[i % JEWEL.length],
-      });
-    }
-
     var layers = [
-      // Deep space.
       {
         type: 'container',
         gradient: {
-          type: 'linear',
-          begin: 'topCenter',
-          end: 'bottomCenter',
-          colors: ['#0d0a1e', '#05030c'],
+          type: 'linear', begin: 'topCenter', end: 'bottomCenter',
+          colors: ['#0d0a20', '#05060f'],
         },
       },
       {
-        type: 'container',
-        alignment: 'center',
-        width: 1200 * k,
-        height: 800 * k,
-        offsetY: -100 * k,
-        opacity: 0.5,
-        gradient: { type: 'radial', colors: [ga('#7c3aed', 0.14), ga('#7c3aed', 0)], stops: [0, 1] },
+        type: 'container', alignment: 'center', offsetY: -20 * k,
+        width: 700 * k, height: 700 * k, borderRadius: 999,
+        opacity: 0.65 * worldIn, blur: 36,
+        gradient: { type: 'radial', colors: ['#407c3aed', '#007c3aed'] },
+      },
+      {
+        type: 'container', alignment: 'center', offsetY: 90 * k,
+        width: 980 * k, height: 360 * k, borderRadius: 999,
+        opacity: 0.32 * worldIn, blur: 50,
+        gradient: { type: 'radial', colors: ['#3322d3ee', '#0022d3ee'] },
       },
     ];
 
-    // ---- Faint gold edges (to the 2 nearest neighbours, each pair once) ------
-    for (var e = 0; e < NN; e++) {
-      var d1 = 1e18, d2 = 1e18, i1 = -1, i2 = -1;
-      for (var o = 0; o < NN; o++) {
-        if (o === e) continue;
-        var dx = pts[e].x - pts[o].x, dy = pts[e].y - pts[o].y;
-        var dd = dx * dx + dy * dy;
-        if (dd < d1) { d2 = d1; i2 = i1; d1 = dd; i1 = o; }
-        else if (dd < d2) { d2 = dd; i2 = o; }
-      }
-      var links = e % 3 === 0 ? [i1, i2] : [i1];
-      for (var l = 0; l < links.length; l++) {
-        var b = links[l];
-        if (b < 0 || b < e) continue;
-        var depth = (pts[e].sc + pts[b].sc) * 0.5;
+    // Deterministic star field: tiny crisp points, not large blurred comets.
+    for (var s = 0; s < 100; s++) {
+      var sx = ((s * 149.3) % 1840) - 920;
+      var sy = ((s * 83.7) % 1000) - 500;
+      var ss = s % 13 === 0 ? 3 : 2;
+      layers.push({
+        type: 'container', alignment: 'center',
+        width: ss * k, height: ss * k, borderRadius: 999,
+        offsetX: sx * k, offsetY: sy * k,
+        color: s % 5 === 0 ? '#7dd3fc' : '#ffffff',
+        opacity: (0.18 + 0.52 * shimmer(frame + s * 5, 44)) * worldIn,
+      });
+    }
+
+    layers.push({
+      type: 'text', alignment: 'topCenter', offsetY: 44 * k,
+      text: 'YOCLIP  /  FEATURE CONSTELLATION', opacity: worldIn,
+      style: { fontSize: 14 * k, color: '#7dd3fc', fontFamily: font, fontWeight: 700, letterSpacing: 4 * k },
+    });
+
+    // Elliptical tracks establish a deliberate, readable geometry.
+    var tracks = [
+      { w: 1320, h: 680, c: '#337c3aed', bw: 1.4, r: -7 },
+      { w: 1000, h: 500, c: '#4022d3ee', bw: 1.2, r: 10 },
+      { w: 590, h: 290, c: '#38a78bfa', bw: 1.2, r: -12 },
+    ];
+    for (var tr = 0; tr < tracks.length; tr++) {
+      layers.push({
+        type: 'container', alignment: 'center', offsetY: -20 * k,
+        width: tracks[tr].w * k, height: tracks[tr].h * k,
+        rotation: tracks[tr].r, borderRadius: 999,
+        borderColor: tracks[tr].c, borderWidth: tracks[tr].bw,
+        opacity: worldIn,
+      });
+    }
+
+    var labels = ['Scenes', '3D GPU', 'Golden tests', 'Audio', 'Studio', 'CLI', 'Timeline', 'Themes'];
+    var colors = ['#22d3ee', '#a78bfa', '#fbbf24', '#34d399', '#ec4899', '#7dd3fc', '#f97316', '#c4b5fd'];
+    var rx = 610 * k, ry = 292 * k;
+    var drift = frame * 0.0015;
+    for (var i = 0; i < labels.length; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / 4 + drift;
+      var x = Math.cos(a) * rx;
+      var y = Math.sin(a) * ry - 20 * k;
+      var nodeIn = ease(frame, 12 + i * 4, 30 + i * 4, eoBack);
+      var nodeW = (labels[i].length * 10 + 72) * k;
+
+      // Four restrained spokes connect the system without a radial web.
+      if (i % 2 === 0) {
+        var dist = Math.sqrt(x * x + y * y);
+        var start = 116 * k;
         layers.push({
-          type: 'container',
-          width: 1920,
-          height: 1080,
-          opacity: cap01(flyIn * 0.4 * depth),
-          child: {
-            type: 'path',
-            path: 'M ' + pts[e].x.toFixed(1) + ' ' + pts[e].y.toFixed(1) +
-                  ' L ' + pts[b].x.toFixed(1) + ' ' + pts[b].y.toFixed(1),
-            progress: 1,
-            color: '#b3862e',
-            strokeWidth: 1.5,
-            width: 1920,
-            height: 1080,
-            alignment: 'center',
-          },
+          type: 'container', alignment: 'center',
+          width: Math.max(1, dist - start - nodeW * 0.42), height: 1.2,
+          borderRadius: 999, rotation: Math.atan2(y, x) * 180 / Math.PI,
+          offsetX: Math.cos(a) * (start + (dist - start) * 0.5),
+          offsetY: Math.sin(a) * (start + (dist - start) * 0.5),
+          color: '#38a78bfa', opacity: cap01(nodeIn) * 0.65,
         });
       }
-    }
 
-    // ---- Nodes: soft glow + hot core ------------------------------------------
-    for (var n = 0; n < NN; n++) {
-      var p = pts[n];
-      var tw = 0.82 + 0.18 * Math.sin(frame * 0.06 + n * 1.7);
-      var size = (10 + 26 * p.deg) * p.sc * k;
       layers.push({
-        type: 'container',
-        alignment: 'center',
-        width: size * 3,
-        height: size * 3,
-        offsetX: p.x - 960,
-        offsetY: p.y - 540,
-        opacity: cap01(flyIn * tw * p.sc),
-        gradient: { type: 'radial', colors: [ga(p.c, 0.85), ga(p.c, 0)], stops: [0, 1] },
-      });
-      layers.push({
-        type: 'container',
-        alignment: 'center',
-        width: Math.max(2, size * 0.32),
-        height: Math.max(2, size * 0.32),
-        borderRadius: 999,
-        offsetX: p.x - 960,
-        offsetY: p.y - 540,
-        opacity: cap01(flyIn * tw),
-        color: '#ffffff',
-      });
-    }
-
-    // ---- Feature hub labels ----------------------------------------------------
-    var HUBS = [
-      { i: 3, label: 'Render' },
-      { i: 7, label: '3D GPU' },
-      { i: 9, label: 'Scenes' },
-      { i: 12, label: 'Audio' },
-      { i: 15, label: 'Studio' },
-      { i: 18, label: 'Timeline' },
-      { i: 22, label: 'Golden tests' },
-      { i: 25, label: 'Variants' },
-      { i: 28, label: 'Shorts' },
-      { i: 31, label: 'CLI' },
-      { i: 34, label: 'Effects' },
-      { i: 38, label: 'Locales' },
-      { i: 41, label: 'Themes' },
-    ];
-    for (var h = 0; h < HUBS.length; h++) {
-      var hp = pts[HUBS[h].i];
-      layers.push({
-        type: 'text',
-        alignment: 'center',
-        offsetX: hp.x - 960 + 16,
-        offsetY: hp.y - 540 - 26,
-        text: HUBS[h].label,
-        opacity: cap01(labelIn * hp.sc),
-        style: {
-          fontSize: 20 * k,
-          color: '#e8e4f8',
-          fontFamily: font,
-          fontWeight: 600,
-          letterSpacing: 2,
+        type: 'container', alignment: 'center', offsetX: x, offsetY: y,
+        width: nodeW, height: 64 * k,
+        scale: Math.max(0.001, nodeIn), opacity: cap01(nodeIn),
+        color: '#ed11172d', borderRadius: 999,
+        borderColor: ga(colors[i], 0.65), borderWidth: 1.5,
+        shadow: { color: ga(colors[i], 0.30), blur: 20, offsetX: 0, offsetY: 8 },
+        child: {
+          type: 'row', crossAxisAlignment: 'center',
+          children: [
+            { type: 'container', width: 18 * k },
+            { type: 'container', width: 10 * k, height: 10 * k, borderRadius: 999, color: colors[i] },
+            { type: 'container', width: 12 * k },
+            { type: 'text', text: labels[i], style: { fontSize: 19 * k, color: '#f3f0ff', fontFamily: font, fontWeight: 600, letterSpacing: 0.6 * k } },
+          ],
         },
       });
     }
 
-    // Caption chip.
+    // Traveling pulses make the map feel like a live render graph.
+    for (var p = 0; p < 3; p++) {
+      var pa = frame * 0.010 + p * Math.PI * 2 / 3;
+      layers.push({
+        type: 'container', alignment: 'center',
+        width: 10 * k, height: 10 * k, borderRadius: 999,
+        offsetX: Math.cos(pa) * 655 * k,
+        offsetY: Math.sin(pa) * 335 * k - 20 * k,
+        color: colors[p * 2], opacity: worldIn,
+        shadow: { color: ga(colors[p * 2], 0.8), blur: 16, offsetX: 0, offsetY: 0 },
+      });
+    }
+
+    // The brand hub lands first and remains the visual anchor.
+    var hub = pop(frame, 0, 20);
     layers.push({
-      type: 'text',
-      alignment: 'bottomCenter',
-      offsetY: -54 * k,
-      text: yoclipT('starmap').caption || 'Every feature, one constellation.',
-      opacity: cap01(labelIn),
-      style: {
-        fontSize: 24 * k,
-        color: '#9d94c4',
-        fontFamily: font,
-        letterSpacing: 6,
+      type: 'container', alignment: 'center', offsetY: -20 * k,
+      width: 320 * k, height: 132 * k,
+      scale: Math.max(0.001, hub.scale), opacity: hub.opacity,
+      color: '#f6f4ff', borderRadius: 30 * k,
+      borderColor: '#99ffffff', borderWidth: 1.5,
+      shadow: { color: '#807c3aed', blur: 44, offsetX: 0, offsetY: 18 },
+      child: {
+        type: 'row', crossAxisAlignment: 'center',
+        children: [
+          { type: 'container', width: 32 * k },
+          { type: 'image', source: 'external:yo_bubble', fit: 'contain', width: 70 * k, height: 70 * k },
+          { type: 'container', width: 16 * k },
+          { type: 'text', text: 'yoclip', style: { fontSize: 38 * k, color: '#20143d', fontFamily: font, fontWeight: 700, letterSpacing: -1 * k } },
+        ],
       },
     });
+    layers.push({
+      type: 'text', alignment: 'center', offsetY: 74 * k,
+      text: 'ONE RENDER GRAPH', opacity: worldIn,
+      style: { fontSize: 13 * k, color: '#a9a0cc', fontFamily: font, fontWeight: 700, letterSpacing: 3 * k },
+    });
+    layers.push({
+      type: 'text', alignment: 'bottomCenter', offsetY: -48 * k,
+      text: yoclipT('starmap').caption || 'Every feature, one constellation.',
+      opacity: ease(frame, 42, 68, eo3),
+      style: { fontSize: 24 * k, color: '#c2bade', fontFamily: font, letterSpacing: 3 * k },
+    });
 
-    return {
-      type: 'stack',
-      fit: 'expand',
-      opacity: fadeOut(frame, 138, 12),
-      children: layers,
-    };
+    return { type: 'stack', fit: 'expand', opacity: outro, children: layers };
   },
 };

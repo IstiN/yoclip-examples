@@ -30,6 +30,7 @@ scene = {
         type: 'container',
         width: size,
         height: size,
+        borderRadius: 999,
         alignment: 'center',
         offsetX: x,
         offsetY: y,

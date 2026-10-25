@@ -63,6 +63,12 @@ external_assets:
   yo_bubble:
     type: image
     path: assets/images/yo_bubble.svg
+  rocket_vector:
+    type: image
+    path: assets/images/rocket_vector.svg
+  satellite_vector:
+    type: image
+    path: assets/images/satellite_vector.svg
   golden_hook:
     type: image
     path: assets/goldens/hook.png

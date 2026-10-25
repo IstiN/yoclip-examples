@@ -215,7 +215,7 @@ scene = {
     var chatPanel = {
       type: 'container',
       alignment: portrait ? 'bottomCenter' : 'bottomRight',
-      offsetX: portrait ? 0 : lerp(0, -64, seg(frame, 90, 112)),
+      offsetX: portrait ? 0 : lerp(-48, -88, seg(frame, 90, 112)),
       offsetY: -48 - panelY,
       width: portrait ? 940 : 760,
       height: portrait ? 520 : 440,
@@ -226,7 +226,10 @@ scene = {
       clip: true,
       child: {
         type: 'container',
-        offsetX: 36,
+        // The auto-sized content is already centered in the 760px panel,
+        // leaving 36px on each side. An extra +36 pushed every row into the
+        // right clip edge (most visible on the blue user bubble).
+        offsetX: 0,
         // Content sits mid-panel while only the input exists, then docks
         // to the top as the conversation fills in (no sparse white box).
         offsetY: lerp(150, 40, seg(frame, 56, 100)),
@@ -313,7 +316,7 @@ scene = {
                     {
                       type: 'text',
                       text: userMsg,
-                      maxWidth: rowW - 48,
+                      maxWidth: rowW - 120,
                       textAlign: 'left',
                       margin: { top: 13, bottom: 13 },
                       style: { fontSize: portrait ? 26 : 28, color: '#ffffff', fontFamily: font },
@@ -322,6 +325,10 @@ scene = {
                     { type: 'container', height: 62 },
                   ],
                 },
+              }, {
+                // A real layout spacer, not a visual offset: the rounded
+                // bubble and its text stay inside the clipped white card.
+                type: 'container', width: 36, height: 1,
               }],
             },
             { type: 'container', height: 26 },
@@ -383,8 +390,8 @@ scene = {
     // Lands early (local ~90) so the screen never hangs half-empty; the
     // counters start ~18 frames before the card is fully in (animation
     // overlap), so the viewer never reads "0 0 0" on a settled card.
-    var cardPop = pop(frame, 90, 24);
-    var BAR_START = 104;
+    var cardPop = pop(frame, 76, 24);
+    var BAR_START = 90;
     var barTargets = [0.4, 0.62, 0.5, 0.78, 0.66, 0.92, 0.8, 1.0];
     var bars = [];
     for (var i = 0; i < 8; i++) {
@@ -405,7 +412,7 @@ scene = {
 
     function statNode(stat, idx) {
       var val = parseInt(stat[0], 10) || 0;
-      var shown = counter(frame, 96 + idx * 8, 30, 0, val);
+      var shown = counter(frame, 82 + idx * 6, 28, 0, val);
       return {
         type: 'column',
         crossAxisAlignment: 'center',
@@ -481,6 +488,50 @@ scene = {
       },
     };
 
+    // Keep a live scene manifest present while the user types; it
+    // crossfades into stats instead of leaving a blank left half. This is
+    // real vector UI, not a scaled screenshot with unreadable baked text.
+    var recallW = portrait ? 900 : 800;
+    var recallTitles = ['Hook & brand', 'Product deck', 'Space launch', 'Stats report'];
+    var recallSubs = ['01  ·  15 sec  ·  ready', '02  ·  6 scenes  ·  ready', '03  ·  vector world  ·  ready', '04  ·  agent edit'];
+    var recallRows = [];
+    for (var dr = 0; dr < recallTitles.length; dr++) {
+      recallRows.push({
+        type: 'container', width: recallW, height: portrait ? 92 : 82,
+        color: dr === 3 ? '#f4f1ff' : '#ffffff',
+        child: {
+          type: 'stack', fit: 'expand', children: [
+            { type: 'text', alignment: 'centerLeft', offsetX: 28, text: '0' + (dr + 1), style: { fontSize: 16, color: '#8b5cf6', fontFamily: font, fontWeight: 700 } },
+            { type: 'text', alignment: 'centerLeft', offsetX: 82, offsetY: -11, text: recallTitles[dr], style: { fontSize: 22, color: '#1f2937', fontFamily: font, fontWeight: 700 } },
+            { type: 'text', alignment: 'centerLeft', offsetX: 82, offsetY: 18, text: recallSubs[dr], style: { fontSize: 14, color: '#64748b', fontFamily: font } },
+            { type: 'text', alignment: 'centerLeft', offsetX: recallW - 142, text: dr === 3 ? (frame > 34 ? 'EDITING' : 'QUEUED') : 'READY', style: { fontSize: 13, color: dr === 3 ? '#7c3aed' : '#94a3b8', fontFamily: font, fontWeight: 700, letterSpacing: 1.2 } },
+            { type: 'container', alignment: 'bottomCenter', width: recallW - 48, height: 1, color: '#e8ecf4' },
+          ],
+        },
+      });
+    }
+    var deckRecall = {
+      type: 'container', alignment: portrait ? 'center' : 'centerLeft',
+      offsetX: portrait ? 0 : 90, offsetY: portrait ? -320 : -40,
+      width: recallW, height: portrait ? 506 : 450,
+      opacity: ease(frame, 0, 10, eo3) * (1 - seg(frame, 70, 88)),
+      color: '#ffffff', borderRadius: 24, clip: true,
+      borderColor: '#80ffffff', borderWidth: 1.5,
+      shadow: { color: '#4d0f2a44', blur: 54, offsetX: 0, offsetY: 24 },
+      child: {
+        type: 'column', mainAxisAlignment: 'center', crossAxisAlignment: 'start',
+        children: [{
+          type: 'container', width: recallW, height: 74, color: '#f5f7ff',
+          child: {
+            type: 'stack', fit: 'expand', children: [
+              { type: 'text', alignment: 'centerLeft', offsetX: 24, text: 'CURRENT DECK  /  LIVE', style: { fontSize: 14, color: '#475569', fontFamily: font, fontWeight: 700, letterSpacing: 1.4 } },
+              { type: 'text', alignment: 'centerLeft', offsetX: recallW - 164, text: '12 SCENES', style: { fontSize: 13, color: '#7c3aed', fontFamily: font, fontWeight: 700, letterSpacing: 1.2 } },
+            ],
+          },
+        }].concat(recallRows),
+      },
+    };
+
     return {
       type: 'stack',
       fit: 'expand',
@@ -499,6 +550,7 @@ scene = {
           },
         },
         { type: 'absolute_fill', color: '#12325b', opacity: 0.38 },
+        deckRecall,
         statsCard,
         chatPanel,
       ],

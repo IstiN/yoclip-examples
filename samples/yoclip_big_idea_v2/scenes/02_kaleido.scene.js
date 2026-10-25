@@ -35,7 +35,7 @@ scene = {
     var k = portrait ? 0.56 : 1.0;   // global coordinate scale for portrait
 
     // Elements fade in right behind the dissolving portal ring.
-    var worldIn = ease(frame, 2, 14, eo3);
+    var worldIn = 0.35 + 0.65 * ease(frame, 0, 9, eo3);
 
     function ga(hex, a) {
       var ah = Math.round(a * 255).toString(16);
@@ -63,6 +63,7 @@ scene = {
         alignment: 'center',
         width: n.w * k,
         height: n.h * k,
+        borderRadius: 999,
         offsetX: n.x * k + 18 * Math.sin(frame * 0.008 + n.ph),
         offsetY: n.y * k + 12 * Math.cos(frame * 0.006 + n.ph),
         opacity: worldIn,
@@ -114,6 +115,7 @@ scene = {
       alignment: 'center',
       width: 760 * k,
       height: 760 * k,
+      borderRadius: 999,
       opacity: worldIn,
       gradient: { type: 'radial', colors: [ga('#8b5cf6', 0.30), ga('#8b5cf6', 0)], stops: [0, 1] },
     });
@@ -187,154 +189,119 @@ scene = {
 
     // ---- GARGANTUA core: a black hole as a 2D composite ----------------------
     // (No GLSL here — the Schwarzschild look is approximated by layered
-    // vector parts.) Order matters: disk glow → back-half disk → lensed arcs
-    // → the void → photon ring → bright front-half disk with Doppler
-    // beaming (one side much hotter) → boost glow. Everything breathes:
-    // the brightness pattern swirls, radii jitter (turbulence). All paths
-    // live in a full-frame 1920x1080 box (the path widget clips to its own
-    // bounds), coordinates are screen-space.
+    // vector parts.) Layered elliptical bands, a true black horizon and a
+    // hot front rim create the lensed silhouette without stroked path
+    // segments (which read as spokes when normalized independently).
     var CY = -30 * k;                  // void center offset from screen center
     var VOID_R = 118 * k;
     var DISK_RX = 430 * k, DISK_RY = 118 * k;
 
-    function arcPath(cx, cy, rx, ry, a0, a1, steps) {
-      var pts = [];
-      for (var q = 0; q <= steps; q++) {
-        var th = a0 + (a1 - a0) * (q / steps);
-        pts.push((q === 0 ? 'M ' : 'L ') +
-          (cx + rx * Math.cos(th)).toFixed(1) + ' ' +
-          (cy + ry * Math.sin(th)).toFixed(1));
-      }
-      return pts.join(' ');
-    }
-    function gcol(t) {           // disk temperature: white → gold → orange → amber
-      if (t < 0.35) return hexLerp('#fff7e6', '#ffd27a', t / 0.35);
-      if (t < 0.7) return hexLerp('#ffd27a', '#ff9d3c', (t - 0.35) / 0.35);
-      return hexLerp('#ff9d3c', '#7a3a08', (t - 0.7) / 0.3);
-    }
     function cap01(x) { return Math.max(0, Math.min(1, x)); }
-    function pathLayer(path, color, width_, opacity, blur_) {
+    var swirl = frame * 0.02;
+    function diskBand(rx, ry, bw, color, op, blur_, dy) {
       var layer = {
-        type: 'container',
-        width: 1920,
-        height: 1080,
-        opacity: opacity,
-        child: {
-          type: 'path',
-          path: path,
-          progress: 1,
-          color: color,
-          strokeWidth: width_,
-          width: 1920,
-          height: 1080,
-          alignment: 'center',
-        },
+        type: 'container', alignment: 'center',
+        width: 2 * rx * k, height: 2 * ry * k,
+        offsetY: CY + (dy || 0) * k,
+        borderRadius: 999, borderColor: color, borderWidth: bw * k,
+        opacity: cap01(worldIn * op),
       };
       if (blur_) layer.blur = blur_;
       return layer;
     }
-
-    var SEGS = 28;
-    var swirl = frame * 0.02;            // slow drift of the bright side
-    // Pass 0: the accretion band — 3 thick blurred ellipse rings (a real
-    // glowing band, not strands), a dark mask dimming the far side, and a
-    // hot fireball on the approaching side (Doppler beaming).
-    var BANDS = [
-      { rx: 300, ry: 82, bw: 9, c: '#fff3d6', o: 0.95 },
-      { rx: 380, ry: 100, bw: 30, c: '#ffd27a', o: 0.55 },
-      { rx: 415, ry: 110, bw: 22, c: '#ff9d3c', o: 0.5 },
-      { rx: 450, ry: 122, bw: 14, c: '#b35c14', o: 0.45 },
-    ];
-    for (var bd = 0; bd < BANDS.length; bd++) {
-      var B = BANDS[bd];
-      layers.push({
-        type: 'container',
-        alignment: 'center',
-        width: 2 * B.rx * k,
-        height: 2 * B.ry * k,
-        offsetY: CY,
-        borderRadius: 999,
-        borderColor: B.c,
-        borderWidth: B.bw * k,
-        opacity: cap01(worldIn * B.o),
-        blur: 10,
-      });
-    }
-    // Dim-side mask: a soft black blob swallowing the receding half.
+    // Broad atmospheric bands: nested, blurred ellipses make a continuous
+    // accretion disk rather than a bundle of radial line segments.
+    layers.push(diskBand(460, 128, 30, '#b35c14', 0.26, 20, 0));
+    layers.push(diskBand(420, 112, 34, '#ff9d3c', 0.42, 13, 0));
+    layers.push(diskBand(372, 96, 19, '#ffd27a', 0.72, 7, 0));
+    layers.push(diskBand(308, 80, 7, '#fff3d6', 0.96, 2, 0));
     layers.push({
-      type: 'container',
-      alignment: 'center',
-      width: 620 * k,
-      height: 400 * k,
-      offsetX: -Math.cos(swirl) * DISK_RX * 0.5,
-      offsetY: CY - Math.sin(swirl) * DISK_RY * 0.5,
-      opacity: cap01(worldIn * 0.55),
-      blur: 40,
-      color: '#050208',
+      type: 'container', alignment: 'center',
+      width: 790 * k, height: 34 * k, offsetY: CY,
+      borderRadius: 999, opacity: cap01(worldIn * 0.84), blur: 3,
+      gradient: {
+        type: 'linear', begin: 'centerLeft', end: 'centerRight',
+        colors: ['#00ff9d3c', '#ccff9d3c', '#fff7e6', '#b3ffd27a', '#00ff9d3c'],
+        stops: [0, 0.22, 0.47, 0.75, 1],
+      },
     });
-
-    // Pass 1: crisp BACK half (behind the void).
-    for (var b2 = 0; b2 < SEGS / 2; b2++) {
-      var bt0 = Math.PI + (b2 / (SEGS / 2)) * Math.PI;
-      var bt1 = Math.PI + ((b2 + 1) / (SEGS / 2)) * Math.PI;
-      var btm = (bt0 + bt1) / 2;
-      var bb = 0.35 + 0.65 * Math.cos(btm - swirl);
-      layers.push(pathLayer(
-        arcPath(960, 540 + CY, DISK_RX, DISK_RY, bt0, bt1, 4),
-        gcol(b2 / (SEGS / 2)), 5 * k, cap01(worldIn * Math.max(0, bb) * 0.7)));
-    }
-    // Lensed arcs: the disk's far side bent over and under the horizon.
-    for (var la = 0; la < 2; la++) {
-      var flip = la === 0 ? -1 : 1;
-      layers.push(pathLayer(
-        arcPath(960, 540 + CY + flip * VOID_R * 0.96, VOID_R * 1.55, VOID_R * 0.45, Math.PI * 1.06, Math.PI * 1.94, 24),
-        '#ffe9c0', 6 * k, cap01(worldIn * (0.7 + 0.15 * Math.sin(frame * 0.2 + la * 2))), 4));
-    }
-    // The void: pure black horizon.
+    // Receding-side shadow and the tall relativistic halo.
     layers.push({
-      type: 'container',
-      alignment: 'center',
-      width: 2 * VOID_R,
-      height: 2 * VOID_R,
-      offsetY: CY,
-      borderRadius: 999,
-      opacity: worldIn,
-      color: '#000000',
+      type: 'container', alignment: 'center',
+      width: 620 * k, height: 400 * k,
+      offsetX: -Math.cos(swirl) * DISK_RX * 0.48,
+      offsetY: CY - Math.sin(swirl) * DISK_RY * 0.42,
+      opacity: cap01(worldIn * 0.52), blur: 44, color: '#050208', borderRadius: 999,
     });
-    // Photon ring: crisp white-gold circle hugging the horizon + glow.
-    layers.push(pathLayer(
-      arcPath(960, 540 + CY, VOID_R * 1.05, VOID_R * 1.05, 0, 2 * Math.PI, 64),
-      '#ffe9b8', 10 * k, cap01(worldIn * 0.9), 5));
-    layers.push(pathLayer(
-      arcPath(960, 540 + CY, VOID_R * 1.05, VOID_R * 1.05, 0, 2 * Math.PI, 64),
-      '#fff3d6', 3 * k, cap01(worldIn)));
-    // Pass 2: crisp FRONT half with Doppler beaming (the swirl side burns).
-    for (var f = 0; f < SEGS / 2; f++) {
-      var ft0 = (f / (SEGS / 2)) * Math.PI;
-      var ft1 = ((f + 1) / (SEGS / 2)) * Math.PI;
-      var ftm = (ft0 + ft1) / 2;
-      var fb = 0.35 + 0.65 * Math.cos(ftm - swirl) + 0.1 * Math.sin(frame * 0.33 + f * 2.1);
-      layers.push(pathLayer(
-        arcPath(960, 540 + CY, DISK_RX * (1 + 0.05 * Math.sin(f * 2.3 + frame * 0.1)), DISK_RY, ft0, ft1, 4),
-        gcol(f / (SEGS / 2)), 6 * k, cap01(worldIn * Math.max(0, fb) * 1.0)));
-    }
-    // Doppler boost: a soft white fireball on the approaching side.
     layers.push({
-      type: 'container',
-      alignment: 'center',
-      width: 300 * k,
-      height: 300 * k,
-      width: 420 * k,
-      height: 420 * k,
+      type: 'container', alignment: 'center',
+      width: 3.28 * VOID_R, height: 3.28 * VOID_R, offsetY: CY,
+      borderRadius: 999, borderColor: '#80ffd27a', borderWidth: 5 * k,
+      opacity: cap01(worldIn * 0.52), blur: 7,
+    });
+    // Doppler glow sits behind the horizon so the void always stays black.
+    layers.push({
+      type: 'container', alignment: 'center',
+      width: 420 * k, height: 420 * k, borderRadius: 999,
       offsetX: Math.cos(swirl) * DISK_RX * 0.62,
       offsetY: CY + Math.sin(swirl) * DISK_RY * 0.62,
-      opacity: cap01(worldIn * 0.6),
-      gradient: { type: 'radial', colors: ['#b3fff3e0', '#00ffd27a'], stops: [0, 1] },
+      opacity: cap01(worldIn * 0.52),
+      gradient: { type: 'radial', colors: ['#b3fff3e0', '#00ffd27a'] },
     });
+    // Pure black event horizon, then the razor-thin photon sphere.
+    layers.push({
+      type: 'container', alignment: 'center',
+      width: 2 * VOID_R, height: 2 * VOID_R, offsetY: CY,
+      borderRadius: 999, opacity: worldIn, color: '#000000',
+    });
+    layers.push({
+      type: 'container', alignment: 'center',
+      width: 2.12 * VOID_R, height: 2.12 * VOID_R, offsetY: CY,
+      borderRadius: 999, borderColor: '#ffe9b8', borderWidth: 11 * k,
+      opacity: cap01(worldIn * 0.72), blur: 8,
+    });
+    layers.push({
+      type: 'container', alignment: 'center',
+      width: 2.10 * VOID_R, height: 2.10 * VOID_R, offsetY: CY,
+      borderRadius: 999, borderColor: '#fff3d6', borderWidth: 3 * k,
+      opacity: worldIn,
+    });
+    // Hot front rim crossing the lower horizon; transparent ends and a
+    // slim white core keep it photographic rather than cartoonish.
+    layers.push({
+      type: 'container', alignment: 'center',
+      width: 680 * k, height: 64 * k, offsetY: CY + 68 * k,
+      borderRadius: 999, opacity: cap01(worldIn * 0.68),
+      gradient: { type: 'radial', colors: ['#a6ffd27a', '#00ffd27a'] },
+    });
+    layers.push({
+      type: 'container', alignment: 'center',
+      width: 650 * k, height: 20 * k, offsetY: CY + 72 * k,
+      borderRadius: 999, opacity: cap01(worldIn * 0.96), blur: 2,
+      gradient: {
+        type: 'linear', begin: 'centerLeft', end: 'centerRight',
+        colors: ['#00ff9d3c', '#d9ff9d3c', '#fff7e6', '#ccffd27a', '#00ff9d3c'],
+        stops: [0, 0.24, 0.46, 0.74, 1],
+      },
+    });
+    // Small hot grains travel with the disk and add scale to the glow.
+    for (var dg = 0; dg < 22; dg++) {
+      var da2 = dg * 2.399 + frame * 0.006;
+      var dr = 300 + (dg % 5) * 31;
+      layers.push({
+        type: 'container', alignment: 'center',
+        width: (2 + dg % 3) * k, height: (2 + dg % 3) * k,
+        borderRadius: 999,
+        offsetX: Math.cos(da2) * dr * k,
+        offsetY: CY + Math.sin(da2) * dr * 0.27 * k,
+        color: dg % 4 === 0 ? '#ffffff' : '#ffd27a',
+        opacity: cap01(worldIn * (0.3 + 0.65 * shimmer(frame + dg * 5, 30))),
+      });
+    }
 
     // Beat 1: the portal ring handed off from 01_monolith expands past the
     // frame and dissolves (fast — a slow dissolve reads as a feeble ring).
-    var ringOut = seg(frame, 0, 10);
+    var ringOut = seg(frame, 0, 8);
     if (ringOut < 1) {
       layers.push({
         type: 'container',
@@ -350,7 +317,7 @@ scene = {
       layers.push({
         type: 'container',
         color: '#ffffff',
-        opacity: 0.85 * (1 - seg(frame, 0, 10)),
+        opacity: 0.65 * (1 - seg(frame, 0, 8)),
       });
     }
 

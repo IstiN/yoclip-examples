@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 360" width="240" height="360">
+  <defs>
+    <linearGradient id="body" x1="54" y1="80" x2="188" y2="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.42" stop-color="#e7eefc"/>
+      <stop offset="0.72" stop-color="#a9b8d4"/>
+      <stop offset="1" stop-color="#61708e"/>
+    </linearGradient>
+    <linearGradient id="nose" x1="84" y1="35" x2="164" y2="115" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c4b5fd"/>
+      <stop offset="0.48" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#4c1d95"/>
+    </linearGradient>
+    <linearGradient id="fin" x1="40" y1="205" x2="186" y2="302" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a78bfa"/>
+      <stop offset="0.55" stop-color="#6d28d9"/>
+      <stop offset="1" stop-color="#312e81"/>
+    </linearGradient>
+    <radialGradient id="glass" cx="0" cy="0" r="1" gradientTransform="translate(104 124) rotate(48) scale(48)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e0f2fe"/>
+      <stop offset="0.28" stop-color="#67e8f9"/>
+      <stop offset="0.68" stop-color="#0891b2"/>
+      <stop offset="1" stop-color="#164e63"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="90" y1="250" x2="150" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#cbd5e1"/>
+      <stop offset="0.5" stop-color="#64748b"/>
+      <stop offset="1" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <path d="M75 185 C48 208 31 255 27 307 L83 275 L96 220 Z" fill="url(#fin)"/>
+  <path d="M165 185 C192 208 209 255 213 307 L157 275 L144 220 Z" fill="url(#fin)"/>
+  <path d="M120 15 C82 54 69 119 72 219 L75 254 Q120 274 165 254 L168 219 C171 119 158 54 120 15 Z" fill="url(#body)"/>
+  <path d="M120 15 C91 44 78 78 74 116 Q120 91 166 116 C162 78 149 44 120 15 Z" fill="url(#nose)"/>
+  <path d="M84 105 C78 145 79 208 84 239" fill="none" stroke="#ffffff" stroke-opacity="0.72" stroke-width="7" stroke-linecap="round"/>
+  <path d="M157 124 C160 166 158 213 153 241" fill="none" stroke="#334155" stroke-opacity="0.22" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="120" cy="143" r="39" fill="#27334b"/>
+  <circle cx="120" cy="143" r="31" fill="url(#glass)"/>
+  <circle cx="120" cy="143" r="31" fill="none" stroke="#cffafe" stroke-opacity="0.72" stroke-width="2"/>
+  <path d="M101 130 Q111 116 127 119" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="6" stroke-linecap="round"/>
+  <path d="M91 211 Q120 222 149 211 L147 228 Q120 238 93 228 Z" fill="#7c3aed" opacity="0.9"/>
+  <path d="M91 252 L149 252 L141 292 Q120 304 99 292 Z" fill="url(#metal)"/>
+  <path d="M101 275 L139 275 L134 309 Q120 318 106 309 Z" fill="#111827"/>
+  <path d="M106 285 L134 285 L130 303 Q120 309 110 303 Z" fill="#22d3ee" opacity="0.7"/>
+</svg>

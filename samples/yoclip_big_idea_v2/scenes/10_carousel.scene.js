@@ -88,6 +88,8 @@ scene = {
             type: 'container',
             alignment: 'center',
             offsetY: 150,
+            width: 330,
+            height: 64,
             gradient: {
               colors: [primaryLight, primary],
               begin: 'centerLeft',
@@ -98,7 +100,6 @@ scene = {
             child: {
               type: 'text',
               text: 'Render free draft',
-              margin: { left: 34, right: 34, top: 15, bottom: 15 },
               style: { fontSize: 26, color: '#ffffff', fontFamily: font, fontWeight: 700 },
             },
           },
@@ -114,8 +115,9 @@ scene = {
       type: 'container',
       alignment: 'center',
       offsetY: portrait ? -360 : -310,
-      // Explicit width — a container > row stretches to the frame otherwise.
+      // Fixed pill geometry; width-only containers fill the lower frame.
       width: portrait ? 340 : 380,
+      height: 62,
       opacity: chipOp,
       scale: Math.max(0.05, chipPop.scale * (1 - 0.1 * chipDip)),
       color: '#ffffff',
@@ -168,9 +170,9 @@ scene = {
         return {
           type: 'container',
           alignment: 'center',
-          width: 12,
-          height: 52,
-          borderRadius: 6,
+          width: 16,
+          height: 92,
+          borderRadius: 8,
           rotation: rot,
           color: figure,
         };
@@ -195,10 +197,15 @@ scene = {
             {
               type: 'container',
               alignment: 'center',
-              width: 18,
-              height: 18,
+              width: 24,
+              height: 24,
               borderRadius: 999,
               color: '#ffffff',
+            },
+            {
+              type: 'text', alignment: 'bottomCenter', offsetY: -18,
+              text: 'MAKE IT MOVE',
+              style: { fontSize: 13, color: '#994c1d95', fontFamily: font, fontWeight: 700, letterSpacing: 2.4 },
             },
           ],
         },
@@ -363,14 +370,12 @@ scene = {
                 },
               ],
             },
-            // Content area — wrapped in a scale container so the zoomed
-            // card's content grows with the card (same zoom factor)
-            // instead of staying a fixed 286x196 island.
+            // The parent card already scales its whole subtree during the
+            // zoom. A second scale here caused a 2.4x content blowout.
             {
               type: 'container',
               alignment: 'center',
               offsetY: 4,
-              scale: i === ZOOMED ? lerp(1, portrait ? 1.35 : 1.55, zoom) : 1,
               child: contents[i],
             },
             // Footer: heart + count, comment, share.
@@ -435,6 +440,7 @@ scene = {
       alignment: 'center',
       offsetY: portrait ? 420 : 330,
       width: portrait ? 320 : 360,
+      height: 64,
       opacity: shareOp,
       scale: Math.max(0.05, sharePop.scale * (1 - 0.08 * shareDip)),
       gradient: {
@@ -446,6 +452,7 @@ scene = {
       shadow: { color: '#662563eb', blur: 26, offsetX: 0, offsetY: 10 },
       child: {
         type: 'row',
+        mainAxisAlignment: 'center',
         crossAxisAlignment: 'center',
         children: [
           { type: 'container', width: 28 },
@@ -476,6 +483,8 @@ scene = {
       type: 'container',
       alignment: 'bottomCenter',
       offsetY: portrait ? -54 : -46,
+      width: 480,
+      height: 64,
       opacity: capPop.opacity,
       scale: Math.max(0.05, capPop.scale),
       color: '#1f2937',
@@ -484,7 +493,6 @@ scene = {
       child: {
         type: 'text',
         text: follow,
-        margin: { left: 32, right: 32, top: 15, bottom: 15 },
         style: { fontSize: 25, color: '#ffffff', fontFamily: font, fontWeight: 600 },
       },
     };
@@ -520,7 +528,6 @@ scene = {
     return {
       type: 'stack',
       fit: 'expand',
-      opacity: life,
       children: [
         // Same pastel world as 09 — the transition reads as a transform.
         { type: 'container', color: '#fdf6ec' },
@@ -535,9 +542,11 @@ scene = {
             colors: ['#bcd7f0', '#8fb8dd'],
           },
         },
-        hero,
-        turnChip,
-      ].concat(cards, [sharePill, followChip, cursor]),
+        {
+          type: 'stack', fit: 'expand', opacity: life,
+          children: [hero, turnChip].concat(cards, [sharePill, followChip, cursor]),
+        },
+      ],
     };
   },
 };

@@ -88,7 +88,7 @@ scene = {
     var L_TOP = 3.5373;           // l-stem top in logo space (layout)
     var L_W = 0.342;              // l-stem width in logo space (layout)
     var SETTLE = 1.15;            // lgrad entry scale (matches glSc below)
-    var colAlive = frame < 50 ? 1 : 0;
+    var colAlive = 1 - seg(frame, 50, 64);
     var vs = Math.max(0.001, monoIn * lerp(1, (L_TOP - L_BOT) * SETTLE / 3.3, morph) * colAlive);
     var monoX = lerp(0, L_X, morph);
     // Base lifts from the dune to the stem bottom (scaled by the settle) so
@@ -117,116 +117,6 @@ scene = {
       cumH += h12;
     }
 
-    // ---- Logo assembly: the "l" is ONE continuous element ------------------
-    // The column, the gradient "l" and the white "l" are the SAME object at
-    // the SAME slot. Every handoff is a same-place, full-scale, single-frame
-    // swap (plus a small settle bump), so on video it reads as one element
-    // transforming — never two models at once, never a gap, never anything
-    // flying in from the side:
-    // 1) 30–48f  the column slides onto the l-stem slot.
-    // 2) 50f     column → gradient "l" (swap + settle bump 50–58f).
-    // 3) 66–77f  the Yo bubble swells as a blob pinned to that "l".
-    // 4) 77f     the blob detaches — in the same instant the "l" turns WHITE
-    //    in place (identical geometry, identical scale: a pure recolor with
-    //    a pulse 77–89f, as if the color drained into the blob).
-    // 5) 77–104f the blob slides left into its slot, liquid squash & stretch.
-    // 6) 100–136f arc/i/p slide out of the "l"; the dot drops 128–142f.
-    var logoModels = [];
-    var PART_CX = { arc: -1.72, bubble: -1.06, l: 0.94, i: 1.58, idot: 1.58, p: 2.9 };
-
-    // The gradient "l" (skyscraper colors): full scale from frame 50, with a
-    // small landing settle so the swap reads as a morph, not a cut.
-    var glSc = (frame >= 50 && frame < 77)
-      ? 1 + 0.15 * (1 - eo3(seg(frame, 50, 58)))
-      : 0;
-    if (glSc > 0) {
-      logoModels.push({
-        modelId: 'lgrad',
-        src: 'models/logo/lgrad.glb',
-        unlit: true,
-        position: [0, logoY, 0],
-        scale: [glSc, glSc, glSc],
-      });
-    }
-
-    // The DRIP: a droplet of color gathers ON THE TIP of the "l" stem,
-    // swells there (~30% of the beat), then detaches and flies left into
-    // the icon slot, growing to the full Yo bubble with liquid squash &
-    // stretch. The pin is scale-aware: the bubble's center sits at
-    // (1.0604 left, 2.2816 up) of its origin (build_logo_3d layout), so to
-    // keep it exactly on the stem tip (x = L_X, y = 3.3) at ANY scale the
-    // position compensates by the scaled offset. Mid-flight the blob also
-    // bulges toward the camera (z) — no coplanar z-fighting with the stem.
-    var drip = seg(frame, 66, 104);
-    if (drip > 0) {
-      var de = eio3(seg(drip, 0.3, 1));         // travel phase (starts at 30%)
-      var dsc = lerp(0.05, 1, eio3(seg(drip, 0, 0.75)));
-      var squash = Math.sin(de * Math.PI);      // mid-flight bulge
-      // Pinned phase: world center = stem top (2.46) + half the scaled
-      // bubble height - 0.15 overlap, so the droplet's bottom always dips
-      // INTO the stem tip — attached at any scale. (Bubble center sits at
-      // 1.0604 left / 2.2816 up of its origin, extents y 2.5114 — layout.)
-      logoModels.push({
-        modelId: 'bubble',
-        src: 'models/logo/bubble.glb',
-        unlit: true,
-        position: [
-          lerp(L_X + 1.0604 * dsc, 0, de),
-          lerp(2.31 - 1.0256 * dsc, logoY, de),
-          0.3 * squash,
-        ],
-        rotation: [0, 0, lerp(-8, 0, de)],
-        scale: [dsc * (1 + 0.14 * squash), dsc * (1 - 0.11 * squash), dsc],
-      });
-    }
-
-    function logoPart(id, start) {
-      var p = seg(frame, start, start + 16);
-      if (p <= 0) return;
-      var e = eo3(p);
-      var sc = Math.max(0.001, eoBack(p));
-      var rise = (1 - e) * -0.5;
-      var emergeX = (1 - e) * (L_X - PART_CX[id]);
-      logoModels.push({
-        modelId: id,
-        src: 'models/logo/' + id + '.glb',
-        unlit: true,
-        position: [emergeX, logoY + rise, 0],
-        scale: [sc, sc, sc],
-      });
-    }
-    logoPart('arc', 100);  // slides out of the "l" once the blob has landed
-    // The WHITE l: the same "l" recolored in place at frame 77 — the moment
-    // the blob detaches. Identical geometry, identical slot, full scale; a
-    // sine pulse sells the recolor as energy released into the blob.
-    var wlSc = frame >= 77
-      ? 1 + 0.1 * Math.sin(seg(frame, 77, 89) * Math.PI)
-      : 0;
-    if (wlSc > 0) {
-      logoModels.push({
-        modelId: 'l',
-        src: 'models/logo/l.glb',
-        unlit: true,
-        position: [0, logoY, 0],
-        scale: [wlSc, wlSc, wlSc],
-      });
-    }
-    logoPart('i', 110);
-    logoPart('p', 120);
-    // The "i" dot: drops in from above after the letters land, bounces once
-    // on the stem and stays STATIC (no pulsing) — its HDR-white center is
-    // the portal the camera later dives into.
-    var idotP = seg(frame, 128, 142);
-    if (idotP > 0) {
-      var drop = 1 - eo3(idotP);
-      logoModels.push({
-        modelId: 'idot',
-        src: 'models/logo/idot.glb',
-        unlit: true,
-        position: [0, logoY + drop * 2.2, 0],
-        scale: [1, 1, 1],
-      });
-    }
 
     // ---- Camera ------------------------------------------------------------
     // Frames the wordmark's visual center (LOGO_CX), not the world origin —
@@ -246,6 +136,17 @@ scene = {
     camZ = lerp(camZ, 2.3, fly);
     tgtX = lerp(tgtX, DOT_X, fly);
     tgtY = lerp(tgtY, DOT_Y, fly);
+
+    // Vector brand assembly: the original SVG resolves from the column,
+    // then the camera dive tracks the actual i-dot coordinates inside the
+    // SVG viewBox. This preserves the portal handoff without flame GLBs.
+    var markW = portrait ? 620 : 940;
+    var markH = Math.round(markW * 520 / 820);
+    var markAssemble = ease(frame, 50, 120, eio3);
+    var markScale = (0.52 + 0.48 * markAssemble) * (1 + 4.5 * fly);
+    var markOp = seg(frame, 48, 62);
+    var markX = -0.165 * markW * markScale * fly;
+    var markY = 40 * (1 - fly) + 0.146 * markH * markScale * fly;
 
     // ---- 2D sky, sun, stars -------------------------------------------------
     var layers = [
@@ -268,6 +169,7 @@ scene = {
         alignment: 'center',
         width: 1500,
         height: 620,
+        borderRadius: 999,
         offsetX: -380,
         offsetY: 260,
         opacity: worldIn,
@@ -282,6 +184,7 @@ scene = {
         alignment: 'center',
         width: 1000,
         height: 1000,
+        borderRadius: 999,
         offsetX: -380,
         offsetY: 240,
         opacity: worldIn,
@@ -338,20 +241,16 @@ scene = {
         opacity: worldIn,
       },
       {
+        type: 'image', source: 'external:logo_on_light', fit: 'contain',
+        alignment: 'center', width: markW, height: markH,
+        offsetX: markX, offsetY: markY,
+        scale: markScale, opacity: markOp,
+      },
+      {
         type: 'scene3d',
         meshes: meshes,
         camera: { position: [camX, camY, camZ], target: [tgtX, tgtY, tgtZ], fov: 50 },
         light: { direction: [-0.35, -0.6, 0.7] },
-      },
-      // The real logo in 3D (GLB parts) — GPU flame layer over the dunes.
-      {
-        type: 'scene3d',
-        engine: 'flame',
-        id: 'v2-logo',
-        time: frame / 30,
-        camera: { position: [camX, camY, camZ], target: [tgtX, tgtY, tgtZ], fov: 50 },
-        light: { ambient: 1.7, diffuse: 1.4, position: [4, 6, 6] },
-        models: logoModels,
       },
     ];
 

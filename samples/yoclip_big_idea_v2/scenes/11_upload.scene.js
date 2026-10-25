@@ -164,8 +164,10 @@ scene = {
       type: 'container',
       alignment: 'center',
       offsetY: chipY,
-      // Explicit width — a container > row stretches to the window otherwise.
+      // Both dimensions are required: width-only containers can stretch
+      // vertically to the dropzone and become a giant purple slab.
       width: 460,
+      height: 76,
       opacity: seg(frame, 26, 30) * (1 - seg(frame, 100, 112)),
       color: '#241d3d',
       borderRadius: 14,

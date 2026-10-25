@@ -69,6 +69,7 @@ scene = {
         alignment: 'center',
         width: sz * 3,
         height: sz * 3,
+        borderRadius: 999,
         offsetX: d.x - 960,
         offsetY: d.y - 540,
         opacity: cap01(worldIn * tw * (front ? 1 : 0.35)),
@@ -93,6 +94,7 @@ scene = {
         alignment: 'center',
         width: R * 2.6,
         height: R * 2.6,
+        borderRadius: 999,
         offsetY: CY - 540,
         opacity: cap01(worldIn * 0.6),
         gradient: { type: 'radial', colors: [ga('#3b82f6', 0.22), ga('#3b82f6', 0)], stops: [0.55, 1] },
@@ -136,6 +138,18 @@ scene = {
       });
     }
 
+    // Longitude ellipses complete the wireframe so the disc reads as a
+    // rotating globe rather than a flat blue ball.
+    for (var lon = 0; lon < 3; lon++) {
+      layers.push({
+        type: 'container', alignment: 'center',
+        width: 2 * R * (0.30 + lon * 0.28), height: 2 * R,
+        offsetY: CY - 540, borderRadius: 999,
+        borderColor: lon === 1 ? '#3d7dd3fc' : '#3d6fd8', borderWidth: 1,
+        opacity: cap01(worldIn * 0.16),
+      });
+    }
+
     // Front dots.
     for (var f = 0; f < frontDots.length; f++) layers.push(dotLayer(frontDots[f], true));
 
@@ -175,8 +189,10 @@ scene = {
         offsetX: chipX,
         offsetY: chipY + (CY - 540),
         scale: Math.max(0.001, chipIn),
-        // Explicit width — a container > row stretches to the frame.
+        // Fixed pill geometry; without height the chips became full-height
+        // glass columns that hid the globe.
         width: (CHIPS[ch].length * 15 + 78) * k,
+        height: 58 * k,
         color: '#d90e1628',
         borderColor: '#59729fd8',
         borderWidth: 1.5,

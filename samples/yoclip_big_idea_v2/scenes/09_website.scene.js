@@ -198,6 +198,9 @@ scene = {
         {
           type: 'container',
           margin: { top: 36 },
+          width: 360,
+          height: 68,
+          alignment: 'center',
           opacity: ctaPop.opacity,
           scale: ctaPop.scale,
           gradient: {
@@ -210,7 +213,6 @@ scene = {
           child: {
             type: 'text',
             text: cta,
-            margin: { left: 40, right: 40, top: 18, bottom: 18 },
             style: { fontSize: portrait ? 26 : 29, color: '#ffffff', fontFamily: font, fontWeight: 700 },
           },
         },

@@ -29,7 +29,7 @@ scene = {
     var t = yoclipT('tunnel');
     var tagline = t.tagline || 'Your big idea. In code.';
     var portrait = yoclipIsPortrait();
-    var life = presence(frame, 6, 116, 10);
+    var life = presence(frame, 6, 149, 10);
 
     var font = yoclipFont();
     var txt = yoclipColor('text', '#ffffff');
