@@ -1,0 +1,68 @@
+config:
+  duration: 1520
+  fps: 30
+  width: 1080
+  height: 1920
+  background: '#05060d'
+
+project_js: project.js
+
+# Вертикальный лирик-клип (TikTok / Reels / Shorts), 1080x1920 @ 30fps.
+# Музыка: сегмент 1:40 -> конец трека (50.425 c), 76 BPM.
+# Синк: forced alignment слов (Gemini 2.5 Pro) -> lib/timing.js, 16 строк = 16 сцен.
+# Фоновый пульс: 76 BPM, 1 бит = 23.684 кадра.
+
+fonts:
+  - family: SS3 Black
+    path: assets/fonts/SourceSans3-Black.ttf
+  - family: SS3 Bold
+    path: assets/fonts/SourceSans3-Bold.ttf
+  - family: SS3
+    path: assets/fonts/SourceSans3-Regular.ttf
+
+external_assets:
+  grade0:
+    type: image
+    path: assets/images/grade0.png
+  grade1:
+    type: image
+    path: assets/images/grade1.png
+  grade2:
+    type: image
+    path: assets/images/grade2.png
+  silhouette:
+    type: image
+    path: assets/images/silhouette.png
+
+audio:
+  tracks:
+    - source: assets://audio/track_from_1_40.mp3
+      start: 0
+      volume: 1.0
+
+theme:
+  colors:
+    background: '#05060d'
+    text: '#ffffff'
+    primary: '#8b5cf6'
+    accent: '#b6ff2e'
+
+scenes:
+  - scenes/00_bg.scene.js
+  - scenes/01_frequency.scene.js
+  - scenes/02_mirror.scene.js
+  - scenes/03_diagnosis.scene.js
+  - scenes/04_demo.scene.js
+  - scenes/05_camera.scene.js
+  - scenes/06_mic.scene.js
+  - scenes/07_tee.scene.js
+  - scenes/08_daw.scene.js
+  - scenes/09_champion.scene.js
+  - scenes/10_iphone.scene.js
+  - scenes/11_concert.scene.js
+  - scenes/12_mama.scene.js
+  - scenes/13_champion2.scene.js
+  - scenes/14_iphone2.scene.js
+  - scenes/15_concert2.scene.js
+  - scenes/16_mama2.scene.js
+  - scenes/90_overlay.scene.js
