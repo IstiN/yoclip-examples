@@ -31,6 +31,8 @@ scene = {
         offsetY: y,
         gradient: {
           type: 'radial',
+          center: 'center',
+          radius: 0.5,
           colors: [yoclipColorA(key, alpha * boost, fallback), yoclipColorA(key, 0, fallback)],
           stops: [0, 1],
         },

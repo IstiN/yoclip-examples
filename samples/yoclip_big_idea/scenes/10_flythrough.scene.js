@@ -1,22 +1,14 @@
-// 10 — Fly-through: the tunnel drop into the finale.
+// 10 — Fly-through: a pure-vector render-space tunnel.
 //
-// Reference beat (Gamma 73–78s): a dive through a tunnel of glowing square
-// rings with the helmet (yoclip's 3D mascot probe) tumbling at the center.
-// The rings are 4 thin meshCube bars each, spaced along -Z; the camera
-// dolly is faked by moving the rings +Z with modulo wraparound, shrinking
-// the far ones. Around frame 150 the tagline fades in with expanding
-// letter-spacing while the 3D layer dims behind it.
-//
-// Renderer notes: 3D fills its tight stack slot (width/height/
-// alignment ignored) — motion comes from per-frame meshes/camera. Mesh
-// colors carry no alpha, so depth fade is faked with scale. Flat Lambert
-// shading: brightness is mesh color x light direction, so the helmet gets
-// a near-white tint and a light pointing at the camera.
+// Perspective is expressed with scale, depth opacity and outward-moving
+// particles. Floating scene files and a suspended yoclip mark give the tunnel
+// a subject; the final tagline takes over without any scene3d/GLB viewport
+// artifacts. All geometry remains sharp at 1920×1080 and in portrait.
 
 scene = {
   id: 'flythrough',
   duration: 216,
-  description: '3D setpiece: a tunnel of ~10 square rings (4 meshCube bars each, primary/accent/primaryLight) flows toward the camera with modulo wraparound, the GLB helmet tumbles on axis at the center tinted near-white lavender, camera sways gently around the axis; at frame ~150 the tagline fades in with expanding letter-spacing as the 3D layer dims to 0.25.',
+  description: 'A procedural neon tunnel of perspective rings, outward particles and floating scene files rushes past a suspended yoclip mark before the tagline lands.',
   voicePrompts: {
     en: 'A deep whoosh diving down the tunnel; the music opens up for the tagline.',
     ru: 'Глубокий свист погружения в туннель; музыка раскрывается под теглайн.',
@@ -30,128 +22,122 @@ scene = {
     var t = yoclipT('flythrough');
     var tagline = t.tagline || 'Your big idea. In code.';
     var portrait = yoclipIsPortrait();
-
-    var life = presence(frame, 8, 194, 14);
-
     var font = yoclipFont();
     var txt = yoclipColor('text', '#ffffff');
+    var muted = yoclipColor('textMuted', '#a1a1aa');
     var primary = yoclipColor('primary', '#7c3aed');
     var primaryLight = yoclipColor('primaryLight', '#a78bfa');
     var accent = yoclipColor('accent', '#22d3ee');
-    var ringColors = [primary, accent, primaryLight];
+    var deep = yoclipColor('backgroundDeep', '#07070d');
+    var life = presence(frame, 8, 194, 14);
 
-    // -- Tagline beat: dim the 3D layer early enough that the text owns the
-    // frame when it reaches full opacity (172).
-    var tagIn = ease(frame, 150, 172, eo3);
-    var dim = lerp(1, 0.25, seg(frame, 135, 168));
-    var letterSp = lerp(2, 14, ease(frame, 150, 195, eo3));
-    var tagScale = 0.94 + 0.06 * ease(frame, 150, 176, eo3);
+    var tagIn = ease(frame, 148, 172, eo3);
+    var dim = lerp(1, 0.18, seg(frame, 132, 168));
+    var swayX = Math.sin(frame * 0.025) * 30;
+    var swayY = Math.sin(frame * 0.019 + 1) * 20;
+    var tunnel = [];
 
-    // -- Tunnel rings: 4 bars per square ring, flowing +Z with wraparound.
-    var N = 10;
-    var gap = 3.2;
-    var depth = N * gap; // 32
-    var speed = 0.14;
-    var half = 2.8, th = 0.12, len = 5.72;
-
-    var meshes = [];
-    for (var i = 0; i < N; i++) {
-      var z = 2 - ((i * gap + frame * speed) % depth);
-      var col = ringColors[i % 3];
-      // Depth fade is faked with scale (mesh colors carry no alpha).
-      var shrink = 1 - 0.45 * ((2 - z) / depth);
-      var ringSpin = (i % 2) * 45 + frame * 0.3;
-      var bars = [
-        meshXform(meshCube(len, th, th), { translate: [0, half, 0] }),
-        meshXform(meshCube(len, th, th), { translate: [0, -half, 0] }),
-        meshXform(meshCube(th, len, th), { translate: [half, 0, 0] }),
-        meshXform(meshCube(th, len, th), { translate: [-half, 0, 0] }),
-      ];
-      for (var b = 0; b < 4; b++) {
-        meshes.push(meshXform(bars[b], {
-          color: col,
-          scale: shrink,
-          rotate: { z: ringSpin },
-          translate: [0, 0, z],
-        }));
-      }
+    // Star streaks accelerate out of the vanishing point.
+    for (var s = 0; s < 64; s++) {
+      var phase = (s * 0.61803398875 + frame * 0.0075) % 1;
+      var angle = s * 2.39996;
+      var radius = 34 + phase * phase * (portrait ? 690 : 980);
+      var x = Math.cos(angle) * radius * 1.25 + swayX * phase;
+      var y = Math.sin(angle) * radius * 0.72 + swayY * phase;
+      var streak = s % 4 === 0;
+      tunnel.push({
+        type: 'container', alignment: 'center', offsetX: x, offsetY: y,
+        width: streak ? 2 : 2 + (s % 2), height: streak ? 22 : 2 + (s % 3),
+        borderRadius: 2, rotation: angle * 180 / Math.PI + 90,
+        color: s % 5 === 0 ? primaryLight : accent,
+        opacity: Math.sin(phase * Math.PI) * 0.72,
+      });
     }
 
-    // -- Helmet: the REAL Khronos DamagedHelmet.glb (textured, GPU) tumbling
-    // on the tunnel axis — the mesh rings stay procedural around it.
-    var camera = {
-      position: [Math.sin(frame * 0.02) * 0.35, Math.sin(frame * 0.017 + 1) * 0.25, 6.2],
-      target: [0, 0, 0],
-      fov: 55,
-    };
+    // Rings recycle from a distant point to beyond the camera.
+    for (var i = 0; i < 13; i++) {
+      var p = (i / 13 + frame * 0.0058) % 1;
+      var scale = 0.07 + p * p * 2.35;
+      var op = Math.sin(p * Math.PI) * 0.9;
+      var col = i % 3 === 0 ? accent : (i % 3 === 1 ? primary : primaryLight);
+      tunnel.push({
+        type: 'container', alignment: 'center',
+        offsetX: swayX * p, offsetY: swayY * p,
+        width: portrait ? 620 : 900, height: portrait ? 920 : 540,
+        borderRadius: portrait ? 76 : 62,
+        scale: scale, rotation: i * 11 + frame * (i % 2 ? 0.13 : -0.09),
+        color: '#00000000', borderColor: col, borderWidth: i % 4 === 0 ? 4 : 2.5,
+        opacity: op,
+        shadow: { color: yoclipColorA(i % 3 === 0 ? 'accent' : 'primary', i % 4 === 0 ? 0x08 : 0, '#7c3aed'), blur: 28, offsetX: 0, offsetY: 0 },
+      });
+    }
 
-    var helmetNode = {
-      type: 'scene3d',
-      engine: 'flame',
-      id: 'flythrough-helmet',
-      opacity: dim,
-      time: frame / 30,
-      camera: camera,
-      light: { ambient: 1.0, diffuse: 1.7, position: [3, 5, 6] },
-      models: [{
-        modelId: 'helmet',
-        src: 'models/DamagedHelmet.glb',
-        position: [0, -0.7, 0.5],
-        rotation: [18 + frame * 0.35, frame * 0.5, frame * 0.12],
-        scale: [0.85, 0.85, 0.85],
-      }],
-    };
+    // Scene-file panels drift on four depth lanes.
+    for (var n = 0; n < 4; n++) {
+      var dp = (n * 0.27 + 0.18 + frame * 0.0038) % 1;
+      var side = n % 2 === 0 ? -1 : 1;
+      var panelScale = 0.42 + dp * 0.72;
+      var px = side * (390 + dp * 390) + swayX * dp;
+      var py = -245 + n * 155 + Math.sin(frame * 0.025 + n) * 24;
+      var panelOp = Math.sin(dp * Math.PI) * 0.8;
+      var lines = [];
+      lines.push({ type: 'container', alignment: 'topCenter', width: 280, height: 34, color: '#221b31' });
+      lines.push({ type: 'text', alignment: 'topLeft', offsetX: 16, offsetY: 10, text: n % 2 ? '11_cta.scene.js' : '0' + n + '_idea.scene.js', style: { fontSize: 14, color: muted, fontFamily: font, letterSpacing: 1 } });
+      for (var l = 0; l < 4; l++) {
+        lines.push({ type: 'container', alignment: 'centerLeft', offsetX: 20 + (l % 2) * 18, offsetY: -42 + l * 25, width: 190 - l * 19, height: 8, borderRadius: 4, color: l === 0 ? accent : (l === 1 ? primaryLight : muted), opacity: l < 2 ? 0.85 : 0.42 });
+      }
+      tunnel.push({
+        type: 'container', alignment: 'center', offsetX: px, offsetY: py,
+        width: 280, height: 164, scale: panelScale, rotation: side * (7 + dp * 5), opacity: panelOp,
+        color: '#10101c', borderRadius: 18, clip: true,
+        borderColor: side < 0 ? primaryLight : accent, borderWidth: 1.5,
+        shadow: { color: yoclipColorA(side < 0 ? 'primary' : 'accent', 0x28, '#7c3aed'), blur: 30, offsetX: 0, offsetY: 12 },
+        child: { type: 'stack', fit: 'expand', children: lines },
+      });
+    }
+
+    // A still brand core anchors the rushing geometry.
+    tunnel.push({
+      type: 'container', alignment: 'center', offsetY: float(frame, 12, 0.045),
+      width: 260, height: 158, borderRadius: 28, opacity: 1 - tagIn,
+      scale: 0.92 + Math.sin(frame * 0.035) * 0.045,
+      rotation: Math.sin(frame * 0.022) * 2,
+      color: '#100d1c', borderColor: primaryLight, borderWidth: 1.5,
+      shadow: { color: yoclipColorA('primary', 0x44, '#7c3aed'), blur: 46, offsetX: 0, offsetY: 14 },
+      child: { type: 'stack', fit: 'expand', children: [{ type: 'image', source: yoclipLogoSource(), fit: 'contain', width: 178, height: 113, alignment: 'center' }] },
+    });
+    tunnel.push({ type: 'text', alignment: 'topLeft', offsetX: 54, offsetY: 44, text: 'YOCLIP  /  RENDER SPACE', style: { fontSize: 17, color: muted, fontFamily: font, fontWeight: 600, letterSpacing: 4 } });
+    tunnel.push({ type: 'text', alignment: 'topRight', offsetX: -54, offsetY: 44, text: '030 FPS  /  1920 × 1080', style: { fontSize: 17, color: accent, fontFamily: font, fontWeight: 600, letterSpacing: 3 } });
 
     return {
-      type: 'stack',
-      fit: 'expand',
-      opacity: life,
+      type: 'stack', fit: 'expand', opacity: life,
       children: [
-        // Deep space base.
         {
           type: 'container',
-          color: yoclipColor('backgroundDeep', '#07070d'),
+          gradient: { type: 'linear', begin: 'topLeft', end: 'bottomRight', colors: ['#03050c', deep, '#0b0718'] },
         },
-        // Bloom feel behind the 3D viewport (direct props — `decoration`
-        // is silently dropped).
         {
-          type: 'container',
-          alignment: 'center',
-          width: 1000,
-          height: 1000,
-          opacity: dim,
-          gradient: {
-            type: 'radial',
-            center: 'center',
-            radius: 0.5,
-            colors: [yoclipColorA('accent', 0x22, '#22d3ee'), yoclipColorA('accent', 0x00, '#22d3ee')],
-          },
+          type: 'container', alignment: 'center', width: 1100, height: 1100, opacity: dim,
+          gradient: { type: 'radial', center: 'center', radius: 0.5, colors: [yoclipColorA('accent', 0x25, '#22d3ee'), yoclipColorA('primary', 0, '#7c3aed')] },
         },
-        // The procedural 3D tunnel rings.
+        { type: 'stack', fit: 'expand', opacity: dim, children: tunnel },
+        // The idea resolves out of the tunnel.
         {
-          type: 'scene3d',
-          opacity: dim,
-          meshes: meshes,
-          camera: camera,
-          light: { direction: [0.2, -0.3, 0.9] },
+          type: 'container', alignment: 'center', offsetY: portrait ? -112 : -96,
+          width: 170 * tagIn, height: 3, color: accent, opacity: tagIn,
         },
-        // The real GLB helmet (GPU, textured).
-        helmetNode,
-        // Tagline lands ~150 and holds to the end.
         {
-          type: 'text',
-          alignment: 'center',
-          text: tagline,
-          opacity: tagIn,
-          scale: tagScale,
+          type: 'text', alignment: 'center', text: tagline, opacity: tagIn,
+          scale: 0.94 + 0.06 * ease(frame, 148, 176, eo3), textAlign: 'center',
           style: {
-            fontSize: portrait ? 58 : 96,
-            color: txt,
-            fontFamily: font,
-            fontWeight: 700,
-            letterSpacing: letterSp,
-            shadows: [{ color: yoclipColorA('primary', 0x99, '#7c3aed'), blur: 34, offsetX: 0, offsetY: 0 }],
+            fontSize: portrait ? 54 : 86, color: txt, fontFamily: font, fontWeight: 700,
+            letterSpacing: lerp(1, 7, ease(frame, 148, 194, eo3)),
+            shadows: [{ color: yoclipColorA('primary', 0x77, '#7c3aed'), blur: 32, offsetX: 0, offsetY: 0 }],
           },
+        },
+        {
+          type: 'text', alignment: 'center', offsetY: portrait ? 92 : 88, text: 'DESCRIBE  /  RENDER  /  SHIP', opacity: tagIn * 0.8,
+          style: { fontSize: portrait ? 17 : 18, color: accent, fontFamily: font, fontWeight: 600, letterSpacing: 5 },
         },
       ],
     };

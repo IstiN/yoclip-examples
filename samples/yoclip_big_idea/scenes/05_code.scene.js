@@ -3,18 +3,14 @@
 // Reference beat (Gamma 30–42s): the "dark space" demo. Left: an editor
 // window (dots + filename tab) where a yoclip scene file types in line by
 // line with light syntax coloring. Right: a live preview panel that starts
-// as an empty bordered placeholder and, as the code completes, a real 3D
-// rocket (scene3d software meshes: cone nose + cylinder body + cube fins)
-// scales in on a soft glow and slowly rotates. Caption chip closes the beat.
-//
-// Renderer notes: container styling must be direct props (a `decoration`
-// map is silently dropped); `scene3d` is a JWR built-in, so it ignores
-// width/height/alignment and simply fills its tight stack slot.
+// as an empty bordered placeholder and, as the code completes, a shaded
+// vector-3D rocket scales in on a soft glow and hovers. A caption chip
+// closes the beat. The procedural preview cannot leak outside its panel.
 
 scene = {
   id: 'code',
   duration: 246,
-  description: 'Split demo: editor window types a rocket scene file line by line (syntax colors), the preview panel lights up with a rotating 3D rocket built from scene3d meshes, caption chip "Code in. Video out." lands.',
+  description: 'Split demo: editor window types a rocket scene file line by line (syntax colors), the preview lights up with a hovering vector-3D rocket, and the caption chip lands.',
   voicePrompts: {
     en: 'Steady keystrokes; a low riser as the rocket ignites in the preview.',
     ru: 'Ровный стук клавиш; нарастающий ризер при появлении ракеты.',
@@ -78,28 +74,13 @@ scene = {
     // -- Panels entrance.
     var cardIn = ease(frame, 4, 34, eo3);
 
-    // -- Rocket: fades/scales in as the code completes, then slowly rotates.
+    // -- Rocket: fades/scales in as the code completes, then hovers.
     var rocketIn = ease(frame, codeDoneAt - 8, codeDoneAt + 26, eo3);
     var rocketScale = 0.65 + 0.35 * eoBack(seg(frame, codeDoneAt - 8, codeDoneAt + 22));
-    var yaw = Math.max(0, frame - codeDoneAt + 22) * 0.9;
     var bob = float(frame, 0.12, 0.05);
     var accent = yoclipColor('accent', '#22d3ee');
     var primary = yoclipColor('primary', '#7c3aed');
     var primaryLight = yoclipColor('primaryLight', '#a78bfa');
-
-    var meshes = [
-      meshXform(meshCone(0.38, 0.8, 12), { color: accent, rotate: { y: yaw }, translate: [0, 1.15 + bob, 0] }),
-      meshXform(meshCylinder(0.38, 1.5, 14), { color: primaryLight, rotate: { y: yaw }, translate: [0, bob, 0] }),
-      meshXform(meshCone(0.2, 0.5, 10), { color: accent, rotate: { z: 180 }, translate: [0, -1.0 + bob, 0] }),
-    ];
-    for (var k = 0; k < 3; k++) {
-      var a = (yaw + k * 120) * Math.PI / 180;
-      meshes.push(meshXform(meshCube(0.5, 0.6, 0.12), {
-        color: primary,
-        rotate: { y: yaw + k * 120 },
-        translate: [Math.cos(a) * 0.5, -0.55 + bob, Math.sin(a) * 0.5],
-      }));
-    }
 
     function dot(color) {
       return { type: 'container', width: 16, height: 16, color: color, borderRadius: 8 };
@@ -170,6 +151,44 @@ scene = {
       },
     };
 
+    // Vector-3D preview: the same rocket silhouette without a scene3d
+    // viewport painting outside its clipped panel.
+    var rocketVector = {
+      type: 'stack',
+      fit: 'expand',
+      opacity: rocketIn,
+      children: [
+        {
+          type: 'stack', fit: 'expand', scale: rocketScale * 1.08, offsetY: bob * 90,
+          children: [
+            {
+              type: 'container', alignment: 'center', offsetY: 234,
+              width: 220, height: 20, borderRadius: 10, color: '#000000', opacity: 0.4,
+            },
+            {
+              type: 'container', alignment: 'center', offsetY: 170,
+              width: 66, height: 116 + Math.sin(frame * 0.35) * 12, borderRadius: 33,
+              gradient: { type: 'linear', begin: 'topCenter', end: 'bottomCenter', colors: [accent, primary, yoclipColorA('primary', 0, '#7c3aed')] },
+            },
+            { type: 'svg', alignment: 'center', offsetX: -91, offsetY: 84, width: 100, height: 128, viewBox: '0 0 100 128', path: 'M 100 0 L 100 128 L 0 128 L 0 74 Z', color: primary },
+            { type: 'svg', alignment: 'center', offsetX: 91, offsetY: 84, width: 100, height: 128, viewBox: '0 0 100 128', path: 'M 0 0 L 0 128 L 100 128 L 100 74 Z', color: primary },
+            {
+              type: 'container', alignment: 'center', width: 132, height: 232,
+              borderRadius: 66, gradient: { type: 'linear', begin: 'topCenter', end: 'bottomCenter', colors: [primaryLight, primary] },
+              borderColor: yoclipColorA('primaryLight', 0x88, '#a78bfa'), borderWidth: 2,
+              shadow: { color: yoclipColorA('primary', 0x44, '#7c3aed'), blur: 36, offsetX: 0, offsetY: 14 },
+            },
+            { type: 'svg', alignment: 'center', offsetY: -157, width: 154, height: 126, viewBox: '0 0 154 126', path: 'M 77 0 L 154 126 L 0 126 Z', color: accent },
+            {
+              type: 'container', alignment: 'center', offsetY: -32, width: 62, height: 62,
+              borderRadius: 31, color: yoclipColor('backgroundDeep', '#07070d'), borderColor: accent, borderWidth: 4,
+            },
+            { type: 'container', alignment: 'center', offsetX: -12, offsetY: -45, width: 15, height: 15, borderRadius: 8, color: '#d9fbff', opacity: 0.85 },
+          ],
+        },
+      ],
+    };
+
     var preview = {
       type: 'container',
       alignment: portrait ? 'bottomCenter' : 'centerRight',
@@ -220,15 +239,7 @@ scene = {
               colors: [yoclipColorA('accent', 0x59, '#22d3ee'), yoclipColorA('accent', 0x00, '#22d3ee')],
             },
           },
-          // The 3D rocket fills the preview's tight stack slot.
-          {
-            type: 'scene3d',
-            opacity: rocketIn,
-            scale: rocketScale,
-            meshes: meshes,
-            camera: { position: [0, 0.6, 5], target: [0, 0.4, 0], fov: 55 },
-            light: { direction: [-0.4, -0.8, -0.6] },
-          },
+          rocketVector,
         ],
       },
     };
@@ -239,23 +250,28 @@ scene = {
       type: 'container',
       alignment: 'bottomCenter',
       offsetY: (portrait ? -36 : -52) - (1 - capIn) * 16,
+      width: portrait ? 620 : (caption.length > 24 ? 680 : 510),
+      height: 64,
       opacity: capIn,
-      color: yoclipColorA('backgroundDeep', 0xb3, '#07070d'),
-      borderRadius: 999,
+      color: yoclipColorA('backgroundDeep', 0xd9, '#07070d'),
+      borderRadius: 32,
       borderColor: yoclipColorA('accent', 0x66, '#22d3ee'),
       borderWidth: 1.5,
       child: {
-        type: 'text',
-        text: caption,
-        padding: 12,
-        margin: { left: 18, right: 18 },
-        style: {
-          fontSize: portrait ? 24 : 26,
-          color: yoclipColor('primaryLight', '#a78bfa'),
-          fontFamily: yoclipFont(),
-          fontWeight: 600,
-          letterSpacing: 8,
-        },
+        type: 'stack',
+        fit: 'expand',
+        children: [{
+          type: 'text',
+          alignment: 'center',
+          text: caption,
+          style: {
+            fontSize: portrait ? 22 : (caption.length > 24 ? 22 : 25),
+            color: yoclipColor('primaryLight', '#a78bfa'),
+            fontFamily: yoclipFont(),
+            fontWeight: 600,
+            letterSpacing: caption.length > 24 ? 3 : 6,
+          },
+        }],
       },
     };
 

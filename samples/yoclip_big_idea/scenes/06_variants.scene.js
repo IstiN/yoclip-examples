@@ -1,20 +1,13 @@
-// 06 — Variants: one project, every format.
+// 06 — Variants: one source becomes a deliberate output matrix.
 //
-// Reference beat (Gamma 42–57s): the master project bursts into per-variant
-// outputs. A single large "master" frame card (mini logo + project label)
-// sits center; on the beat it collapses and five variant cards fly out with
-// a staggered overshoot to a fanned arc, then settle into a neat row — the
-// Shorts card is a tall 9:16, light cards use the light palette. The title
-// types above; a mono command chip rises at the end.
-//
-// Renderer notes: container styling must be direct props (a `decoration`
-// map is silently dropped); padded chips are container > text(+margin);
-// children of the root fit:'expand' stack all carry `alignment`.
+// A detailed project window bursts into five miniature, art-directed renders.
+// The final composition is a 2×2 landscape grid plus a native 9:16 panel,
+// rather than five near-identical cards fighting for one row.
 
 scene = {
   id: 'variants',
   duration: 276,
-  description: 'A large master frame card bursts into 5 variant cards (Dark/Light EN/RU + tall Shorts 9:16) that fly to a fanned arc with staggerItem + eoBack, settle into a grid row under a typed title, and a mono render-command chip rises at the bottom.',
+  description: 'A project window bursts into five detailed render previews and settles into a 2x2 landscape matrix with a native 9:16 Shorts panel.',
   voicePrompts: {
     en: 'A whoosh as the frame multiplies into five variants, one per format.',
     ru: 'Свист — кадр размножается в пять вариантов, по одному на формат.',
@@ -31,196 +24,165 @@ scene = {
     var command = t.command || 'yoclip render -V shorts_en';
     var portrait = yoclipIsPortrait();
 
-    var life = presence(frame, 8, 254, 14);
-
     var font = yoclipFont();
     var surface = yoclipColor('surface', '#15131f');
+    var deep = yoclipColor('backgroundDeep', '#07070d');
     var txt = yoclipColor('text', '#ffffff');
+    var muted = yoclipColor('textMuted', '#a1a1aa');
     var primary = yoclipColor('primary', '#7c3aed');
     var primaryLight = yoclipColor('primaryLight', '#a78bfa');
     var accent = yoclipColor('accent', '#22d3ee');
+    var life = presence(frame, 8, 254, 14);
 
-    // -- Beats.
-    var BURST = 48;    // master collapses, cards fly out
-    var SETTLE = 118;  // arc -> grid row
+    // Quiet studio grid: visible in the empty entrance, never fights the cards.
+    var children = [];
+    for (var gx = -3; gx <= 3; gx++) {
+      children.push({ type: 'container', alignment: 'center', offsetX: gx * 260, width: 1, height: 900, color: primaryLight, opacity: 0.035 });
+    }
+    for (var gy = -2; gy <= 2; gy++) {
+      children.push({ type: 'container', alignment: 'center', offsetY: gy * 190, width: 1720, height: 1, color: accent, opacity: 0.035 });
+    }
+    children.push({
+      type: 'container', alignment: 'center', width: 1050, height: 1050,
+      gradient: { type: 'radial', center: 'center', radius: 0.5, colors: [yoclipColorA('primary', 0x24, '#7c3aed'), yoclipColorA('primary', 0, '#7c3aed')] },
+    });
 
-    // -- Master card: pops in, then collapses into the burst.
-    var masterPop = pop(frame, 6, 22);
-    var masterOut = seg(frame, BURST - 6, BURST + 12);
-    var masterOp = masterPop.opacity * (1 - masterOut);
-    var masterScale = Math.max(0.05, masterPop.scale * (1 - 0.65 * masterOut));
+    var W = portrait ? 300 : 400;
+    var H = portrait ? 169 : 225;
+    var WT = portrait ? 160 : 238;
+    var HT = portrait ? 284 : 423;
+    var gridX = portrait ? [-180, 180, -180, 180, 0] : [-452, -20, -452, -20, 500];
+    var gridY = portrait ? [-300, -300, -40, -40, 340] : [-62, -62, 202, 202, 70];
 
-    var master = {
-      type: 'container',
-      alignment: 'center',
-      offsetY: portrait ? 60 : 40,
-      width: portrait ? 480 : 560,
-      height: portrait ? 270 : 315,
-      scale: masterScale,
-      opacity: masterOp,
-      color: surface,
-      borderRadius: 24,
-      borderColor: yoclipColorA('primaryLight', 0x4d, '#a78bfa'),
-      borderWidth: 1.5,
-      shadow: { color: yoclipColorA('primary', 0x55, '#7c3aed'), blur: 50, offsetX: 0, offsetY: 22 },
-      child: {
-        type: 'stack',
-        fit: 'expand',
-        children: [
-          {
-            type: 'image',
-            source: yoclipLogoSource(),
-            fit: 'contain',
-            width: 200,
-            height: 127,
-            alignment: 'center',
-            offsetY: -30,
-          },
-          {
-            type: 'text',
-            alignment: 'center',
-            offsetY: 92,
-            text: 'yoclip_big_idea',
-            style: {
-              fontSize: 30,
-              color: yoclipColor('textMuted', '#a1a1aa'),
-              fontFamily: font,
-              letterSpacing: 4,
-            },
-          },
-        ],
-      },
-    };
+    function previewCard(i, masterMode) {
+      var light = !masterMode && (i === 2 || i === 3);
+      var tall = !masterMode && i === 4;
+      var start = 44 + i * 8;
+      var p = masterMode ? 1 : staggerItem(frame, i, 44, 8, 40);
+      var e = eo3(p);
+      var arc = Math.sin(clamp(p, 0, 1) * Math.PI);
+      var x = masterMode ? 0 : lerp(0, gridX[i], e);
+      var y = masterMode ? 40 : lerp(40, gridY[i], e) - arc * (110 + i * 12);
+      var rot = masterMode ? 0 : (i - 2) * 9 * arc;
+      var sc = masterMode ? 1 : Math.max(0.04, 0.28 + 0.72 * eoBack(p));
+      var op = masterMode ? 1 : seg(frame, start, start + 8);
+      if (!masterMode && p >= 1) y += float(frame, 3, 0.04, i * 0.8);
 
-    // -- Variant cards: burst to a fanned arc, then settle into a row.
-    var W = 260, H = 146, WT = 150, HT = 267; // 16:9 cards + 9:16 shorts
-    var gridX = portrait
-      ? [-170, 170, -170, 170, 0]
-      : [-521, -233, 55, 343, 576];
-    var gridY = portrait
-      ? [-110, -110, 140, 140, 418]
-      : [120, 120, 120, 120, 120];
-
-    function variantCard(i) {
-      var light = (i === 2 || i === 3);
-      var tall = (i === 4);
-      var p1 = staggerItem(frame, i, BURST, 9, 22);      // burst
-      var e1 = eo3(p1);
-      var m = ease(frame, SETTLE + i * 3, SETTLE + i * 3 + 26, eio3); // settle
-
-      // Fan arc: spacing must exceed the rotated card footprint (260w x 146h
-      // at 14deg ~ 293px, tall card ~ 270px) so faces never overlap mid-deal.
-      var arcX = (i - 2) * (portrait ? 190 : 300);
-      var arcY = (portrait ? -110 : -90) + Math.abs(i - 2) * (portrait ? 100 : 50);
-      var arcRot = (i - 2) * 7;
-
-      var x = lerp(lerp(0, arcX, e1), gridX[i], m);
-      var y = lerp(lerp(40, arcY, e1), gridY[i], m);
-      var rot = lerp(lerp(0, arcRot, e1), 0, m);
-      var sc = Math.max(0.05, (0.35 + 0.65 * eoBack(p1)));
-      var op = seg(frame, BURST + i * 9, BURST + i * 9 + 8);
-
-      var bg = light ? '#f4f3fa' : surface;
+      var w = masterMode ? (portrait ? 540 : 640) : (tall ? WT : W);
+      var h = masterMode ? (portrait ? 304 : 360) : (tall ? HT : H);
+      var bg = light ? '#f4f3fa' : (masterMode ? deep : surface);
       var fg = light ? '#14121f' : txt;
-      var border = light ? '#3314121f' : yoclipColorA('primaryLight', 0x3a, '#a78bfa');
+      var sub = light ? '#68627c' : muted;
       var logo = light ? 'external:logo_on_light' : yoclipLogoSource();
+      var line = light ? '#286d28d9' : primaryLight;
+      var logoW = masterMode ? 210 : (tall ? 118 : 132);
+      var logoH = Math.round(logoW * 152 / 240);
+
+      var previewChildren = [
+        {
+          type: 'container', alignment: 'center', width: w, height: h,
+          gradient: {
+            type: 'radial', center: 'center', radius: 0.65,
+            colors: [light ? '#335f46ee' : yoclipColorA('primary', 0x30, '#7c3aed'), light ? '#00f4f3fa' : yoclipColorA('primary', 0, '#7c3aed')],
+          },
+        },
+        // Native output chrome.
+        { type: 'container', alignment: 'topCenter', width: w, height: masterMode ? 48 : 38, color: light ? '#e7e4f1' : yoclipColorA('backgroundSoft', 0xe6, '#0d0d18') },
+        {
+          type: 'text', alignment: 'topLeft', offsetX: masterMode ? 20 : 16, offsetY: masterMode ? 15 : 11,
+          text: masterMode ? 'PROJECT  /  yoclip_big_idea' : (cardNames[i] || ''),
+          style: { fontSize: masterMode ? 18 : (tall ? 14 : 17), color: fg, fontFamily: font, fontWeight: 600, letterSpacing: masterMode ? 2 : 0.5 },
+        },
+        {
+          type: 'text', alignment: 'topRight', offsetX: masterMode ? -20 : -16, offsetY: masterMode ? 16 : 12,
+          text: masterMode ? 'SOURCE 01' : (tall ? '9:16' : '16:9'),
+          style: { fontSize: masterMode ? 15 : 13, color: tall ? accent : sub, fontFamily: font, fontWeight: 600, letterSpacing: 1.5 },
+        },
+        {
+          type: 'image', source: logo, fit: 'contain', width: logoW, height: logoH,
+          alignment: 'center', offsetY: masterMode ? -30 : (tall ? -62 : -25),
+        },
+        // Tiny editorial headline and subtitle, intentionally drawn as bars.
+        {
+          type: 'container', alignment: 'center', offsetY: masterMode ? 83 : (tall ? 42 : 43),
+          width: masterMode ? 270 : (tall ? 120 : 200), height: masterMode ? 14 : 11,
+          borderRadius: 6, color: fg, opacity: 0.88,
+        },
+        {
+          type: 'container', alignment: 'center', offsetY: masterMode ? 110 : (tall ? 68 : 67),
+          width: masterMode ? 190 : (tall ? 88 : 138), height: 7,
+          borderRadius: 4, color: tall ? accent : line, opacity: 0.8,
+        },
+      ];
+
+      if (masterMode) {
+        // Timeline tracks make the source read as a real project, not a logo tile.
+        for (var tr = 0; tr < 3; tr++) {
+          previewChildren.push({ type: 'container', alignment: 'bottomLeft', offsetX: 28, offsetY: -26 - tr * 20, width: 400 - tr * 62, height: 8, borderRadius: 4, color: tr === 1 ? accent : primaryLight, opacity: 0.45 + tr * 0.12 });
+          previewChildren.push({ type: 'container', alignment: 'bottomRight', offsetX: -28, offsetY: -26 - tr * 20, width: 92 + tr * 24, height: 8, borderRadius: 4, color: muted, opacity: 0.28 });
+        }
+      } else {
+        previewChildren.push({
+          type: 'text', alignment: 'bottomCenter', offsetY: tall ? -22 : -14,
+          text: tall ? 'NATIVE  /  1080 × 1920' : '1920 × 1080  /  30 FPS',
+          style: { fontSize: tall ? 11 : 12, color: sub, fontFamily: font, fontWeight: 600, letterSpacing: tall ? 1 : 1.5 },
+        });
+        // Render-complete marker.
+        previewChildren.push({ type: 'container', alignment: 'bottomRight', offsetX: -14, offsetY: -14, width: 7, height: 7, borderRadius: 4, color: tall ? accent : '#34d399' });
+      }
 
       return {
-        type: 'container',
-        alignment: 'center',
-        offsetX: x,
-        offsetY: y,
-        width: tall ? WT : W,
-        height: tall ? HT : H,
-        scale: sc,
-        rotation: rot,
-        opacity: op,
-        color: bg,
-        borderRadius: 16,
-        borderColor: tall ? yoclipColorA('accent', 0x73, '#22d3ee') : border,
+        type: 'container', alignment: 'center', offsetX: x, offsetY: y,
+        width: w, height: h, rotation: rot, scale: sc, opacity: op,
+        color: bg, borderRadius: masterMode ? 26 : 19, clip: true,
+        borderColor: tall ? yoclipColorA('accent', 0x99, '#22d3ee') : (light ? '#3314121f' : yoclipColorA('primaryLight', 0x55, '#a78bfa')),
         borderWidth: tall ? 2 : 1.5,
-        shadow: { color: yoclipColorA('primary', 0x33, '#7c3aed'), blur: 26, offsetX: 0, offsetY: 12 },
-        child: {
-          type: 'stack',
-          fit: 'expand',
-          children: [
-            {
-              type: 'image',
-              source: logo,
-              fit: 'contain',
-              width: tall ? 84 : 96,
-              height: tall ? 53 : 61,
-              alignment: 'center',
-              offsetY: tall ? -62 : -22,
-            },
-            {
-              type: 'text',
-              alignment: 'center',
-              offsetY: tall ? 58 : 34,
-              text: cardNames[i] || '',
-              style: {
-                fontSize: tall ? 21 : 24,
-                color: fg,
-                fontFamily: font,
-                fontWeight: 600,
-                letterSpacing: 1,
-              },
-            },
-          ],
-        },
+        shadow: { color: yoclipColorA(tall ? 'accent' : 'primary', 0x28, '#7c3aed'), blur: 34, offsetX: 0, offsetY: 14 },
+        child: { type: 'stack', fit: 'expand', children: previewChildren },
       };
     }
 
-    var cards = [];
-    for (var i = 0; i < 5; i++) cards.push(variantCard(i));
+    // Master collapses as the outputs leave the source.
+    var masterPop = pop(frame, 5, 22);
+    var masterOut = seg(frame, 38, 66);
+    var master = previewCard(0, true);
+    master.scale = Math.max(0.04, masterPop.scale * (1 - 0.72 * masterOut));
+    master.opacity = masterPop.opacity * (1 - masterOut);
+    master.offsetY = 40 - 34 * masterOut;
+    children.push(master);
+    for (var i = 0; i < 5; i++) children.push(previewCard(i, false));
 
-    // -- Title types above the row.
-    var typedTitle = typewriter(title, frame, 10, 45);
-    var titleNode = {
-      type: 'text',
-      alignment: 'topCenter',
-      offsetY: portrait ? 200 : 108,
-      text: typedTitle,
-      opacity: seg(frame, 8, 14),
-      style: {
-        fontSize: portrait ? 48 : 58,
-        color: txt,
-        fontFamily: font,
-        fontWeight: 700,
-      },
-    };
+    // Header hierarchy.
+    children.push({
+      type: 'text', alignment: 'topCenter', offsetY: portrait ? 122 : 72,
+      text: typewriter(title, frame, 8, 52), opacity: seg(frame, 6, 12),
+      style: { fontSize: portrait ? 44 : 56, color: txt, fontFamily: font, fontWeight: 700, letterSpacing: -0.5 },
+    });
+    children.push({
+      type: 'text', alignment: 'topCenter', offsetY: portrait ? 180 : 140,
+      text: '01 SOURCE   /   05 RENDERS', opacity: seg(frame, 12, 24),
+      style: { fontSize: portrait ? 17 : 18, color: accent, fontFamily: font, fontWeight: 600, letterSpacing: 4 },
+    });
 
-    // -- Command chip rises at the end (early enough to fill the space
-    // below the settled grid).
-    var capIn = ease(frame, 196, 214, eo3);
-    var chip = {
-      type: 'container',
-      alignment: 'bottomCenter',
-      offsetY: (portrait ? -46 : -64) - (1 - capIn) * 18,
-      opacity: capIn,
-      color: yoclipColorA('backgroundDeep', 0xb3, '#07070d'),
-      borderRadius: 999,
-      borderColor: yoclipColorA('accent', 0x66, '#22d3ee'),
-      borderWidth: 1.5,
+    var capIn = ease(frame, 190, 210, eo3);
+    children.push({
+      type: 'container', alignment: 'bottomCenter', offsetY: (portrait ? -54 : -46) - (1 - capIn) * 18,
+      width: portrait ? 760 : 720, height: 62, opacity: capIn,
+      color: yoclipColorA('backgroundDeep', 0xd9, '#07070d'), borderRadius: 31,
+      borderColor: yoclipColorA('accent', 0x66, '#22d3ee'), borderWidth: 1.5,
       child: {
-        type: 'text',
-        text: '$ ' + command,
-        margin: { left: 30, right: 30, top: 13, bottom: 13 },
-        style: {
-          fontSize: portrait ? 24 : 27,
-          color: primaryLight,
-          fontFamily: font,
-          fontWeight: 600,
-          letterSpacing: 3,
-        },
+        type: 'row', mainAxisAlignment: 'center', crossAxisAlignment: 'center',
+        children: [
+          { type: 'container', width: 24 },
+          { type: 'container', width: 8, height: 8, borderRadius: 4, color: accent },
+          {
+            type: 'text', text: '$  ' + command, margin: { left: 14, right: 26 },
+            style: { fontSize: portrait ? 21 : 24, color: primaryLight, fontFamily: font, fontWeight: 600, letterSpacing: 2 },
+          },
+        ],
       },
-    };
+    });
 
-    return {
-      type: 'stack',
-      fit: 'expand',
-      opacity: life,
-      children: [master].concat(cards, [titleNode, chip]),
-    };
+    return { type: 'stack', fit: 'expand', opacity: life, children: children };
   },
 };

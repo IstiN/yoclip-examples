@@ -1,19 +1,15 @@
-// 01 — Worlds: a hard-cut 3D montage of "what you can render".
+// 01 — Worlds: three graphic impossibilities, cut like a title sequence.
 //
-// Reference beat (Gamma 4–9s): surreal cinematic 3D worlds flash by — proof
-// of limitless styles. Two 3D pipelines share the stage: the software
-// `meshes` path (procedural, export-safe) and the `flame` GPU path (real
-// GLB with textures + skeletal animation). Three worlds, 62 frames each:
-//   A "any world": a Hollywood-style hill with giant voxel YOCLIP letters
-//      rising on beats
-//   B "any style": a low-poly plane towing a waving YOCLIP banner
-//   C "any story": three KayKit adventurers at a rally — Cheer skeletal
-//      loops, a YOCLIP placard and confetti
+// The original low-poly dioramas read as tech demos and were vulnerable to
+// scene3d viewport artifacts. This is an intentionally 2.5D editorial montage:
+// a monolith over layered dunes, a luminous portal with floating layouts,
+// then a prism vortex around the wordmark. Everything is procedural vector
+// and type, so every frame stays crisp and export-safe.
 
 scene = {
   id: 'worlds',
   duration: 186,
-  description: '3D montage: Hollywood YOCLIP sign → flying banner → rally with placard.',
+  description: 'Three surreal vector worlds: monolith dunes, a neon portal of floating layouts, and a prism vortex around the yoclip mark.',
   voicePrompts: {
     en: 'Music lifts: wide cinematic synths, three hard cuts on downbeats.',
     ru: 'Подъём музыки: широкие синты, три жёстких среза на долях.',
@@ -29,217 +25,253 @@ scene = {
     var primary = yoclipColor('primary', '#7c3aed');
     var primaryLight = yoclipColor('primaryLight', '#a78bfa');
     var accent = yoclipColor('accent', '#22d3ee');
+    var txt = yoclipColor('text', '#ffffff');
+    var muted = yoclipColor('textMuted', '#a1a1aa');
+    var surface = yoclipColor('surface', '#15131f');
+    var font = yoclipFont();
+    var portrait = yoclipIsPortrait();
 
     var SLOT = 62;
     var idx = Math.min(2, Math.floor(frame / SLOT));
-    var f = frame - idx * SLOT; // world-local frame
+    var f = frame - idx * SLOT;
+    var enter = ease(f, 0, 12, eo3);
 
-    var skyA, skyB, skyC;
-    var meshNode = null;
-    var glbNode = null;
-
-    if (idx === 0) {
-      // ---- A: Hollywood hill + rising YOCLIP letters ----------------------
-      var pm = [];
-      // Hill: a wide green mound with a rocky base and two pines.
-      pm.push(meshXform(meshCone(3.4, 1.5, 22), { color: '#3f8a44', translate: [0, -0.75, 0] }));
-      pm.push(meshXform(meshCylinder(3.4, 0.35, 22), { color: '#2c5c30', translate: [0, -1.55, 0] }));
-      for (var p = 0; p < 2; p++) {
-        var px = p === 0 ? -2.5 : 2.4;
-        pm.push(meshXform(meshCylinder(0.07, 0.4, 6), { color: '#5d4a36', translate: [px, 0.55, -0.4] }));
-        pm.push(meshXform(meshCone(0.5, 1.2, 8), { color: '#276b32', translate: [px, 1.3, -0.4] }));
+    function stars(count, local, seed) {
+      var out = [];
+      for (var i = 0; i < count; i++) {
+        var x = ((i * 197 + seed * 83) % 1730) - 865;
+        var y = ((i * 89 + seed * 47) % 720) - 410;
+        var s = 1 + (i % 3);
+        out.push({
+          type: 'container',
+          alignment: 'center',
+          offsetX: x + Math.sin(local * 0.018 + i) * 5,
+          offsetY: y,
+          width: s,
+          height: s,
+          borderRadius: s / 2,
+          color: i % 5 === 0 ? accent : txt,
+          opacity: 0.18 + 0.48 * shimmer(local + i * 7, 54),
+        });
       }
-      // Letters rise one by one on the crest.
-      var word = 'YOCLIP';
-      var v = 0.17, letterW = 6 * v;
-      var wordW = voxelWordWidth(word, v);
-      for (var li = 0; li < word.length; li++) {
-        var start = 6 + li * 6;
-        var up = ease(f, start, start + 14, eoBack);
-        if (up <= 0) continue;
-        var col = li === 0 ? accent : '#ffffff';
-        pm.push(meshXform(voxelLetterMesh(word.charAt(li), v, 0.1, col), {
-          scale: Math.max(0.001, up),
-          rotate: { x: -6 },
-          translate: [-wordW / 2 + li * letterW + 0.5 * v, 0.62 - (1 - up) * 0.5, 0.85],
-        }));
-      }
-      meshNode = {
-        type: 'scene3d',
-        meshes: pm,
-        camera: {
-          position: [0, 1.45, 6.4 - 0.6 * ease(f, 0, 62, eio3)],
-          target: [0, 0.85, 0],
-          fov: 50,
-        },
-        light: { direction: [-0.25, -0.55, 0.75] },
-      };
-      skyA = '#3d2a5d';
-      skyB = '#c2567a';
-      skyC = '#ffb27a';
-    } else if (idx === 1) {
-      // ---- B: low-poly plane towing the YOCLIP banner ---------------------
-      var bm = [];
-      var planeX = 3.2 - f * 0.1;
-      var planeY = 1.75 + Math.sin(f * 0.06) * 0.18;
-      var bank = Math.sin(f * 0.05) * 7;
-      // Fuselage + nose + wings + tail + spinning prop.
-      bm.push(meshXform(meshCube(1.1, 0.3, 0.3), { color: primary, rotate: { z: bank }, translate: [planeX, planeY, 0] }));
-      bm.push(meshXform(meshCone(0.16, 0.35, 8), { color: accent, rotate: { z: -90 + bank }, translate: [planeX - 0.7, planeY, 0] }));
-      bm.push(meshXform(meshCube(0.5, 0.06, 1.7), { color: primaryLight, rotate: { z: bank }, translate: [planeX + 0.05, planeY + 0.12, 0] }));
-      bm.push(meshXform(meshCube(0.22, 0.34, 0.06), { color: primaryLight, rotate: { z: bank }, translate: [planeX + 0.55, planeY + 0.28, 0] }));
-      bm.push(meshXform(meshCube(0.26, 0.05, 0.6), { color: primaryLight, rotate: { z: bank }, translate: [planeX + 0.55, planeY + 0.1, 0] }));
-      var propA = f * 37 % 360;
-      bm.push(meshXform(meshCube(0.04, 0.55, 0.05), { color: '#e9d5ff', rotate: { x: propA, z: bank }, translate: [planeX - 0.92, planeY, 0] }));
-      bm.push(meshXform(meshCube(0.04, 0.05, 0.55), { color: '#e9d5ff', rotate: { x: propA, z: bank }, translate: [planeX - 0.92, planeY, 0] }));
-      // Tow rope.
-      bm.push(meshXform(meshCylinder(0.015, 0.9, 6), { color: '#cbd5e1', rotate: { z: 90 }, translate: [planeX + 1.0, planeY - 0.1, 0] }));
-      // Banner letters trailing with a fabric wave.
-      var bword = 'YOCLIP';
-      var bv = 0.085;
-      for (var bi = 0; bi < bword.length; bi++) {
-        var wave = Math.sin(f * 0.16 + bi * 0.85);
-        bm.push(meshXform(voxelLetterMesh(bword.charAt(bi), bv, 0.05, bi % 2 ? accent : '#ffffff'), {
-          rotate: { z: wave * 9 },
-          translate: [planeX + 1.25 + bi * 0.45, planeY - 0.28 + wave * 0.1, 0],
-        }));
-      }
-      // Drifting clouds.
-      for (var c = 0; c < 4; c++) {
-        var ca = (f * 0.22 + c * 95) * Math.PI / 180;
-        bm.push(meshXform(meshCube(1.2, 0.16, 0.6), {
-          color: '#e8ecf4',
-          translate: [Math.cos(ca) * 3.6, 2.4 + (c % 2) * 0.5, Math.sin(ca) * 3.0 - 0.5],
-        }));
-      }
-      meshNode = {
-        type: 'scene3d',
-        meshes: bm,
-        camera: {
-          position: [0.3 + Math.sin(f * 0.01) * 0.3, 1.55, 6.6],
-          target: [0.5, 1.3, 0],
-          fov: 50,
-        },
-        light: { direction: [-0.3, -0.7, 0.65] },
-      };
-      skyA = '#3a7bd5';
-      skyB = '#15304f';
-      skyC = null;
-    } else {
-      // ---- C: rally — cheering adventurers + YOCLIP placard ---------------
-      var cm = [];
-      cm.push(meshXform(meshCube(10, 0.16, 7), { color: '#3f8a44', translate: [0, -0.08, 0] }));
-      cm.push(meshXform(meshCube(10, 0.05, 1.0), { color: '#8a6f52', translate: [0, 0.02, 0.6] }));
-      for (var tr = 0; tr < 4; tr++) {
-        var tx = -3.6 + tr * 2.4;
-        cm.push(meshXform(meshCylinder(0.08, 0.45, 6), { color: '#5d4a36', translate: [tx, 0.22, -2.4] }));
-        cm.push(meshXform(meshCone(0.55, 1.5, 8), { color: '#276b32', translate: [tx, 1.3, -2.4] }));
-      }
-      // Placard: sticks + board + voxel letters, rising at the start.
-      var posterUp = ease(f, 4, 18, eoBack);
-      var posterY = 0.55 + posterUp * 0.85;
-      var pv = 0.085, pword = 'YOCLIP', pwordW = voxelWordWidth(pword, pv);
-      cm.push(meshXform(meshCylinder(0.035, 1.6, 6), { color: '#5d4a36', translate: [-pwordW / 2 - 0.25, posterY - 0.35, -0.2] }));
-      cm.push(meshXform(meshCylinder(0.035, 1.6, 6), { color: '#5d4a36', translate: [pwordW / 2 + 0.25, posterY - 0.35, -0.2] }));
-      cm.push(meshXform(meshCube(pwordW + 0.8, 1.0, 0.08), { color: '#f4f1ea', translate: [0, posterY + 0.15, -0.2] }));
-      for (var qi = 0; qi < pword.length; qi++) {
-        cm.push(meshXform(voxelLetterMesh(pword.charAt(qi), pv, 0.06, primary), {
-          scale: Math.max(0.001, posterUp),
-          translate: [-pwordW / 2 + qi * 6 * pv + 0.5 * pv, posterY + 0.52, -0.13],
-        }));
-      }
-      // Confetti after the poster lands.
-      var confCols = [primary, accent, primaryLight, '#f472b6', '#fbbf24'];
-      for (var ci = 0; ci < 26; ci++) {
-        var cyc2 = ((f * 0.025 + ci * 0.377) % 1.3) / 1.3;
-        if (cyc2 < 0.12) continue;
-        cm.push(meshXform(meshCube(0.07, 0.07, 0.02), {
-          color: confCols[ci % 5],
-          rotate: { x: f * (2 + ci % 3), y: f * 3 },
-          translate: [-3 + (ci * 0.61 % 6), 2.8 - cyc2 * 2.6, -0.5 + (ci * 0.43 % 1.6)],
-        }));
-      }
-      // Contact shadows under the party.
-      for (var sh = 0; sh < 3; sh++) {
-        cm.push(meshXform(meshCylinder(0.4, 0.015, 12), {
-          color: '#2c5c30', translate: [-1.3 + sh * 1.3, 0.045, 0.5],
-        }));
-      }
-      meshNode = {
-        type: 'scene3d',
-        meshes: cm,
-        camera: {
-          position: [0.2 + Math.sin(f * 0.01) * 0.3, 1.35, 6.3 - 0.5 * ease(f, 0, 62, eio3)],
-          target: [0.2, 1.0, 0],
-          fov: 50,
-        },
-        light: { direction: [0.25, -0.65, 0.7] },
-      };
-      // The cheering party (GPU GLB, skeletal Cheer loops).
-      glbNode = {
-        type: 'scene3d',
-        engine: 'flame',
-        id: 'worlds-party',
-        time: f / 30,
-        camera: {
-          position: [0.2 + Math.sin(f * 0.01) * 0.3, 1.35, 6.3 - 0.5 * ease(f, 0, 62, eio3)],
-          target: [0.2, 1.0, 0],
-          fov: 50,
-        },
-        light: { ambient: 0.65, diffuse: 1.2, position: [4, 7, 5] },
-        models: [
-          { modelId: 'knight', src: 'models/Knight.glb', position: [-1.3, 0.02, 0.5], rotation: [0, 12, 0], scale: [0.5, 0.5, 0.5], animation: 'Cheer' },
-          { modelId: 'mage', src: 'models/Mage.glb', position: [0, 0.02, 0.4], rotation: [0, -8, 0], scale: [0.5, 0.5, 0.5], animation: 'Cheer' },
-          { modelId: 'rogue', src: 'models/Rogue.glb', position: [1.3, 0.02, 0.5], rotation: [0, -20, 0], scale: [0.5, 0.5, 0.5], animation: 'Cheer' },
-        ],
-      };
-      skyA = '#1c3a63';
-      skyB = '#0a1428';
-      skyC = null;
+      return out;
     }
 
-    // Caption chip (cycles per world).
-    var capEase = ease(f, 4, 16, eo3);
-    var capIn = 0.25 + 0.75 * capEase;
-    var caption = {
-      type: 'container',
-      alignment: 'bottomCenter',
-      offsetY: -64 - 14 * (1 - capEase),
-      opacity: capIn,
-      color: yoclipColorA('backgroundDeep', 0xb0, '#07070d'),
-      borderRadius: 999,
-      borderColor: yoclipColorA('accent', 0x66, '#22d3ee'),
-      borderWidth: 1.5,
-      child: {
-        type: 'text',
-        text: captions[idx],
-        margin: { left: 28, right: 28, top: 12, bottom: 12 },
-        style: {
-          fontSize: 30,
-          color: yoclipColor('text', '#ffffff'),
-          fontFamily: yoclipFont(),
-          fontWeight: 600,
-          letterSpacing: 6,
+    function glow(key, fallback, size, alpha) {
+      return {
+        type: 'container',
+        alignment: 'center',
+        width: size,
+        height: size,
+        gradient: {
+          type: 'radial',
+          center: 'center',
+          radius: 0.5,
+          colors: [yoclipColorA(key, alpha, fallback), yoclipColorA(key, 0, fallback)],
         },
-      },
-    };
+      };
+    }
 
-    var life = idx === 0 ? presence(frame, 8, 9999, 0) : 1;
-    var outro = fadeOut(frame, 186, 8);
+    function glassCard(x, y, rot, local, kind) {
+      var p = ease(local, 7 + kind * 4, 25 + kind * 4, eoBack);
+      var kids = [];
+      if (kind === 0) {
+        kids.push({
+          type: 'image',
+          source: yoclipLogoSource(),
+          fit: 'contain',
+          width: 176,
+          height: 111,
+          alignment: 'center',
+        });
+      } else if (kind === 1) {
+        kids.push({ type: 'text', alignment: 'center', text: 'Aa', style: { fontSize: 82, color: txt, fontFamily: font, fontWeight: 700 } });
+        kids.push({ type: 'container', alignment: 'center', offsetY: 58, width: 160, height: 3, color: accent });
+      } else {
+        for (var j = 0; j < 4; j++) {
+          kids.push({
+            type: 'container',
+            alignment: 'center',
+            offsetX: j % 2 ? 26 : -20,
+            offsetY: -52 + j * 34,
+            width: 190 - j * 18,
+            height: 12,
+            borderRadius: 6,
+            color: j === 0 ? primaryLight : yoclipColorA('textMuted', 0x55, '#a1a1aa'),
+          });
+        }
+      }
+      return {
+        type: 'container',
+        alignment: 'center',
+        offsetX: x,
+        offsetY: y + float(local, 10, 0.055, kind),
+        rotation: rot,
+        scale: Math.max(0.01, p),
+        opacity: seg(local, 5 + kind * 4, 12 + kind * 4),
+        width: portrait ? 250 : 310,
+        height: 190,
+        color: yoclipColorA('backgroundSoft', 0xd9, '#0d0d18'),
+        borderRadius: 24,
+        borderColor: yoclipColorA(kind === 1 ? 'accent' : 'primaryLight', 0x77, '#a78bfa'),
+        borderWidth: 1.5,
+        shadow: { color: yoclipColorA('primary', 0x28, '#7c3aed'), blur: 46, offsetX: 0, offsetY: 16 },
+        child: { type: 'stack', fit: 'expand', children: kids },
+      };
+    }
 
-    var sky = skyC == null
-      ? { type: 'linear', begin: 'topCenter', end: 'bottomCenter', colors: [skyA, skyB] }
-      : { type: 'linear', begin: 'topCenter', end: 'bottomCenter', colors: [skyA, skyB, skyC] };
-    var layers = [{ type: 'container', gradient: sky }];
-    if (meshNode) layers.push(meshNode);
-    if (glbNode) layers.push(glbNode);
-    layers.push(caption);
+    var layers = [];
+    if (idx === 0) {
+      // A — monolith over a violet desert.
+      layers.push({
+        type: 'container',
+        gradient: { type: 'linear', begin: 'topCenter', end: 'bottomCenter', colors: ['#080813', '#211335', '#713e75'] },
+      });
+      layers = layers.concat(stars(34, f, 1));
+      layers.push(glow('primaryLight', '#a78bfa', 860, 0x48));
+      // Long translucent aurora ribbons.
+      for (var a = 0; a < 3; a++) {
+        layers.push({
+          type: 'container',
+          alignment: 'center',
+          offsetX: -180 + a * 170 + float(f, 35, 0.025, a),
+          offsetY: -310 + a * 76,
+          rotation: -13 + a * 5,
+          width: 1380,
+          height: 100,
+          borderRadius: 50,
+          opacity: 0.42 - a * 0.08,
+          gradient: {
+            type: 'linear', begin: 'centerLeft', end: 'centerRight',
+            colors: [yoclipColorA('accent', 0, '#22d3ee'), yoclipColorA(a === 1 ? 'primaryLight' : 'accent', 0x88, '#22d3ee'), yoclipColorA('primary', 0, '#7c3aed')],
+          },
+        });
+      }
+      // Dunes: three silhouettes create real foreground/midground depth.
+      layers.push({
+        type: 'svg', alignment: 'bottomCenter', width: 1920, height: 410, viewBox: '0 0 1920 410',
+        path: 'M 0 270 C 260 110 540 150 790 260 C 1120 400 1430 90 1920 180 L 1920 410 L 0 410 Z',
+        color: '#2b2140',
+      });
+      layers.push({
+        type: 'svg', alignment: 'bottomCenter', width: 1920, height: 330, offsetY: -2, viewBox: '0 0 1920 330',
+        path: 'M 0 190 C 300 30 650 280 980 145 C 1290 20 1570 110 1920 220 L 1920 330 L 0 330 Z',
+        color: '#151426',
+      });
+      var monoIn = ease(f, 2, 22, eo3);
+      layers.push({
+        type: 'stack', fit: 'expand', alignment: 'center', offsetY: 36 - 26 * (1 - monoIn), scale: 0.92 + 0.08 * monoIn,
+        children: [
+          { type: 'container', alignment: 'center', offsetY: 248, width: 250, height: 18, borderRadius: 9, color: '#05050b', opacity: 0.55 },
+          { type: 'svg', alignment: 'center', width: 360, height: 520, viewBox: '0 0 360 520', path: 'M 120 40 L 240 20 L 240 500 L 120 460 Z', color: primary },
+          { type: 'svg', alignment: 'center', width: 360, height: 520, viewBox: '0 0 360 520', path: 'M 240 20 L 310 70 L 310 480 L 240 500 Z', color: '#321c5d' },
+          { type: 'svg', alignment: 'center', width: 360, height: 520, viewBox: '0 0 360 520', path: 'M 120 40 L 190 0 L 310 70 L 240 20 Z', color: primaryLight },
+          { type: 'container', alignment: 'center', offsetX: -52, offsetY: -14, width: 5, height: 330, color: yoclipColorA('primaryLight', 0x66, '#a78bfa') },
+        ],
+      });
+      layers.push({
+        type: 'svg', alignment: 'bottomCenter', width: 1920, height: 220, viewBox: '0 0 1920 220',
+        path: 'M 0 120 C 390 10 760 190 1120 105 C 1440 30 1710 85 1920 140 L 1920 220 L 0 220 Z',
+        color: '#090b14',
+      });
+    } else if (idx === 1) {
+      // B — a portal and a constellation of design surfaces.
+      layers.push({
+        type: 'container',
+        gradient: { type: 'linear', begin: 'topLeft', end: 'bottomRight', colors: ['#020c15', '#092d3c', '#17132e'] },
+      });
+      layers = layers.concat(stars(28, f, 2));
+      layers.push(glow('accent', '#22d3ee', 1050, 0x3d));
+      // Perspective floor grid.
+      for (var g = 0; g < 6; g++) {
+        layers.push({ type: 'container', alignment: 'center', offsetY: 250 + g * 55, width: 1500 + g * 180, height: 1, color: accent, opacity: 0.11 });
+      }
+      for (var r = 0; r < 8; r++) {
+        var rp = (r + 1) / 8;
+        layers.push({
+          type: 'container', alignment: 'center', offsetY: -24,
+          width: 610, height: 610, borderRadius: 305,
+          scale: 0.32 + rp * 0.92 + Math.sin(f * 0.035 + r) * 0.012,
+          rotation: (r % 2 ? -1 : 1) * f * 0.22 + r * 7,
+          borderColor: r % 3 === 0 ? accent : (r % 3 === 1 ? primaryLight : primary),
+          borderWidth: r === 7 ? 5 : 2.5,
+          color: '#00000000', opacity: 0.2 + rp * 0.65,
+          shadow: { color: yoclipColorA(r % 2 ? 'primary' : 'accent', r === 7 ? 0x44 : 0, '#7c3aed'), blur: 30, offsetX: 0, offsetY: 0 },
+        });
+      }
+      layers.push({ type: 'container', alignment: 'center', offsetY: -24, width: 130, height: 130, borderRadius: 65, color: '#d9fbff', opacity: 0.9, shadow: { color: accent, blur: 60, offsetX: 0, offsetY: 0 } });
+      layers.push(glassCard(portrait ? -280 : -570, -175, -8, f, 0));
+      layers.push(glassCard(portrait ? 270 : 565, -70, 7, f, 1));
+      layers.push(glassCard(portrait ? -245 : -480, 245, 5, f, 2));
+    } else {
+      // C — a prismatic story vortex; the brand is the still center.
+      layers.push({
+        type: 'container',
+        gradient: { type: 'linear', begin: 'topCenter', end: 'bottomCenter', colors: ['#100717', '#25113a', '#061d27'] },
+      });
+      layers = layers.concat(stars(30, f, 3));
+      layers.push(glow('primary', '#7c3aed', 1080, 0x50));
+      for (var s = 0; s < 14; s++) {
+        var ang = (s / 14) * Math.PI * 2 + f * 0.018;
+        var rad = 290 + (s % 3) * 105;
+        var shardIn = ease(f, 2 + (s % 5) * 2, 20 + (s % 5) * 2, eoBack);
+        layers.push({
+          type: 'svg', alignment: 'center',
+          offsetX: Math.cos(ang) * rad,
+          offsetY: Math.sin(ang) * rad * 0.66,
+          width: 118, height: 205, viewBox: '0 0 118 205',
+          path: 'M 59 0 L 118 205 L 0 205 Z',
+          color: s % 3 === 0 ? accent : (s % 3 === 1 ? primary : primaryLight),
+          opacity: (0.28 + (s % 4) * 0.14) * shardIn,
+          rotation: ang * 180 / Math.PI + 90 + f * (s % 2 ? 0.8 : -0.55),
+          scale: Math.max(0.01, shardIn * (0.65 + (s % 3) * 0.18)),
+        });
+      }
+      // Orbiting narrative cards.
+      var storyWords = ['PROMPT', 'RENDER', 'SHIP'];
+      for (var n = 0; n < 3; n++) {
+        var na = n * Math.PI * 2 / 3 - f * 0.012;
+        layers.push({
+          type: 'container', alignment: 'center',
+          offsetX: Math.cos(na) * 550,
+          offsetY: Math.sin(na) * 285,
+          width: 218, height: 72, borderRadius: 18,
+          color: yoclipColorA('backgroundDeep', 0xd9, '#07070d'),
+          borderColor: n === 1 ? accent : primaryLight, borderWidth: 1.5,
+          rotation: Math.sin(na) * 7,
+          child: { type: 'stack', fit: 'expand', children: [{ type: 'text', alignment: 'center', text: '0' + (n + 1) + '  /  ' + storyWords[n], style: { fontSize: 19, color: txt, fontFamily: font, fontWeight: 600, letterSpacing: 3 } }] },
+        });
+      }
+      var markIn = pop(f, 4, 22);
+      layers.push({
+        type: 'container', alignment: 'center', width: 440, height: 250,
+        scale: Math.max(0.02, markIn.scale), opacity: markIn.opacity,
+        rotation: Math.sin(f * 0.035) * 2,
+        color: yoclipColorA('backgroundDeep', 0xe6, '#07070d'), borderRadius: 34,
+        borderColor: yoclipColorA('primaryLight', 0x99, '#a78bfa'), borderWidth: 2,
+        shadow: { color: yoclipColorA('primary', 0x22, '#7c3aed'), blur: 60, offsetX: 0, offsetY: 16 },
+        child: { type: 'stack', fit: 'expand', children: [{ type: 'image', source: yoclipLogoSource(), fit: 'contain', width: 280, height: 177, alignment: 'center' }] },
+      });
+    }
 
+    // Shared editorial HUD: chapter, caption and three hard-cut progress ticks.
+    var capIn = ease(f, 3, 15, eo3);
+    layers.push({ type: 'text', alignment: 'topLeft', offsetX: 64, offsetY: 52, text: '0' + (idx + 1) + '  /  03', style: { fontSize: 21, color: accent, fontFamily: font, fontWeight: 600, letterSpacing: 5 } });
+    layers.push({ type: 'text', alignment: 'topRight', offsetX: -64, offsetY: 54, text: 'YOCLIP  /  WORLDS', style: { fontSize: 18, color: muted, fontFamily: font, fontWeight: 600, letterSpacing: 5 } });
+    layers.push({
+      type: 'text', alignment: 'bottomLeft', offsetX: 64 + (1 - capIn) * 28, offsetY: portrait ? -82 : -64,
+      text: captions[idx], opacity: capIn,
+      style: { fontSize: portrait ? 48 : 68, color: txt, fontFamily: font, fontWeight: 700, letterSpacing: 1, shadows: [{ color: '#99000000', blur: 20, offsetX: 0, offsetY: 5 }] },
+    });
+    layers.push({ type: 'text', alignment: 'bottomRight', offsetX: -42, offsetY: 6, text: '0' + (idx + 1), opacity: 0.1, style: { fontSize: 190, color: txt, fontFamily: font, fontWeight: 700 } });
+    for (var q = 0; q < 3; q++) {
+      layers.push({ type: 'container', alignment: 'bottomCenter', offsetX: (q - 1) * 186, offsetY: -24, width: 164, height: 3, color: q === idx ? accent : yoclipColorA('textMuted', 0x44, '#a1a1aa') });
+    }
+
+    var life = idx === 0 ? presence(frame, 7, 9999, 0) : 1;
     return {
-      type: 'stack',
-      fit: 'expand',
-      opacity: life * outro,
-      children: layers,
+      type: 'stack', fit: 'expand', opacity: life * fadeOut(frame, 186, 8),
+      children: [{ type: 'stack', fit: 'expand', opacity: enter, scale: 0.975 + 0.025 * enter, children: layers }],
     };
   },
 };

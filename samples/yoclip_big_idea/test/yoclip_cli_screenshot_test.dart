@@ -33,8 +33,18 @@ void main() {
       print('SCREENSHOT: runtime init done');
       addTearDown(runtime.dispose);
 
-      final scenes = await loadYoclipProjectScenes(runtime, project, storage);
-      print('SCREENSHOT: scenes loaded');
+      final variantId = Platform.environment['YOCLIP_VARIANT'] ?? 'dark_en';
+      final variant = project.config.variants.firstWhere(
+        (v) => v.id == variantId,
+        orElse: () => throw StateError('Unknown variant "$variantId"'),
+      );
+      final scenes = await loadYoclipProjectScenes(
+        runtime,
+        project,
+        storage,
+        variant: variant,
+      );
+      print('SCREENSHOT: scenes loaded for $variantId');
 
       final targetScenes = scenes;
 

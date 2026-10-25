@@ -229,6 +229,7 @@ scene = {
         type: 'row',
         mainAxisAlignment: 'end',
         width: rowW,
+        offsetX: portrait ? 0 : -80,
         opacity: userPop.opacity,
         children: [{
           type: 'container',
@@ -304,11 +305,10 @@ scene = {
       children: [
         {
           type: 'container',
-          alignment: portrait ? 'center' : 'centerRight',
-          // Landscape: hug the chat content (~276px + padding) instead of a
-          // tall mostly-empty panel, and shift further left so the frame
-          // isn't right-weighted.
-          offsetX: portrait ? 0 : -150,
+          alignment: 'center',
+          // Keep the conversation centered and leave enough room for the
+          // longest localized bubble; the feed itself stays top-anchored.
+          offsetX: 0,
           offsetY: panelY,
           width: portrait ? 960 : 900,
           height: portrait ? 1000 : 360,

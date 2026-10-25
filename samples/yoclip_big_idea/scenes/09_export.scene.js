@@ -203,6 +203,7 @@ scene = {
       var sc = Math.max(0.05, 0.6 + 0.4 * eoBack(p));
       return {
         type: 'container',
+        height: 64,
         scale: sc,
         // Opacity floor once the entrance starts: the chip container is
         // visible from its first frame (hidden entirely before it).
@@ -242,6 +243,7 @@ scene = {
           mainAxisAlignment: 'center',
           crossAxisAlignment: 'center',
           alignment: 'center',
+          height: 340,
           offsetY: 420,
           children: [
             chip(0), { type: 'container', height: 18 },
@@ -255,6 +257,7 @@ scene = {
           mainAxisAlignment: 'center',
           crossAxisAlignment: 'center',
           alignment: 'center',
+          height: 76,
           offsetY: 330,
           children: [
             chip(0), { type: 'container', width: 22 },
