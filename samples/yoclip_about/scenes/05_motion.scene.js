@@ -12,7 +12,7 @@ scene = {
   },
   render: function(frame) {
     var T = yoclipT('motion');
-    var life = presence(frame, 16, 252, 18);
+    var life = presence(frame, 16, 266, 18);
     var titleIn = ease(frame, 0, 28, eo3);
     // Portrait variants (e.g. shorts 1080x1920) get a re-composed layout:
     // smaller title to fit the narrow frame, cards spread vertically using

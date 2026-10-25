@@ -18,7 +18,7 @@ scene = {
   },
   render: function(frame) {
     var T = yoclipT('hook');
-    var life = presence(frame, 14, 224, 18);
+    var life = presence(frame, 14, 238, 18);
     // Portrait variants (e.g. shorts 1080x1920) shrink the headline so it
     // clears the narrower frame and use the extra vertical room to spread
     // the kicker and sub line away from the headline.

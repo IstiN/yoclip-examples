@@ -13,7 +13,7 @@ scene = {
   },
   render: function(frame) {
     var T = yoclipT('export');
-    var life = presence(frame, 14, 226, 16);
+    var life = presence(frame, 14, 240, 16);
     var titleIn = ease(frame, 0, 26, eo3);
     // Portrait variants (e.g. shorts 1080x1920) re-compose: the three chips
     // stack vertically as wider cards instead of a side-by-side row.

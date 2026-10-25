@@ -21,7 +21,7 @@ scene = {
   },
   render: function(frame) {
     var T = yoclipT('intro');
-    var life = presence(frame, 12, 256, 20);
+    var life = presence(frame, 12, 268, 20);
     // Portrait variants (e.g. shorts 1080x1920) get a re-composed layout:
     // bigger ring/logo using the vertical space, tagline higher up.
     var portrait = yoclipIsPortrait();
@@ -71,8 +71,8 @@ scene = {
         },
         {
           type: 'container',
-          alignment: 'bottomCenter',
-          offsetY: portrait ? -420 : -156,
+          alignment: 'center',
+          offsetY: portrait ? 160 : 250,
           opacity: seg(frame, 188, 210),
           child: {
             type: 'row',

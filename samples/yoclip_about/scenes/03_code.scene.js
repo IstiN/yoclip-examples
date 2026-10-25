@@ -18,7 +18,7 @@ scene = {
     // Portrait variants (shorts 1080x1920) re-compose: the editor and
     // preview cards stack vertically instead of side by side.
     var portrait = yoclipIsPortrait();
-    var life = presence(frame, 16, 312, 18);
+    var life = presence(frame, 16, 326, 18);
     var titleIn = ease(frame, 0, 28, eo3);
     // Soft entrance for the window panels so they don't just pop in.
     var cardIn = ease(frame, 8, 44, eo3);

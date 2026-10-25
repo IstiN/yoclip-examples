@@ -12,7 +12,7 @@ scene = {
     lane: 'video',
   },
   render: function(frame) {
-    var life = presence(frame, 16, 312, 18);
+    var life = presence(frame, 16, 326, 18);
     // Portrait variants (e.g. shorts 1080x1920) shrink the app card so it
     // fits the narrow canvas with margins, keeping the screenshot aspect,
     // and lift it a touch above center for better vertical rhythm.

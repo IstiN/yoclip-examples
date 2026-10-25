@@ -5,7 +5,7 @@
 
 scene = {
   id: 'cta',
-  duration: 480,
+  duration: 492,
   from: 0,
   // Scene plan + voiceover prompts (metadata only — not rendered, not
   // played; drives the goal → scenario → scenes plan and future TTS).

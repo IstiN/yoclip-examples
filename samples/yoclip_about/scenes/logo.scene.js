@@ -4,7 +4,7 @@
 
 scene = {
   id: 'logo',
-  duration: 4000,
+  duration: 4170,
   from: 0,
   timeline: {
     label: yoclipT('logo').timeline || 'Logo',
@@ -12,9 +12,9 @@ scene = {
     lane: 'video',
   },
   render: function(frame) {
-    // Hide the corner watermark once the finale (CTA, global frame ~3264+)
+    // Hide the corner watermark as the finale (CTA, global frame 3678)
     // takes over — the big centered logo owns the brand there.
-    var fadeOut = frame < 3264 ? 1 : 1 - ease(frame, 3264, 3294, eo3);
+    var fadeOut = frame < 3678 ? 1 : 1 - ease(frame, 3678, 3708, eo3);
     return {
       type: 'image',
       source: yoclipLogoSource(),

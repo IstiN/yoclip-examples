@@ -37,19 +37,25 @@ scene = {
     // Coordinates are for a 1200x576 virtual page (was 1500x720).
     // Keeping the zoom scale moderate (max 2.4x) reduces the offscreen
     // bitmap size and avoids browser rasterization stalls on this scene.
-    var f1 = seg(frame, 40, 130);   // full -> feature card (bottom-left)
-    var f2 = seg(frame, 130, 220);  // pan to profile avatar (top-right)
-    var f3 = seg(frame, 220, 290);  // snap back to full page
+    // Deliberate dwells keep each focused detail fully readable; the cropped
+    // page is only visible while the camera is actually travelling.
+    var f1 = seg(frame, 36, 104);   // full -> feature card, then hold to 174
+    var f2 = seg(frame, 174, 228);  // pan to profile avatar, then hold to 246
+    var f3 = seg(frame, 246, 312);  // return to the complete page
 
     var s, fx, fy;
-    if (frame < 130) {
+    if (frame < 104) {
       s  = lerp(1.0, 2.2, eio3(f1));
       fx = px(lerp(600, 216, eio3(f1)));
       fy = px(lerp(288, 445, eio3(f1)));
-    } else if (frame < 220) {
+    } else if (frame < 174) {
+      s = 2.2; fx = px(216); fy = px(445);
+    } else if (frame < 228) {
       s  = lerp(2.2, 2.4, eio3(f2));
       fx = px(lerp(216, 1072, eio3(f2)));
       fy = px(lerp(445, 96, eio3(f2)));
+    } else if (frame < 246) {
+      s = 2.4; fx = px(1072); fy = px(96);
     } else {
       s  = lerp(2.4, 1.0, eio3(f3));
       fx = px(lerp(1072, 600, eio3(f3)));
@@ -254,7 +260,7 @@ scene = {
     return {
       type: 'stack', fit: 'expand', opacity: life,
       children: [
-        { type: 'text', text: 'Zoom into any detail',
+        { type: 'text', text: T.title || 'Zoom into any detail',
           style: { fontSize: yoclipSize('lg', 56), color: C.text, fontFamily: yoclipFont(), fontWeight: 700 },
           alignment: 'topCenter', offsetY: portrait ? 260 : 80, opacity: titleIn },
         frame,

@@ -96,6 +96,12 @@ project = {
         title: 'Built for real output',
         resolution: 'any resolution',
         scriptable: 'scriptable',
+        frameRate: 'Frame rate',
+        output: 'Output',
+        control: 'Control',
+        profile: 'YOCLIP  /  RENDER PROFILE',
+        ready: 'ENGINE READY',
+        caption: 'ONE TIMELINE  ·  EVERY FRAME  ·  ANY OUTPUT',
       },
       chat: {
         timeline: 'Chat',
@@ -111,6 +117,7 @@ project = {
         timeline: 'Montage',
         title: 'Anything you can code',
         labels: ['draw', 'breathe', 'spin'],
+        caption: 'THREE PRIMITIVES  ·  INFINITE DIRECTIONS',
       },
       export: {
         timeline: 'Export',
@@ -133,6 +140,7 @@ project = {
           'chromatic', 'shine', 'wave text', 'letter reveal', 'spectrum',
         ],
         wordEffects: 'EFFECTS',
+        caption: 'TEN LOOKS  /  ONE SCENE GRAPH  /  ZERO PLUG-INS',
       },
       background: {
         timeline: 'Background',
@@ -196,6 +204,12 @@ project = {
         title: 'Сделано для реального результата',
         resolution: 'любое разрешение',
         scriptable: 'программируемо',
+        frameRate: 'Частота кадров',
+        output: 'Формат',
+        control: 'Контроль',
+        profile: 'YOCLIP  /  ПРОФИЛЬ РЕНДЕРА',
+        ready: 'ДВИЖОК ГОТОВ',
+        caption: 'ОДИН ТАЙМЛАЙН  ·  КАЖДЫЙ КАДР  ·  ЛЮБОЙ ФОРМАТ',
       },
       chat: {
         timeline: 'Чат',
@@ -211,6 +225,7 @@ project = {
         timeline: 'Монтаж',
         title: 'Всё, что можно закодировать',
         labels: ['рисунок', 'дыхание', 'вращение'],
+        caption: 'ТРИ ПРИМИТИВА  ·  БЕСКОНЕЧНЫЕ НАПРАВЛЕНИЯ',
       },
       export: {
         timeline: 'Экспорт',
@@ -233,6 +248,7 @@ project = {
           'хроматика', 'блик', 'волна текста', 'буквы', 'спектр',
         ],
         wordEffects: 'ЭФФЕКТЫ',
+        caption: 'ДЕСЯТЬ СТИЛЕЙ  /  ОДИН ГРАФ СЦЕНЫ  /  БЕЗ ПЛАГИНОВ',
       },
       background: {
         timeline: 'Фон',

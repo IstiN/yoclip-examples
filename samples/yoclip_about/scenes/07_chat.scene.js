@@ -13,7 +13,7 @@ scene = {
   },
   render: function(frame) {
     var T = yoclipT('chat');
-    var life = presence(frame, 14, 226, 16);
+    var life = presence(frame, 14, 240, 16);
     var titleIn = ease(frame, 0, 26, eo3);
     // Portrait variants re-compose: smaller title that clears the watermark,
     // and the bubble/input bar spread out over the tall canvas.
