@@ -48,7 +48,7 @@ scene = {
                 borderRadius: 32,
                 borderColor: c('sea'),
                 borderWidth: 2,
-                alignment: 'topLeft',
+                padding: { left: 24, right: 24 },
                 child: {
                   type: 'text',
                   text: 'GET IN TOUCH',

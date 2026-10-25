@@ -69,10 +69,6 @@ scene = {
       var b = {
         type: 'container',
         width: 44, height: 44, borderRadius: 22,
-        alignment: 'topLeft',
-        offsetX: x, offsetY: y,
-        scale: 0.6 + 0.4 * t,
-        opacity: 0.25 * pre + 0.75 * t,
         child: {
           type: 'text',
           text: '' + n,
@@ -91,7 +87,22 @@ scene = {
         b.borderColor = c('hairline');
         b.borderWidth = 1.5;
       }
-      return b;
+      // Positioning alignment belongs on a transparent wrapper. Putting it
+      // on the decorated circle also aligns its digit to the top-left.
+      if (x == null || y == null) {
+        b.scale = 0.6 + 0.4 * t;
+        b.opacity = 0.25 * pre + 0.75 * t;
+        return b;
+      }
+      return {
+        type: 'container',
+        width: 44, height: 44,
+        alignment: 'topLeft',
+        offsetX: x, offsetY: y,
+        scale: 0.6 + 0.4 * t,
+        opacity: 0.25 * pre + 0.75 * t,
+        child: b,
+      };
     }
 
     // Side card (ticket / bridge / PR).
@@ -135,20 +146,28 @@ scene = {
       (function(i) {
         var s = steps[i];
         var t = eo3(seg(frame, s.at, s.at + 16));
-        var rowY = 96 + i * 76;
-        // badge
-        runnerChildren.push(badge(s.n, 30, rowY, s.at));
-        // texts — hidden until the step activates (no gray pending block)
+        var rowY = 90 + i * 76;
+        // One laid-out row keeps the badge centered against the complete
+        // title/subtitle unit, with a 30px inset and a consistent 20px gap.
         runnerChildren.push({
-          type: 'column',
+          type: 'row',
+          width: runnerW - 60, height: 70,
           alignment: 'topLeft',
-          offsetX: 94, offsetY: rowY - 6,
-          crossAxisAlignment: 'start',
-          opacity: t,
+          offsetX: 30, offsetY: rowY,
+          crossAxisAlignment: 'center',
           children: [
-            emphasis(s.title, 28, c('snow')),
-            { type: 'container', height: 6, alignment: 'topLeft' },
-            body(s.sub, 21, c('muted')),
+            badge(s.n, null, null, s.at),
+            { type: 'container', width: 20, height: 1 },
+            {
+              type: 'column',
+              crossAxisAlignment: 'start',
+              opacity: t,
+              children: [
+                emphasis(s.title, 28, c('snow')),
+                { type: 'container', height: 6 },
+                body(s.sub, 21, c('muted')),
+              ],
+            },
           ],
         });
       })(i);
@@ -159,7 +178,7 @@ scene = {
     // ---- human in the loop ---------------------------------------------
     var humT = eo3(seg(frame, 318, 340));
     var humY = top + runnerH + 56;
-    var human = {
+    var humanBar = {
       type: 'container',
       width: xPR + cardW - xTicket,
       height: 84,
@@ -167,10 +186,7 @@ scene = {
       color: c('surface'),
       borderColor: c('lilac'),
       borderWidth: 1.5,
-      alignment: 'topLeft',
-      offsetX: xTicket,
-      offsetY: humY,
-      opacity: humT,
+      alignment: 'center',
       child: {
         type: 'row',
         alignment: 'center',
@@ -190,6 +206,16 @@ scene = {
           body('— reviews the story, approves the pull request.', 26, c('muted'), undefined, { alignment: 'center' }),
         ],
       },
+    };
+    var human = {
+      type: 'container',
+      width: xPR + cardW - xTicket,
+      height: 84,
+      alignment: 'topLeft',
+      offsetX: xTicket,
+      offsetY: humY,
+      opacity: humT,
+      child: humanBar,
     };
 
     // dashed connectors: ticket bottom -> bar, bar -> PR bottom

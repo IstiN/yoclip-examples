@@ -166,7 +166,7 @@ scene = {
             type: 'container',
             width: 74,
             height: 180,
-            alignment: 'topLeft',
+            alignment: 'center',
             opacity: arrowT,
             child: {
               type: 'container',

@@ -18,7 +18,7 @@ scene = {
   audio: [ { source: 'assets/audio/00.mp3', start: 30, volume: 1.0 } ],
   render: function(frame) {
     if (typeof presence === 'undefined') return { type: 'container' };
-    var master = presence(frame, 10, 254, 20);
+    var master = presence(frame, 10, 170, 104);
 
     // Signature blur glows blooming in.
     var glow1 = eo3(seg(frame, 0, 70));

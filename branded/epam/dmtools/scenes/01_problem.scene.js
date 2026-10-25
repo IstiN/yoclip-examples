@@ -65,9 +65,11 @@ scene = {
             type: 'container',
             width: 46,
             height: 150,
-            alignment: 'topLeft',
+            alignment: 'center',
             child: {
               type: 'stack',
+              width: 46,
+              height: 150,
               children: [
                 {
                   type: 'container',
