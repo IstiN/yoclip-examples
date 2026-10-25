@@ -80,63 +80,74 @@ scene = {
         borderWidth: 1.5,
         shadow: { color: yoclipColorA('primary', 0x55, '#7c3aed'), blur: 34, offsetX: 0, offsetY: 16 },
         child: {
-          type: 'row',
-          crossAxisAlignment: 'center',
+          // Badge and text block are centered independently: a plain row let
+          // the text sit high while the badge hung low (uneven indents).
+          type: 'stack',
+          fit: 'expand',
           children: [
-            { type: 'container', width: 30 },
             {
               type: 'container',
               width: 52,
               height: 52,
-              gradient: {
-                colors: [yoclipColor('primary', '#7c3aed'), yoclipColor('accent', '#22d3ee')],
-                begin: 'topLeft',
-                end: 'bottomRight',
-              },
-              borderRadius: 14,
-              child: {
-                type: 'stack',
-                fit: 'expand',
-                children: [{
-                  type: 'text',
-                  alignment: 'center',
-                  // Chip mirrors the card title's own number prefix
-                  // (00_hook -> 00, 11_cta -> 11), not a sequential index.
-                  text: cards[i][0].split('_')[0],
-                  style: {
-                    fontSize: 24,
-                    color: '#ffffff',
-                    fontFamily: yoclipFont(),
-                    fontWeight: 700,
-                  },
-                }],
-              },
+              alignment: 'centerLeft',
+              offsetX: 30,
+                gradient: {
+                  colors: [yoclipColor('primary', '#7c3aed'), yoclipColor('accent', '#22d3ee')],
+                  begin: 'topLeft',
+                  end: 'bottomRight',
+                },
+                borderRadius: 14,
+                child: {
+                  type: 'stack',
+                  fit: 'expand',
+                  children: [{
+                    type: 'text',
+                    alignment: 'center',
+                    // Chip mirrors the card title's own number prefix
+                    // (00_hook -> 00, 11_cta -> 11), not a sequential index.
+                    text: cards[i][0].split('_')[0],
+                    style: {
+                      fontSize: 24,
+                      color: '#ffffff',
+                      fontFamily: yoclipFont(),
+                      fontWeight: 700,
+                    },
+                  }],
+                },
             },
-            { type: 'container', width: 26 },
             {
-              type: 'column',
-              crossAxisAlignment: 'start',
-              children: [
-                {
-                  type: 'text',
-                  text: cards[i][0],
-                  style: {
-                    fontSize: portrait ? 36 : 42,
-                    color: yoclipColor('text', '#ffffff'),
-                    fontFamily: yoclipFont(),
-                    fontWeight: 700,
+              type: 'container',
+              alignment: 'centerLeft',
+              padding: { left: 108 },
+              child: {
+                type: 'column',
+                mainAxisAlignment: 'center',
+                crossAxisAlignment: 'start',
+                children: [
+                  {
+                    type: 'text',
+                    text: cards[i][0],
+                    style: {
+                      fontSize: portrait ? 36 : 42,
+                      color: yoclipColor('text', '#ffffff'),
+                      fontFamily: yoclipFont(),
+                      fontWeight: 700,
+                      lineHeight: 1.15,
+                    },
                   },
-                },
-                {
-                  type: 'text',
-                  text: cards[i][1],
-                  style: {
-                    fontSize: portrait ? 24 : 27,
-                    color: yoclipColor('textMuted', '#a1a1aa'),
-                    fontFamily: yoclipFont(),
+                  { type: 'container', height: 6 },
+                  {
+                    type: 'text',
+                    text: cards[i][1],
+                    style: {
+                      fontSize: portrait ? 24 : 27,
+                      color: yoclipColor('textMuted', '#a1a1aa'),
+                      fontFamily: yoclipFont(),
+                      lineHeight: 1.25,
+                    },
                   },
-                },
-              ],
+                ],
+              },
             },
           ],
         },

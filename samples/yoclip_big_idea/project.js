@@ -116,7 +116,7 @@ project = {
       cta: {
         timeline: 'CTA',
         tagline: 'Describe it. Render it.',
-        url: 'yoclip.dev',
+        url: 'yoclip.studio',
         meta: 'Rendered by yoclip.',
       },
     },
@@ -200,7 +200,7 @@ project = {
       cta: {
         timeline: 'CTA',
         tagline: 'Опиши. Отрендерь.',
-        url: 'yoclip.dev',
+        url: 'yoclip.studio',
         meta: 'Отрендерено в yoclip.',
       },
     },

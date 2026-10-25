@@ -26,7 +26,7 @@ scene = {
   render: function(frame) {
     var t = yoclipT('cta');
     var tagline = t.tagline || 'Describe it. Render it.';
-    var url = t.url || 'yoclip.dev';
+    var url = t.url || 'yoclip.studio';
     var meta = t.meta || 'Rendered by yoclip.';
     var portrait = yoclipIsPortrait();
 
