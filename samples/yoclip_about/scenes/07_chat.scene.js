@@ -100,67 +100,66 @@ scene = {
           alignment: 'center',
           offsetY: portrait ? 340 : 150,
           child: {
-            type: 'row',
-            mainAxisAlignment: 'spaceBetween',
-            crossAxisAlignment: 'center',
+            // Stack with explicit edges: a spaceBetween row shrink-wraps and
+            // centers inside the bar, which stranded the send icon mid-bar.
+            type: 'stack',
+            fit: 'expand',
             children: [
               {
-                type: 'row',
-                crossAxisAlignment: 'center',
-                children: [
-                  { type: 'container', width: 28 },
-                  {
-                    type: 'text',
-                    text: sent ? '' : (hasText ? typed : T.placeholder || 'Type a message...'),
-                    style: {
-                      fontSize: yoclipSize('captionXl', 32),
-                      color: hasText && !sent
-                        ? yoclipTheme.colors.text
-                        : yoclipTheme.colors.textMuted,
-                      fontFamily: yoclipFont(),
+                type: 'container',
+                alignment: 'centerLeft',
+                padding: { left: 28 },
+                child: {
+                  type: 'row',
+                  crossAxisAlignment: 'center',
+                  children: [
+                    {
+                      type: 'text',
+                      text: hasText && !sent ? typed : (T.placeholder || 'Type a message...'),
+                      style: {
+                        fontSize: yoclipSize('captionXl', 32),
+                        color: hasText && !sent
+                          ? yoclipTheme.colors.text
+                          : yoclipTheme.colors.textMuted,
+                        fontFamily: yoclipFont(),
+                      },
+                      textAlign: 'left',
                     },
-                    textAlign: 'left',
-                  },
-                  {
-                    type: 'container',
-                    width: 3,
-                    height: 32,
-                    color: yoclipTheme.colors.primaryLight || yoclipColor('lavender', '#a78bfa'),
-                    opacity: showCursor ? 1 : 0,
-                    offsetX: 4,
-                  },
-                ],
+                    {
+                      type: 'container',
+                      width: 3,
+                      height: 32,
+                      color: yoclipTheme.colors.primaryLight || yoclipColor('lavender', '#a78bfa'),
+                      opacity: showCursor ? 1 : 0,
+                      offsetX: 4,
+                    },
+                  ],
+                },
               },
               {
-                type: 'row',
-                crossAxisAlignment: 'center',
-                children: [
-                  {
-                    type: 'container',
-                    width: 56,
-                    height: 56,
-                    borderRadius: 28,
-                    color: yoclipTheme.colors.primary || yoclipColor('primary', '#7c3aed'),
-                    alignment: 'center',
-                    scale: sendScale,
-                    child: {
-                      type: 'stack',
-                      fit: 'expand',
-                      children: [
-                        {
-                          type: 'path',
-                          path: 'M 8 6 L 18 14 L 8 22',
-                          color: yoclipColor('white', '#ffffff'),
-                          strokeWidth: 2.8,
-                          width: 22,
-                          height: 22,
-                          alignment: 'center',
-                        },
-                      ],
+                type: 'container',
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                color: yoclipTheme.colors.primary || yoclipColor('primary', '#7c3aed'),
+                alignment: 'centerRight',
+                offsetX: -24,
+                scale: sendScale,
+                child: {
+                  type: 'stack',
+                  fit: 'expand',
+                  children: [
+                    {
+                      type: 'path',
+                      path: 'M 8 6 L 18 14 L 8 22',
+                      color: yoclipColor('white', '#ffffff'),
+                      strokeWidth: 2.8,
+                      width: 22,
+                      height: 22,
+                      alignment: 'center',
                     },
-                  },
-                  { type: 'container', width: 24 },
-                ],
+                  ],
+                },
               },
             ],
           },

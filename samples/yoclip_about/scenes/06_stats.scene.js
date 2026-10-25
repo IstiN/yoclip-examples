@@ -46,7 +46,7 @@ scene = {
           style: { fontSize: index === 2 ? 42 : 26, color: accent, fontFamily: yoclipFont(), fontWeight: 700, letterSpacing: 2 } });
       }
       return {
-        type: 'container', width: portrait ? 760 : 430, height: portrait ? 236 : 300,
+        type: 'container', width: portrait ? 760 : 430, height: portrait ? 248 : 312,
         opacity: p, offsetY: (1 - p) * 24,
         child: {
           type: 'column', mainAxisAlignment: 'center', crossAxisAlignment: 'center',
@@ -67,7 +67,7 @@ scene = {
     }
 
     var metrics = [
-      metric(0, T.frameRate || 'Frame rate', 60, 'FPS', '24 / 30 / 60', C.primaryLight),
+      metric(0, T.frameRate || 'Frame rate', 120, 'FPS', '24 / 30 / 60 / 120', C.primaryLight),
       metric(1, T.output || 'Output', '4K', '', T.resolution || 'any resolution', C.accent),
       metric(2, T.control || 'Control', 100, '%', T.scriptable || 'scriptable', C.primaryLight),
     ];

@@ -157,15 +157,10 @@ scene = {
     };
 
     var editorBody = {
-      type: 'container',
-      offsetX: 44,
-      offsetY: 20,
-      child: {
-        type: 'column',
-        mainAxisAlignment: 'start',
-        crossAxisAlignment: 'start',
-        children: codeChildren,
-      },
+      type: 'column',
+      mainAxisAlignment: 'start',
+      crossAxisAlignment: 'start',
+      children: codeChildren,
     };
 
     var previewBody = {
@@ -265,7 +260,9 @@ scene = {
                 crossAxisAlignment: 'stretch',
                 children: [
                   editorHeader,
-                  { type: 'container', height: 648, child: editorBody },
+                  // Explicit topLeft + padding: an unaligned container centers
+                  // the shrink-wrapped code column (random-looking indents).
+                  { type: 'container', height: 648, alignment: 'topLeft', padding: { left: 48, top: 24 }, child: editorBody },
                 ],
               },
             },
