@@ -78,12 +78,20 @@ scene = {
       shadow: { color: yoclipColorA('primary', 0x55, '#7c3aed'), blur: 46 + 24 * shimmer(frame, 60) * glowPulse, offsetX: 0, offsetY: 22 },
       clip: true,
       child: {
+        // Top-anchor the chrome: without this sized topLeft wrapper the
+        // shrink-wrapped column is centered and the header floats mid-card.
+        type: 'container',
+        width: termW,
+        height: portrait ? 620 : 560,
+        alignment: 'topLeft',
+        child: {
         type: 'column',
         crossAxisAlignment: 'start',
         children: [
           // Chrome: mac dots.
           {
             type: 'container',
+            width: termW,
             height: 64,
             color: yoclipColorA('surface', 0x99, '#15131f'),
             child: {
@@ -194,6 +202,7 @@ scene = {
             },
           },
         ],
+        },
       },
     };
 

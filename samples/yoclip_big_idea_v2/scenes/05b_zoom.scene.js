@@ -110,7 +110,7 @@ scene = {
       shadow: { color: '#99fbbf24', blur: 30, offsetX: 0, offsetY: 0 },
     });
     previewKids.push({
-      type: 'container', alignment: 'center', width: 205, height: 54, borderRadius: 999,
+      type: 'container', alignment: 'center', width: 264, height: 56, borderRadius: 999,
       offsetY: 168, color: '#c914142c', borderColor: '#4067e8f9', borderWidth: 1,
       child: {
         type: 'text', alignment: 'center', text: 'LIVE VECTOR PREVIEW',
@@ -120,11 +120,16 @@ scene = {
     previewKids.push({
       type: 'container', alignment: 'bottomLeft', offsetX: 26, offsetY: -24,
       width: 190, height: 48, borderRadius: 999, color: '#d9ffffff',
+      // Outer bottomLeft also aligns the pill's CONTENT — wrap it in a
+      // full-size centered box or the icon+label sink to the bottom corner.
       child: {
+        type: 'container', width: 190, height: 48, alignment: 'center',
+        child: {
         type: 'row', mainAxisAlignment: 'center', crossAxisAlignment: 'center', children: [
           { type: 'path', path: 'M 8 4 L 20 12 L 8 20 Z', color: primary, strokeWidth: 2.5, width: 24, height: 24 },
           { type: 'text', text: t.previewChip || 'Preview · 8s', margin: { left: 8 }, style: { fontSize: 17, color: '#273a5c', fontFamily: font, fontWeight: 700 } },
         ],
+        },
       },
     });
     workspace.push({
@@ -147,19 +152,49 @@ scene = {
         ],
       };
     }
+    // Inline caret: wrap the typed prompt ourselves and attach the caret to
+    // the END of the last line. The old caret was a fixed-position block
+    // under the text area, blinking in empty space left of the divider.
+    function wrapPrompt(s, maxChars) {
+      var words = s.split(' ');
+      var lines = [];
+      var cur = '';
+      for (var wi = 0; wi < words.length; wi++) {
+        var w = words[wi];
+        var next = cur.length === 0 ? w : cur + ' ' + w;
+        if (next.length > maxChars && cur.length > 0) {
+          lines.push(cur);
+          cur = w;
+        } else {
+          cur = next;
+        }
+      }
+      lines.push(cur);
+      return lines;
+    }
+    var promptLines = wrapPrompt(typed, portrait ? 30 : 34);
+    var promptStyle = { fontSize: portrait ? 24 : 27, color: '#172554', fontFamily: font, fontWeight: 600, lineHeight: 1.3 };
+    var promptNodes = [];
+    for (var pl = 0; pl < promptLines.length; pl++) {
+      if (pl === promptLines.length - 1) {
+        promptNodes.push({
+          type: 'row', crossAxisAlignment: 'center', children: [
+            { type: 'text', text: promptLines[pl], textAlign: 'left', style: promptStyle },
+            { type: 'container', width: 4, height: 28, color: primary, margin: { left: 3 }, opacity: blink(frame, 14) },
+          ],
+        });
+      } else {
+        promptNodes.push({ type: 'text', text: promptLines[pl], textAlign: 'left', style: promptStyle });
+      }
+    }
     var panelChildren = [
       {
         type: 'text', alignment: 'topLeft', offsetX: 32, offsetY: 30, text: 'PROMPT',
         style: { fontSize: 17, color: primary, fontFamily: font, fontWeight: 700, letterSpacing: 3 },
       },
       {
-        type: 'text', alignment: 'topLeft', offsetX: 32, offsetY: 82,
-        width: portrait ? 500 : 516, height: 124, text: typed, textAlign: 'left',
-        style: { fontSize: portrait ? 24 : 27, color: '#172554', fontFamily: font, fontWeight: 600, lineHeight: 1.3 },
-      },
-      {
-        type: 'container', alignment: 'topLeft', offsetX: 32, offsetY: 74 + Math.min(2, Math.ceil(typed.length / 28)) * 35,
-        width: 4, height: 30, color: primary, opacity: blink(frame, 14),
+        type: 'column', alignment: 'topLeft', offsetX: 32, offsetY: 82,
+        crossAxisAlignment: 'start', children: promptNodes,
       },
       { type: 'container', alignment: 'topCenter', offsetY: 224, width: portrait ? 500 : 516, height: 1, color: '#dce5f2' },
       settingRow('FORMAT', '16:9  /  1920 × 1080', 250),

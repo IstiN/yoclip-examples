@@ -73,22 +73,22 @@ scene = {
 
     var font = yoclipFont();
     var rowW = portrait ? 880 : 820;
+    // Agent avatar: the real Fa assistant mark from our chat (indigo->teal
+    // sparkle) on a dark glass chip, not a generic "y" initial.
     var avatarDeco = {
-      gradient: {
-        colors: [yoclipColor('primary', '#7c3aed'), yoclipColor('primaryLight', '#a78bfa')],
-        begin: 'topLeft',
-        end: 'bottomRight',
-      },
-      borderRadius: 23,
+      color: '#10151f',
+      borderColor: '#3d465e',
     };
     var avatarChild = {
       type: 'stack',
       fit: 'expand',
       children: [{
-        type: 'text',
+        type: 'image',
+        source: 'external:fa_mark',
+        fit: 'contain',
+        width: 26,
+        height: 26,
         alignment: 'center',
-        text: 'y',
-        style: { fontSize: 26, color: '#ffffff', fontFamily: font, fontWeight: 700 },
       }],
     };
 
@@ -114,7 +114,9 @@ scene = {
           type: 'container',
           width: 46,
           height: 46,
-          gradient: avatarDeco.gradient,
+          color: avatarDeco.color,
+          borderColor: avatarDeco.borderColor,
+          borderWidth: 1,
           borderRadius: 23,
           child: avatarChild,
         },
@@ -150,7 +152,9 @@ scene = {
           width: 46,
           height: 46,
           scale: agentPop.scale,
-          gradient: avatarDeco.gradient,
+          color: avatarDeco.color,
+          borderColor: avatarDeco.borderColor,
+          borderWidth: 1,
           borderRadius: 23,
           child: avatarChild,
         },

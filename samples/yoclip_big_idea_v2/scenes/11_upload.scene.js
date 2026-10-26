@@ -404,14 +404,14 @@ scene = {
               end: 'bottomRight',
               colors: ['#fdba74', '#f97316'],
             },
-            child: {
-              type: 'row',
-              alignment: 'bottomCenter',
-              offsetY: -26,
-              crossAxisAlignment: 'end',
-              mainAxisAlignment: 'center',
-              children: bars,
-            },
+          },
+          // Header art sits at the RIGHT of the header, clear of the
+          // centered title (the old bottomCenter row landed on top of it).
+          {
+            type: 'row',
+            positioned: { right: 56, top: 62 },
+            crossAxisAlignment: 'end',
+            children: bars,
           },
           // Report title inside the header — same slot as in 12_polish.
           {

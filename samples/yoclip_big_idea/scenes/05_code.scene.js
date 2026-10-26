@@ -106,12 +106,21 @@ scene = {
       shadow: { color: yoclipColorA('primary', 0x44, '#7c3aed'), blur: 46, offsetX: 0, offsetY: 24 },
       clip: true,
       child: {
+        // Pin the chrome to the TOP of the window: the editor's own
+        // alignment (centerLeft) also centers a shrink-wrapped child column
+        // inside the card, which stranded the header mid-card.
+        type: 'container',
+        width: editorW,
+        height: editorH,
+        alignment: 'topLeft',
+        child: {
         type: 'column',
         crossAxisAlignment: 'start',
         children: [
           // Chrome: dots + filename tab.
           {
             type: 'container',
+            width: editorW,
             height: 76,
             color: yoclipColorA('surface', 0x99, '#15131f'),
             child: {
@@ -148,6 +157,7 @@ scene = {
             },
           },
         ],
+        },
       },
     };
 

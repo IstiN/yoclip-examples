@@ -262,7 +262,9 @@ scene = {
                   editorHeader,
                   // Explicit topLeft + padding: an unaligned container centers
                   // the shrink-wrapped code column (random-looking indents).
-                  { type: 'container', height: 648, alignment: 'topLeft', padding: { left: 48, top: 24 }, child: editorBody },
+                  // Width is required too: with only a height the box hugs
+                  // the code column and centers it horizontally in the card.
+                  { type: 'container', width: 880, height: 648, alignment: 'topLeft', padding: { left: 48, top: 24 }, child: editorBody },
                 ],
               },
             },

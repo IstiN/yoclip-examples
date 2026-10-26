@@ -53,6 +53,9 @@ external_assets:
   logo_on_light:
     type: image
     path: assets/images/yoclip_logo_on_light.svg
+  fa_mark:
+    type: image
+    path: assets/images/fa_mark.svg
   golden_hollywood:
     type: image
     path: assets/goldens/hollywood.png

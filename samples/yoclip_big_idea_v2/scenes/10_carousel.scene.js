@@ -491,9 +491,17 @@ scene = {
       borderRadius: 999,
       shadow: { color: '#40325b7a', blur: 22, offsetX: 0, offsetY: 10 },
       child: {
-        type: 'text',
-        text: follow,
-        style: { fontSize: 25, color: '#ffffff', fontFamily: font, fontWeight: 600 },
+        // Center the label INSIDE the pill: the outer bottomCenter would
+        // otherwise pin it to the pill's bottom edge (no vertical padding).
+        type: 'container',
+        width: 480,
+        height: 64,
+        alignment: 'center',
+        child: {
+          type: 'text',
+          text: follow,
+          style: { fontSize: 25, color: '#ffffff', fontFamily: font, fontWeight: 600 },
+        },
       },
     };
 

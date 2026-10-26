@@ -439,6 +439,13 @@ scene = {
       borderRadius: 999,
       shadow: { color: '#662563eb', blur: shareGlow, offsetX: 0, offsetY: 12 },
       child: {
+        // Keep icon+label centered inside the pill regardless of the outer
+        // bottomCenter placement (which otherwise shifts them to the edge).
+        type: 'container',
+        width: portrait ? 380 : 420,
+        height: 92,
+        alignment: 'center',
+        child: {
         type: 'row',
         mainAxisAlignment: 'center',
         crossAxisAlignment: 'center',
@@ -458,6 +465,7 @@ scene = {
             style: { fontSize: portrait ? 32 : 36, color: '#ffffff', fontFamily: font, fontWeight: 700 },
           },
         ],
+        },
       },
     };
 

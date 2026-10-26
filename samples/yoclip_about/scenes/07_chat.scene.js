@@ -138,12 +138,14 @@ scene = {
               },
               {
                 type: 'container',
+                // Real Positioned, not alignment+scale: scale is applied
+                // OUTSIDE the Align wrapper, so an aligned send button slid
+                // toward the bar center during the press animation.
+                positioned: { right: 24, top: 20 },
                 width: 56,
                 height: 56,
                 borderRadius: 28,
                 color: yoclipTheme.colors.primary || yoclipColor('primary', '#7c3aed'),
-                alignment: 'centerRight',
-                offsetX: -24,
                 scale: sendScale,
                 child: {
                   type: 'stack',
