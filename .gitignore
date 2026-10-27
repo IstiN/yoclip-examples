@@ -1,6 +1,7 @@
 # Build & tooling
 build/
 .dart_tool/
+.fah/
 .yoclip_cache/
 .idea/
 .metadata

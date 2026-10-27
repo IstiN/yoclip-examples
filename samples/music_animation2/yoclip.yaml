@@ -1,0 +1,78 @@
+config:
+  duration: auto
+  fps: 30
+  width: 1080
+  height: 1920
+  background: '#05060d'
+
+project_js: project.js
+
+# Вертикальный лирик-клип (TikTok/Reels), 1080x1920 @ 30fps.
+# Трек: track.m4a -> assets/audio/track.mp3, 274.97 c, BPM 97 (бит 18.56 кадра).
+# Клип = финал трека с 3:14 (строки из ТЗ): исходник обрезан media_trim
+# (193.0 c -> assets/audio/track_clip.mp3, 81.97 c = 2459 кадров @ 30fps).
+# Караоке — реальный транскрипт (google/gemini-3.8-flash,
+# .yoclip_cache/analysis/track.transcript.txt), пословный тайминг + снап к 8-м
+# долям сетки 97 BPM (scenes/music_timing.js).
+
+fonts:
+  - family: SS3 Black
+    path: assets/fonts/SourceSans3-Black.ttf
+  - family: SS3 Bold
+    path: assets/fonts/SourceSans3-Bold.ttf
+  - family: SS3
+    path: assets/fonts/SourceSans3-Regular.ttf
+
+external_assets:
+  grade0:
+    type: image
+    path: assets/images/grade0.png
+  grade1:
+    type: image
+    path: assets/images/grade1.png
+  grade2:
+    type: image
+    path: assets/images/grade2.png
+
+audio:
+  tracks:
+    - source: assets://audio/track_clip.mp3
+      start: 0
+      volume: 1.0
+
+theme:
+  colors:
+    background: '#05060d'
+    panel: '#0b0e1c'
+    panelLine: '#1d2438'
+    text: '#f4f6ff'
+    textMuted: '#8b93b8'
+    textDim: '#4a5272'
+    ice: '#7dd3fc'
+    blue: '#3b82f6'
+    violet: '#8b5cf6'
+    violetLight: '#c4b5fd'
+    red: '#ff2d55'
+    redDeep: '#c1123f'
+  font:
+    family: SS3 Black
+  sizes:
+    lyric: 56
+    lyricBig: 110
+    huge: 150
+    cap: 26
+
+scenes:
+  - scenes/00_bg.scene.js
+  - scenes/01_phone.scene.js
+  - scenes/02_puddle.scene.js
+  - scenes/03_mic.scene.js
+  - scenes/04_screentime.scene.js
+  - scenes/05_phones.scene.js
+  - scenes/06_silhouette.scene.js
+  - scenes/07_chorus.scene.js
+  - scenes/08_glass.scene.js
+  - scenes/09_chat.scene.js
+  - scenes/10_heart.scene.js
+  - scenes/11_ember.scene.js
+  - scenes/90_overlay.scene.js
