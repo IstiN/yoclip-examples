@@ -5,6 +5,12 @@ config:
   height: 1080
   background: '#000000'
 
+theme:
+  colors:
+    accent: '#6157f3'
+    accentBlue: '#3c7af4'
+    accentSoft: '#a6a6f8'
+
 scenes:
   - scenes/intro.scene.js
 
@@ -15,6 +21,9 @@ external_assets:
   logo:
     type: image
     path: assets/logo.png
+  logo_white:
+    type: image
+    path: assets/logo_white.png
 
 audio:
   tracks:
