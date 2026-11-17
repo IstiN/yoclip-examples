@@ -3,14 +3,29 @@
 // No browser, DOM, RAF or wall clock. YoClip supplies one master frame event.
 import { EffectComposer, RenderPass, ShaderPass, OutputPass, FXAAShader } from './addons_bundle.js';
 
-var W = 1920, H = 1080, FPS = 30, RENDER_SCALE = 2, USE_FXAA = __YOCLIP_FXAA__;
+var W = 1920, H = 1080, FPS = 30, MASTER_FPS = 30, RENDER_SCALE = 3, USE_FXAA = __YOCLIP_FXAA__;
 var OUTPUT_PASS_ONLY = __YOCLIP_OUTPUT_ONLY__;
 var TWO_PI = Math.PI * 2;
-// Native R1 has no MSAA. Render at 2× and average-downsample in the export
-// composite. Higher DPR currently stalls native presentation readback.
-var canvas = jsr.three.createCanvas('main', { width: W, height: H, pixelRatio: RENDER_SCALE });
+// Before the first master frame the effective output is unknown, so attach a
+// harmless 1× surface. The desired DPR is applied only in the first payload;
+// this avoids a transient 3×→1× resize on 8K engines.
+var hasMasterFrame = false;
+// The project loader publishes the effective format before world evaluation.
+// Use it immediately so a native 8K master creates one 7680×4320 surface
+// instead of briefly creating a 3× surface that no backend can materialize.
+var projectFormat = (typeof yoclipFormat !== 'undefined' && yoclipFormat) || {};
+W = Math.max(1, Math.round(Number(projectFormat.width) || W));
+H = Math.max(1, Math.round(Number(projectFormat.height) || H));
+// Native R1 has no MSAA. Render at 3× and average-downsample in the export
+// composite; 4K/8K exports are already target-native, so do not oversubscribe
+// the GPU surface there. Higher DPR currently stalls native presentation readback.
+function outputPixelRatio(width) {
+  if (!hasMasterFrame) return 1;
+  return width >= 3840 ? 1 : RENDER_SCALE;
+}
+var canvas = jsr.three.createCanvas('main', { width: W, height: H, pixelRatio: outputPixelRatio(W) });
 var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-renderer.setPixelRatio(RENDER_SCALE);
+renderer.setPixelRatio(outputPixelRatio(W));
 renderer.setSize(W, H, false);
 // The scene graph owns camera/exposure per frame. Composer output must keep
 // the same color path on every frame instead of using the WebGLRenderer
@@ -38,7 +53,8 @@ function resizeFxaa(width, height) {
     1 / Math.max(1, Math.floor(height * pixelRatio))
   );
 }
-if (USE_FXAA) {
+function ensureFxaaComposer() {
+  if (!USE_FXAA || fxaaComposer) return;
   var composerSize = renderer.getSize(new THREE.Vector2());
   var composerTarget = new THREE.WebGLRenderTarget(
     Math.max(1, composerSize.x | 0), Math.max(1, composerSize.y | 0),
@@ -245,10 +261,13 @@ function positionDriver() {
 // Initialize frame state before any loader can invoke a cached asset callback.
 var latestFrame = 0, latestFps = FPS, latestParams = {}, worldReady = false;
 function renderLatestFrame() {
-  if (!worldReady) return;
-  renderFrame(latestFrame, latestFps, latestParams);
-  jsr.render({ type: 'three', canvasId: 'main', width: W, height: H, pixelRatio: RENDER_SCALE });
+  // Asset callbacks can fire before the first yoclip.frame payload. Emitting a
+  // tree then would attach a legacy-sized surface and force an 8K resize race.
+  if (!worldReady || !hasMasterFrame) return;
+  renderFrame(timelineFrame(latestFrame), MASTER_FPS, latestParams);
+  jsr.render({ type: 'three', canvasId: 'main', width: W, height: H, pixelRatio: outputPixelRatio(W) });
 }
+function timelineFrame(frame) { return frame * (MASTER_FPS / Math.max(1, FPS)); }
 var studioRig = new THREE.Group(); world.add(studioRig); studioRig.visible = false;
 new THREE.GLTFLoader().load('three/RobotExpressive.glb', function(gltf) {
   carDriver = gltf.scene; carDriver.scale.setScalar(0.3);
@@ -1319,22 +1338,39 @@ function renderFrame(frame, fps, params) {
   camera.updateProjectionMatrix();
   camera.rotation.z += Math.sin(frame * 0.025) * (act >= 14 && act <= 15 ? 0.006 : 0.0025);
   renderer.toneMappingExposure = 1.0 + pulse * 0.035;
-  if (USE_FXAA) fxaaComposer.render(0); else renderer.render(world, camera);
+  if (USE_FXAA && hasMasterFrame) {
+    ensureFxaaComposer();
+    fxaaComposer.render(0);
+  } else {
+    renderer.render(world, camera);
+  }
 }
 
 function handleEvent(action, payload) {
   if (action !== 'yoclip.frame') return;
   payload = payload || {};
+  hasMasterFrame = true;
   var nextW = Math.max(1, Math.round(payload.width || W)), nextH = Math.max(1, Math.round(payload.height || H));
+  // Change DPR before dimensions: setting 7680×4320 while still carrying the
+  // 3× sub-4K ratio would transiently request a >16K drawing buffer.
+  var nextScale = outputPixelRatio(nextW);
+  if (nextScale !== RENDER_SCALE) {
+    RENDER_SCALE = nextScale;
+    renderer.setPixelRatio(RENDER_SCALE);
+  }
   if (nextW !== W || nextH !== H) {
-    W = nextW; H = nextH; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
+    W = nextW; H = nextH;
+    renderer.setSize(W, H, false);
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    resizeFxaa(W, H);
   }
   FPS = payload.fps || FPS;
   var frame = Math.max(0, Math.round(payload.frame || 0));
   latestFrame = frame;
   latestFps = FPS;
   latestParams = payload.params || {};
-  renderFrame(frame, FPS, latestParams);
+  renderFrame(timelineFrame(frame), MASTER_FPS, latestParams);
   jsr.render({ type: 'three', canvasId: 'main', width: W, height: H, pixelRatio: RENDER_SCALE });
   jsr.exportState({ renderer: 'THREE r186', backend: 'Flutter GPU', frame: frame, act: latestParams.act || 0, particles: PARTICLE_COUNT, carAsset: carAssetState, driverAsset: driverAssetState });
 }

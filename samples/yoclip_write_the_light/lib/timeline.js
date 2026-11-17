@@ -1,7 +1,7 @@
 // Generated from the actual WAV analysis. Times are seconds on the master.
 // The same map drives Flutter typography, Three.js, Studio and headless export.
-var FILM_DURATION = 6022;
-var FILM_FPS = 30;
+var FILM_DURATION = 24088;
+var FILM_FPS = 120;
 var FILM_ACTS = [
   {
     "id": 0,

@@ -1,10 +1,10 @@
 # WRITE THE LIGHT — a YoClip music film
 
-A **200.72-second narrative music video** built entirely from JavaScript scene graphs, native Three.js geometry and the supplied `write_the_light.wav`. It is not a slideshow or a single 3D logo loop: 18 hard-cut acts tell the story of Yo, a tiny developer bot asked for a product film at Friday 4:59.
+A **200.73-second narrative music video** built entirely from JavaScript scene graphs, native Three.js geometry and the supplied `write_the_light.wav`. It is not a slideshow or a single 3D logo loop: 18 hard-cut acts tell the story of Yo, a tiny developer bot asked for a product film at Friday 4:59.
 
 ## What is in the film
 
-- **6,022 frames**, 1920×1080, 30 fps, with the original stereo master.
+- **24,088 frames**, 7680×4320, 120 fps, with the original stereo master.
 - **18 acts:** Slack cold open → repo boot → code verse → first build → paper typography → chorus → split-screen → GPU story → formats → export roulette → second chorus → phone notes → riser → breakdown → two finales → boss's last question → outro.
 - **399 word-level cues** across 74 master-aligned lyric lines. A local faster-whisper full/line hybrid preserves measured speech onsets, resolves cross-line collisions and validates act boundaries; active words change color and pulse while past/future words keep distinct brightness. There is no artificial karaoke lead or entry-opacity delay: the active word is visible on its first rendered onset frame.
 - **Eight final-chorus Three.js variants** alternating every two beats: Ferrari drift / 3D wordmark, wheel-detail camera, Yo, Ferrari night drive, neon city, Ferrari inside an architectural light tunnel, DJ Yo and the close-up RobotExpressive dance / LDraw construction lab.
@@ -18,12 +18,12 @@ A **200.72-second narrative music video** built entirely from JavaScript scene g
 - A recurring Yo character with blinking eyes, mouth movement, dancing arms and a reactive antenna.
 - Paper/ink acts, explicit split-screens, phone UI, format frames, code, particles and hard cuts.
 - Active-word camera focus with eased previous→current-word travel, selective hero-phrase dolly/push-in with a soft vignette, and synchronized Three.js optical zoom. Long lines are amplitude-compensated so the camera move does not crop them.
-- Deterministic 2× Three.js supersampling: the native backend renders 3840×2160 and export composites it down to 1920×1080 with an average filter (the native R1 renderer has no MSAA).
+- Deterministic 3× Three.js supersampling for sub-4K targets: the native backend renders 5760×3240 and export composites it down with an average filter; 4K/8K render natively at 1× (the native R1 renderer has no MSAA).
 - Beat-synced shockwaves, emissive shards and anime impact-lines shared by the character variants.
 
 No browser, DOM, WebGL context, HTML harness, footage or pre-rendered 3D movie is used. `three/world.source.js` builds a real `THREE.Scene`; `npm run build:three` bundles it with the pinned r186 addons into the single `three/world.js` IIFE consumed by the runtime, which executes its draw calls with Flutter GPU. Edit `world.source.js`, not the generated `world.js`. The default build selects the verified RenderPass → OutputPass → FXAA chain; `YOCLIP_FXAA=0 npm run build:three` keeps direct rendering for A/B diagnostics.
 
-Runtime baseline: `js_widget_runtime 0.4.204`. Its real GLB morph path, faster animation submission, native shadow lane and corrected per-pass presentation orientation are used. Production now renders through **RenderPass → OutputPass → FXAA at 2× supersampling**. Production A/B captures at car, robot and outro frames verified upright output, one output color transform, opaque alpha and visibly smoother edges. Direct and composer output still have a moderate color response difference; this is recorded separately from the fixed double-transfer defect. UnrealBloom, Bokeh and transmission are not enabled in the production pipeline; native MSAA and >2× capture remain unsupported.
+Runtime baseline: `js_widget_runtime 0.4.206`. Its real GLB morph path, faster animation submission, native shadow lane and corrected per-pass presentation orientation are used. Production now renders through **RenderPass → OutputPass → FXAA at 3× supersampling**. Production A/B captures at car, robot and outro frames verified upright output, one output color transform, opaque alpha and visibly smoother edges. Direct and composer output still have a moderate color response difference; this is recorded separately from the fixed double-transfer defect. UnrealBloom, Bokeh and transmission are not enabled in the production pipeline; native MSAA remains unsupported; the production sub-4K lane uses 3× capture, while 4K/8K stay target-native.
 
 **Current car limitations:** the drive retains an explicit open-cockpit fallback: the Ferrari glass node is removed during asset load, before the first render. Earlier 0.4.201 tests of native `MeshPhysicalMaterial.transmission` and explicit `MeshStandardMaterial({ transparent: true, opacity: 0.08 })` did not produce reliable see-through glass in this workload. The bounded-transmission fix in 0.4.202 has not yet been validated here, so this fallback is not presented as working glass transmission. Wheel contact is derived from the loaded car bounding box (`bounds.min.y`) and the road plane rather than a hand-tuned ride height.
 
@@ -55,7 +55,7 @@ The aligner combines a full master pass with known-lyric line windows, maps reco
 ## Project layout
 
 ```text
-yoclip.yaml                  # 200.72 s composition, bundled fonts, master audio
+yoclip.yaml                  # 200.73 s composition, bundled fonts, master audio
 project.js                   # shared libraries and layered scene order
 lib/
   timeline.js                # acts, lyric lines, fallback cues, 390 analysed beats
@@ -88,7 +88,7 @@ From this directory:
 flutter test test/yoclip_project_test.dart
 
 # One composed frame (defaults to film, local frame 1605).
-YOCLIP_SCENE=film YOCLIP_FRAME=1080 YOCLIP_OUTPUT=build/car_drive.png \
+YOCLIP_SCENE=film YOCLIP_FRAME=4320 YOCLIP_OUTPUT=build/car_drive.png \
   flutter test --enable-impeller --enable-flutter-gpu \
   test/yoclip_review_frames_test.dart
 

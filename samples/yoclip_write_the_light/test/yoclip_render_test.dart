@@ -13,7 +13,7 @@ void main() {
     Platform.environment['YOCLIP_END_FRAME'] ?? '',
   );
   testWidgets(
-    'render the 200.72-second MP4 master',
+    'render the 200.73-second MP4 master',
     (tester) async {
       if (outputPath == null) return;
       final projectPath = Directory.current.path;
@@ -64,8 +64,8 @@ void main() {
               ),
             )
             .toList(growable: false),
-        videoBitrate: 12000000,
-        audioBitrate: 192000,
+        videoBitrate: 480000000,
+        audioBitrate: 256000,
       );
       await tester.runAsync(encoder.start);
       await renderer.renderToRgba(
@@ -74,7 +74,7 @@ void main() {
           await tester.runAsync(
             () => encoder.appendFrame(Uint8List.fromList(rgba)),
           );
-          if (frame % 30 == 0 ||
+          if (frame % 120 == 0 ||
               frame == (requestedEndFrame ?? project.config.duration) - 1) {
             // ignore: avoid_print
             print(

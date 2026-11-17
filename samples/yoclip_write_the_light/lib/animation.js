@@ -54,7 +54,7 @@ function counter(frame, start, duration, from, to) {
   return Math.round(lerp(from, to, eo3(seg(frame, start, start + duration))));
 }
 function typewriter(text, frame, start, cps) {
-  var count = Math.floor((frame - start) * (cps || 42) / 30);
+  var count = Math.floor((frame - start) * (cps || 42) / (typeof FILM_FPS === 'number' ? FILM_FPS : 30));
   return text.slice(0, clamp(count, 0, text.length));
 }
 function typewriterParts(text, frame, start, cps) {

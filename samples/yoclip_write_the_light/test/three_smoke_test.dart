@@ -11,12 +11,12 @@ void main() {
   ) async {
     const width = 960;
     const height = 540;
-    const frame = int.fromEnvironment('YOCLIP_REVIEW_FRAME', defaultValue: 150);
+    const frame = int.fromEnvironment('YOCLIP_REVIEW_FRAME', defaultValue: 600);
     final graph = <String, dynamic>{
       'type': 'three_scene',
       'source': 'three/world.js',
       'frame': frame,
-      'fps': 30,
+      'fps': 120,
       'width': width,
       'height': height,
       'fit': 'expand',
@@ -33,7 +33,7 @@ void main() {
       composition: YoclipWidgetRenderer().compile(graph, frame),
       config: const VideoConfig(
         duration: 1,
-        fps: 30,
+        fps: 120,
         width: width,
         height: height,
       ),

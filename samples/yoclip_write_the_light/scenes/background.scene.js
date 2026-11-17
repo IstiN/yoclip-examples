@@ -16,8 +16,8 @@ scene = {
       source: 'three/world.js',
       frame: frame,
       fps: FILM_FPS,
-      width: format.width || 1920,
-      height: format.height || 1080,
+      width: format.width || 7680,
+      height: format.height || 4320,
       params: {
         act: ctx.actIndex,
         actProgress: ctx.progress,

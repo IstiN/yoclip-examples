@@ -1817,13 +1817,22 @@
   var W = 1920;
   var H = 1080;
   var FPS = 30;
-  var RENDER_SCALE = 2;
+  var MASTER_FPS = 30;
+  var RENDER_SCALE = 3;
   var USE_FXAA = true;
   var OUTPUT_PASS_ONLY = false;
   var TWO_PI = Math.PI * 2;
-  var canvas = jsr.three.createCanvas("main", { width: W, height: H, pixelRatio: RENDER_SCALE });
+  var hasMasterFrame = false;
+  var projectFormat = typeof yoclipFormat !== "undefined" && yoclipFormat || {};
+  W = Math.max(1, Math.round(Number(projectFormat.width) || W));
+  H = Math.max(1, Math.round(Number(projectFormat.height) || H));
+  function outputPixelRatio(width) {
+    if (!hasMasterFrame) return 1;
+    return width >= 3840 ? 1 : RENDER_SCALE;
+  }
+  var canvas = jsr.three.createCanvas("main", { width: W, height: H, pixelRatio: outputPixelRatio(W) });
   var renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(RENDER_SCALE);
+  renderer.setPixelRatio(outputPixelRatio(W));
   renderer.setSize(W, H, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1847,9 +1856,10 @@
       1 / Math.max(1, Math.floor(height * pixelRatio))
     );
   }
-  if (USE_FXAA) {
-    composerSize = renderer.getSize(new THREE.Vector2());
-    composerTarget = new THREE.WebGLRenderTarget(
+  function ensureFxaaComposer() {
+    if (!USE_FXAA || fxaaComposer) return;
+    var composerSize = renderer.getSize(new THREE.Vector2());
+    var composerTarget = new THREE.WebGLRenderTarget(
       Math.max(1, composerSize.x | 0),
       Math.max(1, composerSize.y | 0),
       { type: THREE.UnsignedByteType }
@@ -1857,7 +1867,7 @@
     fxaaComposer = new EffectComposer(renderer, composerTarget);
     fxaaComposer.addPass(new RenderPass(world, camera));
     fxaaComposer.addPass(new OutputPass());
-    fxaaMaterial = new THREE.ShaderMaterial({
+    var fxaaMaterial = new THREE.ShaderMaterial({
       name: FXAAShader.name,
       defines: Object.assign({}, FXAAShader.defines),
       uniforms: FXAAShader.uniforms,
@@ -1869,9 +1879,6 @@
     fxaaComposer.addPass(fxaaPass);
     resizeFxaa(composerSize.x, composerSize.y);
   }
-  var composerSize;
-  var composerTarget;
-  var fxaaMaterial;
   var VIOLET = 8141549;
   var LILAC = 10980346;
   var CYAN = 2282478;
@@ -2158,9 +2165,12 @@
   var latestParams = {};
   var worldReady = false;
   function renderLatestFrame() {
-    if (!worldReady) return;
-    renderFrame(latestFrame, latestFps, latestParams);
-    jsr.render({ type: "three", canvasId: "main", width: W, height: H, pixelRatio: RENDER_SCALE });
+    if (!worldReady || !hasMasterFrame) return;
+    renderFrame(timelineFrame(latestFrame), MASTER_FPS, latestParams);
+    jsr.render({ type: "three", canvasId: "main", width: W, height: H, pixelRatio: outputPixelRatio(W) });
+  }
+  function timelineFrame(frame) {
+    return frame * (MASTER_FPS / Math.max(1, FPS));
   }
   var studioRig = new THREE.Group();
   world.add(studioRig);
@@ -3584,26 +3594,37 @@
     camera.updateProjectionMatrix();
     camera.rotation.z += Math.sin(frame * 0.025) * (act >= 14 && act <= 15 ? 6e-3 : 25e-4);
     renderer.toneMappingExposure = 1 + pulse * 0.035;
-    if (USE_FXAA) fxaaComposer.render(0);
-    else renderer.render(world, camera);
+    if (USE_FXAA && hasMasterFrame) {
+      ensureFxaaComposer();
+      fxaaComposer.render(0);
+    } else {
+      renderer.render(world, camera);
+    }
   }
   function handleEvent(action, payload) {
     if (action !== "yoclip.frame") return;
     payload = payload || {};
+    hasMasterFrame = true;
     var nextW = Math.max(1, Math.round(payload.width || W)), nextH = Math.max(1, Math.round(payload.height || H));
+    var nextScale = outputPixelRatio(nextW);
+    if (nextScale !== RENDER_SCALE) {
+      RENDER_SCALE = nextScale;
+      renderer.setPixelRatio(RENDER_SCALE);
+    }
     if (nextW !== W || nextH !== H) {
       W = nextW;
       H = nextH;
       renderer.setSize(W, H, false);
       camera.aspect = W / H;
       camera.updateProjectionMatrix();
+      resizeFxaa(W, H);
     }
     FPS = payload.fps || FPS;
     var frame = Math.max(0, Math.round(payload.frame || 0));
     latestFrame = frame;
     latestFps = FPS;
     latestParams = payload.params || {};
-    renderFrame(frame, FPS, latestParams);
+    renderFrame(timelineFrame(frame), MASTER_FPS, latestParams);
     jsr.render({ type: "three", canvasId: "main", width: W, height: H, pixelRatio: RENDER_SCALE });
     jsr.exportState({ renderer: "THREE r186", backend: "Flutter GPU", frame, act: latestParams.act || 0, particles: PARTICLE_COUNT, carAsset: carAssetState, driverAsset: driverAssetState });
   }

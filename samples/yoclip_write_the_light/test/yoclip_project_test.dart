@@ -6,15 +6,15 @@ import 'package:yoclip_core/yoclip_core.dart';
 
 void main() {
   test(
-    '200.72-second film loads and every act renders deterministically',
+    '200.73-second film loads and every act renders deterministically',
     () async {
       final path = Directory.current.path;
       final storage = LocalFileSystemStorage(path);
       final project = await YoclipProject.load(storage, path);
-      expect(project.config.duration, 6022);
-      expect(project.config.fps, 30);
-      expect(project.config.width, 1920);
-      expect(project.config.height, 1080);
+      expect(project.config.duration, 24088);
+      expect(project.config.fps, 120);
+      expect(project.config.width, 7680);
+      expect(project.config.height, 4320);
       final runtime = createYoclipJsRuntime();
       await runtime.init();
       addTearDown(runtime.dispose);
@@ -22,10 +22,10 @@ void main() {
       expect(scenes, hasLength(2));
       expect(
         scenes.singleWhere((scene) => scene.id == 'three_world').duration,
-        6022,
+        24088,
       );
       final film = scenes.singleWhere((scene) => scene.id == 'film');
-      expect(film.duration, 6022);
+      expect(film.duration, 24088);
       const actMidpoints = <double>[
         3.6,
         11.9,
@@ -47,7 +47,7 @@ void main() {
         197.7,
       ];
       for (final seconds in actMidpoints) {
-        final frame = (seconds * 30).round();
+        final frame = (seconds * 120).round();
         final first = film.render(frame);
         final second = film.render(frame);
         expect(first, isA<Map<String, dynamic>>(), reason: '$seconds seconds');
@@ -75,7 +75,7 @@ void main() {
     final scene = await runtime.loadScene(
       '''
 scene = {
-  id: 'word_timing_audit', duration: 6022,
+  id: 'word_timing_audit', duration: 24088,
   render(frame) {
     var failures = [], count = 0;
     for (var li = 0; li < LYRIC_CUES.length; li++) {

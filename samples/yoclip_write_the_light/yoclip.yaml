@@ -2,14 +2,14 @@ project: yoclip_write_the_light
 project_js: project.js
 
 config:
-  duration: 6022
-  fps: 30
-  width: 1920
-  height: 1080
+  duration: 24088
+  fps: 120
+  width: 7680
+  height: 4320
   background: '#05050a'
 
 render:
-  videoBitrate: 16000000
+  videoBitrate: 480000000
   audioBitrate: 256000
   codec: h264
 

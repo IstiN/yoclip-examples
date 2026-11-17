@@ -1,5 +1,6 @@
 // WRITE THE LIGHT — narrative scenes and kinetic typography.
-// All positions are 1920×1080 design pixels; all motion is master-frame pure.
+// Design remains authored in 1920×1080 units; at the native 8K master every
+// filmRoot is scaled 4× without changing any motion constants.
 
 var PAPER = '#f1efe8';
 var WHITE = '#f8f7ff';
@@ -10,6 +11,12 @@ var LILAC = '#a78bfa';
 var CYAN = '#22d3ee';
 var LIME = '#c7f464';
 var ACTIVE_FILM_CONTEXT = null;
+var DESIGN_WIDTH = 1920;
+var DESIGN_HEIGHT = 1080;
+var OUTPUT_SCALE = (function() {
+  var width = typeof yoclipFormat !== 'undefined' && yoclipFormat && Number(yoclipFormat.width);
+  return width && width > 0 ? width / DESIGN_WIDTH : 1;
+})();
 
 function rootPlace(node) {
   if (!node || !node.alignment) return node;
@@ -30,14 +37,21 @@ function rootPlace(node) {
   return placed;
 }
 function fullColor(color) {
-  return box({ width: 1920, height: 1080, color: color, positioned: { left: 0, top: 0 } });
+  return box({ width: DESIGN_WIDTH, height: DESIGN_HEIGHT, color: color, positioned: { left: 0, top: 0 } });
 }
 function filmRoot(children, mode) {
   var all = [], ctx = ACTIVE_FILM_CONTEXT;
   if (mode === 'paper') all.push(fullColor(PAPER));
   if (mode === 'black' || mode === 'staticBlack') all.push(fullColor('#020204'));
   for (var i = 0; i < children.length; i++) all.push(rootPlace(children[i]));
-  if (mode === 'fixed' || mode === 'staticBlack') return stack(all, { fit: 'expand' });
+  if (mode === 'fixed' || mode === 'staticBlack') {
+    return stack(all, {
+      width: DESIGN_WIDTH,
+      height: DESIGN_HEIGHT,
+      fit: 'expand',
+      scale: OUTPUT_SCALE,
+    });
+  }
   var zoom = 1, offsetX = 0, offsetY = 0, focusPush = 0;
   if (ctx) {
     var entrance = cueEnter(ctx, 0.3);
@@ -58,7 +72,14 @@ function filmRoot(children, mode) {
   if (focusPush > 0.01) {
     all.push(box({ width: 1920, height: 1080, positioned: { left: 0, top: 0 }, gradient: { type: 'radial', colors: ['#00000000', alphaColor(mode === 'paper' ? INK : '#000000', mode === 'paper' ? 0.24 : 0.48)] }, opacity: focusPush }));
   }
-  return stack(all, { fit: 'expand', scale: zoom, offsetX: offsetX, offsetY: offsetY });
+  return stack(all, {
+    width: DESIGN_WIDTH,
+    height: DESIGN_HEIGHT,
+    fit: 'expand',
+    scale: zoom * OUTPUT_SCALE,
+    offsetX: offsetX,
+    offsetY: offsetY,
+  });
 }
 function display(value, o) {
   o = o || {};
@@ -226,7 +247,7 @@ function techStamp(ctx, color) {
   return row([
     micro('WRITE THE LIGHT', { color: color || '#8d8d99' }),
     micro('  /  ', { color: color || '#555560' }),
-    micro(timecode(Math.floor(ctx.time * 30), 30), { color: color || '#8d8d99' }),
+    micro(timecode(Math.floor(ctx.time * FILM_FPS), FILM_FPS), { color: color || '#8d8d99' }),
   ], { alignment: 'bottomLeft', offsetX: 72, offsetY: -54 });
 }
 function beatBorder(ctx, color, width) {
@@ -310,7 +331,7 @@ function renderBoot(ctx) {
   children.push(micro('NEW PROJECT  /  NO FOOTAGE FOUND', { color: ORANGE, alignment: 'topLeft', offsetX: 90, offsetY: 90 }));
   children.push(column(rows, { alignment: 'topLeft', offsetX: 110, offsetY: 220, scale: 1 + ctx.progress * 0.08 }));
   var bootCode = 'export function scene({ frame }) { … }';
-  var bootTypeFrame = Math.floor(t * 30);
+  var bootTypeFrame = Math.floor(t * FILM_FPS);
   var typedBootCode = typewriter(bootCode, bootTypeFrame, 20, 34);
   // One fixed-size, left-aligned monospace node: an inline block caret avoids
   // trailing-space width changes and caret layout shifts during typing.
@@ -512,7 +533,7 @@ function formatFrame(label, ratio, w, h, x, y, entry, ctx, index) {
 function renderFormats(ctx) {
   var children = [], t = ctx.time;
   children.push(micro('FORMAT FOUNDRY  /  ONE SOURCE · EVERY SCREEN', { color: CYAN, alignment: 'topLeft', offsetX: 74, offsetY: 58 }));
-  children.push(mono('1920 × 1080  /  MASTER 01', { fontSize: 18, color: '#777782', alignment: 'topRight', offsetX: -74, offsetY: 60 }));
+  children.push(mono('8K · 7680 × 4320  /  MASTER 01', { fontSize: 18, color: '#777782', alignment: 'topRight', offsetX: -74, offsetY: 60 }));
   children.push(cueBlock(ctx, { fontSize: 100, maxChars: 32, y: 115, width: 1760, color: '#ffffff', beatScale: 0.008, shadows: [{ color: '#b3000000', blur: 22, offsetY: 5 }] }));
   if (t < 97.88) {
     var scan = (t * 0.65) % 1, flash = Math.exp(-Math.max(0, t - 94.14) * 4);
@@ -568,7 +589,7 @@ function renderPreTwo(ctx) {
     children.push(box({ width: 1280, height: 92, color: alphaColor(LIME, 0.08 + typed * 0.12), positioned: { left: 300, top: 410 }, borderRadius: 8 }));
     children.push(mono('109', { fontSize: 30, color: '#555560', alignment: 'topLeft', offsetX: 250, offsetY: 440 }));
     children.push(mono('+ title: "' + title.slice(0, Math.ceil(title.length * typed)) + '"', { fontSize: 44, color: LIME, alignment: 'topLeft', offsetX: 345, offsetY: 430 }));
-    children.push(box({ width: 4, height: 52, color: LIME, positioned: { left: 370 + typed * 650, top: 432 }, opacity: blink(Math.floor(t * 30), 8) }));
+    children.push(box({ width: 4, height: 52, color: LIME, positioned: { left: 370 + typed * 650, top: 432 }, opacity: blink(Math.floor(t * FILM_FPS), 8) }));
     children.push(micro('OK 0 FILES RENDERED AGAIN  /  OK ANIMATION PRESERVED', { color: LIME, alignment: 'topLeft', offsetX: 350, offsetY: 565 }));
     children.push(cueBlock(ctx, { fontSize: 116, maxChars: 28, x: 180, y: 745, width: 1580, accent: LIME }));
   } else {
@@ -672,7 +693,7 @@ function renderPhone(ctx) {
 function renderRiser(ctx) {
   var children = [], p = ctx.progress, i;
   if (ctx.time > 149.25 && ctx.time < 149.72) {
-    children.push(box({ width: 13, height: 30, color: '#ffffff', alignment: 'center', opacity: blink(Math.floor(ctx.time * 30), 8) }));
+    children.push(box({ width: 13, height: 30, color: '#ffffff', alignment: 'center', opacity: blink(Math.floor(ctx.time * FILM_FPS), 8) }));
     return filmRoot(children, 'black');
   }
   children.push(fullColor(alphaColor('#020204', 0.42)));
@@ -728,7 +749,7 @@ function renderBreakdown(ctx) {
   var count = sceneMode ? 4 : 5, activeIndex = ctx.beat.index % count;
   if (!sceneMode) children.push(fullColor(alphaColor('#020204', 0.60)));
   children.push(micro('CUTTING ROOM  /  ' + (sceneMode ? 'ASSEMBLY / 4 SHOTS' : 'ONION SKIN / LIVE FRAMES'), { color: accent, alignment: 'topLeft', offsetX: 75, offsetY: 62 }));
-  children.push(mono(timecode(Math.floor(ctx.time * 30), 30) + '  /  30 FPS', { fontSize: 20, color: sceneMode ? INK : '#8d8d99', alignment: 'topRight', offsetX: -75, offsetY: 62 }));
+  children.push(mono(timecode(Math.floor(ctx.time * FILM_FPS), FILM_FPS) + '  /  120 FPS', { fontSize: 20, color: sceneMode ? INK : '#8d8d99', alignment: 'topRight', offsetX: -75, offsetY: 62 }));
   children.push(cueBlock(ctx, { color: ink, accent: accent, fontSize: 132, maxChars: 14, x: 105, y: 135, width: 1350, beatScale: 0.025, shadows: sceneMode ? undefined : [{ color: '#cc000000', blur: 30, offsetY: 6 }] }));
   children.push(mono(sceneMode ? 'scene.map(shot => shot.render())' : 'scene({ frame: ' + String(4520 + activeIndex) + ' })  →  RGBA', { fontSize: 24, color: sceneMode ? INK : LIME, alignment: 'topRight', offsetX: -105, offsetY: 315 }));
   children.push(micro(sceneMode ? 'FOUR HARD CUTS / ONE STORY' : 'SAME SCENE / DIFFERENT MASTER FRAME', { color: alphaColor(ink, 0.62), alignment: 'topLeft', offsetX: 110, offsetY: 330 }));
@@ -757,7 +778,7 @@ function renderBreakdown(ctx) {
     var tickActive = sceneMode ? i <= activeIndex * 10 + 9 : Math.floor(i / 6) <= activeIndex;
     children.push(box({ width: 43, height: tickActive ? 14 : 8, borderRadius: 3, color: tickActive ? accent : alphaColor(ink, 0.18), positioned: { left: 110 + i * 57, top: 875 }, opacity: e }));
   }
-  children.push(mono(sceneMode ? 'CUT 01  →  CUT 02  →  CUT 03  →  EXPORT' : '30 fps  /  deterministic seek  /  no wall clock', { fontSize: 22, color: ink, alignment: 'bottomLeft', offsetX: 110, offsetY: -105 }));
+  children.push(mono(sceneMode ? 'CUT 01  →  CUT 02  →  CUT 03  →  EXPORT' : '120 fps  /  deterministic seek  /  no wall clock', { fontSize: 22, color: ink, alignment: 'bottomLeft', offsetX: 110, offsetY: -105 }));
   children.push(micro('SCENE → FRAME → WORD → BEAT', { color: accent, alignment: 'bottomLeft', offsetX: 115, offsetY: -62 }));
   return filmRoot(children, sceneMode ? 'paper' : undefined);
 }
