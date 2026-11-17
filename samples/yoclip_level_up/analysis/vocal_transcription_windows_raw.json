@@ -1,0 +1,1594 @@
+{
+  "source": "assets/audio/level_up.wav",
+  "tool": "faster-whisper 1.2.1",
+  "model": "small.en",
+  "windowSeconds": 8.0,
+  "stepSeconds": 6.0,
+  "settings": {
+    "language": "en",
+    "beamSize": 5,
+    "temperature": 0.0,
+    "wordTimestamps": true,
+    "conditionOnPreviousText": false,
+    "vadFilter": false,
+    "initialPrompt": null,
+    "repetitionPenalty": 1.1,
+    "noRepeatNgramSize": 3
+  },
+  "windows": [
+    {
+      "windowStart": 0.0,
+      "windowEnd": 8.0,
+      "segments": [
+        {
+          "start": 2.02,
+          "end": 3.42,
+          "text": "Thanks for watching!",
+          "avgLogprob": -0.937063,
+          "noSpeechProb": 0.561301,
+          "compressionRatio": 0.714286,
+          "words": [
+            {
+              "start": 2.02,
+              "end": 3.42,
+              "word": " Thanks",
+              "probability": 0.009368
+            },
+            {
+              "start": 3.42,
+              "end": 3.42,
+              "word": " for",
+              "probability": 0.892417
+            },
+            {
+              "start": 3.42,
+              "end": 3.42,
+              "word": " watching!",
+              "probability": 0.959509
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 6.0,
+      "windowEnd": 14.0,
+      "segments": [
+        {
+          "start": 8.88,
+          "end": 11.16,
+          "text": "System loading.",
+          "avgLogprob": -0.882572,
+          "noSpeechProb": 0.251544,
+          "compressionRatio": 0.764706,
+          "words": [
+            {
+              "start": 8.88,
+              "end": 10.28,
+              "word": " System",
+              "probability": 0.566629
+            },
+            {
+              "start": 10.28,
+              "end": 11.16,
+              "word": " loading.",
+              "probability": 0.881103
+            }
+          ]
+        },
+        {
+          "start": 12.52,
+          "end": 13.8,
+          "text": "Your clip!",
+          "avgLogprob": -0.882572,
+          "noSpeechProb": 0.251544,
+          "compressionRatio": 0.764706,
+          "words": [
+            {
+              "start": 12.52,
+              "end": 12.74,
+              "word": " Your",
+              "probability": 0.238055
+            },
+            {
+              "start": 12.74,
+              "end": 13.8,
+              "word": " clip!",
+              "probability": 0.944696
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 12.0,
+      "windowEnd": 20.0,
+      "segments": [
+        {
+          "start": 12.0,
+          "end": 13.3,
+          "text": "Yo, yo, yo!",
+          "avgLogprob": -0.805573,
+          "noSpeechProb": 0.553879,
+          "compressionRatio": 0.914286,
+          "words": [
+            {
+              "start": 12.0,
+              "end": 12.74,
+              "word": " Yo,",
+              "probability": 0.11837
+            },
+            {
+              "start": 12.74,
+              "end": 12.98,
+              "word": " yo,",
+              "probability": 0.78298
+            },
+            {
+              "start": 12.98,
+              "end": 13.3,
+              "word": " yo!",
+              "probability": 0.96762
+            }
+          ]
+        },
+        {
+          "start": 13.3,
+          "end": 13.86,
+          "text": "Yo, clip!",
+          "avgLogprob": -0.805573,
+          "noSpeechProb": 0.553879,
+          "compressionRatio": 0.914286,
+          "words": [
+            {
+              "start": 13.3,
+              "end": 13.5,
+              "word": " Yo,",
+              "probability": 0.224383
+            },
+            {
+              "start": 13.86,
+              "end": 13.86,
+              "word": " clip!",
+              "probability": 0.826415
+            }
+          ]
+        },
+        {
+          "start": 17.02,
+          "end": 17.52,
+          "text": "Jock good!",
+          "avgLogprob": -0.805573,
+          "noSpeechProb": 0.553879,
+          "compressionRatio": 0.914286,
+          "words": [
+            {
+              "start": 17.02,
+              "end": 17.28,
+              "word": " Jock",
+              "probability": 0.124822
+            },
+            {
+              "start": 17.28,
+              "end": 17.52,
+              "word": " good!",
+              "probability": 0.316815
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 18.0,
+      "windowEnd": 26.0,
+      "segments": [
+        {
+          "start": 19.9,
+          "end": 21.0,
+          "text": "Yeah, I'm good!",
+          "avgLogprob": -1.004727,
+          "noSpeechProb": 0.564774,
+          "compressionRatio": 1.457143,
+          "words": [
+            {
+              "start": 19.9,
+              "end": 20.7,
+              "word": " Yeah,",
+              "probability": 0.046869
+            },
+            {
+              "start": 20.74,
+              "end": 20.8,
+              "word": " I'm",
+              "probability": 0.309016
+            },
+            {
+              "start": 20.8,
+              "end": 21.0,
+              "word": " good!",
+              "probability": 0.820623
+            }
+          ]
+        },
+        {
+          "start": 22.06,
+          "end": 24.0,
+          "text": "Yeah, yeah, yeah!",
+          "avgLogprob": -1.004727,
+          "noSpeechProb": 0.564774,
+          "compressionRatio": 1.457143,
+          "words": [
+            {
+              "start": 22.06,
+              "end": 22.06,
+              "word": " Yeah,",
+              "probability": 0.018818
+            },
+            {
+              "start": 22.06,
+              "end": 22.06,
+              "word": " yeah,",
+              "probability": 0.014594
+            },
+            {
+              "start": 22.06,
+              "end": 24.0,
+              "word": " yeah!",
+              "probability": 0.835095
+            }
+          ]
+        },
+        {
+          "start": 24.4,
+          "end": 25.2,
+          "text": "Yeah, Yeah!",
+          "avgLogprob": -1.004727,
+          "noSpeechProb": 0.564774,
+          "compressionRatio": 1.457143,
+          "words": [
+            {
+              "start": 24.4,
+              "end": 24.72,
+              "word": " Yeah,",
+              "probability": 0.255768
+            },
+            {
+              "start": 25.16,
+              "end": 25.2,
+              "word": " Yeah!",
+              "probability": 0.006593
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 24.0,
+      "windowEnd": 32.0,
+      "segments": [
+        {
+          "start": 24.0,
+          "end": 26.02,
+          "text": "I'll play with you",
+          "avgLogprob": -0.612372,
+          "noSpeechProb": 0.523219,
+          "compressionRatio": 1.095238,
+          "words": [
+            {
+              "start": 24.0,
+              "end": 24.78,
+              "word": " I'll",
+              "probability": 0.282213
+            },
+            {
+              "start": 24.78,
+              "end": 25.16,
+              "word": " play",
+              "probability": 0.238684
+            },
+            {
+              "start": 25.16,
+              "end": 25.54,
+              "word": " with",
+              "probability": 0.467424
+            },
+            {
+              "start": 25.54,
+              "end": 26.02,
+              "word": " you",
+              "probability": 0.982762
+            }
+          ]
+        },
+        {
+          "start": 26.02,
+          "end": 27.68,
+          "text": "Ready? Ready? Fight! Fight!",
+          "avgLogprob": -0.612372,
+          "noSpeechProb": 0.523219,
+          "compressionRatio": 1.095238,
+          "words": [
+            {
+              "start": 26.02,
+              "end": 26.32,
+              "word": " Ready?",
+              "probability": 0.62258
+            },
+            {
+              "start": 26.86,
+              "end": 26.86,
+              "word": " Ready?",
+              "probability": 0.943102
+            },
+            {
+              "start": 27.04,
+              "end": 27.2,
+              "word": " Fight!",
+              "probability": 0.730956
+            },
+            {
+              "start": 27.68,
+              "end": 27.68,
+              "word": " Fight!",
+              "probability": 0.818492
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 30.0,
+      "windowEnd": 38.0,
+      "segments": []
+    },
+    {
+      "windowStart": 36.0,
+      "windowEnd": 44.0,
+      "segments": [
+        {
+          "start": 39.9,
+          "end": 40.44,
+          "text": "Let's go!",
+          "avgLogprob": -0.554083,
+          "noSpeechProb": 0.619817,
+          "compressionRatio": 1.62069,
+          "words": [
+            {
+              "start": 39.9,
+              "end": 40.26,
+              "word": " Let's",
+              "probability": 0.671151
+            },
+            {
+              "start": 40.26,
+              "end": 40.44,
+              "word": " go!",
+              "probability": 0.924698
+            }
+          ]
+        },
+        {
+          "start": 40.62,
+          "end": 40.88,
+          "text": "Let's Go!",
+          "avgLogprob": -0.554083,
+          "noSpeechProb": 0.619817,
+          "compressionRatio": 1.62069,
+          "words": [
+            {
+              "start": 40.62,
+              "end": 40.72,
+              "word": " Let's",
+              "probability": 0.914661
+            },
+            {
+              "start": 40.72,
+              "end": 40.88,
+              "word": " Go!",
+              "probability": 0.058375
+            }
+          ]
+        },
+        {
+          "start": 41.04,
+          "end": 41.34,
+          "text": "Let's GO!",
+          "avgLogprob": -0.554083,
+          "noSpeechProb": 0.619817,
+          "compressionRatio": 1.62069,
+          "words": [
+            {
+              "start": 41.04,
+              "end": 41.14,
+              "word": " Let's",
+              "probability": 0.933073
+            },
+            {
+              "start": 41.14,
+              "end": 41.34,
+              "word": " GO!",
+              "probability": 0.157971
+            }
+          ]
+        },
+        {
+          "start": 41.34,
+          "end": 41.88,
+          "text": "Let's GOOO!",
+          "avgLogprob": -0.554083,
+          "noSpeechProb": 0.619817,
+          "compressionRatio": 1.62069,
+          "words": [
+            {
+              "start": 41.34,
+              "end": 41.34,
+              "word": " Let's",
+              "probability": 0.623506
+            },
+            {
+              "start": 41.34,
+              "end": 41.88,
+              "word": " GOOO!",
+              "probability": 0.395924
+            }
+          ]
+        },
+        {
+          "start": 43.24,
+          "end": 43.6,
+          "text": "Let's",
+          "avgLogprob": -0.554083,
+          "noSpeechProb": 0.619817,
+          "compressionRatio": 1.62069,
+          "words": [
+            {
+              "start": 43.24,
+              "end": 43.6,
+              "word": " Let's",
+              "probability": 0.635749
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 42.0,
+      "windowEnd": 50.0,
+      "segments": [
+        {
+          "start": 42.0,
+          "end": 45.86,
+          "text": "Waka waka, waka wakka, wakkah waka",
+          "avgLogprob": -0.784677,
+          "noSpeechProb": 0.806648,
+          "compressionRatio": 1.584906,
+          "words": [
+            {
+              "start": 42.0,
+              "end": 42.32,
+              "word": " Waka",
+              "probability": 0.354509
+            },
+            {
+              "start": 42.32,
+              "end": 42.78,
+              "word": " waka,",
+              "probability": 0.724151
+            },
+            {
+              "start": 42.9,
+              "end": 43.08,
+              "word": " waka",
+              "probability": 0.91282
+            },
+            {
+              "start": 43.08,
+              "end": 43.28,
+              "word": " wakka,",
+              "probability": 0.291975
+            },
+            {
+              "start": 43.28,
+              "end": 45.62,
+              "word": " wakkah",
+              "probability": 0.257497
+            },
+            {
+              "start": 45.62,
+              "end": 45.86,
+              "word": " waka",
+              "probability": 0.776326
+            }
+          ]
+        },
+        {
+          "start": 45.86,
+          "end": 48.26,
+          "text": "Pac-Man, Pac-Pac, Pacman, Pac Man",
+          "avgLogprob": -0.784677,
+          "noSpeechProb": 0.806648,
+          "compressionRatio": 1.584906,
+          "words": [
+            {
+              "start": 45.86,
+              "end": 46.22,
+              "word": " Pac",
+              "probability": 0.004142
+            },
+            {
+              "start": 46.22,
+              "end": 46.48,
+              "word": "-Man,",
+              "probability": 0.4921
+            },
+            {
+              "start": 46.82,
+              "end": 46.88,
+              "word": " Pac",
+              "probability": 0.73155
+            },
+            {
+              "start": 46.88,
+              "end": 47.08,
+              "word": "-Pac,",
+              "probability": 0.590181
+            },
+            {
+              "start": 47.22,
+              "end": 47.5,
+              "word": " Pacman,",
+              "probability": 0.497701
+            },
+            {
+              "start": 47.5,
+              "end": 47.86,
+              "word": " Pac",
+              "probability": 0.984427
+            },
+            {
+              "start": 47.86,
+              "end": 48.26,
+              "word": " Man",
+              "probability": 0.003406
+            }
+          ]
+        },
+        {
+          "start": 48.26,
+          "end": 49.9,
+          "text": "Waka, Waka-Waka",
+          "avgLogprob": -0.784677,
+          "noSpeechProb": 0.806648,
+          "compressionRatio": 1.584906,
+          "words": [
+            {
+              "start": 48.26,
+              "end": 49.14,
+              "word": " Waka,",
+              "probability": 0.581032
+            },
+            {
+              "start": 49.44,
+              "end": 49.58,
+              "word": " Waka",
+              "probability": 0.510737
+            },
+            {
+              "start": 49.58,
+              "end": 49.9,
+              "word": "-Waka",
+              "probability": 0.389838
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 48.0,
+      "windowEnd": 56.0,
+      "segments": [
+        {
+          "start": 48.0,
+          "end": 52.6,
+          "text": "Waka, waka, baka, back man, back-man, back, man,",
+          "avgLogprob": -0.853331,
+          "noSpeechProb": 0.809282,
+          "compressionRatio": 1.657143,
+          "words": [
+            {
+              "start": 48.0,
+              "end": 49.1,
+              "word": " Waka,",
+              "probability": 0.172263
+            },
+            {
+              "start": 49.26,
+              "end": 49.54,
+              "word": " waka,",
+              "probability": 0.895001
+            },
+            {
+              "start": 49.7,
+              "end": 50.16,
+              "word": " baka,",
+              "probability": 0.495542
+            },
+            {
+              "start": 50.2,
+              "end": 50.38,
+              "word": " back",
+              "probability": 0.114713
+            },
+            {
+              "start": 50.38,
+              "end": 50.68,
+              "word": " man,",
+              "probability": 0.493848
+            },
+            {
+              "start": 50.68,
+              "end": 50.98,
+              "word": " back",
+              "probability": 0.87956
+            },
+            {
+              "start": 50.98,
+              "end": 51.7,
+              "word": "-man,",
+              "probability": 0.462926
+            },
+            {
+              "start": 52.0,
+              "end": 52.1,
+              "word": " back,",
+              "probability": 0.92806
+            },
+            {
+              "start": 52.24,
+              "end": 52.6,
+              "word": " man,",
+              "probability": 0.942954
+            }
+          ]
+        },
+        {
+          "start": 52.6,
+          "end": 53.46,
+          "text": "back man.",
+          "avgLogprob": -0.853331,
+          "noSpeechProb": 0.809282,
+          "compressionRatio": 1.657143,
+          "words": [
+            {
+              "start": 52.6,
+              "end": 53.0,
+              "word": " back",
+              "probability": 0.9536
+            },
+            {
+              "start": 53.0,
+              "end": 53.46,
+              "word": " man.",
+              "probability": 0.379077
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 54.0,
+      "windowEnd": 62.0,
+      "segments": [
+        {
+          "start": 54.0,
+          "end": 55.0,
+          "text": "Waka waka Batman!",
+          "avgLogprob": -0.820345,
+          "noSpeechProb": 0.585748,
+          "compressionRatio": 1.827586,
+          "words": [
+            {
+              "start": 54.0,
+              "end": 54.22,
+              "word": " Waka",
+              "probability": 0.063551
+            },
+            {
+              "start": 54.22,
+              "end": 54.4,
+              "word": " waka",
+              "probability": 0.756579
+            },
+            {
+              "start": 54.4,
+              "end": 55.0,
+              "word": " Batman!",
+              "probability": 0.412629
+            }
+          ]
+        },
+        {
+          "start": 55.48,
+          "end": 57.2,
+          "text": "Waka, waka, wa-ga-wa-ga, waa-ga wa-da-wa, waga-ga Batman!",
+          "avgLogprob": -0.820345,
+          "noSpeechProb": 0.585748,
+          "compressionRatio": 1.827586,
+          "words": [
+            {
+              "start": 55.48,
+              "end": 55.82,
+              "word": " Waka,",
+              "probability": 0.684127
+            },
+            {
+              "start": 55.98,
+              "end": 56.02,
+              "word": " waka,",
+              "probability": 0.964743
+            },
+            {
+              "start": 56.34,
+              "end": 56.44,
+              "word": " wa",
+              "probability": 0.002368
+            },
+            {
+              "start": 56.44,
+              "end": 56.54,
+              "word": "-ga",
+              "probability": 0.384868
+            },
+            {
+              "start": 56.54,
+              "end": 56.58,
+              "word": "-wa",
+              "probability": 0.397333
+            },
+            {
+              "start": 56.58,
+              "end": 56.58,
+              "word": "-ga,",
+              "probability": 0.954606
+            },
+            {
+              "start": 56.58,
+              "end": 56.76,
+              "word": " waa",
+              "probability": 0.16178
+            },
+            {
+              "start": 56.76,
+              "end": 56.76,
+              "word": "-ga",
+              "probability": 0.970799
+            },
+            {
+              "start": 56.76,
+              "end": 56.76,
+              "word": " wa",
+              "probability": 0.019123
+            },
+            {
+              "start": 56.76,
+              "end": 56.76,
+              "word": "-da",
+              "probability": 0.443515
+            },
+            {
+              "start": 56.76,
+              "end": 56.86,
+              "word": "-wa,",
+              "probability": 0.516307
+            },
+            {
+              "start": 56.86,
+              "end": 56.86,
+              "word": " waga",
+              "probability": 0.160315
+            },
+            {
+              "start": 56.86,
+              "end": 56.96,
+              "word": "-ga",
+              "probability": 0.515641
+            },
+            {
+              "start": 56.96,
+              "end": 57.2,
+              "word": " Batman!",
+              "probability": 0.02824
+            }
+          ]
+        },
+        {
+          "start": 57.44,
+          "end": 58.48,
+          "text": "Joe Bane, Batman, Batman!",
+          "avgLogprob": -0.820345,
+          "noSpeechProb": 0.585748,
+          "compressionRatio": 1.827586,
+          "words": [
+            {
+              "start": 57.44,
+              "end": 57.56,
+              "word": " Joe",
+              "probability": 0.137342
+            },
+            {
+              "start": 57.56,
+              "end": 57.78,
+              "word": " Bane,",
+              "probability": 0.065577
+            },
+            {
+              "start": 58.06,
+              "end": 58.06,
+              "word": " Batman,",
+              "probability": 0.49046
+            },
+            {
+              "start": 58.28,
+              "end": 58.48,
+              "word": " Batman!",
+              "probability": 0.882767
+            }
+          ]
+        },
+        {
+          "start": 58.78,
+          "end": 60.32,
+          "text": "Waka wa-ka wa-ta wa-to wa- to wa- da wa-",
+          "avgLogprob": -0.820345,
+          "noSpeechProb": 0.585748,
+          "compressionRatio": 1.827586,
+          "words": [
+            {
+              "start": 58.78,
+              "end": 58.84,
+              "word": " Waka",
+              "probability": 0.929425
+            },
+            {
+              "start": 58.84,
+              "end": 59.02,
+              "word": " wa",
+              "probability": 0.203037
+            },
+            {
+              "start": 59.02,
+              "end": 59.1,
+              "word": "-ka",
+              "probability": 0.466599
+            },
+            {
+              "start": 59.1,
+              "end": 59.42,
+              "word": " wa",
+              "probability": 0.709232
+            },
+            {
+              "start": 59.42,
+              "end": 59.54,
+              "word": "-ta",
+              "probability": 0.51969
+            },
+            {
+              "start": 59.54,
+              "end": 59.62,
+              "word": " wa",
+              "probability": 0.762322
+            },
+            {
+              "start": 59.62,
+              "end": 59.78,
+              "word": "-to",
+              "probability": 0.483993
+            },
+            {
+              "start": 59.78,
+              "end": 59.84,
+              "word": " wa",
+              "probability": 0.731043
+            },
+            {
+              "start": 59.84,
+              "end": 59.96,
+              "word": "-",
+              "probability": 0.947598
+            },
+            {
+              "start": 59.96,
+              "end": 59.96,
+              "word": " to",
+              "probability": 0.007277
+            },
+            {
+              "start": 59.96,
+              "end": 60.08,
+              "word": " wa",
+              "probability": 0.977475
+            },
+            {
+              "start": 60.08,
+              "end": 60.18,
+              "word": "-",
+              "probability": 0.93833
+            },
+            {
+              "start": 60.18,
+              "end": 60.18,
+              "word": " da",
+              "probability": 0.006565
+            },
+            {
+              "start": 60.18,
+              "end": 60.28,
+              "word": " wa",
+              "probability": 0.329882
+            },
+            {
+              "start": 60.28,
+              "end": 60.32,
+              "word": "-",
+              "probability": 0.904345
+            }
+          ]
+        },
+        {
+          "start": 60.32,
+          "end": 61.82,
+          "text": "Batman, BAC-MAN!",
+          "avgLogprob": -0.820345,
+          "noSpeechProb": 0.585748,
+          "compressionRatio": 1.827586,
+          "words": [
+            {
+              "start": 60.32,
+              "end": 60.8,
+              "word": " Batman,",
+              "probability": 0.000724
+            },
+            {
+              "start": 61.28,
+              "end": 61.62,
+              "word": " BAC",
+              "probability": 0.156253
+            },
+            {
+              "start": 61.62,
+              "end": 61.82,
+              "word": "-MAN!",
+              "probability": 0.636235
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 60.0,
+      "windowEnd": 68.0,
+      "segments": [
+        {
+          "start": 60.0,
+          "end": 62.06,
+          "text": "Black Men, Black Men",
+          "avgLogprob": -0.707677,
+          "noSpeechProb": 0.418868,
+          "compressionRatio": 1.512195,
+          "words": [
+            {
+              "start": 60.0,
+              "end": 60.72,
+              "word": " Black",
+              "probability": 0.077512
+            },
+            {
+              "start": 60.72,
+              "end": 61.1,
+              "word": " Men,",
+              "probability": 0.265653
+            },
+            {
+              "start": 61.44,
+              "end": 61.5,
+              "word": " Black",
+              "probability": 0.832719
+            },
+            {
+              "start": 61.5,
+              "end": 62.06,
+              "word": " Men",
+              "probability": 0.979708
+            }
+          ]
+        },
+        {
+          "start": 62.06,
+          "end": 65.76,
+          "text": "Black men, black men, Black men",
+          "avgLogprob": -0.707677,
+          "noSpeechProb": 0.418868,
+          "compressionRatio": 1.512195,
+          "words": [
+            {
+              "start": 62.06,
+              "end": 62.26,
+              "word": " Black",
+              "probability": 0.006096
+            },
+            {
+              "start": 62.26,
+              "end": 62.56,
+              "word": " men,",
+              "probability": 0.069746
+            },
+            {
+              "start": 62.8,
+              "end": 62.8,
+              "word": " black",
+              "probability": 0.673216
+            },
+            {
+              "start": 62.8,
+              "end": 62.8,
+              "word": " men,",
+              "probability": 0.890182
+            },
+            {
+              "start": 62.8,
+              "end": 63.1,
+              "word": " Black",
+              "probability": 0.011141
+            },
+            {
+              "start": 63.1,
+              "end": 65.76,
+              "word": " men",
+              "probability": 0.694902
+            }
+          ]
+        },
+        {
+          "start": 65.76,
+          "end": 67.98,
+          "text": "Game over",
+          "avgLogprob": -0.707677,
+          "noSpeechProb": 0.418868,
+          "compressionRatio": 1.512195,
+          "words": [
+            {
+              "start": 65.76,
+              "end": 65.76,
+              "word": " Game",
+              "probability": 0.000386
+            },
+            {
+              "start": 65.76,
+              "end": 67.98,
+              "word": " over",
+              "probability": 0.581376
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 66.0,
+      "windowEnd": 74.0,
+      "segments": [
+        {
+          "start": 66.0,
+          "end": 68.08,
+          "text": "Game Over!",
+          "avgLogprob": -0.646835,
+          "noSpeechProb": 0.516859,
+          "compressionRatio": 0.954545,
+          "words": [
+            {
+              "start": 66.0,
+              "end": 67.6,
+              "word": " Game",
+              "probability": 0.50098
+            },
+            {
+              "start": 67.6,
+              "end": 68.08,
+              "word": " Over!",
+              "probability": 0.421219
+            }
+          ]
+        },
+        {
+          "start": 68.24,
+          "end": 68.94,
+          "text": "Game Over.",
+          "avgLogprob": -0.646835,
+          "noSpeechProb": 0.516859,
+          "compressionRatio": 0.954545,
+          "words": [
+            {
+              "start": 68.24,
+              "end": 68.46,
+              "word": " Game",
+              "probability": 0.543829
+            },
+            {
+              "start": 68.46,
+              "end": 68.94,
+              "word": " Over.",
+              "probability": 0.922034
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 72.0,
+      "windowEnd": 80.0,
+      "segments": [
+        {
+          "start": 73.3,
+          "end": 75.86,
+          "text": "Finish him! YEAH!",
+          "avgLogprob": -0.828696,
+          "noSpeechProb": 0.462722,
+          "compressionRatio": 0.846154,
+          "words": [
+            {
+              "start": 73.3,
+              "end": 74.3,
+              "word": " Finish",
+              "probability": 0.277601
+            },
+            {
+              "start": 74.3,
+              "end": 74.8,
+              "word": " him!",
+              "probability": 0.823023
+            },
+            {
+              "start": 75.3,
+              "end": 75.86,
+              "word": " YEAH!",
+              "probability": 0.739817
+            }
+          ]
+        },
+        {
+          "start": 77.98,
+          "end": 79.56,
+          "text": "Your clip wins!",
+          "avgLogprob": -0.828696,
+          "noSpeechProb": 0.462722,
+          "compressionRatio": 0.846154,
+          "words": [
+            {
+              "start": 77.98,
+              "end": 78.98,
+              "word": " Your",
+              "probability": 0.468737
+            },
+            {
+              "start": 78.98,
+              "end": 79.22,
+              "word": " clip",
+              "probability": 0.883653
+            },
+            {
+              "start": 79.22,
+              "end": 79.56,
+              "word": " wins!",
+              "probability": 0.975543
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 78.0,
+      "windowEnd": 86.0,
+      "segments": [
+        {
+          "start": 78.0,
+          "end": 79.66,
+          "text": "Waka, waka, your clip wins!",
+          "avgLogprob": -0.684547,
+          "noSpeechProb": 0.564279,
+          "compressionRatio": 1.26087,
+          "words": [
+            {
+              "start": 78.0,
+              "end": 78.18,
+              "word": " Waka,",
+              "probability": 0.328571
+            },
+            {
+              "start": 78.48,
+              "end": 78.48,
+              "word": " waka,",
+              "probability": 0.904502
+            },
+            {
+              "start": 78.48,
+              "end": 78.98,
+              "word": " your",
+              "probability": 0.049236
+            },
+            {
+              "start": 78.98,
+              "end": 79.2,
+              "word": " clip",
+              "probability": 0.545945
+            },
+            {
+              "start": 79.2,
+              "end": 79.66,
+              "word": " wins!",
+              "probability": 0.985139
+            }
+          ]
+        },
+        {
+          "start": 79.8,
+          "end": 81.76,
+          "text": "Waka-waka, wa-wa-wa, waa-wa!",
+          "avgLogprob": -0.684547,
+          "noSpeechProb": 0.564279,
+          "compressionRatio": 1.26087,
+          "words": [
+            {
+              "start": 79.8,
+              "end": 79.88,
+              "word": " Waka",
+              "probability": 0.927172
+            },
+            {
+              "start": 79.88,
+              "end": 80.28,
+              "word": "-waka,",
+              "probability": 0.597726
+            },
+            {
+              "start": 80.52,
+              "end": 80.64,
+              "word": " wa",
+              "probability": 0.038178
+            },
+            {
+              "start": 80.64,
+              "end": 80.8,
+              "word": "-wa",
+              "probability": 0.677544
+            },
+            {
+              "start": 80.8,
+              "end": 81.02,
+              "word": "-wa,",
+              "probability": 0.78199
+            },
+            {
+              "start": 81.02,
+              "end": 81.5,
+              "word": " waa",
+              "probability": 0.36602
+            },
+            {
+              "start": 81.5,
+              "end": 81.76,
+              "word": "-wa!",
+              "probability": 0.927524
+            }
+          ]
+        },
+        {
+          "start": 81.76,
+          "end": 82.54,
+          "text": "Level up!",
+          "avgLogprob": -0.684547,
+          "noSpeechProb": 0.564279,
+          "compressionRatio": 1.26087,
+          "words": [
+            {
+              "start": 81.76,
+              "end": 82.2,
+              "word": " Level",
+              "probability": 0.9202
+            },
+            {
+              "start": 82.2,
+              "end": 82.54,
+              "word": " up!",
+              "probability": 0.82642
+            }
+          ]
+        },
+        {
+          "start": 83.26,
+          "end": 84.36,
+          "text": "Wa-ta, wae-ta wa-ta!",
+          "avgLogprob": -0.684547,
+          "noSpeechProb": 0.564279,
+          "compressionRatio": 1.26087,
+          "words": [
+            {
+              "start": 83.26,
+              "end": 83.3,
+              "word": " Wa",
+              "probability": 0.17747
+            },
+            {
+              "start": 83.3,
+              "end": 83.52,
+              "word": "-ta,",
+              "probability": 0.533107
+            },
+            {
+              "start": 83.68,
+              "end": 83.84,
+              "word": " wae",
+              "probability": 0.46579
+            },
+            {
+              "start": 83.84,
+              "end": 83.98,
+              "word": "-ta",
+              "probability": 0.96298
+            },
+            {
+              "start": 83.98,
+              "end": 84.16,
+              "word": " wa",
+              "probability": 0.040988
+            },
+            {
+              "start": 84.16,
+              "end": 84.36,
+              "word": "-ta!",
+              "probability": 0.929608
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 84.0,
+      "windowEnd": 92.0,
+      "segments": [
+        {
+          "start": 88.94,
+          "end": 91.32,
+          "text": "I don't want to, I don' want to",
+          "avgLogprob": -0.948964,
+          "noSpeechProb": 0.869608,
+          "compressionRatio": 1.068966,
+          "words": [
+            {
+              "start": 88.94,
+              "end": 89.42,
+              "word": " I",
+              "probability": 0.051325
+            },
+            {
+              "start": 89.42,
+              "end": 89.9,
+              "word": " don't",
+              "probability": 0.544935
+            },
+            {
+              "start": 89.9,
+              "end": 90.2,
+              "word": " want",
+              "probability": 0.240206
+            },
+            {
+              "start": 90.2,
+              "end": 90.38,
+              "word": " to,",
+              "probability": 0.499658
+            },
+            {
+              "start": 90.44,
+              "end": 90.6,
+              "word": " I",
+              "probability": 0.659203
+            },
+            {
+              "start": 90.6,
+              "end": 90.72,
+              "word": " don'",
+              "probability": 0.990374
+            },
+            {
+              "start": 90.72,
+              "end": 90.72,
+              "word": " want",
+              "probability": 0.651378
+            },
+            {
+              "start": 90.72,
+              "end": 91.32,
+              "word": " to",
+              "probability": 0.990031
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 90.0,
+      "windowEnd": 98.0,
+      "segments": [
+        {
+          "start": 90.0,
+          "end": 94.12,
+          "text": "Baka, baka, ba-ba, ba, ba",
+          "avgLogprob": -0.763633,
+          "noSpeechProb": 0.774298,
+          "compressionRatio": 1.605263,
+          "words": [
+            {
+              "start": 90.0,
+              "end": 90.28,
+              "word": " Baka,",
+              "probability": 0.059808
+            },
+            {
+              "start": 90.46,
+              "end": 90.72,
+              "word": " baka,",
+              "probability": 0.767163
+            },
+            {
+              "start": 90.72,
+              "end": 91.04,
+              "word": " ba",
+              "probability": 0.009298
+            },
+            {
+              "start": 91.04,
+              "end": 91.26,
+              "word": "-ba,",
+              "probability": 0.450876
+            },
+            {
+              "start": 91.3,
+              "end": 93.36,
+              "word": " ba,",
+              "probability": 0.830916
+            },
+            {
+              "start": 93.36,
+              "end": 94.12,
+              "word": " ba",
+              "probability": 0.858499
+            }
+          ]
+        },
+        {
+          "start": 94.12,
+          "end": 95.42,
+          "text": "Baka-ba-ba",
+          "avgLogprob": -0.763633,
+          "noSpeechProb": 0.774298,
+          "compressionRatio": 1.605263,
+          "words": [
+            {
+              "start": 94.12,
+              "end": 94.88,
+              "word": " Baka",
+              "probability": 0.482553
+            },
+            {
+              "start": 94.88,
+              "end": 95.1,
+              "word": "-ba",
+              "probability": 0.354367
+            },
+            {
+              "start": 95.1,
+              "end": 95.42,
+              "word": "-ba",
+              "probability": 0.601611
+            }
+          ]
+        },
+        {
+          "start": 95.42,
+          "end": 96.24,
+          "text": "Baka baka-baka",
+          "avgLogprob": -0.763633,
+          "noSpeechProb": 0.774298,
+          "compressionRatio": 1.605263,
+          "words": [
+            {
+              "start": 95.42,
+              "end": 95.42,
+              "word": " Baka",
+              "probability": 0.544132
+            },
+            {
+              "start": 95.42,
+              "end": 95.42,
+              "word": " baka",
+              "probability": 0.499558
+            },
+            {
+              "start": 95.42,
+              "end": 96.24,
+              "word": "-baka",
+              "probability": 0.419781
+            }
+          ]
+        },
+        {
+          "start": 96.24,
+          "end": 97.38,
+          "text": "Baka Baka",
+          "avgLogprob": -0.763633,
+          "noSpeechProb": 0.774298,
+          "compressionRatio": 1.605263,
+          "words": [
+            {
+              "start": 96.24,
+              "end": 96.72,
+              "word": " Baka",
+              "probability": 0.574075
+            },
+            {
+              "start": 96.72,
+              "end": 97.38,
+              "word": " Baka",
+              "probability": 0.525246
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "windowStart": 96.0,
+      "windowEnd": 102.0,
+      "segments": [
+        {
+          "start": 96.0,
+          "end": 96.52,
+          "text": "Wacka!",
+          "avgLogprob": -0.920721,
+          "noSpeechProb": 0.157407,
+          "compressionRatio": 0.714286,
+          "words": [
+            {
+              "start": 96.0,
+              "end": 96.52,
+              "word": " Wacka!",
+              "probability": 0.369309
+            }
+          ]
+        },
+        {
+          "start": 99.0,
+          "end": 100.18,
+          "text": "Victory Sound",
+          "avgLogprob": -0.920721,
+          "noSpeechProb": 0.157407,
+          "compressionRatio": 0.714286,
+          "words": [
+            {
+              "start": 98.6,
+              "end": 99.3,
+              "word": " Victory",
+              "probability": 0.741024
+            },
+            {
+              "start": 99.3,
+              "end": 100.18,
+              "word": " Sound",
+              "probability": 0.57957
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "caution": "Independent overlapping-window diagnostic; no fantasy-script vocabulary was supplied. Musical ASR can hallucinate, especially repeated tokens."
+}

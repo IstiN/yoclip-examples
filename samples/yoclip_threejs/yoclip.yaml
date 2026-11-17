@@ -1,0 +1,63 @@
+project: yoclip_threejs
+project_js: project.js
+
+config:
+  duration: 3600
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#05050c'
+
+render:
+  videoBitrate: 12000000
+  audioBitrate: 192000
+  codec: h264
+
+fonts:
+  - { family: 'Source Sans 3', path: 'assets/fonts/SourceSans3-Regular.ttf' }
+  - { family: 'Source Sans 3 Bold', path: 'assets/fonts/SourceSans3-Bold.ttf' }
+
+theme:
+  font:
+    family: 'Source Sans 3'
+  colors:
+    primary: '#7c3aed'
+    primaryLight: '#a78bfa'
+    accent: '#22d3ee'
+    background: '#05050c'
+    backgroundDeep: '#030308'
+    surface: '#10101c'
+    text: '#ffffff'
+    textMuted: '#a1a1aa'
+    good: '#34d399'
+
+scenes:
+  - scenes/background.scene.js
+  - scenes/00_intro.scene.js
+  - scenes/01_author.scene.js
+  - scenes/02_generate.scene.js
+  - scenes/03_realtime.scene.js
+  - scenes/04_direct.scene.js
+  - scenes/05_edit.scene.js
+  - scenes/06_formats.scene.js
+  - scenes/07_verify.scene.js
+  - scenes/08_export.scene.js
+  - scenes/09_showreel.scene.js
+  - scenes/10_repository.scene.js
+  - scenes/11_outro.scene.js
+  - scenes/hud.scene.js
+
+external_assets:
+  logo:
+    type: image
+    path: assets/images/yoclip_logo.svg
+
+audio:
+  tracks:
+    - source: assets://audio/click_loop_drive.mp3
+      start: 0
+      volume: 0.65
+      envelope:
+        - { frame: 0, volume: 0.52, ramp: 0 }
+        - { frame: 3300, volume: 0.62, ramp: 60 }
+        - { frame: 3600, volume: 0.0, ramp: 120 }

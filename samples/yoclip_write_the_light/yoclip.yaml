@@ -1,0 +1,54 @@
+project: yoclip_write_the_light
+project_js: project.js
+
+config:
+  duration: 6022
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#05050a'
+
+render:
+  videoBitrate: 16000000
+  audioBitrate: 256000
+  codec: h264
+
+fonts:
+  - { family: 'Source Sans 3', path: 'assets/fonts/SourceSans3-Regular.ttf' }
+  - { family: 'Source Sans 3 Bold', path: 'assets/fonts/SourceSans3-Bold.ttf' }
+  - { family: 'Anton', path: 'assets/fonts/Anton-Regular.ttf' }
+  - { family: 'Space Mono', path: 'assets/fonts/SpaceMono-Regular.ttf' }
+  - { family: 'Space Mono Bold', path: 'assets/fonts/SpaceMono-Bold.ttf' }
+
+theme:
+  font:
+    family: 'Source Sans 3'
+  colors:
+    primary: '#7c3aed'
+    primaryLight: '#a78bfa'
+    accent: '#22d3ee'
+    background: '#05050a'
+    backgroundDeep: '#020204'
+    surface: '#111118'
+    text: '#ffffff'
+    textMuted: '#a1a1aa'
+    good: '#34d399'
+    paper: '#f1efe8'
+    ink: '#0a0a0d'
+    orange: '#ff5a36'
+    lime: '#c7f464'
+
+scenes:
+  - scenes/background.scene.js
+  - scenes/film.scene.js
+
+external_assets:
+  logo:
+    type: image
+    path: assets/images/yoclip_logo.svg
+
+audio:
+  tracks:
+    - source: assets://audio/write_the_light.wav
+      start: 0
+      volume: 1.0

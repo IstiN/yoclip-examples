@@ -1,0 +1,53 @@
+project: yoclip_level_up
+project_js: project.js
+
+config:
+  duration: 3060
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#02030a'
+
+render:
+  videoBitrate: 18000000
+  audioBitrate: 256000
+  codec: h264
+
+fonts:
+  - { family: 'Source Sans 3', path: 'assets/fonts/SourceSans3-Regular.ttf' }
+  - { family: 'Source Sans 3 Bold', path: 'assets/fonts/SourceSans3-Bold.ttf' }
+  - { family: 'Anton', path: 'assets/fonts/Anton-Regular.ttf' }
+  - { family: 'Space Mono', path: 'assets/fonts/SpaceMono-Regular.ttf' }
+  - { family: 'Space Mono Bold', path: 'assets/fonts/SpaceMono-Bold.ttf' }
+
+theme:
+  font:
+    family: 'Source Sans 3'
+  colors:
+    primary: '#7137ff'
+    primaryLight: '#a77bff'
+    accent: '#16e7ff'
+    background: '#02030a'
+    surface: '#0a1020'
+    text: '#f4f8ff'
+    textMuted: '#8391ad'
+    danger: '#ff304f'
+    orange: '#ff7a32'
+    pac: '#ffe83d'
+    good: '#54ff9f'
+
+scenes:
+  - scenes/background.scene.js
+  - scenes/film.scene.js
+
+external_assets:
+  logo:
+    type: image
+    path: assets/images/yoclip_logo.svg
+
+audio:
+  tracks:
+    - source: assets://audio/level_up.wav
+      start: 0
+      volume: 1.0
+      loop: false

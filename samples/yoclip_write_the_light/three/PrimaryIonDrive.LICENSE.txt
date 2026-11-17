@@ -1,0 +1,15 @@
+Primary Ion Drive ///
+===================
+
+Author: indierocktopus (https://sketchfab.com/indierocktopus)
+Source: https://sketchfab.com/models/d3f50a66fee74c6588dd9bc92f7fe7b3
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+The model is distributed with the official three.js UnrealBloom example:
+https://github.com/mrdoob/three.js/blob/dev/examples/models/gltf/PrimaryIonDrive.glb
+
+The GLB metadata contains the same author, source, title and license fields.
+The unmodified three.js MIT license is included alongside this file as
+THREE_LICENSE. The sample adds deterministic master-frame animation, camera
+movement and exhaust geometry; the source GLB is not modified.

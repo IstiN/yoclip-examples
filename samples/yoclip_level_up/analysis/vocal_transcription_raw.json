@@ -1,0 +1,856 @@
+{
+  "source": "assets/audio/level_up.wav",
+  "tool": "faster-whisper",
+  "toolVersion": "1.2.1",
+  "model": "small.en",
+  "settings": {
+    "language": "en",
+    "beamSize": 5,
+    "temperature": 0.0,
+    "wordTimestamps": true,
+    "conditionOnPreviousText": false,
+    "vadFilter": false,
+    "initialPrompt": null
+  },
+  "detectedLanguage": "en",
+  "languageProbability": 1.0,
+  "duration": 102.0,
+  "durationAfterVad": 102.0,
+  "segments": [
+    {
+      "id": 1,
+      "start": 9.58,
+      "end": 11.18,
+      "text": "System loading.",
+      "avgLogprob": -0.527574,
+      "noSpeechProb": 0.446903,
+      "compressionRatio": 1.47619,
+      "words": [
+        {
+          "start": 9.58,
+          "end": 10.38,
+          "word": " System",
+          "probability": 0.361642
+        },
+        {
+          "start": 10.38,
+          "end": 11.18,
+          "word": " loading.",
+          "probability": 0.880298
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "start": 12.48,
+      "end": 13.94,
+      "text": "Y-Y-Y-Y-Y-YALL CLIP!",
+      "avgLogprob": -0.527574,
+      "noSpeechProb": 0.446903,
+      "compressionRatio": 1.47619,
+      "words": [
+        {
+          "start": 12.48,
+          "end": 12.68,
+          "word": " Y",
+          "probability": 0.329789
+        },
+        {
+          "start": 12.68,
+          "end": 13.04,
+          "word": "-Y",
+          "probability": 0.370617
+        },
+        {
+          "start": 13.04,
+          "end": 13.26,
+          "word": "-Y",
+          "probability": 0.955393
+        },
+        {
+          "start": 13.26,
+          "end": 13.4,
+          "word": "-Y",
+          "probability": 0.839965
+        },
+        {
+          "start": 13.4,
+          "end": 13.42,
+          "word": "-Y",
+          "probability": 0.680961
+        },
+        {
+          "start": 13.42,
+          "end": 13.52,
+          "word": "-YALL",
+          "probability": 0.423718
+        },
+        {
+          "start": 13.52,
+          "end": 13.94,
+          "word": " CLIP!",
+          "probability": 0.894054
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "start": 17.24,
+      "end": 17.5,
+      "text": "JAP CUT!",
+      "avgLogprob": -0.527574,
+      "noSpeechProb": 0.446903,
+      "compressionRatio": 1.47619,
+      "words": [
+        {
+          "start": 17.24,
+          "end": 17.3,
+          "word": " JAP",
+          "probability": 0.313463
+        },
+        {
+          "start": 17.3,
+          "end": 17.5,
+          "word": " CUT!",
+          "probability": 0.542222
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "start": 19.94,
+      "end": 20.94,
+      "text": "JAP CUT!",
+      "avgLogprob": -0.527574,
+      "noSpeechProb": 0.446903,
+      "compressionRatio": 1.47619,
+      "words": [
+        {
+          "start": 19.94,
+          "end": 20.74,
+          "word": " JAP",
+          "probability": 0.889248
+        },
+        {
+          "start": 20.74,
+          "end": 20.94,
+          "word": " CUT!",
+          "probability": 0.992842
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "start": 24.12,
+      "end": 25.18,
+      "text": "YALL CLIP!",
+      "avgLogprob": -0.527574,
+      "noSpeechProb": 0.446903,
+      "compressionRatio": 1.47619,
+      "words": [
+        {
+          "start": 24.12,
+          "end": 24.78,
+          "word": " YALL",
+          "probability": 0.528219
+        },
+        {
+          "start": 24.78,
+          "end": 25.18,
+          "word": " CLIP!",
+          "probability": 0.948345
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "start": 25.74,
+      "end": 26.82,
+      "text": "Ready? Ready?",
+      "avgLogprob": -0.527574,
+      "noSpeechProb": 0.446903,
+      "compressionRatio": 1.47619,
+      "words": [
+        {
+          "start": 25.74,
+          "end": 26.28,
+          "word": " Ready?",
+          "probability": 0.834271
+        },
+        {
+          "start": 26.82,
+          "end": 26.82,
+          "word": " Ready?",
+          "probability": 0.961019
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "start": 27.04,
+      "end": 27.6,
+      "text": "FIGHT! FIGHT!",
+      "avgLogprob": -0.527574,
+      "noSpeechProb": 0.446903,
+      "compressionRatio": 1.47619,
+      "words": [
+        {
+          "start": 27.04,
+          "end": 27.22,
+          "word": " FIGHT!",
+          "probability": 0.25447
+        },
+        {
+          "start": 27.44,
+          "end": 27.6,
+          "word": " FIGHT!",
+          "probability": 0.917053
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "start": 40.86,
+      "end": 56.06,
+      "text": "Waka waka waka waka waka waka waka waka waka waka waka waka waka waka waka waka",
+      "avgLogprob": -0.55775,
+      "noSpeechProb": 0.75658,
+      "compressionRatio": 4.9375,
+      "words": [
+        {
+          "start": 40.86,
+          "end": 42.26,
+          "word": " Waka",
+          "probability": 0.309953
+        },
+        {
+          "start": 42.26,
+          "end": 42.74,
+          "word": " waka",
+          "probability": 0.787617
+        },
+        {
+          "start": 42.74,
+          "end": 43.24,
+          "word": " waka",
+          "probability": 0.979576
+        },
+        {
+          "start": 43.24,
+          "end": 44.14,
+          "word": " waka",
+          "probability": 0.97828
+        },
+        {
+          "start": 44.14,
+          "end": 46.06,
+          "word": " waka",
+          "probability": 0.8122
+        },
+        {
+          "start": 46.06,
+          "end": 46.28,
+          "word": " waka",
+          "probability": 0.685555
+        },
+        {
+          "start": 46.28,
+          "end": 46.32,
+          "word": " waka",
+          "probability": 0.75327
+        },
+        {
+          "start": 46.32,
+          "end": 48.02,
+          "word": " waka",
+          "probability": 0.812212
+        },
+        {
+          "start": 48.02,
+          "end": 48.48,
+          "word": " waka",
+          "probability": 0.851536
+        },
+        {
+          "start": 48.48,
+          "end": 48.8,
+          "word": " waka",
+          "probability": 0.88223
+        },
+        {
+          "start": 48.8,
+          "end": 51.44,
+          "word": " waka",
+          "probability": 0.90015
+        },
+        {
+          "start": 51.44,
+          "end": 54.42,
+          "word": " waka",
+          "probability": 0.91723
+        },
+        {
+          "start": 54.42,
+          "end": 55.14,
+          "word": " waka",
+          "probability": 0.923519
+        },
+        {
+          "start": 55.14,
+          "end": 55.24,
+          "word": " waka",
+          "probability": 0.937362
+        },
+        {
+          "start": 55.24,
+          "end": 55.24,
+          "word": " waka",
+          "probability": 0.944299
+        },
+        {
+          "start": 55.24,
+          "end": 56.06,
+          "word": " waka",
+          "probability": 0.949209
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "start": 56.06,
+      "end": 78.66,
+      "text": "Wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka wacka w",
+      "avgLogprob": -0.059492,
+      "noSpeechProb": 0.603676,
+      "compressionRatio": 23.421053,
+      "words": [
+        {
+          "start": 56.06,
+          "end": 56.34,
+          "word": " Wacka",
+          "probability": 0.26454
+        },
+        {
+          "start": 56.34,
+          "end": 56.54,
+          "word": " wacka",
+          "probability": 0.846581
+        },
+        {
+          "start": 56.54,
+          "end": 56.76,
+          "word": " wacka",
+          "probability": 0.972674
+        },
+        {
+          "start": 56.76,
+          "end": 56.84,
+          "word": " wacka",
+          "probability": 0.980954
+        },
+        {
+          "start": 56.84,
+          "end": 56.98,
+          "word": " wacka",
+          "probability": 0.973424
+        },
+        {
+          "start": 56.98,
+          "end": 57.34,
+          "word": " wacka",
+          "probability": 0.943299
+        },
+        {
+          "start": 57.34,
+          "end": 57.4,
+          "word": " wacka",
+          "probability": 0.925584
+        },
+        {
+          "start": 57.4,
+          "end": 58.6,
+          "word": " wacka",
+          "probability": 0.912631
+        },
+        {
+          "start": 58.6,
+          "end": 58.68,
+          "word": " wacka",
+          "probability": 0.921937
+        },
+        {
+          "start": 58.68,
+          "end": 60.4,
+          "word": " wacka",
+          "probability": 0.92612
+        },
+        {
+          "start": 60.4,
+          "end": 61.08,
+          "word": " wacka",
+          "probability": 0.939389
+        },
+        {
+          "start": 61.08,
+          "end": 61.96,
+          "word": " wacka",
+          "probability": 0.948911
+        },
+        {
+          "start": 61.96,
+          "end": 62.28,
+          "word": " wacka",
+          "probability": 0.953516
+        },
+        {
+          "start": 62.28,
+          "end": 62.34,
+          "word": " wacka",
+          "probability": 0.959511
+        },
+        {
+          "start": 62.34,
+          "end": 62.52,
+          "word": " wacka",
+          "probability": 0.96212
+        },
+        {
+          "start": 62.52,
+          "end": 62.72,
+          "word": " wacka",
+          "probability": 0.965965
+        },
+        {
+          "start": 62.72,
+          "end": 62.74,
+          "word": " wacka",
+          "probability": 0.968878
+        },
+        {
+          "start": 62.74,
+          "end": 62.74,
+          "word": " wacka",
+          "probability": 0.970541
+        },
+        {
+          "start": 62.74,
+          "end": 63.4,
+          "word": " wacka",
+          "probability": 0.970916
+        },
+        {
+          "start": 63.4,
+          "end": 63.62,
+          "word": " wacka",
+          "probability": 0.972251
+        },
+        {
+          "start": 63.62,
+          "end": 63.84,
+          "word": " wacka",
+          "probability": 0.970036
+        },
+        {
+          "start": 63.84,
+          "end": 64.08,
+          "word": " wacka",
+          "probability": 0.972963
+        },
+        {
+          "start": 64.08,
+          "end": 64.08,
+          "word": " wacka",
+          "probability": 0.973681
+        },
+        {
+          "start": 64.08,
+          "end": 64.08,
+          "word": " wacka",
+          "probability": 0.973345
+        },
+        {
+          "start": 64.08,
+          "end": 64.08,
+          "word": " wacka",
+          "probability": 0.975213
+        },
+        {
+          "start": 64.08,
+          "end": 64.62,
+          "word": " wacka",
+          "probability": 0.975558
+        },
+        {
+          "start": 64.62,
+          "end": 65.24,
+          "word": " wacka",
+          "probability": 0.977458
+        },
+        {
+          "start": 65.24,
+          "end": 65.24,
+          "word": " wacka",
+          "probability": 0.974333
+        },
+        {
+          "start": 65.24,
+          "end": 65.8,
+          "word": " wacka",
+          "probability": 0.974972
+        },
+        {
+          "start": 65.8,
+          "end": 66.06,
+          "word": " wacka",
+          "probability": 0.975271
+        },
+        {
+          "start": 66.06,
+          "end": 66.06,
+          "word": " wacka",
+          "probability": 0.97525
+        },
+        {
+          "start": 66.06,
+          "end": 66.06,
+          "word": " wacka",
+          "probability": 0.975641
+        },
+        {
+          "start": 66.06,
+          "end": 66.06,
+          "word": " wacka",
+          "probability": 0.975482
+        },
+        {
+          "start": 66.06,
+          "end": 66.6,
+          "word": " wacka",
+          "probability": 0.975743
+        },
+        {
+          "start": 66.6,
+          "end": 66.6,
+          "word": " wacka",
+          "probability": 0.976271
+        },
+        {
+          "start": 66.6,
+          "end": 66.9,
+          "word": " wacka",
+          "probability": 0.974654
+        },
+        {
+          "start": 66.9,
+          "end": 67.62,
+          "word": " wacka",
+          "probability": 0.97679
+        },
+        {
+          "start": 67.62,
+          "end": 67.62,
+          "word": " wacka",
+          "probability": 0.976399
+        },
+        {
+          "start": 67.62,
+          "end": 67.62,
+          "word": " wacka",
+          "probability": 0.978091
+        },
+        {
+          "start": 67.62,
+          "end": 67.62,
+          "word": " wacka",
+          "probability": 0.979237
+        },
+        {
+          "start": 67.62,
+          "end": 67.86,
+          "word": " wacka",
+          "probability": 0.980908
+        },
+        {
+          "start": 67.86,
+          "end": 68.08,
+          "word": " wacka",
+          "probability": 0.983255
+        },
+        {
+          "start": 68.08,
+          "end": 68.52,
+          "word": " wacka",
+          "probability": 0.984346
+        },
+        {
+          "start": 68.52,
+          "end": 68.52,
+          "word": " wacka",
+          "probability": 0.985286
+        },
+        {
+          "start": 68.52,
+          "end": 68.54,
+          "word": " wacka",
+          "probability": 0.98528
+        },
+        {
+          "start": 68.54,
+          "end": 68.54,
+          "word": " wacka",
+          "probability": 0.985083
+        },
+        {
+          "start": 68.54,
+          "end": 68.74,
+          "word": " wacka",
+          "probability": 0.983155
+        },
+        {
+          "start": 68.74,
+          "end": 69.02,
+          "word": " wacka",
+          "probability": 0.983058
+        },
+        {
+          "start": 69.02,
+          "end": 69.12,
+          "word": " wacka",
+          "probability": 0.98339
+        },
+        {
+          "start": 69.12,
+          "end": 69.12,
+          "word": " wacka",
+          "probability": 0.985019
+        },
+        {
+          "start": 69.12,
+          "end": 69.12,
+          "word": " wacka",
+          "probability": 0.985986
+        },
+        {
+          "start": 69.12,
+          "end": 69.18,
+          "word": " wacka",
+          "probability": 0.985202
+        },
+        {
+          "start": 69.18,
+          "end": 69.18,
+          "word": " wacka",
+          "probability": 0.985878
+        },
+        {
+          "start": 69.18,
+          "end": 70.08,
+          "word": " wacka",
+          "probability": 0.984713
+        },
+        {
+          "start": 70.08,
+          "end": 70.08,
+          "word": " wacka",
+          "probability": 0.985976
+        },
+        {
+          "start": 70.08,
+          "end": 70.1,
+          "word": " wacka",
+          "probability": 0.986497
+        },
+        {
+          "start": 70.1,
+          "end": 70.1,
+          "word": " wacka",
+          "probability": 0.986715
+        },
+        {
+          "start": 70.1,
+          "end": 70.1,
+          "word": " wacka",
+          "probability": 0.986163
+        },
+        {
+          "start": 70.1,
+          "end": 70.1,
+          "word": " wacka",
+          "probability": 0.985002
+        },
+        {
+          "start": 70.1,
+          "end": 70.1,
+          "word": " wacka",
+          "probability": 0.986878
+        },
+        {
+          "start": 70.1,
+          "end": 71.24,
+          "word": " wacka",
+          "probability": 0.986953
+        },
+        {
+          "start": 71.24,
+          "end": 71.56,
+          "word": " wacka",
+          "probability": 0.986958
+        },
+        {
+          "start": 71.56,
+          "end": 71.56,
+          "word": " wacka",
+          "probability": 0.985518
+        },
+        {
+          "start": 71.56,
+          "end": 72.38,
+          "word": " wacka",
+          "probability": 0.986909
+        },
+        {
+          "start": 72.38,
+          "end": 72.78,
+          "word": " wacka",
+          "probability": 0.987292
+        },
+        {
+          "start": 72.78,
+          "end": 72.78,
+          "word": " wacka",
+          "probability": 0.986624
+        },
+        {
+          "start": 72.78,
+          "end": 72.8,
+          "word": " wacka",
+          "probability": 0.987211
+        },
+        {
+          "start": 72.8,
+          "end": 72.8,
+          "word": " wacka",
+          "probability": 0.986428
+        },
+        {
+          "start": 72.8,
+          "end": 74.68,
+          "word": " wacka",
+          "probability": 0.987194
+        },
+        {
+          "start": 74.68,
+          "end": 74.82,
+          "word": " wacka",
+          "probability": 0.986858
+        },
+        {
+          "start": 74.82,
+          "end": 75.0,
+          "word": " wacka",
+          "probability": 0.987077
+        },
+        {
+          "start": 75.0,
+          "end": 75.0,
+          "word": " wacka",
+          "probability": 0.987111
+        },
+        {
+          "start": 75.0,
+          "end": 75.0,
+          "word": " wacka",
+          "probability": 0.986586
+        },
+        {
+          "start": 75.0,
+          "end": 78.64,
+          "word": " wacka",
+          "probability": 0.986048
+        },
+        {
+          "start": 78.64,
+          "end": 78.66,
+          "word": " w",
+          "probability": 0.96445
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "start": 78.66,
+      "end": 79.7,
+      "text": "Your Clips wins!",
+      "avgLogprob": -0.603686,
+      "noSpeechProb": 0.14337,
+      "compressionRatio": 0.833333,
+      "words": [
+        {
+          "start": 78.66,
+          "end": 78.98,
+          "word": " Your",
+          "probability": 0.492854
+        },
+        {
+          "start": 78.98,
+          "end": 79.3,
+          "word": " Clips",
+          "probability": 0.511492
+        },
+        {
+          "start": 79.3,
+          "end": 79.7,
+          "word": " wins!",
+          "probability": 0.787824
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "start": 80.24,
+      "end": 82.76,
+      "text": "Level up!",
+      "avgLogprob": -0.603686,
+      "noSpeechProb": 0.14337,
+      "compressionRatio": 0.833333,
+      "words": [
+        {
+          "start": 80.24,
+          "end": 80.72,
+          "word": " Level",
+          "probability": 0.946043
+        },
+        {
+          "start": 80.72,
+          "end": 82.76,
+          "word": " up!",
+          "probability": 0.519951
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "start": 98.66,
+      "end": 100.14,
+      "text": "Victory Sound",
+      "avgLogprob": -0.603686,
+      "noSpeechProb": 0.14337,
+      "compressionRatio": 0.833333,
+      "words": [
+        {
+          "start": 98.52,
+          "end": 99.06,
+          "word": " Victory",
+          "probability": 0.769744
+        },
+        {
+          "start": 99.06,
+          "end": 100.14,
+          "word": " Sound",
+          "probability": 0.621395
+        }
+      ]
+    }
+  ],
+  "caution": "Raw ASR on a dense musical mix is diagnostic, not ground truth. No fantasy-script prompt or lyric vocabulary was supplied."
+}

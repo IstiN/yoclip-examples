@@ -1,0 +1,11 @@
+{
+  "name": "yoclip-write-the-light",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:three": "node tools/build_three_bundle.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.5"
+  }
+}

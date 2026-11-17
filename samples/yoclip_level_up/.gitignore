@@ -1,0 +1,10 @@
+.dart_tool/
+.flutter-plugins*
+.packages
+build/
+.yoclip_cache/
+renders/
+review/
+*.mp4
+__pycache__/
+pubspec.lock

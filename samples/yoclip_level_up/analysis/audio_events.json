@@ -1,0 +1,1629 @@
+{
+  "source": "assets/audio/level_up.wav",
+  "duration": 102.0,
+  "nominalBpm": 140.0,
+  "measuredBpm": 139.998,
+  "beatOffset": 0.032,
+  "beatTimes": [
+    0.032,
+    0.460571,
+    0.889143,
+    1.317714,
+    1.746286,
+    2.174857,
+    2.603429,
+    3.032,
+    3.460571,
+    3.889143,
+    4.317714,
+    4.746286,
+    5.174857,
+    5.603429,
+    6.032,
+    6.460571,
+    6.889143,
+    7.317714,
+    7.746286,
+    8.174857,
+    8.603429,
+    9.032,
+    9.460571,
+    9.889143,
+    10.317714,
+    10.746286,
+    11.174857,
+    11.603429,
+    12.032,
+    12.460571,
+    12.889143,
+    13.317714,
+    13.746286,
+    14.174857,
+    14.603429,
+    15.032,
+    15.460571,
+    15.889143,
+    16.317714,
+    16.746286,
+    17.174857,
+    17.603429,
+    18.032,
+    18.460571,
+    18.889143,
+    19.317714,
+    19.746286,
+    20.174857,
+    20.603429,
+    21.032,
+    21.460571,
+    21.889143,
+    22.317714,
+    22.746286,
+    23.174857,
+    23.603429,
+    24.032,
+    24.460571,
+    24.889143,
+    25.317714,
+    25.746286,
+    26.174857,
+    26.603429,
+    27.032,
+    27.460571,
+    27.889143,
+    28.317714,
+    28.746286,
+    29.174857,
+    29.603429,
+    30.032,
+    30.460571,
+    30.889143,
+    31.317714,
+    31.746286,
+    32.174857,
+    32.603429,
+    33.032,
+    33.460571,
+    33.889143,
+    34.317714,
+    34.746286,
+    35.174857,
+    35.603429,
+    36.032,
+    36.460571,
+    36.889143,
+    37.317714,
+    37.746286,
+    38.174857,
+    38.603429,
+    39.032,
+    39.460571,
+    39.889143,
+    40.317714,
+    40.746286,
+    41.174857,
+    41.603429,
+    42.032,
+    42.460571,
+    42.889143,
+    43.317714,
+    43.746286,
+    44.174857,
+    44.603429,
+    45.032,
+    45.460571,
+    45.889143,
+    46.317714,
+    46.746286,
+    47.174857,
+    47.603429,
+    48.032,
+    48.460571,
+    48.889143,
+    49.317714,
+    49.746286,
+    50.174857,
+    50.603429,
+    51.032,
+    51.460571,
+    51.889143,
+    52.317714,
+    52.746286,
+    53.174857,
+    53.603429,
+    54.032,
+    54.460571,
+    54.889143,
+    55.317714,
+    55.746286,
+    56.174857,
+    56.603429,
+    57.032,
+    57.460571,
+    57.889143,
+    58.317714,
+    58.746286,
+    59.174857,
+    59.603429,
+    60.032,
+    60.460571,
+    60.889143,
+    61.317714,
+    61.746286,
+    62.174857,
+    62.603429,
+    63.032,
+    63.460571,
+    63.889143,
+    64.317714,
+    64.746286,
+    65.174857,
+    65.603429,
+    66.032,
+    66.460571,
+    66.889143,
+    67.317714,
+    67.746286,
+    68.174857,
+    68.603429,
+    69.032,
+    69.460571,
+    69.889143,
+    70.317714,
+    70.746286,
+    71.174857,
+    71.603429,
+    72.032,
+    72.460571,
+    72.889143,
+    73.317714,
+    73.746286,
+    74.174857,
+    74.603429,
+    75.032,
+    75.460571,
+    75.889143,
+    76.317714,
+    76.746286,
+    77.174857,
+    77.603429,
+    78.032,
+    78.460571,
+    78.889143,
+    79.317714,
+    79.746286,
+    80.174857,
+    80.603429,
+    81.032,
+    81.460571,
+    81.889143,
+    82.317714,
+    82.746286,
+    83.174857,
+    83.603429,
+    84.032,
+    84.460571,
+    84.889143,
+    85.317714,
+    85.746286,
+    86.174857,
+    86.603429,
+    87.032,
+    87.460571,
+    87.889143,
+    88.317714,
+    88.746286,
+    89.174857,
+    89.603429,
+    90.032,
+    90.460571,
+    90.889143,
+    91.317714,
+    91.746286,
+    92.174857,
+    92.603429,
+    93.032,
+    93.460571,
+    93.889143,
+    94.317714,
+    94.746286,
+    95.174857,
+    95.603429,
+    96.032,
+    96.460571,
+    96.889143,
+    97.317714,
+    97.746286,
+    98.174857,
+    98.603429,
+    99.032,
+    99.460571,
+    99.889143,
+    100.317714,
+    100.746286,
+    101.174857,
+    101.603429
+  ],
+  "downbeats": [
+    0.032,
+    1.746286,
+    3.460571,
+    5.174857,
+    6.889143,
+    8.603429,
+    10.317714,
+    12.032,
+    13.746286,
+    15.460571,
+    17.174857,
+    18.889143,
+    20.603429,
+    22.317714,
+    24.032,
+    25.746286,
+    27.460571,
+    29.174857,
+    30.889143,
+    32.603429,
+    34.317714,
+    36.032,
+    37.746286,
+    39.460571,
+    41.174857,
+    42.889143,
+    44.603429,
+    46.317714,
+    48.032,
+    49.746286,
+    51.460571,
+    53.174857,
+    54.889143,
+    56.603429,
+    58.317714,
+    60.032,
+    61.746286,
+    63.460571,
+    65.174857,
+    66.889143,
+    68.603429,
+    70.317714,
+    72.032,
+    73.746286,
+    75.460571,
+    77.174857,
+    78.889143,
+    80.603429,
+    82.317714,
+    84.032,
+    85.746286,
+    87.460571,
+    89.174857,
+    90.889143,
+    92.603429,
+    94.317714,
+    96.032,
+    97.746286,
+    99.460571,
+    101.174857
+  ],
+  "sections": [
+    {
+      "id": "boot",
+      "index": 0,
+      "startBeat": 0,
+      "endBeat": 24,
+      "start": 0.0,
+      "end": 10.285714,
+      "evidence": "arena assembly; measured System loading at 9.58 s"
+    },
+    {
+      "id": "versus",
+      "index": 1,
+      "startBeat": 24,
+      "endBeat": 60,
+      "start": 10.285714,
+      "end": 25.714286,
+      "evidence": "fighter introductions; measured name calls"
+    },
+    {
+      "id": "duel",
+      "index": 2,
+      "startBeat": 60,
+      "endBeat": 96,
+      "start": 25.714286,
+      "end": 41.142857,
+      "evidence": "Ready/Fight vocals and first heavy combat passage"
+    },
+    {
+      "id": "overclock",
+      "index": 3,
+      "startBeat": 96,
+      "endBeat": 116,
+      "start": 41.142857,
+      "end": 49.714286,
+      "evidence": "first measured waka phrase; arcade transformation"
+    },
+    {
+      "id": "chase",
+      "index": 4,
+      "startBeat": 116,
+      "endBeat": 160,
+      "start": 49.714286,
+      "end": 68.571429,
+      "evidence": "sustained waka-waka bridge and maze chase"
+    },
+    {
+      "id": "showdown",
+      "index": 5,
+      "startBeat": 160,
+      "endBeat": 182,
+      "start": 68.571429,
+      "end": 78.0,
+      "evidence": "final combat build before the result call"
+    },
+    {
+      "id": "ko",
+      "index": 6,
+      "startBeat": 182,
+      "endBeat": 186,
+      "start": 78.0,
+      "end": 79.714286,
+      "evidence": "K.O. and measured Yoclip Wins at 78.66 s"
+    },
+    {
+      "id": "victory",
+      "index": 7,
+      "startBeat": 186,
+      "endBeat": 238,
+      "start": 79.714286,
+      "end": 102.0,
+      "evidence": "Level Up at 80.24 s and victory sound at 98.66 s"
+    }
+  ],
+  "vocals": [
+    {
+      "start": 9.58,
+      "end": 11.18,
+      "text": "SYSTEM LOADING...",
+      "source": "faster-whisper small.en",
+      "color": "#16e7ff"
+    },
+    {
+      "start": 12.48,
+      "end": 13.94,
+      "text": "YOCLIP!",
+      "source": "faster-whisper; normalized name",
+      "color": "#16e7ff"
+    },
+    {
+      "start": 17.24,
+      "end": 17.5,
+      "text": "CAPCUT!",
+      "source": "faster-whisper; normalized name",
+      "color": "#ff304f"
+    },
+    {
+      "start": 19.94,
+      "end": 20.94,
+      "text": "CAPCUT!",
+      "source": "faster-whisper; normalized name",
+      "color": "#ff304f"
+    },
+    {
+      "start": 24.12,
+      "end": 25.18,
+      "text": "YOCLIP!",
+      "source": "faster-whisper; normalized name",
+      "color": "#16e7ff"
+    },
+    {
+      "start": 25.74,
+      "end": 26.82,
+      "text": "READY? READY?",
+      "source": "faster-whisper",
+      "color": "#f4f8ff"
+    },
+    {
+      "start": 27.04,
+      "end": 27.6,
+      "text": "FIGHT! FIGHT!",
+      "source": "faster-whisper",
+      "color": "#ff304f"
+    },
+    {
+      "start": 40.86,
+      "end": 44.14,
+      "text": "WAKA-WAKA-WAKA",
+      "source": "faster-whisper; repeated vocal chop",
+      "color": "#ffe83d"
+    },
+    {
+      "start": 48.02,
+      "end": 51.44,
+      "text": "WAKA-WAKA-WAKA",
+      "source": "faster-whisper; repeated vocal chop",
+      "color": "#ffe83d"
+    },
+    {
+      "start": 56.06,
+      "end": 59.2,
+      "text": "WAKA-WAKA-WAKA",
+      "source": "faster-whisper; repeated vocal chop",
+      "color": "#ffe83d"
+    },
+    {
+      "start": 64.0,
+      "end": 67.2,
+      "text": "WAKA-WAKA-WAKA",
+      "source": "faster-whisper; repeated vocal chop",
+      "color": "#ffe83d"
+    },
+    {
+      "start": 72.0,
+      "end": 75.2,
+      "text": "WAKA-WAKA-WAKA",
+      "source": "faster-whisper; repeated vocal chop",
+      "color": "#ffe83d"
+    },
+    {
+      "start": 78.66,
+      "end": 79.7,
+      "text": "YOCLIP WINS!",
+      "source": "faster-whisper; normalized name",
+      "color": "#54ff9f"
+    },
+    {
+      "start": 80.24,
+      "end": 82.76,
+      "text": "LEVEL UP!",
+      "source": "faster-whisper",
+      "color": "#54ff9f"
+    },
+    {
+      "start": 98.66,
+      "end": 100.14,
+      "text": "VICTORY!",
+      "source": "faster-whisper segment: Victory Sound",
+      "color": "#ffe83d"
+    }
+  ],
+  "impacts": [
+    {
+      "time": 0.433333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 3.866667,
+      "strength": 0.8215,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 4.3,
+      "strength": 0.56957,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 6.433333,
+      "strength": 0.92938,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 6.866667,
+      "strength": 0.90631,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 7.266667,
+      "strength": 0.9182,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 9.7,
+      "strength": 0.84114,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 12.433333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 12.866667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 13.3,
+      "strength": 0.92218,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 13.933333,
+      "strength": 0.9402,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 14.9,
+      "strength": 0.61364,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 15.433333,
+      "strength": 0.58329,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 15.966667,
+      "strength": 0.67881,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 16.5,
+      "strength": 0.64031,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 16.933333,
+      "strength": 0.71541,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 17.366667,
+      "strength": 0.81488,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 17.7,
+      "strength": 0.58886,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 18.333333,
+      "strength": 0.61392,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 18.633333,
+      "strength": 0.66679,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 18.966667,
+      "strength": 0.63946,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 19.3,
+      "strength": 0.75914,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 19.733333,
+      "strength": 0.63225,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 20.033333,
+      "strength": 0.63865,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 20.366667,
+      "strength": 0.64017,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 20.8,
+      "strength": 0.9063,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 21.433333,
+      "strength": 0.82377,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 21.766667,
+      "strength": 0.65527,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 22.066667,
+      "strength": 0.67268,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 22.4,
+      "strength": 0.62943,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 22.733333,
+      "strength": 0.76908,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 23.033333,
+      "strength": 0.60664,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 23.366667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 23.7,
+      "strength": 0.63228,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 24.0,
+      "strength": 0.98057,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 24.333333,
+      "strength": 0.84979,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 24.833333,
+      "strength": 0.7892,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 25.266667,
+      "strength": 0.57103,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 27.0,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 27.433333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 27.833333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 28.3,
+      "strength": 0.8263,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 28.6,
+      "strength": 0.75921,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 28.933333,
+      "strength": 0.87736,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 29.266667,
+      "strength": 0.70831,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 29.566667,
+      "strength": 0.712,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 30.0,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 30.433333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 30.766667,
+      "strength": 0.62748,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 31.066667,
+      "strength": 0.63904,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 31.5,
+      "strength": 0.56581,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 31.833333,
+      "strength": 0.72724,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 32.133333,
+      "strength": 0.99518,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 32.466667,
+      "strength": 0.62746,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 32.8,
+      "strength": 0.69614,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 33.1,
+      "strength": 0.80675,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 33.433333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 33.766667,
+      "strength": 0.69913,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 34.066667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 34.4,
+      "strength": 0.9558,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 34.7,
+      "strength": 0.90011,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 35.133333,
+      "strength": 0.92964,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 35.466667,
+      "strength": 0.62399,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 35.8,
+      "strength": 0.78014,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 36.1,
+      "strength": 0.59311,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 36.433333,
+      "strength": 0.97918,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 36.866667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 37.3,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 37.6,
+      "strength": 0.60091,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 37.933333,
+      "strength": 0.76319,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 38.366667,
+      "strength": 0.56056,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 38.8,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 39.2,
+      "strength": 0.8552,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 39.633333,
+      "strength": 0.98371,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 40.0,
+      "strength": 0.84806,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 40.3,
+      "strength": 0.87245,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 40.933333,
+      "strength": 0.57579,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 41.566667,
+      "strength": 0.88559,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 42.0,
+      "strength": 0.76568,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 42.333333,
+      "strength": 0.57489,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 42.866667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 43.3,
+      "strength": 0.9146,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 43.6,
+      "strength": 0.66856,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 43.933333,
+      "strength": 0.89254,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 44.366667,
+      "strength": 0.5972,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 44.8,
+      "strength": 0.79476,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 45.2,
+      "strength": 0.58541,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 45.533333,
+      "strength": 0.8997,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 45.866667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 46.3,
+      "strength": 0.90076,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 46.733333,
+      "strength": 0.85516,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 47.033333,
+      "strength": 0.73797,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 47.366667,
+      "strength": 0.81305,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 47.8,
+      "strength": 0.77553,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 48.1,
+      "strength": 0.56705,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 48.433333,
+      "strength": 0.81538,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 48.866667,
+      "strength": 0.90431,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 49.3,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 49.7,
+      "strength": 0.7574,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 50.133333,
+      "strength": 0.96869,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 50.466667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 50.8,
+      "strength": 0.92396,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 51.333333,
+      "strength": 0.68342,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 51.866667,
+      "strength": 0.80556,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 52.3,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 52.6,
+      "strength": 0.60396,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 52.933333,
+      "strength": 0.70794,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 53.266667,
+      "strength": 0.61768,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 53.566667,
+      "strength": 0.98575,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 53.9,
+      "strength": 0.94046,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 54.233333,
+      "strength": 0.81222,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 54.866667,
+      "strength": 0.76623,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 55.3,
+      "strength": 0.6903,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 55.733333,
+      "strength": 0.57851,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 56.166667,
+      "strength": 0.70962,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 56.466667,
+      "strength": 0.62703,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 56.9,
+      "strength": 0.71617,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 57.433333,
+      "strength": 0.80401,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 57.866667,
+      "strength": 0.9715,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 58.3,
+      "strength": 0.80692,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 58.733333,
+      "strength": 0.78956,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 59.033333,
+      "strength": 0.68293,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 59.366667,
+      "strength": 0.64888,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 59.9,
+      "strength": 0.66815,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 60.333333,
+      "strength": 0.66768,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 60.866667,
+      "strength": 0.70376,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 61.266667,
+      "strength": 0.78535,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 61.733333,
+      "strength": 0.57511,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 62.133333,
+      "strength": 0.9021,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 62.466667,
+      "strength": 0.71683,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 62.8,
+      "strength": 0.71245,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 63.1,
+      "strength": 0.59662,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 63.433333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 63.766667,
+      "strength": 0.78082,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 64.066667,
+      "strength": 0.85505,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 64.4,
+      "strength": 0.98115,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 64.733333,
+      "strength": 0.76427,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 65.033333,
+      "strength": 0.94511,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 65.366667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 65.666667,
+      "strength": 0.72954,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 66.0,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 66.333333,
+      "strength": 0.8589,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 66.633333,
+      "strength": 0.81857,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 66.966667,
+      "strength": 0.86733,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 69.0,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 69.333333,
+      "strength": 0.87977,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 69.633333,
+      "strength": 0.88222,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 70.066667,
+      "strength": 0.84102,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 70.5,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 70.833333,
+      "strength": 0.87725,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 71.133333,
+      "strength": 0.77382,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 71.566667,
+      "strength": 0.90361,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 71.9,
+      "strength": 0.60936,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 72.233333,
+      "strength": 0.73829,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 72.633333,
+      "strength": 0.61473,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 72.966667,
+      "strength": 0.64663,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 73.3,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 73.6,
+      "strength": 0.74725,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 73.933333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 74.266667,
+      "strength": 0.64707,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 74.566667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 75.866667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 76.3,
+      "strength": 0.82607,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 76.6,
+      "strength": 0.61245,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 76.933333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 77.366667,
+      "strength": 0.95988,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 77.7,
+      "strength": 0.65447,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 78.0,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 78.333333,
+      "strength": 0.79077,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 78.633333,
+      "strength": 0.72805,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 79.066667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 79.5,
+      "strength": 0.57054,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 79.933333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 80.266667,
+      "strength": 0.69042,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 80.566667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 81.0,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 81.333333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 81.633333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 82.0,
+      "strength": 0.61929,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 82.7,
+      "strength": 0.98454,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 83.133333,
+      "strength": 0.71557,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 83.466667,
+      "strength": 0.56251,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 83.8,
+      "strength": 0.7777,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 84.233333,
+      "strength": 0.61402,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 84.633333,
+      "strength": 0.61826,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 84.966667,
+      "strength": 0.58934,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 85.3,
+      "strength": 0.99943,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 85.733333,
+      "strength": 0.77737,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 86.033333,
+      "strength": 0.57264,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 86.366667,
+      "strength": 0.60531,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 86.8,
+      "strength": 0.85508,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 87.233333,
+      "strength": 0.6972,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 87.633333,
+      "strength": 0.5996,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 88.066667,
+      "strength": 0.65562,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 88.4,
+      "strength": 0.673,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 88.7,
+      "strength": 0.83263,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 89.033333,
+      "strength": 0.65147,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 89.366667,
+      "strength": 0.98408,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 89.9,
+      "strength": 0.59833,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 90.233333,
+      "strength": 0.83874,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 90.533333,
+      "strength": 0.63707,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 90.866667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 91.3,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 91.6,
+      "strength": 0.70877,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 91.933333,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 92.266667,
+      "strength": 0.83126,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 92.566667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 92.9,
+      "strength": 0.98256,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 93.233333,
+      "strength": 0.69947,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 93.533333,
+      "strength": 0.93297,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 93.866667,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 94.166667,
+      "strength": 0.86907,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 94.5,
+      "strength": 1.0,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 94.833333,
+      "strength": 0.69209,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 95.166667,
+      "strength": 0.77784,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 95.5,
+      "strength": 0.70474,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 95.8,
+      "strength": 0.59081,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 96.2,
+      "strength": 0.62523,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 99.2,
+      "strength": 0.74967,
+      "kind": "spectral-onset"
+    },
+    {
+      "time": 100.466667,
+      "strength": 0.75586,
+      "kind": "spectral-onset"
+    }
+  ],
+  "risers": [
+    {
+      "start": 3.462,
+      "end": 6.89,
+      "evidence": "bass/RMS rise into intro impact"
+    },
+    {
+      "start": 24.033,
+      "end": 27.462,
+      "evidence": "energy reduction into Ready/Fight transition"
+    },
+    {
+      "start": 38.604,
+      "end": 41.176,
+      "evidence": "drop into first waka overclock"
+    },
+    {
+      "start": 60.89,
+      "end": 64.319,
+      "evidence": "high/RMS correlated rise"
+    },
+    {
+      "start": 66.89,
+      "end": 69.462,
+      "evidence": "bass/RMS rise into showdown"
+    },
+    {
+      "start": 98.604,
+      "end": 100.496,
+      "evidence": "final victory-sound transition"
+    }
+  ],
+  "analysisTools": [
+    "ffmpeg PCM f32le",
+    "numpy 2.5.3 FFT/RMS/spectral flux",
+    "faster-whisper 1.2.1 small.en"
+  ]
+}
