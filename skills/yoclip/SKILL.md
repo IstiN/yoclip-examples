@@ -51,9 +51,9 @@ my_video/
 config:
   duration: auto        # 'auto' = timeline length computed from scenes;
                         # an explicit frame count (e.g. 4170) still works
-  fps: 30
-  width: 1920
-  height: 1080
+  fps: 120
+  width: 7680
+  height: 4320
   background: '#0a0a12'
 
 theme:                  # project-wide theme, exposed to JS as `yoclipTheme`
@@ -160,7 +160,9 @@ project = {
 
 ## JavaScript scenes
 
-A scene file assigns a scene object to the global `scene`:
+A scene file assigns a scene object to the global `scene` (CommonJS-style
+`module.exports = {...}` also works — `scene` wins, `module.exports` is the
+fallback):
 
 ```js
 scene = {
@@ -195,6 +197,9 @@ scene = {
 - Both are **metadata only — not rendered, not played, not mixed into audio**.
   They are plan data plus Studio display/editing and agent context today, and
   the source for future TTS audio and subtitle generation.
+- A `voicePrompts` text written as a dialogue (`Joe: …` / `Jane: …` on
+  separate lines) enables **Gemini multi-speaker TTS** in the Studio scene
+  dialog: one voice dropdown per speaker (max 2 speakers per request).
 
 Every scene (with or without a lib) gets engine builtins pre-declared:
 `var scene = null` and Penner-style easings `easeInOut`, `easeOut`, `easeIn`,
@@ -231,6 +236,11 @@ yoclipFont()                        // theme.font.family with Geneva fallback
 One YAML edit then recolors/rescales every scene, and variants (see below) can
 override any key per theme/language. Keep hardcoded hex / fontSize / fontFamily
 out of scenes — put them in the theme and reference by alias.
+
+Color literals with transparency are **`#AARRGGBB` (alpha first)**, not
+`#RRGGBBAA`: for example, 50% white is `#80FFFFFF`. Changing text/style colors
+cannot recolor pixels already baked into a logo PNG; export a corrected asset
+or use a documented image tint/compositing node instead.
 
 > **Important — always provide a hex fallback for `yoclipTheme.colors.*`.**
 > `yoclip_core` ships **no default colors**, so any `colors.*` the project does
@@ -312,6 +322,7 @@ hand-rolling easing math:
 | `counter(frame, start, dur, from, to)` | animated integer counter |
 | `typewriter(text, frame, start, cps)` | returns first N chars, typing at `cps` chars/sec (fps 30) |
 | `staggerItem(frame, index, start, delay, dur)` | per-item 0..1 stagger |
+| `sequence(frame, fps, steps)` | Motion-Canvas-style chained entrances: steps `[{at, dur, from, to, easing?, apply?}]` in frames, returns eased values in order (backed by `jsr.motion`, js_widget_runtime 0.4.114+) |
 | `blink(frame, period)` | 0/1 square wave |
 | `yoclipOrientation()` | 'landscape' \| 'portrait' \| 'square' from `yoclipFormat` |
 | `yoclipIsPortrait()` | true when rendering a vertical frame (variant resolution) |
@@ -323,12 +334,40 @@ hand-rolling easing math:
 
 A project's own `lib/*.js` can add more; list them in `project.js → lib`.
 
+### Motion builtins: `jsr.ease` and `jsr.motion` (runtime globals)
+
+Every scene (and every `lib/*.js`) can use the runtime's motion builtins —
+one implementation shared with the Studio engine (js_widget_runtime
+0.4.114+). No imports needed.
+
+`jsr.ease` — normalized easing functions (`t` in 0..1 → 0..1, some overshoot):
+`linear`, `easeIn`, `easeOut`, `easeInOut`, `easeInOutCubic`, `easeInOutQuart`,
+`easeOutExpo`, `backIn`, `backOut`, `bounce`, `elastic`, plus
+`cubicBezier(x1, y1, x2, y2)` for CSS-style curves. Pass a function or its
+**string name** to the motion calls.
+
+`jsr.motion` — declarative tweening. All time values are **elapsed
+milliseconds**; convert the scene clock with `frame * 1000 / fps`:
+
+| Call | Purpose |
+|------|---------|
+| `tween(ms, startMs, durMs, from, to, easing?)` | eased value over a window; clamps outside it |
+| `mapRange(v, inMin, inMax, outMin, outMax, easing?)` | clamps `v` and maps through the easing (reversed ranges work) |
+| `clamp(v, min, max)` | scalar clamp |
+| `wave(ms, periodMs, amplitude, phase)` | sine wave around 0 — idle motion, orbits |
+
+For chained entrances prefer the `sequence(frame, fps, steps)` helper from
+the shared lib (table above) — it keeps the choreography in frames and in
+one steps array. Raw `jsr.motion.tween` fits one-off, non-linear windows.
+
+Caveat: `backOut` / `elastic` / `bounce` overshoot past 1 — fine for
+`scale`/`offset`, but clamp values you feed to `opacity` (Flutter accepts
+only 0..1). See `samples/yoclip_motion_shapes/scenes/03_sequence.scene.js`.
+
 ### Node types
 
-Produced by `render()` and compiled to Flutter widgets by the unified
-`YoclipWidgetRenderer` (the one renderer for preview, export, Studio edit
-mode and PPTX — hooks plug in via `overrides` / `nodeDecorator` /
-`hideText`).
+Produced by `render()` and compiled to Flutter widgets by
+`YoclipSceneCompiler`.
 
 | Type | Purpose | Key props |
 |------|---------|-----------|
@@ -337,11 +376,47 @@ mode and PPTX — hooks plug in via `overrides` / `nodeDecorator` /
 | `column` | vertical layout | `children`, `mainAxisAlignment`, `crossAxisAlignment` |
 | `container` | box / fill / gradient / border / shadow / clip | `color`, `gradient`, `borderColor`, `borderWidth`, `borderRadius`, `shadow`/`shadows`, `clip`, `child` |
 | `text` | text | `text`, `style`, `textAlign` |
-| `image` | image / external image | `source`, `fit`, `width`, `height` |
+| `image` | image / external image / scene snapshot | `source`, `fit`, `width`, `height` |
 | `path` | SVG path (stroked, drawable) | `path`, `progress`, `color`, `strokeWidth`, `width`, `height` |
 | `video` | external video clip | `source`, `fit`, `startFrame`, `speed`, `sourceStart`, `reverse` |
-| `audio_player` | frame-driven audio playback (zero-size) | `src`, `playing`, `volume`, `loop`, `seekToMs` |
 | `absolute_fill` / `fill` | absolute color fill layer | `color`, `child` |
+| `rect` | rounded rectangle shape | `width`, `height`, `radius?`, `fill`, `stroke?`, `strokeWidth?`, `opacity?` (stroke drawn inside) |
+| `circle` | filled/stroked circle | `size`, `fill`, `stroke?`, `strokeWidth?`, `opacity?` |
+| `line` | straight line segment | `x1`, `y1`, `x2`, `y2`, `stroke`, `strokeWidth?` (default 2) |
+| `polygon` | filled/stroked polygon | `points` (flat `[x1,y1,x2,y2,…]`, ≥3 pairs), `fill`, `stroke?`, `strokeWidth?`, `opacity?` |
+| `scene3d` | software 3D (meshes) / host 3D engine (GLB) | `meshes`, `camera`, `rotation`, `light`, `background` |
+
+**Scene snapshots (`scene:<id>@<frame>`).** An `image` source can freeze
+another scene at a pinned frame — `scene:deck@last` embeds deck's final
+frame as a live vector image (compiled once, zoom-crisp, no PNG export).
+This is the freeze-frame transition pattern: scene A ends, scene B starts
+full-screen with `scene:a@last` and zooms in (`scale` animated), and scene
+A resumes underneath. `last` = final frame, integers pin an exact frame;
+cycles render a placeholder.
+
+**Text wrapping and the yellow-black overflow stripes.** A `row` gives its
+children *unbounded* width: a long `text` inside a fixed-width card clips and
+paints Flutter's yellow-black overflow marker (it lands in the export too —
+always screenshot-check). The fix is to bound the text, never to shorten the
+copy blindly:
+
+- give the text node (or the column holding it) an explicit `width` —
+  universal prop, e.g. `width: cardW - 96` for paddings+icon — the text then
+  wraps to multiple lines automatically;
+  **⚠️ the moment a text gets a fixed-width box, state `textAlign`
+  explicitly.** The default is `center` (it powers the badge/pill pattern),
+  so a bounded body copy silently becomes a centered one — the #1
+  authored-scene alignment bug. Left-flush copy: `textAlign: 'left'`.
+- `maxLines: 2` + `overflow: 'ellipsis' | 'clip' | 'fade'` clamps it as a
+  safety net (supported by the JSR renderer and, for scenes compiled by
+  `YoclipSceneCompiler`, `maxLines`/`overflow` on the text node);
+- budget line count when you fix the card height: two wrapped lines of a
+  21px subtitle need ~60px, so raise `height` instead of squeezing;
+- a bare `\n` in the string also breaks lines manually.
+
+Same for columns: content taller than the container's fixed `height`
+overflows at the bottom — measure title+subtitle+padding before pinning
+sizes.
 
 `volume`/`muted` on a `video` node are **not render props** — the compiler and
 `AnimVideo` never see them. They are consumed only by the audio resolver, only
@@ -371,7 +446,13 @@ wins when both are set.
 - image/video `fit`: `cover` / `contain` (default) / `fill` / `fitWidth` /
   `fitHeight` / `none`.
 - `fontWeight`: int 100–900 or strings `'normal'`/`'bold'`/`'100'`…`'900'`.
-- `padding` is uniform only (`EdgeInsets.all`) — no per-side padding.
+- `padding` insets a node's **content inside its box**. On a `container`
+  (the common case — colored card/box) it is the inner padding between the
+  background edge and the child, exactly like Flutter's `Container.padding`;
+  the background box itself does NOT move. On every other node type padding
+  stays the legacy outer wrap (space added around the node). Accepts a
+  uniform number or a `{left, top, right, bottom}` map (containers only for
+  the map form).
 - `margin` is outer space around the node: a number or a
   `{top, right, bottom, left}` map (per-side). Also accepted inside `style`.
 - A gradient with fewer than 2 valid colors is silently dropped.
@@ -387,6 +468,13 @@ wins when both are set.
   stretch any child without `alignment` to the full frame** and break
   `offsetX`/`offsetY` positioning. Always add `alignment: 'center'` (or any
   alignment) to positioned/sized nodes — texts, rules, framed prints.
+- **Absolute placement**: a stack child with `positioned: {left?, top?,
+  right?, bottom?}` (pixels) is wrapped in a Flutter `Positioned` — the jsr
+  contract, mirrored by the yoclip compiler. This is how you pin a logo,
+  caption chip, or HUD element to exact coordinates (see
+  `samples/yoclip_motion_shapes/scenes/02_motion.scene.js`). Non-map
+  children (e.g. a nested array of nodes) are silently dropped — spread or
+  `push` generated groups individually.
 
 **`container`** detail:
 
@@ -421,6 +509,44 @@ keywords) — same shape as container gradients
 (`{ colors: [...], stops?, begin, end }` or `type: 'radial'`); the solid
 `color` then only acts as the alpha mask, so keep it opaque.
 
+**Measured typewriter caret.** Put `caret` directly on the `text` node; never
+approximate its X position with `characters × fontSize × 0.6` and never use a
+separate guessed-width container. The renderer measures the real glyphs with
+`TextPainter` and aligns the caret height to the font's ascent/descent, so
+preview, headless screenshots and MP4 export use the same metrics:
+
+```js
+{
+  type: 'text',
+  text: typewriter('export function scene() { … }', frame, 20, 34),
+  style: { fontSize: 29, fontFamily: 'Space Mono', color: '#ffffff' },
+  caret: { color: '#22d3ee', width: 3, gap: 2, opacity: blink(frame, 13) },
+  alignment: 'bottomLeft', offsetX: 110, offsetY: -170,
+}
+```
+
+`caret` supports `color`, `width`, `height` (optional override), `gap` and
+`opacity`; zero opacity hides it without moving the text.
+
+> ⚠️ `fill` is **not** a text property (it belongs to `rect`/`circle`/`polygon`).
+> A gradient coded as `style.fill` is silently ignored and the text renders in
+> a flat/default color. Always use `style.gradient`.
+
+**Multi-part wordmarks (logo text like "DM TOOLS")** — never position the
+parts with hardcoded `offsetX`: rendered text width is font-metric dependent,
+and a guessed offset makes the parts overlap. Compose them in a `row` inside a
+centered container; it adapts to any font size:
+
+```js
+// "DM TOOLS" wordmark — white "DM" + gradient "TOOLS", centered as a unit.
+{ type: 'container', width: 1920, height: 260, alignment: 'center', offsetY: -150,
+  child: { type: 'row', spacing: 24, children: [
+    { type: 'text', text: 'DM',   style: { fontSize: 190, color: '#ffffff', fontWeight: 800 } },
+    { type: 'text', text: 'TOOLS', style: { fontSize: 190, fontWeight: 800,
+      gradient: { colors: ['#a78bfa', '#38bdf8', '#34d399'], stops: [0, 0.55, 1],
+                  begin: 'centerLeft', end: 'centerRight' } } },
+  ] } }
+
 **`path`** detail: `path` is an SVG path string; `progress` (0..1, default 1.0)
 animates the draw length; `color` (default white) / `strokeWidth` (default 4.0)
 style the stroke; `width`/`height` set the layout box. Paths are **stroked,
@@ -430,6 +556,200 @@ ratio. Supported commands: `M/L/H/V/C/S/Q/T/Z/A` (absolute and relative).
 arc, approximated by cubic segments (e.g. a near-full circle ring:
 `M 260 30 A 230 230 0 1 1 259.9 30`). Invalid path data draws nothing.
 
+**`scene3d`** detail (JSR built-in — supported by the compiler; never strip it
+from scenes):
+
+```js
+{
+  type: 'scene3d',
+  meshes: [                                // software meshes path
+    { vertices: [[x, y, z], /* ... */],    // model-space triples
+      faces: [[i, j, k], /* ... */],       // triangle indices into vertices
+      color: '#7c3aed' },
+  ],
+  camera: { position: [0, 0.6, 5], target: [0, 0, 0], fov: 55 },  // fov clamped 10–150
+  rotation: { x: 0, y: frame * 0.9, z: 0 },  // Euler degrees applied to ALL meshes — animate per frame from render(frame)
+  light: { direction: [-0.4, -0.8, -0.6] },  // flat Lambert shading, 0.35 ambient floor
+  background: '#07070d',                       // or backgroundColor
+}
+```
+
+- With `meshes` the node is software-rendered (pure CustomPaint) — it works
+  in Studio preview AND headless export. Keep it ≤ ~500 triangles (up to
+  ~2000 works).
+- Per-mesh transforms must be **baked into the vertices** (e.g. via
+  `meshXform` in `lib/animation.js`) — there are no per-mesh transform props.
+- No z-buffer, textures or backface culling: faces are painter's-sorted
+  far→near, so avoid intersecting faces.
+- With no `width`/`height` the node is AspectRatio 1; inside a root
+  `fit: 'expand'` stack it fills its tight slot (width/height/alignment are
+  ignored there).
+
+**`scene3d` with real GLB models (GPU, flame_3d)** — original textures,
+smooth shading, z-buffer and skeletal animation, in preview AND headless
+export (renders into an offscreen GPU render target; requires
+`--enable-impeller --enable-flutter-gpu`, which the yoclip CLI passes):
+
+```js
+{
+  type: 'scene3d',
+  engine: 'flame',
+  id: 'my-scene',        // unique per 3D scene (controller cache key)
+  time: frame / 30,      // deterministic animation clock (seconds)
+  camera: { position: [0, 1.5, 6], target: [0, 0.8, 0], fov: 50 },
+  light: { ambient: 0.6, diffuse: 1.3, position: [5, 8, 5] },
+  models: [
+    { modelId: 'hero',
+      src: 'models/Knight.glb',          // declare under flutter assets
+      position: [0, 0, 0],
+      rotation: [0, 25, 0],              // Euler degrees, applied per frame
+      scale: [0.5, 0.5, 0.5],
+      animation: 'Walking_A' },          // skeletal clip name from the GLB
+  ],
+}
+```
+
+- Drives declaratively: recompute `position`/`rotation`/`time` from `frame`
+  in `render(frame)` — only diffs are applied, and the animation clock
+  advances by the `time` delta (never wall time), so frames are exact.
+- GLB sources must be declared in the project's `pubspec.yaml` `assets:`
+  (subdirectories like `assets/models/city/` need their own entry) and the
+  path drops the `assets/` prefix (`assets/models/Knight.glb` →
+  `'models/Knight.glb'`).
+- Model forward is +Z: `rotation: [0, 0, 0]` faces the default camera.
+- **sRGB:** flame_3d's albedo shader samples textures without the sRGB→linear
+  decode (its tone map still encodes the output), so sRGB-authored textures
+  render washed out. Fix content-side: pre-linearize the texture pixels
+  (per-channel `pow(x/255, 2.2)*255`) — for embedded GLB images rewrite the
+  image bytes (repack the BIN chunk), for loose PNG atlases just re-encode
+  the file. See `samples/yoclip_big_idea` (KayKit + DamagedHelmet assets are
+  pre-linearized this way).
+- Without `meshes` AND without `engine: 'flame'` the node falls back to the
+  flutter_cube host (primitives/OBJ, CustomPainter — also export-safe).
+
+### Native Three.js worlds (`three_scene`, advanced)
+
+Choose the renderer by workload, not by familiarity:
+
+- **JSR scene-graph widgets** (`text`, `container`, `image`, `stack`, …) are
+  the default for typography, UI, layout and most 2D motion. They are crisp,
+  inexpensive and participate in normal Flutter layout.
+- **`scene3d` with `meshes`** is the small software 3D option; **`scene3d`
+  with `engine: 'flame'`** is the declarative GLB option described above.
+- **`three_scene`** is for a custom persistent `THREE.Scene`: camera work,
+  instancing, custom geometry/materials, mixers and postprocessing. It uses
+  the native Flutter-GPU backend, not a browser/WebGL view. Do not claim full
+  Three.js/WebGL parity: validate every addon, shader and asset path in both
+  a golden screenshot and an exported clip.
+
+The scene node loads one JavaScript world and sends it a master-frame event:
+
+```js
+// scenes/background.scene.js
+scene = {
+  id: 'world', duration: 150, from: 0,
+  render: function(frame) {
+    return {
+      type: 'three_scene', source: 'three/world.js',
+      frame: frame, fps: 120, width: 7680, height: 4320,
+      params: { act: 0, beatPulse: (frame % 15) / 15 },
+    };
+  },
+};
+```
+
+Declare `three/` (including GLBs, textures and typeface JSON) under Flutter
+assets in the project's `pubspec.yaml`. A world receives `yoclip.frame` with
+`{frame, fps, width, height, params}` and calls `jsr.render` only after drawing
+that exact frame:
+
+```js
+// three/world.js — no imports required for this minimal global-THREE example.
+var canvas = jsr.three.createCanvas('main', {
+  width: 7680, height: 4320, pixelRatio: 1,
+});
+var renderer = new THREE.WebGLRenderer({ canvas: canvas });
+renderer.setPixelRatio(1);
+renderer.setSize(7680, 4320, false);
+var world = new THREE.Scene();
+world.background = new THREE.Color('#080812');
+var camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 100);
+camera.position.z = 5;
+var cube = new THREE.Mesh(
+  new THREE.BoxGeometry(1.5, 1.5, 1.5),
+  new THREE.MeshNormalMaterial()
+);
+world.add(cube);
+jsr.onEvent(function(action, payload) {
+  if (action !== 'yoclip.frame') return;
+  var frame = Math.max(0, Math.round(payload.frame || 0));
+  cube.rotation.set(frame * 0.01, frame * 0.02, 0);
+  renderer.render(world, camera);
+  jsr.render({
+    type: 'three', canvasId: 'main', width: 7680, height: 4320, pixelRatio: 1,
+  });
+});
+```
+
+A complete copy of this scene/world pair is in
+`examples/three_basic.scene.js` and `examples/three_basic.world.js` (both pass
+`node --check`). See `samples/samples/yoclip_write_the_light` for GLB loaders,
+animation mixers, deterministic crowds and the production post chain.
+
+**Determinism is mandatory.** Evaluate once, then derive every camera,
+transform, mixer time, particle and visibility flag from the supplied master
+`frame`/`fps` and `params`. Use `mixer.setTime(frame / fps)` (or an equivalent
+absolute time), a seeded PRNG, and no `Date.now`, `performance.now`,
+`requestAnimationFrame`, timers, unseeded `Math.random`, audio-clock reads or
+incremental `position += …` state. Arbitrary screenshot seeks and sequential
+MP4 export must produce the same frame. Keep asynchronous GLB/image loads on
+the host asset path (`new THREE.GLTFLoader().load('three/model.glb', …)`), not
+`fetch`, `FileReader`, DOM images or browser URLs; wait for pending assets
+before presenting the ready frame.
+
+**Large worlds: editable source + pinned addons → one IIFE.** Keep the
+editable entry in `three/world.source.js`; pin Three.js and every addon to an
+exact version/commit; bundle with esbuild into `three/world.js` in `iife`
+format, `platform: 'neutral'`, with `three` aliased to the host global shim.
+The runtime passes that single file directly to `engine.run`; it does not run
+a browser module graph or resolve npm imports at render time. Never edit the
+generated IIFE. Rebuild and syntax-check after every source/addon change:
+
+```bash
+npm ci
+npm run build:three       # world.source.js + pinned addons -> world.js
+node --check three/world.source.js
+node --check three/world.js
+```
+
+The sample's `tools/build_three_bundle.mjs` is the reference build. Its default
+production chain is **RenderPass → OutputPass → FXAA at 2×** on
+`js_widget_runtime 0.4.204`; `YOCLIP_FXAA=0 npm run build:three` produces the
+direct A/B variant and `YOCLIP_OUTPUT_ONLY=1` isolates OutputPass. Keep exactly
+one output color transform. Verify upright orientation, opaque alpha and
+representative dark/saturated frames; a composer is not automatically
+pixel-identical to direct rendering.
+
+**Verification and current limits:** run the ordinary project tests, capture
+several golden frames (including the first ready frame and post-cut frames),
+then render and inspect a short MP4 before the full master:
+
+```bash
+flutter test test/yoclip_project_test.dart
+yoclip screenshot --project . --frame 60 --output build/three_60.png
+yoclip screenshot --project . --frame 120 --output build/three_120.png
+yoclip render --project . --output build/three_review.mp4
+```
+
+For a custom native harness, use `flutter test --enable-impeller
+--enable-flutter-gpu …`; the normal YoClip CLI already supplies the required
+GPU flags. Native MSAA and capture above 2× are not promised. UnrealBloom,
+Bokeh/depth passes and physical transmission remain workload-specific,
+opt-in experiments: prove non-transparent output, depth/instancing coverage,
+glass visibility, orientation and color in goldens and export before using
+them. If an addon depends on DOM/WebGL-only behavior, replace it rather than
+adding a browser harness.
+
 `source` values for `image`/`video`:
 
 - `external:<id>` — resolves to an `external_assets` entry.
@@ -438,6 +758,50 @@ arc, approximated by cubic segments (e.g. a near-full circle ring:
   the scheme, so don't use it here.
 
 ---
+
+## Layout sizing (avoid RenderFlex overflow)
+
+The renderer maps `container` to Flutter's `Container`. A fixed
+`width`/`height` **without `alignment`** gives the child TIGHT
+constraints: content taller than the box paints yellow/black overflow
+stripes ("BOTTOM OVERFLOWED BY 11 PIXELS"). Rules that make overflow
+impossible:
+
+- **Text in a fixed-size box → always set `alignment`.** With any
+  `alignment` (`'center'` for cards/badges) the child gets loose
+  constraints, renders at natural size, centered — it cannot overflow.
+- **Prefer no height at all.** Padding-driven containers grow with their
+  content; reserve fixed heights for grid/canvas alignment (kanban
+  cards, badges).
+- **Clamp every text in fixed rows**: `maxLines: 1`,
+  `overflow: 'ellipsis'` — a long string becomes an ellipsis, not a
+  second line.
+- **A text is max(lineHeight, natural font height) tall.** Inter at
+  `fontSize: 20` is ~27px even with `lineHeight: 24` — budget fixed
+  boxes with real heights, not font sizes.
+- **Line height accepts both conventions.** `lineHeight: 1.35` is a
+  multiplier (× fontSize); `lineHeight: 24` is interpreted as 24
+  **pixels** (anything above 4 is pixels — a 4× multiplier is not a
+  real design). `lineHeightPx: 24` is the always-pixels form;
+  `height` is the strict Flutter multiplier. Prefer `lineHeightPx` in
+  generated scenes for zero ambiguity.
+
+```js
+// Centered automatically: a fixed-size box around a lone text child is the
+// CSS badge/pill pattern — the label centers inside the box, horizontally
+// following textAlign (default center), vertically always.
+{ type: 'container', width: 120, height: 30, borderColor: c,
+  child: { type: 'text', text: tag, maxLines: 1, overflow: 'ellipsis' } }
+
+// textAlign steers horizontal placement inside the fixed box:
+{ type: 'container', width: 240, height: 78,
+  child: { type: 'text', text: id, textAlign: 'left' } }
+
+// A stack of texts with no crossAxisAlignment adopts their unanimous
+// textAlign (left texts lay out left, not Flutter's center default).
+// Explicit `alignment` keeps its other meaning: it positions THIS node
+// inside its parent (StackFit.expand semantics), not its child.
+```
 
 ## Fonts
 
@@ -464,6 +828,29 @@ fonts:
 ---
 
 ## Audio
+
+### Music brief (`music_prompt`)
+
+The project-level score brief lives in `yoclip.yaml` as `music_prompt:` —
+the Studio **Music** panel prefills its Prompt field from it (and picks up
+edits on the file-watcher reload), so write the brief there, not in chat:
+
+```yaml
+# Inline:
+music_prompt: |
+  Instrumental cinematic electronica, 104 BPM, warm analog synth pulse,
+  restrained percussion, spacious pads. No vocals, no EDM drops.
+
+# Or keep a long brief in its own file (referenced files are watched too —
+# editing the file refreshes the Studio panel automatically):
+music_prompt:
+  file: prompts/music.md
+```
+
+Generating in the Music panel saves the mp3 into `assets/audio/` and
+registers it under `audio.tracks` at `start: 0` — no manual wiring.
+
+### Tracks
 
 Three sources: composition tracks (`yoclip.yaml`), scene-level tracks, and
 external-video audio (extracted with `ffmpeg` and mixed in at the video's
@@ -527,41 +914,42 @@ Preview audio tracks loop. The resolver re-reads `yoclip.yaml` from disk at
 resolve time, so track edits apply without touching Dart state. Verify muxed
 audio with `ffprobe video.mp4`.
 
-**`audio_player` node** — the third, code-driven way to place sound. Unlike
-the two declarative track lists above, its props are ordinary JS values
-computed inside `render(frame)`, so play/pause, volume rides and seeks can
-depend on anything the frame knows:
+### Transcription and detailed vocal timing
 
-```js
+Use `transcribe_audio` for lyrics/speech instead of hand-rolled transcription
+or chunking scripts. Whole-file mode is the default. **For detailed vocal or
+lyric timing, set `chunked: true` and use 8–12 second excerpts**:
+
+```json
 {
-  type: 'audio_player',
-  src: 'assets://audio/hit.mp3',
-  playing: frame >= 30 && frame < 90,   // play/pause from code
-  volume: 0.8 * fadeOut(frame, 70, 20), // per-frame volume → fades in code
-  loop: false,                          // preview loops; export ignores it
-  seekToMs: null,                       // seeks when the value CHANGES
+  "path": "assets/audio/song.mp3",
+  "chunked": true,
+  "chunkSeconds": 10
 }
 ```
 
-- In the **Studio preview** a real player is created per node and reconciled
-  every frame (play/pause/volume/loop, seek on `seekToMs` change).
-- At **export** the resolver samples every frame of the scene and converts
-  the node into a regular timeline `AudioTrack`: start = first playing
-  frame, pause/resume and volume envelope points on change. The MP4 mix
-  therefore matches the preview without you touching the audio file.
+Chunked mode uses ffmpeg to split the source, transcribes every excerpt
+separately, rebases each excerpt's local timestamps onto the original audio
+timeline, and returns both the combined `text` and a `chunks` array with
+`startSeconds` / `endSeconds`. If a chunk has no model timestamps, it gets an
+explicit `[start - end]` anchor. Temporary excerpts are deleted and the source
+is unchanged. The 15 MB inline limit applies to the whole file only in
+whole-file mode; in chunked mode it applies to each encoded excerpt. Use the
+returned timestamps to align scene boundaries and karaoke lines, but still
+sanity-check uncertain vocals and boundary-cut words.
 
-**Which one when:** composition yaml tracks for the static music bed and
-its ducking envelope; scene `audio: [...]` entries for one-off stingers on a
-scene (`start` is scene-local, no envelope); `audio_player` when timing or
-level must be computed in JS — character-by-character sync, conditional
-hits, fades driven by the same easing helpers as the visuals.
+CLI equivalent:
+
+```bash
+yoclip media transcribe assets/audio/song.mp3 --chunked --chunk-seconds 10 -o lyrics.txt
+```
 
 ---
 
 ## Export
 
 Export is configured independently for **resolution (preset)**, **video
-quality**, **audio quality**, and **frame rate** — so a 4K/60fps export is the
+quality**, **audio quality**, and **frame rate** — so a 4K/8K 60–120fps export is the
 same timeline at higher resolution and smoother motion, not a longer video.
 
 **Presets** (`YoclipExportPreset`):
@@ -581,7 +969,7 @@ A **custom** resolution is also supported from the export dialog.
 base H.264 bitrate (`width × height × fps × 0.12`) by `0.5 / 1.0 / 1.5`.
 **Audio quality** (`YoclipAudioQuality`): `low` / `medium` / `high` = AAC
 96 / 128 / 192 kbps, set independently from video quality. **Frame rate** is
-chosen separately (24 / 30 / 60; any other value falls back to 30).
+chosen separately (24 / 30 / 60 / 120; an unsupported value falls back to 30).
 
 **Encoding queue**: exports run one at a time; new exports (this project or
 another) are queued. The export progress dialog shows percent, an animated ring,
@@ -606,14 +994,34 @@ yoclip render --project . --output video.mp4 --clean-cache     # delete raw fram
 yoclip render --project . --output frames/                  # non-.mp4 output → PNG sequence
 yoclip screenshot --project . --frame 3200 --output frame.png   # one golden frame
 yoclip screenshot --project . --at 1.5 --scene intro --output frame.png
+yoclip media info assets/song.m4a                        # bitrate/duration/streams (ffprobe)
+yoclip media transcribe assets/song.m4a -o lyrics.txt   # whole-file lyrics/speech via audio-input LLM
+yoclip media transcribe assets/song.m4a --chunked --chunk-seconds 10 -o lyrics.txt  # detailed vocal timing
+yoclip media beats assets/song.m4a -o beats.json        # BPM/beat grid/onsets/energy sections
 ```
 
 - `render` flags: `--output/-o`, `--project/-C`, `--preset/-p`, `--variant/-V`,
-  `--test`, `--no-run`, `--clean-cache`. `--preset` accepts **only** `youtube_1080`,
-  `shorts_1080`, `square_1080`, `youtube_4k` (no `qhd_1440`/`uhd_8k`), and
+  `--test`, `--no-run`, `--clean-cache`. `--preset` accepts `youtube_1080`,
+  `qhd_1440`, `youtube_4k`, `uhd_8k`, `shorts_1080`, `square_1080`, and
   overrides a variant's resolution retargeting.
 - `screenshot` flags: `--frame`, `--at <seconds>`, `--scene <id>`,
   `--variant/-V`, `--output/-o`, `--test`, `--no-run`.
+- `media beats` needs `ffmpeg` on PATH and returns JSON with `bpm` +
+  confidence, `beats` (constant-tempo grid in seconds), `onsets`, and
+  low/medium/high `sections`. Options: `--min-bpm`, `--max-bpm`,
+  `--sensitivity` (higher = fewer onsets), `--output`. Tempo is an
+  estimate — check confidence and octave errors before frame-critical sync.
+- `media info` needs `ffprobe` on PATH (`brew install ffmpeg`). `media
+  transcribe` sends audio as OpenAI `input_audio` (m4a/mp3/wav/aac/
+  flac/ogg) to an audio-capable model; whole-file mode has a 15 MB inline
+  limit, while `--chunked --chunk-seconds 10` applies the limit to each
+  excerpt and rebases the resulting timestamps (see **Transcription and
+  detailed vocal timing** above). Defaults are AIIN
+  (`https://api.aiin.by/v1`) + `google/gemini-3.8-flash`, overridable with
+  `--base-url`/`--model`. Key: `--api-key`, `--api-key-file` or
+  `AIIN_API_KEY`. For video files run `yoclip extract-audio` first. On
+  instrumentals treat transcripts critically — timestamps beyond the
+  `media info` duration indicate hallucination.
 - The CLI has **no fps/quality/bitrate flags** — those come from
   `yoclip.yaml → config`; Studio's quality multipliers don't apply to CLI
   renders. Both commands work by generating a Flutter test file
@@ -713,8 +1121,11 @@ Two kinds of agents edit yoclip projects under **the same contract**:
 | List project files | `list_project_files` | `ls` / `find` in the project folder |
 | Read a file | `read_project_file` | read the file (paths relative to project root) |
 | Write a file | `write_project_file` | write the file — Studio hot-reloads on save |
-| Live studio state (project, active scene, playhead frame, variant, user's drawings) | `get_studio_context` | ask the user, or infer from the files |
+| Live studio state (project, active scene, playhead frame, variant, user's drawings, selected element, pending unsaved edits) | `get_studio_context` | ask the user, or infer from the files |
+| Tweak one property of the selected/highlighted element in the live preview | `set_node_override` (instant; preview-only until `save_scene` or the Save scene button) | edit the property directly in the scene JS |
 | See the current frame | PNG attached to each message (frame + the user's pen/arrow/text annotations) | `yoclip screenshot --project . --frame <n> --output /tmp/frame.png`, then view the image |
+| Verify several animation checkpoints | `capture_frames({frames: [...]})`, then read the returned contact sheet once; open individual frames only for close-ups | capture the required frames with `yoclip screenshot`, then view them |
+| Read the full API/creative reference | `read_reference_file({path: 'SKILL.md'})` / `CREATIVE.md` directly — do not search for docs with bash | read the skill files directly |
 | Check JS syntax | (runtime reports errors on load) | `node --check scenes/<file>.scene.js` |
 
 ### Goal-driven workflow
@@ -825,6 +1236,12 @@ and uppercase `R` is hot restart; native/Swift changes need a full restart.
 
 ## Samples
 
+- `samples/yoclip_motion_shapes/` — showreel-style playground modeled on the
+  Motion Canvas anniversary thumbnail: a thumbnail wall with a blue→red color
+  journey, the mark stamping in from rounded bars over it, and a
+  `sequence()`-choreographed finale. The runnable reference for shape nodes,
+  `jsr.motion`, stack `positioned`, and entrance choreography;
+  `YOCLIP_CAPTURE_DIR=/tmp/x flutter test` dumps visual goldens.
 - `samples/yoclip_intro/` — minimal V2 project.
 - `CREATIVE.md` in this folder — creative cookbook: 15 scene patterns
   (boomerang, beat-synced diptych, editorial stills, quote typography, logo
