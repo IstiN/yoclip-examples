@@ -20,9 +20,16 @@ var camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 0.1, 120);
 var cyan = new THREE.Color('#22d3ee');
 var violet = new THREE.Color('#7c3aed');
 var ice = new THREE.Color('#d9faff');
-var noteTimes = [1.2, 1.4, 1.6, 1.8, 2.0, 2.2];
-var notePans = [-0.5, 0.5, -0.3, 0.3, -0.15, 0.15];
-var kickTimes = [1.2, 1.8];
+// Exact mirrors of the 14 arpeggio steps and five kicks in stinger.scene.js.
+var noteTimes = [
+  2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50,
+  3.75, 4.00, 4.25, 4.50, 4.75, 5.00, 5.25,
+];
+var notePans = [
+  -0.55, 0.50, -0.40, 0.40, -0.25, 0.25, -0.50,
+  0.50, -0.35, 0.35, -0.20, 0.20, -0.45, 0.45,
+];
+var kickTimes = [2.0, 3.0, 4.0, 5.0, 6.0];
 
 // A fixed-seed PRNG is used only while constructing the star field.
 var seed = 0x4e454f4e;
@@ -39,25 +46,30 @@ function pulseAt(time, start, decay) {
 }
 function musicEnergy(time) {
   var base;
-  if (time < 0.6) {
-    base = 0.12 + 0.04 * clamp01(time / 0.6);
-  } else if (time < 1.2) {
-    var rise = clamp01((time - 0.6) / 0.6);
-    base = 0.16 + 0.50 * rise * rise;
+  if (time < 2.0) {
+    // RISER: a slow swell accelerates into the 2 s drop.
+    var rise = clamp01(time / 2.0);
+    base = 0.12 + 0.52 * rise * rise;
+  } else if (time < 5.5) {
+    // GROOVE: a stable floor leaves headroom for notes and kicks.
+    base = 0.30;
   } else {
-    base = 0.26;
+    // TAIL: the final bell and last kick fade into a calm ocean.
+    base = 0.22 - 0.16 * clamp01((time - 5.5) / 2.5);
   }
-  var impact = pulseAt(time, 1.2, 3.0);
+  var impact = pulseAt(time, 2.0, 3.0);
   var notes = 0;
   var kicks = 0;
   for (var i = 0; i < noteTimes.length; i++) {
-    notes += 0.34 * pulseAt(time, noteTimes[i], 10.0);
+    notes += 0.26 * pulseAt(time, noteTimes[i], 10.0);
   }
   for (var k = 0; k < kickTimes.length; k++) {
-    kicks += 0.40 * pulseAt(time, kickTimes[k], 7.0);
+    var kickGain = k === kickTimes.length - 1 ? 0.22 : 0.38;
+    kicks += kickGain * pulseAt(time, kickTimes[k], 7.0);
   }
-  var fade = time > 2.55 ? clamp01((3.0 - time) / 0.45) : 1;
-  return Math.min(1.65, (base + impact * 0.95 + notes + kicks) * fade);
+  var tailBell = 0.22 * pulseAt(time, 5.5, 1.4);
+  var fade = time > 7.3 ? clamp01((8.0 - time) / 0.7) : 1;
+  return Math.min(1.65, (base + impact * 0.95 + notes + kicks + tailBell) * fade);
 }
 
 // Cyan-to-violet wireframe terrain. Geometry is rotated once; animation only
@@ -162,7 +174,7 @@ jsr.onEvent(function(action, payload) {
   var fps = payload.fps || 30;
   var time = frame / fps;
   var energy = musicEnergy(time);
-  var impact = pulseAt(time, 1.2, 3.0);
+  var impact = pulseAt(time, 2.0, 3.0);
   var notePulse = 0;
   for (var n = 0; n < noteTimes.length; n++) {
     notePulse = Math.max(notePulse, pulseAt(time, noteTimes[n], 10.0));
@@ -186,7 +198,8 @@ jsr.onEvent(function(action, payload) {
         var radius = kickDt * 10.0;
         var band = distance - radius;
         y += Math.sin(band * 2.8) * Math.exp(-(band * band) / (0.32 + kickDt * 0.42))
-          * Math.exp(-kickDt * 1.5) * 1.75;
+          * Math.exp(-kickDt * 1.5) * 1.75
+          * (k === kickTimes.length - 1 ? 0.55 : 1.0);
       }
     }
 
@@ -223,7 +236,11 @@ jsr.onEvent(function(action, payload) {
   starMaterial.size = 0.095 + energy * 0.024;
 
   var orbit = time * 0.027;
-  camera.position.set(Math.sin(orbit) * 13.2, 5.8 + impact * 0.20, Math.cos(orbit) * 13.2);
+  var riserDolly = 1.1 * (1 - clamp01(time / 2.0));
+  var tailDrift = 0.6 * clamp01((time - 5.5) / 2.5);
+  var cameraRadius = 13.2 + riserDolly + tailDrift;
+  camera.position.set(Math.sin(orbit) * cameraRadius,
+    5.8 + impact * 0.35, Math.cos(orbit) * cameraRadius);
   camera.lookAt(0, 0.25, -3.2);
   renderer.render(world, camera);
   jsr.render({

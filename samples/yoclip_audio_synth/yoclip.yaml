@@ -1,7 +1,7 @@
 project: yoclip_audio_synth
 
 config:
-  duration: 90
+  duration: 240
   fps: 30
   width: 1920
   height: 1080
