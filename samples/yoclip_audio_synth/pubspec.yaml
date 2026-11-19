@@ -1,0 +1,23 @@
+name: yoclip_audio_synth
+description: Offline audio synthesis — jsr.audio.synth rendered to WAV and mixed into the MP4.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.12.0
+  flutter: ^3.44.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  yoclip_core:
+    path: ../../../packages/yoclip_core
+  yoclip_encoder:
+    path: ../../../packages/yoclip_encoder
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

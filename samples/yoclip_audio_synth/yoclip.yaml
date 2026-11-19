@@ -1,0 +1,33 @@
+project: yoclip_audio_synth
+
+config:
+  duration: 90
+  fps: 30
+  width: 1920
+  height: 1080
+  background: '#07070f'
+
+render:
+  videoBitrate: 8000000
+  audioBitrate: 192000
+  codec: h264
+
+theme:
+  colors:
+    accent: '#22d3ee'
+    accentSoft: '#7c3aed'
+    text: '#f4f6ff'
+    textMuted: '#8a90b8'
+
+# The soundtrack is NOT a file in this repo: the scene synthesizes it with
+# `jsr.audio.synth(...).render()`, yoclip saves it to
+# `assets/audio/generated/demo_stinger.wav` while loading the project, and
+# this `synth:` entry places it on the timeline like any file track.
+audio:
+  tracks:
+    - synth: demo_stinger
+      start: 0
+      volume: 0.9
+
+scenes:
+  - scenes/stinger.scene.js
