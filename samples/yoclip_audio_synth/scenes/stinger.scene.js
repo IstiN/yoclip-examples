@@ -26,32 +26,23 @@ scene = {
   },
   render: function (frame) {
     var t = frame / 30; // seconds
-    // Title rises in over the attack of the note (first ~0.5s).
     var titleIn = Math.min(1, Math.max(0, (t - 0.05) / 0.45));
-    // Ring pulses decaying like the note's envelope, one ring per beat.
-    var ringT = (t % 0.5) / 0.5;
-    var ring = 120 + ringT * 340;
-    var ringFade = Math.max(0, 1 - ringT);
-
-    var bars = [];
-    for (var i = 0; i < 48; i++) {
-      // Waveform-flavored bars: decaying amplitude across the 2s note.
-      var env = Math.max(0, 1 - t / 3);
-      var h = 24 + Math.abs(Math.sin(i * 0.55 + t * 9)) * 210 * env;
-      bars.push({
-        type: 'container',
-        width: 16,
-        height: h,
-        radius: 8,
-        color: i % 2 === 0 ? '#22d3ee' : '#7c3aed',
-        opacity: 0.85,
-      });
-    }
 
     return {
       type: 'stack',
       fit: 'expand',
       children: [
+        {
+          // Persistent native Three.js world. All wave, particle, ring and
+          // camera motion is derived from this exact frame in three/waves.js.
+          type: 'three_scene',
+          source: 'three/waves.js',
+          frame: frame,
+          fps: 30,
+          width: 1920,
+          height: 1080,
+          params: { soundtrack: 'NEON DAWN' },
+        },
         {
           type: 'align',
           alignment: 'center',
@@ -59,6 +50,7 @@ scene = {
             type: 'column',
             mainAxisSize: 'min',
             crossAxisAlignment: 'center',
+            offsetY: -315 + (1 - titleIn) * 24,
             children: [
               {
                 type: 'text',
@@ -66,9 +58,13 @@ scene = {
                 opacity: titleIn,
                 style: {
                   fontSize: 96,
+                  fontFamily: 'Geneva',
                   fontWeight: '800',
                   color: '#f4f6ff',
                   letterSpacing: 10,
+                  shadows: [
+                    { color: '#8022d3ee', blur: 24, offsetX: 0, offsetY: 0 },
+                  ],
                 },
               },
               {
@@ -76,28 +72,15 @@ scene = {
                 text: 'jsr.audio.synth -> WAV -> MP4 mixdown',
                 opacity: titleIn,
                 offsetY: (1 - titleIn) * 30,
-                style: { fontSize: 34, color: '#8a90b8', letterSpacing: 3 },
+                style: {
+                  fontSize: 34,
+                  fontFamily: 'Geneva',
+                  color: '#8a90b8',
+                  letterSpacing: 3,
+                },
               },
             ],
           },
-        },
-        {
-          // Pulse ring behind the title, synced to the synthesized beat.
-          type: 'container',
-          width: ring * 2,
-          height: ring * 2,
-          radius: ring,
-          borderColor: '#22d3ee',
-          borderWidth: 3,
-          opacity: ringFade * 0.5,
-          positioned: { left: 960 - ring, top: 540 - ring },
-        },
-        {
-          type: 'row',
-          mainAxisAlignment: 'center',
-          crossAxisAlignment: 'end',
-          positioned: { left: 0, top: 760 },
-          children: bars,
         },
       ],
     };
