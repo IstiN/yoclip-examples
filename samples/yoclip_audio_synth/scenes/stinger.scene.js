@@ -24,8 +24,9 @@ scene = {
     color: '#22d3ee',
     lane: 'video',
   },
-  render: function (frame) {
-    var t = frame / 30; // seconds
+  render: function (frame, fps) {
+    var rate = fps || 30;
+    var t = frame / rate; // seconds
     var titleIn = Math.min(1, Math.max(0, (t - 0.05) / 0.45));
 
     return {
@@ -38,7 +39,7 @@ scene = {
           type: 'three_scene',
           source: 'three/waves.js',
           frame: frame,
-          fps: 30,
+          fps: rate,
           width: 1920,
           height: 1080,
           params: { soundtrack: 'NEON DAWN' },
