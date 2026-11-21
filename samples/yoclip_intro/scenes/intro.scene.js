@@ -5,7 +5,7 @@ scene = {
   id: 'intro',
   duration: 90,
   from: 0,
-  description: 'Soft brand-colored circles drift and pulse on black (bloom in over frames 0-24); Yoclip logo (white Clip) sits top-right; headline rises, scales and fades in at the center during frames 8-40.',
+  description: 'Soft brand-colored circles drift and pulse on black (bloom in over frames 0-24); laptop_open external video plays on a centered card; Yoclip logo (white Clip) sits top-right; headline rises, scales and fades in at the bottom during frames 8-40.',
   voicePrompts: {
     en: 'Meet Yoclip — the fastest way to turn raw footage into a finished clip.',
     ru: 'Привет! Это Yoclip — быстрый способ превратить исходники в готовый клип.',
@@ -69,6 +69,18 @@ scene = {
         };
       }).concat([
         {
+          id: 'intro_laptop',
+          type: 'video',
+          source: 'external:laptop_open',
+          start: 0,
+          width: 1152,
+          height: 648,
+          alignment: 'center',
+          fit: 'contain',
+          opacity: intro,
+          offsetY: -40,
+        },
+        {
           id: 'intro_logo',
           type: 'image',
           source: 'external:logo_white',
@@ -86,7 +98,8 @@ scene = {
             color: '#ffffff',
             fontFamily: 'Geneva',
           },
-          alignment: 'center',
+          alignment: 'bottomCenter',
+          padding: 64,
           opacity: p,
           offsetY: 48 * (1 - p),
           scale: 0.92 + 0.08 * p,

@@ -25,6 +25,9 @@ pubspec.lock
 *.mov
 *.pptx
 
+# Source footage used by the intro sample is an input asset, not a render.
+!samples/yoclip_intro/assets/laptop_open.mp4
+
 # Temporary Office files
 ~$*
 yoclip_cli_render_test.dart
