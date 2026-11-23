@@ -54,7 +54,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            clang ffmpeg xvfb xauth file \
+            clang ffmpeg xvfb xauth file python3-pil \
             libgl1-mesa-dri libglx-mesa0 libegl1 mesa-vulkan-drivers
       - name: Resolve CLI dependencies
         working-directory: yoclip/packages/yoclip_cli
@@ -78,6 +78,23 @@ jobs:
             --at 1.5 \
             --output "$GALLERY_BUILD/gallery-previews/yoclip_intro.png"
           test -s "$GALLERY_BUILD/gallery-previews/yoclip_intro.png"
+      - name: Reject flat placeholder previews
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageStat
+          path = Path('$GALLERY_BUILD/gallery-previews/yoclip_intro.png')
+          image = Image.open(path).convert('RGB')
+          w, h = image.size
+          # The central media card must contain real imagery. A flat gradient
+          # here means the external video layer failed or is still a placeholder.
+          crop = image.crop((int(w*.25), int(h*.20), int(w*.75), int(h*.62)))
+          crop = crop.resize((192, 108))
+          deviation = sum(ImageStat.Stat(crop).stddev) / 3
+          print(f'Central poster detail (mean RGB stddev): {deviation:.2f}')
+          if deviation < 12.0:
+              raise SystemExit('Flat video layer detected in gallery poster')
+          PY
       - name: Package immutable source and media artifacts
         run: |
           python3 tools/build_gallery.py \
