@@ -21,7 +21,8 @@ concurrency:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
     env:
       GALLERY_BUILD: ${{ github.workspace }}/build
     defaults:
@@ -49,8 +50,12 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Install ffmpeg
-        run: brew list ffmpeg || brew install ffmpeg
+      - name: Install headless native dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            clang ffmpeg xvfb xauth file \
+            libgl1-mesa-dri libglx-mesa0 libegl1 mesa-vulkan-drivers
       - name: Resolve CLI dependencies
         working-directory: yoclip/packages/yoclip_cli
         run: flutter pub get
@@ -58,7 +63,8 @@ jobs:
         working-directory: yoclip/packages/yoclip_cli
         run: |
           mkdir -p "$GALLERY_BUILD/gallery-previews"
-          dart run bin/yoclip.dart render \
+          xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
+            dart run bin/yoclip.dart render \
             --project ../../samples/samples/yoclip_intro \
             --output "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
           test -s "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
@@ -66,7 +72,8 @@ jobs:
       - name: Capture poster
         working-directory: yoclip/packages/yoclip_cli
         run: |
-          dart run bin/yoclip.dart screenshot \
+          xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
+            dart run bin/yoclip.dart screenshot \
             --project ../../samples/samples/yoclip_intro \
             --at 1.5 \
             --output "$GALLERY_BUILD/gallery-previews/yoclip_intro.png"
