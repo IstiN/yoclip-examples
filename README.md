@@ -32,6 +32,19 @@ docs/               — public scene API reference
 skills/yoclip/      — agent skill + creative cookbook for AI assistants
 ```
 
+## Studio Samples gallery
+
+`gallery.json` is the editorial catalog for the native Studio **Samples & remix**
+gallery. `.github/workflows/gallery.yml` renders the MP4/poster, packages an
+immutable source ZIP, publishes `samples.json` plus artifacts to GitHub Pages,
+and never includes caches, AI history or build outputs in a source ZIP.
+
+To publish another example, add it to `gallery.json`, extend the render steps
+in the workflow, and bump its immutable `revision` whenever its source or media
+changes. Studio caches the catalog, poster, MP4 and extracted source on demand;
+Remix creates an empty project and gives the agent the source as a read-only
+reference rather than cloning it.
+
 ## Documentation & agent skill
 
 - `docs/scene_api/` — public reference for `yoclip.yaml`, `project.js`, scenes, widgets, animation, theme, assets and examples.

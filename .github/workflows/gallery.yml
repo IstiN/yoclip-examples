@@ -1,0 +1,81 @@
+name: Publish Studio Samples gallery
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - gallery.json
+      - tools/build_gallery.py
+      - samples/yoclip_intro/**
+      - .github/workflows/gallery.yml
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-samples-gallery
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: examples
+    steps:
+      - name: Check out examples
+        uses: actions/checkout@v4
+        with:
+          path: examples
+      - name: Check out Yoclip renderer
+        uses: actions/checkout@v4
+        with:
+          repository: IstiN/yoclip
+          path: yoclip
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install ffmpeg
+        run: brew list ffmpeg || brew install ffmpeg
+      - name: Resolve renderer dependencies
+        working-directory: yoclip
+        run: flutter pub get
+      - name: Render preview MP4
+        run: |
+          mkdir -p ../build/gallery-previews
+          dart run ../yoclip/packages/yoclip_cli/bin/yoclip.dart render \
+            --project samples/yoclip_intro \
+            --output ../build/gallery-previews/yoclip_intro.mp4
+      - name: Capture poster
+        run: |
+          dart run ../yoclip/packages/yoclip_cli/bin/yoclip.dart screenshot \
+            --project samples/yoclip_intro \
+            --at 1.5s \
+            --output ../build/gallery-previews/yoclip_intro.png
+      - name: Package immutable source and media artifacts
+        run: |
+          python3 tools/build_gallery.py \
+            --previews ../build/gallery-previews \
+            --output ../build/gallery
+      - name: Set up Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/gallery
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

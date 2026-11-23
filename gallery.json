@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "samples": [
+    {
+      "id": "yoclip_intro",
+      "title": "Yoclip Intro",
+      "description": "A compact product intro with an external video layer, logo and animated typography. Remix it into your own product story.",
+      "revision": "2026-11-23",
+      "project": "samples/yoclip_intro"
+    }
+  ]
+}
