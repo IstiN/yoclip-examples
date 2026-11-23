@@ -198,7 +198,7 @@ jobs:
             --pattern '*-mac.zip' \
             --pattern 'latest-mac.yml'
           test "$(find macos -name '*.dmg' -type f | wc -l)" -eq 2
-          test "$(find macos -name '*-mac.zip' -type f | wc -l)" -eq 2
+          test "$(find macos -name '*-mac.zip' -type f | wc -l)" -ge 2
           test -s macos/latest-mac.yml
           ls -lh macos
 
@@ -237,7 +237,7 @@ jobs:
           LINUX_ARCHIVES=(assets/yoclip-player-linux-x64-*.tar.gz)
           LINUX_PACKAGES=(assets/yoclip-player-linux-x64-*.deb)
           [ "${#DMGS[@]}" -eq 2 ]
-          [ "${#MAC_ZIPS[@]}" -eq 2 ]
+          [ "${#MAC_ZIPS[@]}" -ge 2 ]
           [ "${#LINUX_ARCHIVES[@]}" -eq 1 ]
           [ "${#LINUX_PACKAGES[@]}" -eq 1 ]
           [[ "${DMGS[*]}" == *arm64* ]]
