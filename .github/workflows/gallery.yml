@@ -22,6 +22,8 @@ concurrency:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      GALLERY_BUILD: ${{ github.workspace }}/build
     defaults:
       run:
         working-directory: examples
@@ -55,28 +57,31 @@ jobs:
       - name: Render preview MP4
         working-directory: yoclip/packages/yoclip_cli
         run: |
-          mkdir -p ../../../build/gallery-previews
+          mkdir -p "$GALLERY_BUILD/gallery-previews"
           dart run bin/yoclip.dart render \
             --project ../../samples/samples/yoclip_intro \
-            --output ../../../build/gallery-previews/yoclip_intro.mp4
+            --output "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
+          test -s "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
+          ls -lh "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
       - name: Capture poster
         working-directory: yoclip/packages/yoclip_cli
         run: |
           dart run bin/yoclip.dart screenshot \
             --project ../../samples/samples/yoclip_intro \
             --at 1.5 \
-            --output ../../../build/gallery-previews/yoclip_intro.png
+            --output "$GALLERY_BUILD/gallery-previews/yoclip_intro.png"
+          test -s "$GALLERY_BUILD/gallery-previews/yoclip_intro.png"
       - name: Package immutable source and media artifacts
         run: |
           python3 tools/build_gallery.py \
-            --previews ../build/gallery-previews \
-            --output ../build/gallery
+            --previews "$GALLERY_BUILD/gallery-previews" \
+            --output "$GALLERY_BUILD/gallery"
       - name: Set up Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/gallery
+          path: ${{ env.GALLERY_BUILD }}/gallery
 
   deploy:
     environment:
