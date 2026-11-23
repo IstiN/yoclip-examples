@@ -35,7 +35,13 @@ jobs:
         with:
           repository: IstiN/yoclip
           token: ${{ secrets.YOCLIP_RENDERER_TOKEN }}
+          submodules: recursive
           path: yoclip
+      - name: Sync current examples in renderer workspace
+        working-directory: yoclip/samples
+        run: |
+          git fetch origin main
+          git checkout origin/main
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -51,13 +57,13 @@ jobs:
         run: |
           mkdir -p ../../../build/gallery-previews
           dart run bin/yoclip.dart render \
-            --project ../../../examples/samples/yoclip_intro \
+            --project ../../samples/samples/yoclip_intro \
             --output ../../../build/gallery-previews/yoclip_intro.mp4
       - name: Capture poster
         working-directory: yoclip/packages/yoclip_cli
         run: |
           dart run bin/yoclip.dart screenshot \
-            --project ../../../examples/samples/yoclip_intro \
+            --project ../../samples/samples/yoclip_intro \
             --at 1.5s \
             --output ../../../build/gallery-previews/yoclip_intro.png
       - name: Package immutable source and media artifacts
