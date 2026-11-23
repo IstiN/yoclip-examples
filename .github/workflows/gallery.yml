@@ -47,6 +47,9 @@ jobs:
       - name: Resolve renderer dependencies
         working-directory: yoclip
         run: flutter pub get
+      - name: Resolve CLI dependencies
+        working-directory: yoclip/packages/yoclip_cli
+        run: flutter pub get
       - name: Render preview MP4
         working-directory: yoclip/packages/yoclip_cli
         run: |
