@@ -82,8 +82,9 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import os
           from PIL import Image, ImageStat
-          path = Path('$GALLERY_BUILD/gallery-previews/yoclip_intro.png')
+          path = Path(os.environ['GALLERY_BUILD']) / 'gallery-previews/yoclip_intro.png'
           image = Image.open(path).convert('RGB')
           w, h = image.size
           # The central media card must contain real imagery. A flat gradient
