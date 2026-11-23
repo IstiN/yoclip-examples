@@ -48,17 +48,19 @@ jobs:
         working-directory: yoclip
         run: flutter pub get
       - name: Render preview MP4
+        working-directory: yoclip/packages/yoclip_cli
         run: |
-          mkdir -p ../build/gallery-previews
-          dart run ../yoclip/packages/yoclip_cli/bin/yoclip.dart render \
-            --project samples/yoclip_intro \
-            --output ../build/gallery-previews/yoclip_intro.mp4
+          mkdir -p ../../../build/gallery-previews
+          dart run bin/yoclip.dart render \
+            --project ../../../examples/samples/yoclip_intro \
+            --output ../../../build/gallery-previews/yoclip_intro.mp4
       - name: Capture poster
+        working-directory: yoclip/packages/yoclip_cli
         run: |
-          dart run ../yoclip/packages/yoclip_cli/bin/yoclip.dart screenshot \
-            --project samples/yoclip_intro \
+          dart run bin/yoclip.dart screenshot \
+            --project ../../../examples/samples/yoclip_intro \
             --at 1.5s \
-            --output ../build/gallery-previews/yoclip_intro.png
+            --output ../../../build/gallery-previews/yoclip_intro.png
       - name: Package immutable source and media artifacts
         run: |
           python3 tools/build_gallery.py \
