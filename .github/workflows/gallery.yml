@@ -35,7 +35,6 @@ jobs:
         with:
           repository: IstiN/yoclip
           token: ${{ secrets.YOCLIP_RENDERER_TOKEN }}
-          submodules: recursive
           path: yoclip
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -44,9 +43,6 @@ jobs:
           cache: true
       - name: Install ffmpeg
         run: brew list ffmpeg || brew install ffmpeg
-      - name: Resolve renderer dependencies
-        working-directory: yoclip
-        run: flutter pub get
       - name: Resolve CLI dependencies
         working-directory: yoclip/packages/yoclip_cli
         run: flutter pub get
