@@ -87,13 +87,13 @@ jobs:
             [ -n "$sample_id" ] || continue
             PROJECT_DIR="$GITHUB_WORKSPACE/yoclip/samples/$project"
             echo "=== Gallery sample: $sample_id ($project) ==="
-            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
+            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1 \
               dart run bin/yoclip.dart render \
               --project "$PROJECT_DIR" \
               --output "$PREVIEWS/$sample_id.mp4" \
               --duration "$preview_frames"
             test -s "$PREVIEWS/$sample_id.mp4"
-            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
+            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1 \
               dart run bin/yoclip.dart screenshot \
               --project "$PROJECT_DIR" \
               --at "$poster_at" \
