@@ -7,7 +7,7 @@ on:
     paths:
       - gallery.json
       - tools/build_gallery.py
-      - samples/yoclip_intro/**
+      - samples/**
       - .github/workflows/gallery.yml
 
 permissions:
@@ -22,7 +22,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     env:
       GALLERY_BUILD: ${{ github.workspace }}/build
     defaults:
@@ -59,25 +59,48 @@ jobs:
       - name: Resolve CLI dependencies
         working-directory: yoclip/packages/yoclip_cli
         run: flutter pub get
-      - name: Render preview MP4
+      - name: Prepare gallery preview plan
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          catalog = json.loads(Path('gallery.json').read_text())
+          previews = Path(os.environ['GALLERY_BUILD']) / 'gallery-previews'
+          previews.mkdir(parents=True, exist_ok=True)
+          with (previews / 'plan.tsv').open('w') as plan:
+              for sample in catalog['samples']:
+                  plan.write('\t'.join([
+                      sample['id'],
+                      sample['project'],
+                      str(sample.get('posterAt', 1.5)),
+                      str(sample.get('previewFrames', 150)),
+                  ]) + '\n')
+          print(f"Prepared {len(catalog['samples'])} sample previews")
+          PY
+      - name: Render preview MP4 and capture poster
         working-directory: yoclip/packages/yoclip_cli
         run: |
-          mkdir -p "$GALLERY_BUILD/gallery-previews"
-          xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
-            dart run bin/yoclip.dart render \
-            --project ../../samples/samples/yoclip_intro \
-            --output "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
-          test -s "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
-          ls -lh "$GALLERY_BUILD/gallery-previews/yoclip_intro.mp4"
-      - name: Capture poster
-        working-directory: yoclip/packages/yoclip_cli
-        run: |
-          xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
-            dart run bin/yoclip.dart screenshot \
-            --project ../../samples/samples/yoclip_intro \
-            --at 1.5 \
-            --output "$GALLERY_BUILD/gallery-previews/yoclip_intro.png"
-          test -s "$GALLERY_BUILD/gallery-previews/yoclip_intro.png"
+          set -euo pipefail
+          PREVIEWS="$GALLERY_BUILD/gallery-previews"
+          while IFS=$'\t' read -r sample_id project poster_at preview_frames; do
+            [ -n "$sample_id" ] || continue
+            echo "=== Gallery sample: $sample_id ($project) ==="
+            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
+              dart run bin/yoclip.dart render \
+              --project "$GITHUB_WORKSPACE/examples/$project" \
+              --output "$PREVIEWS/$sample_id.mp4" \
+              --duration "$preview_frames"
+            test -s "$PREVIEWS/$sample_id.mp4"
+            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
+              dart run bin/yoclip.dart screenshot \
+              --project "$GITHUB_WORKSPACE/examples/$project" \
+              --at "$poster_at" \
+              --output "$PREVIEWS/$sample_id.png"
+            test -s "$PREVIEWS/$sample_id.png"
+            ls -lh "$PREVIEWS/$sample_id.mp4" "$PREVIEWS/$sample_id.png"
+            rm -rf "$GITHUB_WORKSPACE/examples/$project/.yoclip_cache/external"
+          done < "$PREVIEWS/plan.tsv"
       - name: Reject flat placeholder previews
         run: |
           python3 - <<'PY'
@@ -87,12 +110,12 @@ jobs:
           path = Path(os.environ['GALLERY_BUILD']) / 'gallery-previews/yoclip_intro.png'
           image = Image.open(path).convert('RGB')
           w, h = image.size
-          # The central media card must contain real imagery. A flat gradient
+          # The intro media area must contain real imagery. A flat gradient
           # here means the external video layer failed or is still a placeholder.
           crop = image.crop((int(w*.25), int(h*.20), int(w*.75), int(h*.62)))
           crop = crop.resize((192, 108))
           deviation = sum(ImageStat.Stat(crop).stddev) / 3
-          print(f'Central poster detail (mean RGB stddev): {deviation:.2f}')
+          print(f'Intro poster detail (mean RGB stddev): {deviation:.2f}')
           if deviation < 12.0:
               raise SystemExit('Flat video layer detected in gallery poster')
           PY
