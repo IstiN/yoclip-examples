@@ -25,8 +25,9 @@ pubspec.lock
 *.mov
 *.pptx
 
-# Source footage used by the intro sample is an input asset, not a render.
+# Source footage used by the sample projects is an input asset, not a render.
 !samples/yoclip_intro/assets/laptop_open.mp4
+!samples/fa_ios_release/assets/video/intro_video.mp4
 
 # Temporary Office files
 ~$*
