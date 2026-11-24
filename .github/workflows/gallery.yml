@@ -85,21 +85,22 @@ jobs:
           PREVIEWS="$GALLERY_BUILD/gallery-previews"
           while IFS=$'\t' read -r sample_id project poster_at preview_frames; do
             [ -n "$sample_id" ] || continue
+            PROJECT_DIR="$GITHUB_WORKSPACE/yoclip/$project"
             echo "=== Gallery sample: $sample_id ($project) ==="
             xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
               dart run bin/yoclip.dart render \
-              --project "$GITHUB_WORKSPACE/examples/$project" \
+              --project "$PROJECT_DIR" \
               --output "$PREVIEWS/$sample_id.mp4" \
               --duration "$preview_frames"
             test -s "$PREVIEWS/$sample_id.mp4"
             xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 \
               dart run bin/yoclip.dart screenshot \
-              --project "$GITHUB_WORKSPACE/examples/$project" \
+              --project "$PROJECT_DIR" \
               --at "$poster_at" \
               --output "$PREVIEWS/$sample_id.png"
             test -s "$PREVIEWS/$sample_id.png"
             ls -lh "$PREVIEWS/$sample_id.mp4" "$PREVIEWS/$sample_id.png"
-            rm -rf "$GITHUB_WORKSPACE/examples/$project/.yoclip_cache/external"
+            rm -rf "$PROJECT_DIR/.yoclip_cache/external"
           done < "$PREVIEWS/plan.tsv"
       - name: Reject flat placeholder previews
         run: |
