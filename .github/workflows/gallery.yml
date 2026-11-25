@@ -75,6 +75,8 @@ jobs:
                       sample['project'],
                       str(sample.get('posterAt', 1.5)),
                       str(sample.get('previewFrames', 150)),
+                      str(sample.get('previewPreset', '')),
+                      str(sample.get('previewFps', '')),
                   ]) + '\n')
           print(f"Prepared {len(catalog['samples'])} sample previews")
           PY
@@ -83,21 +85,25 @@ jobs:
         run: |
           set -euo pipefail
           PREVIEWS="$GALLERY_BUILD/gallery-previews"
-          while IFS=$'\t' read -r sample_id project poster_at preview_frames; do
+          while IFS=$'\t' read -r sample_id project poster_at preview_frames preview_preset preview_fps; do
             [ -n "$sample_id" ] || continue
             PROJECT_DIR="$GITHUB_WORKSPACE/yoclip/samples/$project"
+            preset_args=()
+            fps_args=()
+            [ -z "$preview_preset" ] || preset_args=(--preset "$preview_preset")
+            [ -z "$preview_fps" ] || fps_args=(--fps "$preview_fps")
             echo "=== Gallery sample: $sample_id ($project) ==="
             xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1 \
               dart run bin/yoclip.dart render \
               --project "$PROJECT_DIR" \
               --output "$PREVIEWS/$sample_id.mp4" \
-              --duration "$preview_frames"
+              --duration "$preview_frames" "${preset_args[@]}" "${fps_args[@]}"
             test -s "$PREVIEWS/$sample_id.mp4"
             xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1 \
               dart run bin/yoclip.dart screenshot \
               --project "$PROJECT_DIR" \
               --at "$poster_at" \
-              --output "$PREVIEWS/$sample_id.png"
+              --output "$PREVIEWS/$sample_id.png" "${preset_args[@]}"
             test -s "$PREVIEWS/$sample_id.png"
             ls -lh "$PREVIEWS/$sample_id.mp4" "$PREVIEWS/$sample_id.png"
             rm -rf "$PROJECT_DIR/.yoclip_cache/external"

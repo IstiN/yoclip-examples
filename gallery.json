@@ -134,7 +134,9 @@
       "revision": "2026-11-24",
       "project": "samples/yoclip_write_the_light",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 150,
+      "previewPreset": "youtube_1080",
+      "previewFps": 30
     }
   ]
 }
