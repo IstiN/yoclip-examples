@@ -1351,19 +1351,23 @@ function handleEvent(action, payload) {
   payload = payload || {};
   hasMasterFrame = true;
   var nextW = Math.max(1, Math.round(payload.width || W)), nextH = Math.max(1, Math.round(payload.height || H));
-  // Change DPR before dimensions: setting 7680×4320 while still carrying the
-  // 3× sub-4K ratio would transiently request a >16K drawing buffer.
   var nextScale = outputPixelRatio(nextW);
-  if (nextScale !== RENDER_SCALE) {
+  var sizeChanged = nextW !== W || nextH !== H;
+  // Never combine the old dimensions with the new DPR. In particular, going
+  // from the native 8K master to a 1080p poster with a 3× ratio would briefly
+  // request a 23040×12960 buffer before setSize() applies the smaller size.
+  // A neutral 1× ratio keeps both the old and new buffers within the limit.
+  if (sizeChanged || nextScale !== RENDER_SCALE) {
+    renderer.setPixelRatio(1);
+    if (sizeChanged) {
+      W = nextW; H = nextH;
+      renderer.setSize(W, H, false);
+      camera.aspect = W / H;
+      camera.updateProjectionMatrix();
+    }
     RENDER_SCALE = nextScale;
     renderer.setPixelRatio(RENDER_SCALE);
-  }
-  if (nextW !== W || nextH !== H) {
-    W = nextW; H = nextH;
-    renderer.setSize(W, H, false);
-    camera.aspect = W / H;
-    camera.updateProjectionMatrix();
-    resizeFxaa(W, H);
+    if (sizeChanged) resizeFxaa(W, H);
   }
   FPS = payload.fps || FPS;
   var frame = Math.max(0, Math.round(payload.frame || 0));

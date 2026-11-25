@@ -3607,17 +3607,19 @@
     hasMasterFrame = true;
     var nextW = Math.max(1, Math.round(payload.width || W)), nextH = Math.max(1, Math.round(payload.height || H));
     var nextScale = outputPixelRatio(nextW);
-    if (nextScale !== RENDER_SCALE) {
+    var sizeChanged = nextW !== W || nextH !== H;
+    if (sizeChanged || nextScale !== RENDER_SCALE) {
+      renderer.setPixelRatio(1);
+      if (sizeChanged) {
+        W = nextW;
+        H = nextH;
+        renderer.setSize(W, H, false);
+        camera.aspect = W / H;
+        camera.updateProjectionMatrix();
+      }
       RENDER_SCALE = nextScale;
       renderer.setPixelRatio(RENDER_SCALE);
-    }
-    if (nextW !== W || nextH !== H) {
-      W = nextW;
-      H = nextH;
-      renderer.setSize(W, H, false);
-      camera.aspect = W / H;
-      camera.updateProjectionMatrix();
-      resizeFxaa(W, H);
+      if (sizeChanged) resizeFxaa(W, H);
     }
     FPS = payload.fps || FPS;
     var frame = Math.max(0, Math.round(payload.frame || 0));
