@@ -63,6 +63,10 @@ jobs:
     name: Render ${{ matrix.sample_id }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 180
+    env:
+      # Job-level so the upload step can see it (step-level env is invisible
+      # to sibling steps — an empty path made upload-artifact scan `/`).
+      PREVIEW_DIR: ${{ github.workspace }}/gallery-preview
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
@@ -103,7 +107,6 @@ jobs:
           PREVIEW_FRAMES: ${{ matrix.preview_frames }}
           PREVIEW_PRESET: ${{ matrix.preview_preset }}
           PREVIEW_FPS: ${{ matrix.preview_fps }}
-          PREVIEW_DIR: ${{ github.workspace }}/gallery-preview
         run: |
           set -euo pipefail
           mkdir -p "$PREVIEW_DIR"

@@ -663,7 +663,8 @@ scene = {
           kids.push({
             type: 'clipRRect', radius: 18,
             positioned: { left: mx2, top: my2, width: mw2, height: mh2 },
-            child: { type: 'stack', children: bands },
+            child: { type: 'stack', width: mw2, height: mh2,
+              fit: 'expand', children: bands },
           });
         }
 
