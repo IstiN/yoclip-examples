@@ -53,7 +53,10 @@ jobs:
                   'preview_frames': str(sample.get('previewFrames', '')),
                   'preview_preset': sample.get('previewPreset', ''),
                   'preview_fps': str(sample.get('previewFps', '')),
-                  'runner': 'macos-14' if sample['id'] in gpu_samples else 'ubuntu-latest',
+                  # macos-14 is no longer a supported hosted image ("The
+                  # configuration 'macos-14-arm64-us-default' is not
+                  # supported"); macos-latest maps to the current image.
+                  'runner': 'macos-latest' if sample['id'] in gpu_samples else 'ubuntu-latest',
               })
           print('matrix=' + json.dumps({'include': include}))
           PY
