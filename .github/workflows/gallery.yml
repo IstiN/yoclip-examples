@@ -20,19 +20,53 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
-    env:
-      GALLERY_BUILD: ${{ github.workspace }}/build
-    defaults:
-      run:
-        working-directory: examples
+    outputs:
+      matrix: ${{ steps.samples.outputs.matrix }}
     steps:
       - name: Check out examples
         uses: actions/checkout@v4
         with:
           path: examples
+      - name: Prepare full-preview matrix
+        id: samples
+        working-directory: examples
+        run: |
+          python3 - <<'PY' > "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          catalog = json.loads(Path('gallery.json').read_text())
+          gpu_samples = {
+              'yoclip_big_idea_v2',
+              'yoclip_level_up',
+              'yoclip_threejs',
+              'yoclip_write_the_light',
+          }
+          include = []
+          for sample in catalog['samples']:
+              include.append({
+                  'sample_id': sample['id'],
+                  'project': sample['project'],
+                  'poster_at': str(sample.get('posterAt', 1.5)),
+                  'preview_frames': str(sample.get('previewFrames', '')),
+                  'preview_preset': sample.get('previewPreset', ''),
+                  'preview_fps': str(sample.get('previewFps', '')),
+                  'runner': 'macos-14' if sample['id'] in gpu_samples else 'ubuntu-latest',
+              })
+          print('matrix=' + json.dumps({'include': include}))
+          PY
+
+  render:
+    needs: prepare
+    name: Render ${{ matrix.sample_id }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
       - name: Check out Yoclip renderer
         uses: actions/checkout@v4
         with:
@@ -50,65 +84,80 @@ jobs:
         with:
           channel: stable
           cache: true
+      - name: Resolve CLI dependencies
+        working-directory: yoclip/packages/yoclip_cli
+        run: flutter pub get
       - name: Install headless native dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             clang ffmpeg xvfb xauth file python3-pil \
             libgl1-mesa-dri libglx-mesa0 libegl1 mesa-vulkan-drivers
-      - name: Resolve CLI dependencies
+      - name: Render full preview MP4 and capture poster
         working-directory: yoclip/packages/yoclip_cli
-        run: flutter pub get
-      - name: Prepare gallery preview plan
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import json
-          import os
-          catalog = json.loads(Path('gallery.json').read_text())
-          previews = Path(os.environ['GALLERY_BUILD']) / 'gallery-previews'
-          previews.mkdir(parents=True, exist_ok=True)
-          with (previews / 'plan.tsv').open('w') as plan:
-              for sample in catalog['samples']:
-                  plan.write('\t'.join([
-                      sample['id'],
-                      sample['project'],
-                      str(sample.get('posterAt', 1.5)),
-                      str(sample.get('previewFrames', 150)),
-                      str(sample.get('previewPreset', '')),
-                      str(sample.get('previewFps', '')),
-                  ]) + '\n')
-          print(f"Prepared {len(catalog['samples'])} sample previews")
-          PY
-      - name: Render preview MP4 and capture poster
-        working-directory: yoclip/packages/yoclip_cli
+        env:
+          SAMPLE_ID: ${{ matrix.sample_id }}
+          SAMPLE_PROJECT: ${{ matrix.project }}
+          POSTER_AT: ${{ matrix.poster_at }}
+          PREVIEW_FRAMES: ${{ matrix.preview_frames }}
+          PREVIEW_PRESET: ${{ matrix.preview_preset }}
+          PREVIEW_FPS: ${{ matrix.preview_fps }}
+          PREVIEW_DIR: ${{ github.workspace }}/gallery-preview
         run: |
           set -euo pipefail
-          PREVIEWS="$GALLERY_BUILD/gallery-previews"
-          while IFS=$'\t' read -r sample_id project poster_at preview_frames preview_preset preview_fps; do
-            [ -n "$sample_id" ] || continue
-            PROJECT_DIR="$GITHUB_WORKSPACE/yoclip/samples/$project"
-            preset_args=()
-            fps_args=()
-            [ -z "$preview_preset" ] || preset_args=(--preset "$preview_preset")
-            [ -z "$preview_fps" ] || fps_args=(--fps "$preview_fps")
-            echo "=== Gallery sample: $sample_id ($project) ==="
-            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1 \
-              dart run bin/yoclip.dart render \
-              --project "$PROJECT_DIR" \
-              --output "$PREVIEWS/$sample_id.mp4" \
-              --duration "$preview_frames" "${preset_args[@]}" "${fps_args[@]}"
-            test -s "$PREVIEWS/$sample_id.mp4"
-            xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1 \
-              dart run bin/yoclip.dart screenshot \
-              --project "$PROJECT_DIR" \
-              --at "$poster_at" \
-              --output "$PREVIEWS/$sample_id.png" "${preset_args[@]}"
-            test -s "$PREVIEWS/$sample_id.png"
-            ls -lh "$PREVIEWS/$sample_id.mp4" "$PREVIEWS/$sample_id.png"
-            rm -rf "$PROJECT_DIR/.yoclip_cache/external"
-          done < "$PREVIEWS/plan.tsv"
+          mkdir -p "$PREVIEW_DIR"
+          PROJECT_DIR="$GITHUB_WORKSPACE/yoclip/samples/$SAMPLE_PROJECT"
+          preset_args=()
+          fps_args=()
+          duration_args=()
+          render_env=()
+          [ -z "$PREVIEW_PRESET" ] || preset_args=(--preset "$PREVIEW_PRESET")
+          [ -z "$PREVIEW_FPS" ] || fps_args=(--fps "$PREVIEW_FPS")
+          [ -z "$PREVIEW_FRAMES" ] || duration_args=(--duration "$PREVIEW_FRAMES")
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            render_env=(xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1)
+          fi
+          echo "=== Gallery sample: $SAMPLE_ID ($SAMPLE_PROJECT) ==="
+          "${render_env[@]}" dart run bin/yoclip.dart render \
+            --project "$PROJECT_DIR" \
+            --output "$PREVIEW_DIR/$SAMPLE_ID.mp4" \
+            "${duration_args[@]}" "${preset_args[@]}" "${fps_args[@]}"
+          test -s "$PREVIEW_DIR/$SAMPLE_ID.mp4"
+          "${render_env[@]}" dart run bin/yoclip.dart screenshot \
+            --project "$PROJECT_DIR" \
+            --at "$POSTER_AT" \
+            --output "$PREVIEW_DIR/$SAMPLE_ID.png" "${preset_args[@]}"
+          test -s "$PREVIEW_DIR/$SAMPLE_ID.png"
+          ls -lh "$PREVIEW_DIR/$SAMPLE_ID.mp4" "$PREVIEW_DIR/$SAMPLE_ID.png"
+      - name: Upload preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-${{ matrix.sample_id }}
+          path: ${{ env.PREVIEW_DIR }}/
+          include-hidden-files: false
+          if-no-files-found: error
+          retention-days: 1
+
+  package:
+    needs: [prepare, render]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GALLERY_BUILD: ${{ github.workspace }}/build
+    steps:
+      - name: Check out examples
+        uses: actions/checkout@v4
+        with:
+          path: examples
+      - name: Download full previews
+        uses: actions/download-artifact@v4
+        with:
+          pattern: preview-*
+          path: ${{ env.GALLERY_BUILD }}/gallery-previews
+          merge-multiple: true
       - name: Reject flat placeholder previews
+        working-directory: examples
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -117,8 +166,6 @@ jobs:
           path = Path(os.environ['GALLERY_BUILD']) / 'gallery-previews/yoclip_intro.png'
           image = Image.open(path).convert('RGB')
           w, h = image.size
-          # The intro media area must contain real imagery. A flat gradient
-          # here means the external video layer failed or is still a placeholder.
           crop = image.crop((int(w*.25), int(h*.20), int(w*.75), int(h*.62)))
           crop = crop.resize((192, 108))
           deviation = sum(ImageStat.Stat(crop).stddev) / 3
@@ -126,8 +173,6 @@ jobs:
           if deviation < 12.0:
               raise SystemExit('Flat video layer detected in gallery poster')
 
-          # A mostly empty poster usually means posterAt landed on a fade,
-          # reset or blank transition rather than a representative frame.
           for poster in sorted(path.parent.glob('*.png')):
               sample = Image.open(poster).convert('RGB').resize((192, 108))
               detail = sum(ImageStat.Stat(sample).stddev) / 3
@@ -135,7 +180,38 @@ jobs:
               if detail < 4.0:
                   raise SystemExit(f'Flat or empty gallery poster: {poster.name}')
           PY
+      - name: Verify full preview durations
+        working-directory: examples
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          import re
+          import subprocess
+
+          previews = Path(os.environ['GALLERY_BUILD']) / 'gallery-previews'
+          catalog = json.loads(Path('gallery.json').read_text())
+          for sample in catalog['samples']:
+              path = previews / f"{sample['id']}.mp4"
+              duration = float(subprocess.check_output([
+                  'ffprobe', '-v', 'error', '-select_streams', 'v:0',
+                  '-show_entries', 'stream=duration', '-of', 'default=nw=1:nk=1',
+                  str(path),
+              ]))
+              yaml = (Path(sample['project']) / 'yoclip.yaml').read_text()
+              fps = int(sample.get('previewFps') or re.search(
+                  r'^\s*fps:\s*(\d+)', yaml, re.M).group(1))
+              expected = int(sample['previewFrames']) / fps
+              if abs(duration - expected) > max(0.25, 2 / fps):
+                  raise SystemExit(
+                      f"Preview duration mismatch: {sample['id']} "
+                      f"expected {expected:.2f}s, got {duration:.2f}s"
+                  )
+              print(f"{sample['id']}: {duration:.2f}s (full)")
+          PY
       - name: Package immutable source and media artifacts
+        working-directory: examples
         run: |
           python3 -m unittest discover -s tools -p 'test_*.py'
           python3 tools/build_gallery.py \
@@ -153,7 +229,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: package
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

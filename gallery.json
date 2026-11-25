@@ -5,7 +5,7 @@
       "id": "yoclip_intro",
       "title": "Yoclip Intro",
       "description": "A compact product intro with an external video layer, logo and animated typography. Remix it into your own product story.",
-      "revision": "2026-11-24-3",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_intro",
       "posterAt": 1.5,
       "previewFrames": 90
@@ -14,129 +14,131 @@
       "id": "demo_ai",
       "title": "Demo AI",
       "description": "A code-driven AI product demo with four animated scenes and a reusable theme.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/demo_ai",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 1200
     },
     {
       "id": "fa_logo_morph",
       "title": "Fa Logo Morph",
       "description": "An animated Fa logo morph built with reusable geometry, gradient and motion helpers.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/fa_logo_morph",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 720
     },
     {
       "id": "fa_trailer",
       "title": "Fa Trailer",
       "description": "A fast-cut trailer with external video inserts, animated typography and sound design.",
-      "revision": "2026-11-25",
+      "revision": "2026-11-25-full",
       "project": "samples/fa_trailer",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 1754
     },
     {
       "id": "fa_ios_release",
       "title": "Fa iOS Release",
       "description": "A complete iOS app release film with horizontal and vertical variants, chat, build beats and download cards.",
-      "revision": "2026-11-25",
+      "revision": "2026-11-25-full",
       "project": "samples/fa_ios_release",
       "posterAt": 13.0,
-      "previewFrames": 150
+      "previewFrames": 2762
     },
     {
       "id": "music_animation",
       "title": "Music Animation",
       "description": "A music-driven animation with scene-level timing, external media and layered compositions.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/music_animation",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 1520
     },
     {
       "id": "music_animation2",
       "title": "Music Animation 2",
       "description": "A second music-driven animation with denser scene transitions and a larger asset set.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/music_animation2",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 2429
     },
     {
       "id": "yoclip_about",
       "title": "About Yoclip",
       "description": "The full Yoclip product story: scenes, code, motion, statistics and chat, ready to remix.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_about",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 4170
     },
     {
       "id": "yoclip_audio_synth",
       "title": "Audio Synth",
       "description": "A scene-synthesized soundtrack placed directly on the Yoclip timeline.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_audio_synth",
       "posterAt": 2.0,
-      "previewFrames": 150
+      "previewFrames": 240
     },
     {
       "id": "yoclip_big_idea",
       "title": "Big Idea",
       "description": "A complete narrative film with logo, prompt, chat, code and format-variant scenes.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_big_idea",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFrames": 2580
     },
     {
       "id": "yoclip_big_idea_v2",
       "title": "Big Idea v2",
       "description": "An expanded Big Idea cut with more beats, variants and external assets.",
-      "revision": "2026-11-25",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_big_idea_v2",
       "posterAt": 3.0,
-      "previewFrames": 150
+      "previewFrames": 3410
     },
     {
       "id": "yoclip_level_up",
       "title": "Level Up",
       "description": "A gaming-inspired film with custom fonts, 3D rendering and motion graphics.",
-      "revision": "2026-11-25",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_level_up",
       "posterAt": 4.0,
-      "previewFrames": 90
+      "previewFps": 15,
+      "previewFrames": 1530
     },
     {
       "id": "yoclip_motion_shapes",
       "title": "Motion Shapes",
       "description": "A lightweight motion-graphics study built from reusable scene primitives.",
-      "revision": "2026-11-25",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_motion_shapes",
       "posterAt": 3.0,
-      "previewFrames": 150
+      "previewFrames": 360
     },
     {
       "id": "yoclip_threejs",
       "title": "Three.js",
       "description": "A Three.js-powered film with custom 3D rendering, real-time scenes and typography.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_threejs",
       "posterAt": 4.0,
-      "previewFrames": 150
+      "previewFps": 15,
+      "previewFrames": 1800
     },
     {
       "id": "yoclip_write_the_light",
       "title": "Write the Light",
       "description": "A cinematic Three.js piece with custom lighting, typography and a complete source project.",
-      "revision": "2026-11-25",
+      "revision": "2026-11-25-full",
       "project": "samples/yoclip_write_the_light",
       "posterAt": 4.0,
-      "previewFrames": 150,
       "previewPreset": "youtube_1080",
-      "previewFps": 30
+      "previewFps": 15,
+      "previewFrames": 3011
     }
   ]
 }
