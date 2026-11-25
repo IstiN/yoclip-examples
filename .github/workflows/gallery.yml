@@ -124,13 +124,16 @@ jobs:
           if [ "$RUNNER_OS" = "Linux" ]; then
             render_env=(xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 YOCLIP_FLUTTER_GPU=1)
           fi
+          # macOS ships bash 3.2: `"${render_env[@]}"` on an EMPTY array is
+          # an unbound-variable error under `set -u`; the conditional form
+          # stays safe on every bash.
           echo "=== Gallery sample: $SAMPLE_ID ($SAMPLE_PROJECT) ==="
-          "${render_env[@]}" dart run bin/yoclip.dart render \
+          ${render_env[@]+"${render_env[@]}"} dart run bin/yoclip.dart render \
             --project "$PROJECT_DIR" \
             --output "$PREVIEW_DIR/$SAMPLE_ID.mp4" \
             "${duration_args[@]}" "${preset_args[@]}" "${fps_args[@]}"
           test -s "$PREVIEW_DIR/$SAMPLE_ID.mp4"
-          "${render_env[@]}" dart run bin/yoclip.dart screenshot \
+          ${render_env[@]+"${render_env[@]}"} dart run bin/yoclip.dart screenshot \
             --project "$PROJECT_DIR" \
             --at "$POSTER_AT" \
             --output "$PREVIEW_DIR/$SAMPLE_ID.png" "${preset_args[@]}"
