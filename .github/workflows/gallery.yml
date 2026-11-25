@@ -131,12 +131,15 @@ jobs:
           ${render_env[@]+"${render_env[@]}"} dart run bin/yoclip.dart render \
             --project "$PROJECT_DIR" \
             --output "$PREVIEW_DIR/$SAMPLE_ID.mp4" \
-            "${duration_args[@]}" "${preset_args[@]}" "${fps_args[@]}"
+            ${duration_args[@]+"${duration_args[@]}"} \
+            ${preset_args[@]+"${preset_args[@]}"} \
+            ${fps_args[@]+"${fps_args[@]}"}
           test -s "$PREVIEW_DIR/$SAMPLE_ID.mp4"
           ${render_env[@]+"${render_env[@]}"} dart run bin/yoclip.dart screenshot \
             --project "$PROJECT_DIR" \
             --at "$POSTER_AT" \
-            --output "$PREVIEW_DIR/$SAMPLE_ID.png" "${preset_args[@]}"
+            --output "$PREVIEW_DIR/$SAMPLE_ID.png" \
+            ${preset_args[@]+"${preset_args[@]}"}
           test -s "$PREVIEW_DIR/$SAMPLE_ID.png"
           ls -lh "$PREVIEW_DIR/$SAMPLE_ID.mp4" "$PREVIEW_DIR/$SAMPLE_ID.png"
       - name: Upload preview
