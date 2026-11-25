@@ -16,6 +16,38 @@ EXCLUDED_PARTS = {
     "build", "out", "output", "exports",
 }
 EXCLUDED_FILES = {".DS_Store"}
+_SHARED_BRAND_RE = re.compile(r"""['"]((?:\.\./)+brand/[^'"\s]+)['"]""")
+
+
+def shared_brand_sources(project: Path, repo: Path) -> list[tuple[str, Path, str]]:
+    """Return shared brand inputs referenced by a project.js.
+
+    Local samples share one brand kit through ../../brand. The published ZIP
+    has the sample directory as its root, so those paths must be vendored
+    below the sample and rewritten to a local brand/ path during packaging.
+    """
+    project_js = project / "project.js"
+    if not project_js.is_file():
+        return []
+    result = []
+    for relative in sorted(set(_SHARED_BRAND_RE.findall(project_js.read_text()))):
+        source = (project / relative).resolve()
+        if not source.is_relative_to(repo):
+            raise ValueError(f"Shared brand path escapes the gallery repo: {relative}")
+        if not source.is_file():
+            raise FileNotFoundError(f"Shared brand library is missing: {source}")
+        result.append((relative, source, source.relative_to(repo).as_posix()))
+    return result
+
+
+def packaged_project_source(project: Path, shared: list[tuple[str, Path, str]]) -> str:
+    project_js = project / "project.js"
+    if not project_js.is_file():
+        return ""
+    text = project_js.read_text()
+    for relative, _, packaged in shared:
+        text = text.replace(relative, packaged)
+    return text
 
 
 def safe_revision(value: str) -> str:
@@ -57,7 +89,7 @@ def main() -> None:
         "--base-url", default="https://istin.github.io/yoclip-examples"
     )
     args = parser.parse_args()
-    repo = Path.cwd()
+    repo = Path.cwd().resolve()
     catalog = json.loads(Path(args.catalog).read_text())
     if catalog.get("schemaVersion") != 1:
         raise ValueError("Unsupported gallery schemaVersion")
@@ -76,10 +108,18 @@ def main() -> None:
         archive_name = f"{stem}.zip"
         archive_path = args.output / "sources" / archive_name
         archive_path.parent.mkdir(parents=True, exist_ok=True)
+        shared = shared_brand_sources(project, repo)
+        project_source = packaged_project_source(project, shared)
         with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as archive:
             for path in source_files(project):
                 relative = path.relative_to(project)
-                archive.write(path, PurePosixPath(sample_id) / relative.as_posix())
+                member = PurePosixPath(sample_id) / relative.as_posix()
+                if path == project / "project.js":
+                    archive.writestr(member.as_posix(), project_source)
+                else:
+                    archive.write(path, member)
+            for _, source, relative in shared:
+                archive.write(source, PurePosixPath(sample_id) / relative)
 
         video_name = f"{stem}.mp4"
         poster_name = f"{stem}.png"

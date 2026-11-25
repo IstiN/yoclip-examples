@@ -8,6 +8,13 @@ config:
 # Brand geometry and the trace()/gradient-strip helpers live in brand/fa/fa_kit.js (shared kit, ../../ relative to this project).
 project_js: project.js
 
+# Keep CLI screenshots and exports typographically identical to Studio on
+# platforms without the macOS system Impact and generic CSS fonts.
+fonts:
+  - { family: 'Impact', path: 'assets/fonts/Anton-Regular.ttf' }
+  - { family: 'monospace', path: 'assets/fonts/SpaceMono-Regular.ttf' }
+  - { family: 'sans-serif', path: 'assets/fonts/SourceSans3-Regular.ttf' }
+
 # AI-generated footage placeholders (Grok). These PNGs are the START frames;
 # when the real clips land they become `type: video` assets with the same keys.
 external_assets:

@@ -31,6 +31,14 @@ config:
 
 project_js: project.js
 
+# Headless CLI renders do not inherit macOS system fonts. Bundle the same
+# condensed display face for Impact and portable defaults for generic CSS
+# families so Studio, screenshots and exports render identical typography.
+fonts:
+  - { family: 'Impact', path: 'assets/fonts/Anton-Regular.ttf' }
+  - { family: 'monospace', path: 'assets/fonts/SpaceMono-Regular.ttf' }
+  - { family: 'sans-serif', path: 'assets/fonts/SourceSans3-Regular.ttf' }
+
 variants:
   - id: dark_horizontal
     label: Dark · Horizontal

@@ -32,7 +32,7 @@
       "id": "fa_trailer",
       "title": "Fa Trailer",
       "description": "A fast-cut trailer with external video inserts, animated typography and sound design.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25",
       "project": "samples/fa_trailer",
       "posterAt": 4.0,
       "previewFrames": 150
@@ -41,9 +41,9 @@
       "id": "fa_ios_release",
       "title": "Fa iOS Release",
       "description": "A complete iOS app release film with horizontal and vertical variants, chat, build beats and download cards.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25",
       "project": "samples/fa_ios_release",
-      "posterAt": 14.0,
+      "posterAt": 13.0,
       "previewFrames": 150
     },
     {
@@ -95,16 +95,16 @@
       "id": "yoclip_big_idea_v2",
       "title": "Big Idea v2",
       "description": "An expanded Big Idea cut with more beats, variants and external assets.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25",
       "project": "samples/yoclip_big_idea_v2",
-      "posterAt": 4.0,
+      "posterAt": 3.0,
       "previewFrames": 150
     },
     {
       "id": "yoclip_level_up",
       "title": "Level Up",
       "description": "A gaming-inspired film with custom fonts, 3D rendering and motion graphics.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25",
       "project": "samples/yoclip_level_up",
       "posterAt": 4.0,
       "previewFrames": 90
@@ -113,9 +113,9 @@
       "id": "yoclip_motion_shapes",
       "title": "Motion Shapes",
       "description": "A lightweight motion-graphics study built from reusable scene primitives.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25",
       "project": "samples/yoclip_motion_shapes",
-      "posterAt": 4.0,
+      "posterAt": 3.0,
       "previewFrames": 150
     },
     {
@@ -131,7 +131,7 @@
       "id": "yoclip_write_the_light",
       "title": "Write the Light",
       "description": "A cinematic Three.js piece with custom lighting, typography and a complete source project.",
-      "revision": "2026-11-24",
+      "revision": "2026-11-25",
       "project": "samples/yoclip_write_the_light",
       "posterAt": 4.0,
       "previewFrames": 150,

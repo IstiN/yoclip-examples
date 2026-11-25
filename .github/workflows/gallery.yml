@@ -125,9 +125,19 @@ jobs:
           print(f'Intro poster detail (mean RGB stddev): {deviation:.2f}')
           if deviation < 12.0:
               raise SystemExit('Flat video layer detected in gallery poster')
+
+          # A mostly empty poster usually means posterAt landed on a fade,
+          # reset or blank transition rather than a representative frame.
+          for poster in sorted(path.parent.glob('*.png')):
+              sample = Image.open(poster).convert('RGB').resize((192, 108))
+              detail = sum(ImageStat.Stat(sample).stddev) / 3
+              print(f'{poster.stem} poster detail (mean RGB stddev): {detail:.2f}')
+              if detail < 4.0:
+                  raise SystemExit(f'Flat or empty gallery poster: {poster.name}')
           PY
       - name: Package immutable source and media artifacts
         run: |
+          python3 -m unittest discover -s tools -p 'test_*.py'
           python3 tools/build_gallery.py \
             --previews "$GALLERY_BUILD/gallery-previews" \
             --output "$GALLERY_BUILD/gallery"
